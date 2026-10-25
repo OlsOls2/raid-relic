@@ -1,0 +1,102 @@
+{
+  "verifiedAt": "2026-10-25T10:30:52.620Z",
+  "revision": "raid-relic-sendfix1025",
+  "sourceCommit": "8ded729cfaf7329c91d41697d349e5e90dcf3fdf",
+  "imageDigest": "sha256:fa1585ffc623ae8ed71f8dd513ef6a72fdb017ce82f9dd853b1e78be4b36b767",
+  "buildId": "bc72cd34-e119-4d03-87ea-dea5ebaf0b91",
+  "trafficPercent": 100,
+  "health": {
+    "status": "ok",
+    "releaseCommit": "8ded729cfaf7329c91d41697d349e5e90dcf3fdf",
+    "phase": "raid-pilot",
+    "readiness": "owner-test-ready",
+    "liveValidated": false
+  },
+  "assets": [
+    {
+      "path": "/",
+      "sha256": "8437321dc240cc9dcc9d1e9cd114c90f0c7a689fb287055b62f746c14942ecca"
+    },
+    {
+      "path": "/atlas",
+      "sha256": "8437321dc240cc9dcc9d1e9cd114c90f0c7a689fb287055b62f746c14942ecca"
+    },
+    {
+      "path": "/atlas/",
+      "sha256": "8437321dc240cc9dcc9d1e9cd114c90f0c7a689fb287055b62f746c14942ecca"
+    },
+    {
+      "path": "/atlas.css",
+      "sha256": "9b7c6d7ba9c1a274f42c226a385cde16327099665b32583464da601ce7bc9a40"
+    },
+    {
+      "path": "/atlas.js",
+      "sha256": "b2272e817dd3155384815c0ab68e8fcfba8cabc18c87ff2c993a61bf4bf57b56"
+    },
+    {
+      "path": "/control.js",
+      "sha256": "f6cd08721266f24bff1a4eed9eae7f25c781d43f4ca616cd5bb429196b64c445"
+    },
+    {
+      "path": "/control.css",
+      "sha256": "842c36c994b47cc5130f8f9beca6f2348962a38c617b20f8a39f8c68c54117de"
+    },
+    {
+      "path": "/arrival.js",
+      "sha256": "08d406d8638856acabbe207140bb2af79f8b53adbc05893c82c2cca89066c63a"
+    },
+    {
+      "path": "/overlay",
+      "sha256": "c05fc8df84da1c066d7eed843a81f4db04fcf3b6065b1186a2651391aa2c3e7d"
+    },
+    {
+      "path": "/relic.svg",
+      "sha256": "0819680dad1da4c1bfea060243468bfb1f385c8fa53d1d1960f62d9bbd7a575e"
+    },
+    {
+      "path": "/style.css",
+      "sha256": "893d7cb0d26b5c3a2c798f32fb10b9599bf66e853f6b64bca4600803d92ebcb0"
+    },
+    {
+      "path": "/overlay.css",
+      "sha256": "2cdf01b1b923caccbc93e552ce5426829dcbe051f1cda02c730415400f575379"
+    },
+    {
+      "path": "/overlay.js",
+      "sha256": "2814a9f7c1552da9bc3f21eb226c46c43162e0307912d6b5461afa8d9edeade8"
+    },
+    {
+      "path": "/overlay-client.js",
+      "sha256": "6f2a9bd07e3137725e1642609ffbf4c81c564fb67046b51ebf865ebc910aa9a0"
+    },
+    {
+      "path": "/crystal.svg",
+      "sha256": "6fba39ea1b1bb6c49156c24a1e7eee6ecb3431fb95f9138915cd9089cf845013"
+    }
+  ],
+  "controls": [
+    {
+      "id": "1591805230",
+      "status": 401
+    },
+    {
+      "id": "1591806023",
+      "status": 401
+    }
+  ],
+  "unsignedWebhookStatus": 403,
+  "grantCount": 3,
+  "grantUpdateTimesUnchanged": true,
+  "grantsReadWithEmptyFieldMask": true,
+  "configurationPreserved": true,
+  "previewTagsPreserved": true,
+  "tests": {
+    "passed": 235,
+    "total": 235,
+    "skipped": 0
+  },
+  "mockPilotBrowserChecks": 8,
+  "actualRaidOrChatTriggered": false,
+  "liveSendOffValidated": false,
+  "historicalPredicate": "HTTP logs do not identify the exact09:32 reservation rejection; no payload/guard log existed."
+}
