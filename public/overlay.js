@@ -127,11 +127,12 @@ function frame() {
   if (!corner) { effects.shock.style.left = `${anchorX}px`; effects.shock.style.top = `${anchorY}px`; }
   const ambientCount = document.hidden ? 0 : ambientSigils(current, cinematic, motion.matches);
   archiveNode.dataset.ambientCount = String(ambientCount);
+  const ambientEdge=(corner?8:38)/Math.max(1,archiveNode.clientWidth)*100;
   for (let i = 0; i < ambient.length; i++) {
     const glyph = ambient[i]; glyph.hidden = i >= ambientCount; glyph.toggleAttribute('hidden', glyph.hidden);
     if (glyph.hidden) continue;
     const pose = runePose(i, 6, performance.now(), cinematic.unfurl);
-    glyph.style.left = `${pose.x}%`; glyph.style.top = `${pose.y}%`;
+    glyph.style.left = `${Math.max(ambientEdge,Math.min(100-ambientEdge,pose.x))}%`; glyph.style.top = `${Math.max(ambientEdge,Math.min(100-ambientEdge,pose.y))}%`;
     glyph.style.opacity = String(Math.min(1, .35 + pose.flight));
   }
   const showSource = cinematic.host && validSourceLogin(current?.handoff?.sourceLogin) && cinematic.elapsed >= 0 && cinematic.elapsed < 20000 && !document.hidden;
@@ -140,7 +141,7 @@ function frame() {
   archiveNode.dataset.fusionPending = String(cinematic.fusionPending);
   archiveNode.style.setProperty('--p3-fusion', String(cinematic.fusion ?? (cinematic.fusionPending ? 0 : 1)));
   const fuse = cinematic.fusion ?? 0;
-  archiveNode.style.setProperty('--fusion-glow', String(cinematic.fusion === null ? 0 : Math.sin(Math.PI * fuse)));
+  archiveNode.style.setProperty('--fusion-glow', String(cinematic.fusionGlow));
   fusionArcs[0].style.transform = `translateX(${-(1-fuse)*18}px)`; fusionArcs[1].style.transform = `translateX(${(1-fuse)*18}px)`;
   fusionArcs[0].style.opacity = fusionArcs[1].style.opacity = String(1-fuse); fusionArcs[2].style.opacity = String(fuse);
   const ringInset = archiveNode.classList.contains('webgl-relic') ? relic3d?.ringInset?.() : null;
@@ -161,7 +162,7 @@ function frame() {
     node.style.opacity = String((item.mark.faded ? .28 : 1) * (motion.matches ? 1 : Math.min(1, item.progress * 6) * Math.min(1, (1 - item.progress) * 5)));
   }
   if (!archiveNode.classList.contains('webgl-relic')) {
-    for (let i = 0; i < runes.children.length; i++) { const pose = runePose(i, current?.marks.length ?? 0, motion.matches ? 0 : performance.now(), cinematic.unfurl ?? 1); const glyph = runes.children[i]; glyph.hidden = cinematic.unfurl !== null && pose.flight <= 0; glyph.style.left = `${pose.x}%`; glyph.style.top = `${pose.y}%`; }
+    for (let i = 0; i < runes.children.length; i++) { const pose = runePose(i, current?.marks.length ?? 0, motion.matches ? 0 : performance.now(), cinematic.unfurl ?? 1); const glyph = runes.children[i]; glyph.hidden = cinematic.unfurl !== null && pose.flight <= 0; glyph.style.left = `${Math.max(ambientEdge,Math.min(100-ambientEdge,pose.x))}%`; glyph.style.top = `${Math.max(ambientEdge,Math.min(100-ambientEdge,pose.y))}%`; }
   }
   if (cinematic.send) audio.cue('send');
   if (cinematic.chord) audio.cue('claim');

@@ -12,13 +12,15 @@ export function sourceCharge(snapshot, now, reduced = false) {
     && Number.isFinite(now) && now >= meter.startedAt && now < meter.endsAt;
   return { charge: Boolean(active), chargeLevel: active ? Math.max(0, Math.min(1, (now - meter.startedAt) / 180000)) : 0 };
 }
+export const FUSION_TIMING = Object.freeze({ rise:250, hold:3000, fall:400, duration:3650 });
+export function fusionEnvelope(elapsed) { if(!Number.isFinite(elapsed)||elapsed<0||elapsed>=FUSION_TIMING.duration)return 0;return elapsed<FUSION_TIMING.rise?elapsed/FUSION_TIMING.rise:elapsed<FUSION_TIMING.rise+FUSION_TIMING.hold?1:1-(elapsed-FUSION_TIMING.rise-FUSION_TIMING.hold)/FUSION_TIMING.fall; }
 export function cinematicPhase(snapshot, now, { reduced = false, fresh = false } = {}) {
   const hop = snapshot?.handoff, valid = hop && now >= hop.startedAt && now < hop.endsAt;
   const active = valid && ['ready', 'incoming', 'waiting'].includes(snapshot.status);
   const elapsed = active ? now - hop.startedAt : -1;
   const host = active && hop.role === 'host';
   const fusionAt = host && hop.completed && Number.isFinite(hop.completedAt) ? Math.max(hop.startedAt + 20000, hop.completedAt) : null;
-  const fusion = !reduced && fresh && fusionAt !== null && now >= fusionAt && now < fusionAt + 2000 ? (now - fusionAt) / 2000 : null;
+  const fusion = !reduced && fresh && fusionAt !== null && now >= fusionAt && now < fusionAt + FUSION_TIMING.duration ? Math.min(1,(now - fusionAt) / FUSION_TIMING.rise) : null;
   return { elapsed, host: Boolean(host), ...sourceCharge(snapshot, now, reduced),
     comet: !reduced && host && elapsed < 3000 ? elapsed / 3000 : null,
     flash: !reduced && fresh && host && elapsed >= 3000 && elapsed < 3700 ? .45 * Math.sin(Math.PI * (elapsed - 3000) / 700) : 0,
@@ -26,7 +28,7 @@ export function cinematicPhase(snapshot, now, { reduced = false, fresh = false }
     shake: !reduced && fresh && host && elapsed >= 3000 && elapsed < 3300 ? 3 * Math.sin((elapsed - 3000) * .025) * (1 - (elapsed - 3000) / 300) : 0,
     release: !reduced && fresh && active && hop.role === 'source' && elapsed < 600 ? elapsed / 600 : null,
     unfurl: !reduced && host && elapsed >= 5000 && elapsed < 20000 ? (elapsed - 5000) / 15000 : null,
-    fusion, fusionAt };
+    fusion, fusionAt, fusionGlow:fusion===null?0:fusionEnvelope(now-fusionAt) };
 }
 export function wordBatch(marks, phase, reduced = false) {
   const approved = marks.slice(0, 160).map((mark, index) => ({ mark, index })).filter(item => validFlightText(item.mark.flightText));
@@ -54,18 +56,18 @@ export function createCinemaTracker() {
       if (hop) previousCompleted = hop.completed;
       baseline = true;
     },
-    pending(snapshot, now, reduced = false) { const p = cinematicPhase(snapshot, now); return completionFresh && !reduced && p.fusionAt !== null && now < p.fusionAt + 2000; },
+    pending(snapshot, now, reduced = false) { const p = cinematicPhase(snapshot, now); return completionFresh && !reduced && p.fusionAt !== null && now < p.fusionAt + FUSION_TIMING.duration; },
     frame(snapshot, now, { reduced = false, hidden = false } = {}) {
       const phase = cinematicPhase(snapshot, now, { reduced, fresh });
       const completedPhase = cinematicPhase(snapshot, now, { reduced, fresh: completionFresh });
-      phase.fusion = completedPhase.fusion;
+      phase.fusion = completedPhase.fusion; phase.fusionGlow=completedPhase.fusionGlow;
       let chord = false;
       if (!played && phase.fusionAt !== null && now >= phase.fusionAt) {
         played = true; chord = !reduced && !hidden && now - phase.fusionAt < 500;
       }
       let send = false;
       if (!departurePlayed && phase.release !== null) { departurePlayed = true; send = snapshot.handoff.completed && !reduced && !hidden && now - snapshot.handoff.startedAt < 500; }
-      return { ...phase, fusionPending: completionFresh && !reduced && phase.fusionAt !== null && now < phase.fusionAt + 2000, chord, send };
+      return { ...phase, fusionPending: completionFresh && !reduced && phase.fusionAt !== null && now < phase.fusionAt + FUSION_TIMING.duration, chord, send };
     }
   };
 }
