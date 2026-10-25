@@ -1,3 +1,4 @@
+import { sendState } from './send-state.js';
 import { lifecycleConfig, reduceLifecycle, emptyRegistry } from './lifecycle.js';
 import { setMarkContext, reduceMark, publicMarks, publicOverlayState, privateMarks, isModerator, isChatIdentity } from './marks.js';
 
@@ -20,9 +21,17 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
       if (config && host && !config.channels.includes(host)) throw new Error('Unconfigured lifecycle channel');
       const transition = config && host ? reduceLifecycle({ registry, channel: channels.get(host), marks: markDocs.get(host), host, event, chat, now, sentAt }) : null;
       const markDoc = transition ? transition.marks : chat?.markAction ? reduceMark(markDocs.get(chat.broadcasterId), chat.broadcasterId, chat, chat.markAction, now) : null;
+      let sending;
+      if (config) {
+        const channelMap = Object.fromEntries(channels); const markMap = Object.fromEntries(markDocs);
+        if (transition) { channelMap[host] = transition.channel; markMap[host] = transition.marks; }
+        const op = raid ? { type: 'raid', raid, id, sentAt } : chat?.markAction?.type === 'send'
+          ? { type: 'reserve', source: host, actor: chat.chatterId, login: chat.markAction.login, id, sentAt } : { type: 'noop' };
+        sending = sendState(transition?.registry ?? registry, channelMap, markMap, config, op, now);
+      }
       // No await between check and insertion: atomic within this process.
       seen.set(id, expiresAt);
-      if (raid) rituals.set(raid.to_broadcaster_user_id, {
+      if (raid && !config) rituals.set(raid.to_broadcaster_user_id, {
         eventId: id,
         incomingBroadcasterId: raid.from_broadcaster_user_id,
         hostBroadcasterId: raid.to_broadcaster_user_id,
@@ -30,6 +39,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
         endsAt: now + 90000,
       });
       if (transition) { registry = transition.registry; channels.set(host, transition.channel); }
+      if (sending) { registry = sending.registry; if (sending.ritual) rituals.set(raid.to_broadcaster_user_id, sending.ritual); }
       if (markDoc) markDocs.set(host, markDoc);
       if (chat?.markAction?.type === 'forgetme' && chatReceipts.get(chat.broadcasterId)?.chatterId === chat.chatterId) chatReceipts.delete(chat.broadcasterId);
       if (chat && !chat.markAction) chatReceipts.set(chat.broadcasterId, { broadcasterId: chat.broadcasterId, chatterId: chat.chatterId, messageId: chat.messageId, receivedAt: now });
@@ -50,6 +60,11 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
       if (transition) { registry = transition.registry; channels.set(host, transition.channel); }
       markDocs.set(host, doc);
       if (action.type === 'forgetme' && chatReceipts.get(host)?.chatterId === actor.chatterId) chatReceipts.delete(host);
+    },
+    sendOffStep(op, now) {
+      if (!config) throw new Error('Lifecycle required');
+      const next = sendState(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), config, op, now);
+      registry = next.registry; return next.result;
     },
     getKeeperRegistry() { return structuredClone(registry); },
     getStreamStatus(host) { return structuredClone(channels.get(host)); },

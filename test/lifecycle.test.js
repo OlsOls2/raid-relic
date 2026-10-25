@@ -147,7 +147,7 @@ test('actual runtime enables lifecycle, creates no holder at startup, and has ex
     TWITCH_EVENTSUB_SECRET: secret, TWITCH_STREAMER_ID: home, TWITCH_BOT_ID: bot, OAUTH_REDIRECT_URI: 'https://example.test/auth/callback',
     OAUTH_REDIRECT_ALLOWLIST: 'https://example.test/auth/callback', OVERLAY_ORIGIN: 'https://example.test', EVENTSUB_CALLBACK_URL: 'https://example.test/eventsub' },
   { firestoreClient: db, transport: async () => { calls++; throw new Error('No requests at startup'); } });
-  assert.equal(runtime.state.lifecycleEnabled, true); assert.ok(runtime.subscriptions.reconcile);
+  assert.equal(runtime.state.lifecycleEnabled, true); assert.ok(runtime.subscriptions.reconcile); assert.ok(runtime.sendOff.processPending);
   assert.equal(calls, 0); assert.equal(db.docs.size, 0);
   const timestamp = new Date().toISOString(); const id = 'runtime-online';
   const payload = { subscription: { type: 'stream.online', version: '1', condition: { broadcaster_user_id: home } },

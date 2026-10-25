@@ -9,6 +9,7 @@ export function createSubscriptionManager({ oauth, bot, clientId, clientSecret, 
       { type: 'stream.online', condition: { broadcaster_user_id: streamerId } },
       { type: 'stream.offline', condition: { broadcaster_user_id: streamerId } },
       { type: 'channel.raid', condition: { to_broadcaster_user_id: streamerId } },
+      { type: 'channel.raid', condition: { from_broadcaster_user_id: streamerId } },
     ].map(item => ({ ...item, version: '1', transport: { ...chat.transport } })).concat(chat);
   }
   async function call(url, options) {

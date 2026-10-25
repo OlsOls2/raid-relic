@@ -1,3 +1,4 @@
+import { sendState } from './send-state.js';
 import { lifecycleConfig, reduceLifecycle } from './lifecycle.js';
 import { hash } from './crypto.js';
 import { setMarkContext, reduceMark, publicMarks, publicOverlayState, privateMarks, isModerator, isChatIdentity } from './marks.js';
@@ -49,18 +50,31 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         if (existing.exists && existing.data().expiresAt >= now) return 'duplicate';
         const host = event?.host ?? chat?.broadcasterId;
         if (config && host && !config.channels.includes(host)) throw new Error('Unconfigured lifecycle channel');
-        const managed = config && host;
+        const managed = config && (host || raid);
         const registry = managed ? (await tx.get(ref('keeperRegistry', 'single'))).data() : null;
-        const channel = managed ? (await tx.get(ref('streamChannels', host))).data() : null;
-        const markRef = managed || chat?.markAction ? ref('markChannels', host) : null;
-        const markDoc = markRef ? (await tx.get(markRef)).data() : null;
+        const channelMap = {}; const markMap = {};
+        if (managed) for (const channelId of config.channels) {
+          channelMap[channelId] = (await tx.get(ref('streamChannels', channelId))).data();
+          markMap[channelId] = (await tx.get(ref('markChannels', channelId))).data();
+        }
+        const channel = channelMap[host];
+        const markRef = host && (managed || chat?.markAction) ? ref('markChannels', host) : null;
+        const markDoc = managed ? markMap[host] : markRef ? (await tx.get(markRef)).data() : null;
         const receiptRef = chat?.markAction?.type === 'forgetme' ? ref('chatReceipts', chat.broadcasterId) : null;
         const receipt = receiptRef ? (await tx.get(receiptRef)).data() : null;
-        const transition = managed ? reduceLifecycle({ registry, channel, marks: markDoc, host, event, chat, now, sentAt }) : null;
+        const transition = managed && host ? reduceLifecycle({ registry, channel, marks: markDoc, host, event, chat, now, sentAt }) : null;
         const next = transition ? transition.marks : markRef ? reduceMark(markDoc, chat.broadcasterId, chat, chat.markAction, now) : null;
+        let sending;
+        if (managed) {
+          if (transition) { channelMap[host] = transition.channel; markMap[host] = transition.marks; }
+          const op = raid ? { type: 'raid', raid, id, sentAt } : chat?.markAction?.type === 'send'
+            ? { type: 'reserve', source: host, actor: chat.chatterId, login: chat.markAction.login, id, sentAt } : { type: 'noop' };
+          sending = sendState(transition?.registry ?? registry, channelMap, markMap, config, op, now);
+        }
         tx.set(eventRef, { expiresAt });
         if (transition) { tx.set(ref('keeperRegistry', 'single'), transition.registry); tx.set(ref('streamChannels', host), transition.channel); }
-        if (raid) tx.set(ref('rituals', raid.to_broadcaster_user_id), ritualFor(id, now, raid));
+        if (raid && !config) tx.set(ref('rituals', raid.to_broadcaster_user_id), ritualFor(id, now, raid));
+        if (sending) { tx.set(ref('keeperRegistry', 'single'), sending.registry); if (sending.ritual) tx.set(ref('rituals', raid.to_broadcaster_user_id), sending.ritual); }
         // Store only bounded metadata, never raw chat text or proof of membership.
         if (next) tx.set(markRef, next);
         if (receipt && receipt.chatterId === chat?.chatterId) tx.delete(receiptRef);
@@ -93,6 +107,17 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         } else next = reduceMark(previous, host, actor, action, now);
         tx.set(doc, next);
         if (receipt && receipt.chatterId === actor?.chatterId) tx.delete(receiptRef);
+      });
+    },
+    async sendOffStep(op, now) {
+      if (!config) throw new Error('Lifecycle required');
+      return db.runTransaction(async tx => {
+        const registry = (await tx.get(ref('keeperRegistry', 'single'))).data(); const channels = {}; const marks = {};
+        for (const host of config.channels) {
+          channels[host] = (await tx.get(ref('streamChannels', host))).data(); marks[host] = (await tx.get(ref('markChannels', host))).data();
+        }
+        const next = sendState(registry, channels, marks, config, op, now);
+        tx.set(ref('keeperRegistry', 'single'), next.registry); return next.result;
       });
     },
     async getKeeperRegistry() { return (await ref('keeperRegistry', 'single').get()).data() ?? { holderId: null, originated: false }; },

@@ -6,6 +6,7 @@ import { createBot } from './bot.js';
 import { createOverlayFeed } from './overlay-feed.js';
 import { validateReleaseCommit } from './release.js';
 import { createSubscriptionManager } from './subscriptions.js';
+import { createSendOff } from './send-off.js';
 
 export const PROJECT_ID = 'raid-relic-hackathon';
 export async function createRuntime(env, { firestoreClient, transport, loadSDK = () => import('@google-cloud/firestore') } = {}) {
@@ -38,7 +39,8 @@ export async function createRuntime(env, { firestoreClient, transport, loadSDK =
     if (production && (!env.OVERLAY_ORIGIN || new URL(env.OVERLAY_ORIGIN).origin !== env.OVERLAY_ORIGIN || !env.OVERLAY_ORIGIN.startsWith('https://'))) throw new Error('Exact HTTPS overlay origin required');
     overlayFeed = createOverlayFeed(state, env.TWITCH_STREAMER_ID); state = overlayFeed.store;
   }
+  const sendOff = oauth ? createSendOff({ state, oauth, clientId: env.TWITCH_CLIENT_ID, streamerId: env.TWITCH_STREAMER_ID, transport }) : undefined;
   return { ...createApp({ secret: env.TWITCH_EVENTSUB_SECRET, state, oauth, overlayFeed, releaseCommit: releaseCommit ?? undefined,
-    chatContext: oauth ? { streamerId: env.TWITCH_STREAMER_ID, botId: env.TWITCH_BOT_ID } : undefined }), oauth, bot, store, subscriptions, overlayFeed,
+    chatContext: oauth ? { streamerId: env.TWITCH_STREAMER_ID, botId: env.TWITCH_BOT_ID } : undefined }), oauth, bot, store, subscriptions, sendOff, overlayFeed,
     overlayOrigins: production ? [env.OVERLAY_ORIGIN].filter(Boolean) : ['http://localhost:5191', 'http://127.0.0.1:5191'] };
 }

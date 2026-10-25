@@ -21,16 +21,17 @@ function fixture(mode = 'empty') {
 }
 test('subscription plan binds online/offline/raid/chat conditions to one configured keeper and bot', () => {
   const f = fixture(); const payloads = f.manager.payloads(); assert.equal(f.calls.length, 0);
-  assert.deepEqual(payloads.map(item => item.type), ['stream.online', 'stream.offline', 'channel.raid', 'channel.chat.message']);
+  assert.deepEqual(payloads.map(item => item.type), ['stream.online', 'stream.offline', 'channel.raid', 'channel.raid', 'channel.chat.message']);
   assert.deepEqual(payloads[0].condition, { broadcaster_user_id: '1591805230' });
   assert.deepEqual(payloads[2].condition, { to_broadcaster_user_id: '1591805230' });
-  assert.deepEqual(payloads[3].condition, { broadcaster_user_id: '1591805230', user_id: '1591804828' });
+  assert.deepEqual(payloads[3].condition, { from_broadcaster_user_id: '1591805230' });
+  assert.deepEqual(payloads[4].condition, { broadcaster_user_id: '1591805230', user_id: '1591804828' });
 });
 test('explicit setup validates both identities, lists with app token and creates only missing subscriptions', async () => {
-  const f = fixture(); const result = await f.manager.setup(); assert.equal(result.length, 4);
+  const f = fixture(); const result = await f.manager.setup(); assert.equal(result.length, 5);
   assert.deepEqual(f.roles, ['streamer', 'bot']);
   assert.ok(f.calls.slice(1).every(call => call.headers.Authorization === 'Bearer synthetic-app-token'));
-  assert.equal(f.calls.filter(call => call.method === 'POST' && call.url.includes('/eventsub/')).length, 4);
+  assert.equal(f.calls.filter(call => call.method === 'POST' && call.url.includes('/eventsub/')).length, 5);
   const existing = fixture('existing'); assert.ok((await existing.manager.reconcile()).every(item => item.status === 'existing'));
   assert.equal(existing.calls.length, 2);
 });

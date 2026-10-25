@@ -6,7 +6,9 @@ export function lifecycleConfig(value) {
   if (!value) return null;
   if (!Array.isArray(value.channels) || !value.channels.length || value.channels.length > LIFECYCLE_LIMITS.channels
     || !value.channels.every(id => typeof id === 'string' && /^\d{1,32}$/.test(id))) throw new Error('Bounded lifecycle channels required');
-  return { channels: [...new Set(value.channels)] };
+  const logins = value.logins ?? (value.channels.includes(INITIAL_HOME) ? { raidrelichq: INITIAL_HOME } : {});
+  if (Object.keys(logins).length > LIFECYCLE_LIMITS.channels || !Object.entries(logins).every(([login, id]) => /^[a-z0-9_]{1,25}$/.test(login) && value.channels.includes(id))) throw new Error('Bounded Keeper login mapping required');
+  return { channels: [...new Set(value.channels)], logins: { ...logins } };
 }
 export const emptyRegistry = () => ({ holderId: null, originated: false });
 const emptyChannel = () => ({ online: false, streamId: null, startedAt: null, lifecycleAt: -1, closedThrough: -1,
@@ -60,6 +62,11 @@ export function reduceLifecycle({ registry, channel, marks, host, event, chat, p
     channel.online = true; channel.streamId = event.streamId; channel.startedAt = event.startedAt; channel.lifecycleAt = event.sentAt;
   }
   if (event?.type === 'offline' && event.sentAt >= channel.lifecycleAt) {
+    // Retain only the last authoritative stream closure. Repeated offline
+    // deliveries must not extend its eligibility boundary.
+    if (channel.online && channel.streamId) channel.retiredStream = {
+      streamId: channel.streamId, startedAt: channel.startedAt, offlineAt: event.sentAt,
+    };
     closeStream(channel, marks);
     channel.closedThrough = Math.max(channel.closedThrough, event.sentAt);
     channel.lifecycleAt = event.sentAt; channel.online = false; channel.streamId = null; channel.startedAt = null;

@@ -82,7 +82,12 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
         raid = payload.event;
         if (!raid || !['from_broadcaster_user_id', 'to_broadcaster_user_id'].every(key => typeof raid[key] === 'string' && /^\d+$/.test(raid[key]))
           || !Number.isInteger(raid.viewers) || raid.viewers < 0) return result(400, 'Invalid raid');
-        if (chatContext && (subscription.condition?.to_broadcaster_user_id !== chatContext.streamerId || raid.to_broadcaster_user_id !== chatContext.streamerId)) return result(400, 'Invalid raid condition');
+        if (chatContext) {
+          const condition = subscription.condition ?? {};
+          const incoming = Object.keys(condition).length === 1 && condition.to_broadcaster_user_id === chatContext.streamerId && raid.to_broadcaster_user_id === chatContext.streamerId;
+          const outgoing = Object.keys(condition).length === 1 && condition.from_broadcaster_user_id === chatContext.streamerId && raid.from_broadcaster_user_id === chatContext.streamerId;
+          if (!incoming && !outgoing) return result(400, 'Invalid raid condition');
+        }
       }
     }
     const accepted = await state.accept({ id, now: receivedAt, sentAt, expiresAt: sentAt + REPLAY_WINDOW_MS, raid, chat, lifecycle });

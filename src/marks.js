@@ -28,6 +28,8 @@ export function runeSvg(input) {
 }
 
 export function parseMarkCommand(text) {
+  const send = /^!relic send @([a-zA-Z0-9_]{1,25})$/.exec(text);
+  if (send) return { type: 'send', login: send[1].toLowerCase() };
   const mark = /^!mark(?: (.*))?$/iu.exec(text);
   if (mark) return { type: 'mark', text: normalizeMark(mark[1]) };
   if (text === '!relic forgetme') return { type: 'forgetme' };
