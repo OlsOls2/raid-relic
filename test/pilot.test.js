@@ -194,3 +194,45 @@ test('ordinary managed chat and duplicate actions do not read/write ledgers or c
   await f.runtime.state.accept(mark); assert.equal(received.length, 2);
   f.db.reads.length = 0; await f.runtime.state.accept(mark); assert.equal(received.length, 2); assert.equal(f.db.reads.length, 1);
 });
+
+for (const kind of ['memory', 'firestore']) test(`${kind}: bootstrap failures persist safe stage-only diagnostics without upstream text`, async () => {
+  const f = await pilotFixture(kind); for (const id of [BOT, HOME, OTHER]) await f.login(id);
+  f.runtime.subscriptionManagers[HOME].reconcile = async () => { throw Object.assign(new Error('UPSTREAM_PRIVATE_CANARY'), { diagnostic: { stage: 'UPSTREAM_PRIVATE_CANARY', token: 'UPSTREAM_PRIVATE_CANARY' } }); };
+  const failed = await f.control(HOME, 'bootstrap'); assert.equal(failed.status, 502);
+  const body = JSON.parse(failed.body); assert.equal(body.ready, false); assert.deepEqual(body.diagnostic, { stage: 'subscriptions' });
+  assert.ok(!failed.body.includes('UPSTREAM_PRIVATE_CANARY'));
+  const status = await f.runtime.pilot.status(HOME); assert.deepEqual(status.subscriptions.diagnostic, { stage: 'subscriptions' });
+  assert.equal(status.bothReadiness.raidrelichq, false);
+});
+
+test('failed explicit bootstrap logs exactly one bounded structured warning; logger failures cannot change outcome', async () => {
+  const { createPilot } = await import('../src/pilot.js');
+  for (const logging of ['capture', 'throw', 'reject']) {
+    const lines = []; let saved;
+    const pilot = createPilot({ state: { getStreamStatus: async () => null },
+      store: { acquireJob: async () => true, finishJob: async (_id, _owner, result) => { saved = result; } },
+      subscriptions: { [HOME]: { reconcile: async () => { throw Object.assign(new Error('UPSTREAM_PRIVATE_CANARY\nstack'), { diagnostic: { type: 'PRIVATE', stage: 'PRIVATE' }, headers: { Authorization: 'PRIVATE' } }); } } },
+      logger: line => { lines.push(line); if (logging === 'throw') throw Error('logger failed'); if (logging === 'reject') return Promise.reject(Error('logger rejected')); } });
+    const result = await pilot.execute(HOME, 'bootstrap');
+    assert.equal(result.status, 'failed'); assert.equal(result.ready, false); assert.deepEqual(saved, result);
+    assert.equal(lines.length, 1); assert.ok(lines[0].length < 300); assert.equal(lines[0].includes('\n'), false);
+    assert.deepEqual(JSON.parse(lines[0]), { severity: 'WARNING', event: 'raid_relic_bootstrap_failed', keeperId: HOME, diagnostic: { stage: 'subscriptions' } });
+    assert.ok(!lines[0].includes('PRIVATE')); assert.ok(!lines[0].includes('stack')); assert.ok(!lines[0].includes('Authorization'));
+  }
+});
+test('default logger emits one JSON console.warn; successful/busy/invalid bootstrap emits none', async () => {
+  const { createPilot } = await import('../src/pilot.js'); const lines = []; const previous = console.warn;
+  let busy = false, fail = true;
+  const pilot = createPilot({ state: { getStreamStatus: async () => null, accept: async () => 'accepted' },
+    store: { acquireJob: async () => !busy, finishJob: async () => {} }, oauth: { accessTokenForKeeper: async () => 'synthetic-user-token' },
+    subscriptions: { [HOME]: { reconcile: async () => { if (fail) throw Error('PRIVATE'); return { results: [], conditions: [], ready: true }; } } },
+    transport: async () => ({ status: 200, data: { data: [] } }) });
+  console.warn = (...args) => lines.push(args);
+  try {
+    assert.equal((await pilot.execute(HOME, 'bootstrap')).status, 'failed');
+    assert.equal(lines.length, 1); assert.equal(lines[0].length, 1); assert.equal(JSON.parse(lines[0][0]).severity, 'WARNING');
+    fail = false; assert.equal((await pilot.execute(HOME, 'bootstrap')).status, 'reconciled');
+    busy = true; assert.equal((await pilot.execute(HOME, 'bootstrap')).status, 'busy');
+    await assert.rejects(pilot.execute('999', 'bootstrap')); assert.equal(lines.length, 1);
+  } finally { console.warn = previous; }
+});

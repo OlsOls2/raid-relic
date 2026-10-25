@@ -188,3 +188,20 @@ test('configuration, routes and static assets', async () => {
     assert.equal((await app().dispatch({ method: 'GET', path })).status, 200);
   }
 });
+
+test('signed raid notifications accept only the unused empty opposite key; challenge bypasses condition matching safely', async () => {
+  const instance = app({ chatContext: { streamerId: '123', botId: '999', keeperIds: ['123', '456'] } });
+  for (const [active, opposite, host] of [['from_broadcaster_user_id', 'to_broadcaster_user_id', '123'], ['to_broadcaster_user_id', 'from_broadcaster_user_id', '456']]) {
+    const condition = { [active]: host, [opposite]: '' };
+    assert.equal((await instance.dispatch(signed({ id: `empty-${active}`, body: { ...raid, subscription: { ...raid.subscription, condition } } }))).status, 204);
+    for (const bad of [{ ...condition, [opposite]: '777' }, { ...condition, unknown: '' }, { ...condition, [opposite]: null }]) {
+      assert.equal((await instance.dispatch(signed({ body: { ...raid, subscription: { ...raid.subscription, condition: bad } } }))).status, 400);
+    }
+    const request = signed({ type: 'webhook_callback_verification', body: { subscription: { ...raid.subscription, condition }, challenge: 'raid café 星' } });
+    const response = await httpResponse(instance, request);
+    assert.equal(response.status, 200); assert.deepEqual(response.endArgs, ['raid café 星']);
+    assert.equal(response.headers['content-length'], Buffer.byteLength('raid café 星'));
+    request.headers['twitch-eventsub-message-signature'] = `sha256=${'0'.repeat(64)}`;
+    assert.equal((await instance.dispatch(request)).status, 403);
+  }
+});
