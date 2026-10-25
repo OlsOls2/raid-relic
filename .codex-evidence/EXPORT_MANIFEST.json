@@ -2,33 +2,33 @@
   "formatVersion": 1,
   "sessionID": "01a1705c-a87d-7143-80f6-021e47b78ced",
   "inputLeaf": "rollout-2026-10-25T00-01-23-01a1705c-a87d-7143-80f6-021e47b78ced.jsonl",
-  "rawSnapshotSHA256": "cf8c7e513a85d5f8b920618936db8b99139b69ff1642930f5d6c7d7c4552a44d",
-  "rawBytes": 15844547,
+  "rawSnapshotSHA256": "c874e937fc5c1fcab768adfd78f685a4bbb4756683f80590d6ddb58868785864",
+  "rawBytes": 16929688,
   "eventCounts": {
     "session_meta": 1,
-    "event_msg": 1535,
-    "response_item": 1310,
+    "event_msg": 1684,
+    "response_item": 1449,
     "world_state": 41,
-    "turn_context": 43,
-    "token_usage_record": 374,
+    "turn_context": 46,
+    "token_usage_record": 419,
     "compacted": 3
   },
-  "exportedEntries": 870,
+  "exportedEntries": 967,
   "omissions": {
     "private": 46,
     "media": 2,
-    "unselected": 2436,
+    "unselected": 2675,
     "truncated": 2,
-    "credentialLookingItems": 20,
+    "credentialLookingItems": 21,
     "credentialReasons": {
-      "literal assignment": 16,
+      "literal assignment": 17,
       "authorization": 4
     }
   },
   "firstTimestamp": "2026-10-25T00:01:23.357Z",
-  "cutoff": "2026-10-25T06:29:41.733Z",
-  "exportSHA256": "58183847ddd17274efecac534fa78d7f086e7197740f21fe26268cad5a216dca",
-  "exportBytes": 2535623,
+  "cutoff": "2026-10-25T06:59:15.278Z",
+  "exportSHA256": "285fd7c88e6affc00b3179c3ad87fc5ef78c8ff673131529b68a91f425212c1c",
+  "exportBytes": 2845229,
   "sourceRunLogs": [
     {
       "leaf": "run-000.jsonl",
@@ -244,6 +244,21 @@
       "leaf": "run-042.jsonl",
       "bytes": 54604,
       "sha256": "f6f311b9105bafd6af4a90d75ff378b4b6995aea692559280cf61d19a221926b"
+    },
+    {
+      "leaf": "run-043.jsonl",
+      "bytes": 165933,
+      "sha256": "84472082aa2cd584d21849b1cb97e79cd50ba9e8036608879f7e25e24916259c"
+    },
+    {
+      "leaf": "run-044.jsonl",
+      "bytes": 155636,
+      "sha256": "8619a4e36d0845c6c3bb1bc28943d9c5cc7f13cbbeee0012618ef308669e9081"
+    },
+    {
+      "leaf": "run-045.jsonl",
+      "bytes": 78384,
+      "sha256": "ff3368b4b9747e1e502c006c258d6c6f41f40bcd424896e7d582416d7eeb24ee"
     }
   ],
   "scope": "Selected sanitized native JSONL; private/internal/media omitted and per-item output bounded. Raw snapshot remains local ignored."
