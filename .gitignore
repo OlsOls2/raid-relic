@@ -29,3 +29,6 @@ coverage/
 
 # Local browser QA captures (not release payload).
 /artifacts/
+# Only these sanitized evidence outputs are publishable; raw backups stay ignored.
+!/.codex-evidence/EXPORTED_TRANSCRIPT.md
+!/.codex-evidence/EXPORT_MANIFEST.json
