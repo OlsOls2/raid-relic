@@ -12,20 +12,29 @@ export function validScores(v) {
 export function holdDuration(seconds) {
   let remaining=seconds; const parts=[]; for(const [unit,size] of [['d',86400],['h',3600],['m',60],['s',1]]) { const count=Math.floor(remaining/size); remaining%=size; if(count)parts.push(`${count}${unit}`); } return parts.join(' ') || '0s';
 }
-const clear = () => { $('keeper-rows').replaceChildren(); $('raider-rows').replaceChildren(); $('scores-coverage').textContent=''; };
-const node = (tag,text,className) => { const n=document.createElement(tag);n.textContent=text;if(className)n.className=className;return n; };
+export const EVENT_BADGE='Carried during TwitchCon San Diego 2026';
+export function badgeDescription(name) {
+  const meanings={'First Keeper':'The first Keeper of this recorded journey.','24h Keeper':'Held the relic for at least 24 hours of recorded time.','Chain of 3':'Carried the relic on the third or later raid in an unbroken chain.',[EVENT_BADGE]:'Hold the relic during TwitchCon San Diego, 13–15 Nov 2026, to earn this badge.'};
+  if(/^Ring (1|5|10)$/.test(name))return `Carried the relic on recorded raid ${name.slice(5)}, creating that growth ring.`;
+  return Object.hasOwn(meanings,name)?meanings[name]:'';
+}
+let expanded=false;
+const clear = () => { $('keeper-rows').replaceChildren(); $('raider-rows').replaceChildren(); $('scores-coverage').textContent='';$('scores-status').textContent='';$('scores-all').hidden=true;$('scores-all').textContent='All Keepers';expanded=false;$('scores-all').setAttribute('aria-expanded','false'); };
+const node = (tag,text,className) => { const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(className)n.className=className;return n; };
+function badge(name,earned){const item=node('li'),details=node('details',undefined,'score-badge');details.dataset.earned=String(earned);details.dataset.badge=name;const label=name===EVENT_BADGE?'TwitchCon San Diego · 13–15 Nov':name;const summary=node('summary',`${earned?'◇':'Locked ·'} ${label}`);summary.setAttribute('aria-label',`${earned?'Earned':'Locked'}: ${label}`);summary.title=badgeDescription(name);details.append(summary,node('p',badgeDescription(name)));item.append(details);return item;}
 async function loadScores() {
   const current=++generation;controller?.abort();controller=new AbortController();const active=controller;
-  clear();$('scores-refresh').disabled=true;$('scores-status').textContent='Reading recorded scores…';const timer=setTimeout(()=>active.abort(),8000);
+  clear();$('scores-refresh').disabled=true;$('keeper-scores').setAttribute('aria-busy','true');const timer=setTimeout(()=>active.abort(),8000);
   try {
     const r=await fetch('/api/scores',{cache:'no-store',signal:active.signal});if(!r.ok)throw Error();const v=await r.json();if(current!==generation)return;if(!validScores(v))throw Error();
     $('score-preview').hidden=!v.previewReadOnly;if(v.mode==='simulator')$('simulator').hidden=false;
-    for(const row of v.channels){const li=node('li',undefined);const time=node('p',`${holdDuration(row.knownHoldSeconds)} known hold · ${row.hopsCarried} completed ${row.hopsCarried === 1 ? 'carry' : 'carries'}`);time.title=`${row.knownHoldSeconds.toLocaleString()} known hold seconds`;time.setAttribute('aria-label',`${row.knownHoldSeconds} known hold seconds; ${row.hopsCarried} completed ${row.hopsCarried === 1 ? 'carry' : 'carries'}`);li.append(node('h3',row.login?`@${row.login}`:`Channel ${row.channelId}`),time);
-      const badges=node('ul',undefined,'score-badges');for(const b of row.badges)badges.append(node('li',`◇ ${b}`));li.append(badges);$('keeper-rows').append(li);}
+    for(const [index,row] of v.channels.entries()){const li=node('li');li.hidden=index>=3;li.dataset.rank=String(index+1);const time=node('p',`${holdDuration(row.knownHoldSeconds)} time held · ${row.hopsCarried} ${row.hopsCarried === 1 ? 'raid' : 'raids'} carried`,'score-numbers');time.title=`${row.knownHoldSeconds.toLocaleString()} seconds time held`;time.setAttribute('aria-label',`${row.knownHoldSeconds} seconds time held; ${row.hopsCarried} ${row.hopsCarried===1?'raid':'raids'} carried`);li.append(node('h3',`${index+1}. ${row.login?'@'+row.login:'Channel '+row.channelId}`),time);
+      const badges=node('ul',undefined,'score-badges');for(const b of row.badges)badges.append(badge(b,true));if(!row.badges.includes(EVENT_BADGE))badges.append(badge(EVENT_BADGE,false));li.append(badges);$('keeper-rows').append(li);}
+    $('scores-all').hidden=v.channels.length<=3;
     for(const row of v.raiders)$('raider-rows').append(node('li',`@${row.login} · ${row.claimsJoined} completed ${row.claimsJoined === 1 ? 'claim' : 'claims'} joined · since opt-in ${new Date(row.since).toLocaleString()}`));
-    if(!v.raiders.length)$('raider-rows').append(node('li','No consenting raider scores recorded. Historical participation is unknown.'));
+    if(!v.raiders.length)$('raider-rows').append(node('li','Raiders: type !relic scores on to join the ledger.'));
     $('scores-coverage').textContent=v.coverage;$('scores-status').textContent=`${v.rings} recorded ${v.rings === 1 ? 'ring' : 'rings'} · as of ${new Date(v.asOf).toLocaleString()}. Refresh manually.`;
   }catch{if(current===generation){clear();$('scores-status').textContent='Scores unavailable. Previous names and counts hidden. Refresh to try again.';}}
-  finally{clearTimeout(timer);if(current===generation)$('scores-refresh').disabled=false;}
+  finally{clearTimeout(timer);if(current===generation){$('scores-refresh').disabled=false;$('keeper-scores').setAttribute('aria-busy','false');}}
 }
-if(typeof document!=='undefined' && $('keeper-scores')){ $('scores-refresh').onclick=loadScores;addEventListener('pagehide',()=>{generation++;controller?.abort();clear();});addEventListener('pageshow',e=>{if(e.persisted)loadScores();});loadScores(); }
+if(typeof document!=='undefined' && $('keeper-scores')){ $('scores-refresh').onclick=loadScores;$('scores-all').onclick=()=>{expanded=!expanded;$('scores-all').setAttribute('aria-expanded',String(expanded));$('scores-all').textContent=expanded?'Top 3 Keepers':'All Keepers';for(const row of $('keeper-rows').children)row.hidden=Number(row.dataset.rank)>3&&!expanded;};addEventListener('pagehide',()=>{generation++;controller?.abort();clear();});addEventListener('pageshow',e=>{if(e.persisted)loadScores();});loadScores(); }

@@ -177,7 +177,7 @@ export function createApp({ scoreAcks, claimAcks, secret, state = createMemorySt
     if (method === 'GET' && assets.has(path)) {
       const [file, type] = assets.get(path);
       const bytes = await readFile(new URL(`../public/${file}`, import.meta.url));
-      return result(200, previewReadOnly && file === 'atlas.html' ? bytes.toString().replace('<body>', '<body><aside role="status">P5 READ-ONLY PREVIEW · Live Twitch chat commands are not enabled on canonical yet.</aside>') : bytes, type);
+      return result(200, bytes, type);
     }
     if (path !== '/eventsub') return result(404, 'Not found');
     if (method !== 'POST') return result(405, 'Method not allowed');

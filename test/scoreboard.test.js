@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { scoreboard, reduceScores, SCORE_LIMITS, TWITCHCON } from '../src/scoreboard.js';
 import { createApp } from '../src/app.js';
-import { holdDuration, validScores } from '../public/scoreboard.js';
+import { badgeDescription, EVENT_BADGE, holdDuration, validScores } from '../public/scoreboard.js';
 import { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';
 import { hash } from '../src/crypto.js';
 const config={channels:[HOME,OTHER],logins:{raidrelichq:HOME,olsols2:OTHER}};
@@ -94,7 +94,7 @@ test('preview blocks EVERY mutation, OAuth/controls before store/auth/network; G
  let touched=0;const state=new Proxy({getScoreboard:()=>({channels:[],raiders:[],rings:0})},{get(t,k){return k in t?t[k]:(()=>{touched++;throw Error();});}});const oauth={callbackPath:'/auth/callback',route(){touched++;},control:{route(){touched++;}}};const app=createApp({previewReadOnly:true,state,oauth});
  for(const path of ['/eventsub','/api/forge','/api/atlas/search','/api/my-marks','/control/1591805230','/oauth/bot/start','/oauth/keeper/1591806023/start','/auth/callback'])for(const method of ['POST','PUT','DELETE'])assert.equal((await app.dispatch({method,path,rawBody:Buffer.from('{}')})).status,403);
  for(const path of ['/control/1591805230/status','/oauth/bot/start','/auth/callback?code=not-real'])assert.equal((await app.dispatch({method:'GET',path})).status,403);
- assert.equal(touched,0);const r=await app.dispatch({method:'GET',path:'/api/scores'});assert.equal(r.status,200);assert.equal(JSON.parse(r.body).previewReadOnly,true);assert.equal(touched,0);assert.match(String((await app.dispatch({method:'GET',path:'/'})).body),/P5 READ-ONLY PREVIEW/);
+ assert.equal(touched,0);const r=await app.dispatch({method:'GET',path:'/api/scores'});assert.equal(r.status,200);assert.equal(JSON.parse(r.body).previewReadOnly,true);assert.equal(touched,0);const html=String((await app.dispatch({method:'GET',path:'/'})).body);assert.equal((html.match(/id="score-preview"/g)??[]).length,1);assert.match(html,/id="score-preview"[^>]*hidden>Read-only preview/);assert.equal(html.includes('<aside role="status">P5 READ-ONLY PREVIEW'),false);
 });
 
 for(const kind of ['memory','firestore']) {
@@ -130,3 +130,9 @@ test('specific-channel event badge uses proven half-open holds/current instant, 
 });
 
 test('compact duration keeps exact seconds independently available',()=>{assert.equal(holdDuration(0),'0s');assert.equal(holdDuration(86400),'1d');assert.equal(holdDuration(90061),'1d 1h 1m 1s');});
+
+test('every earned badge has a human meaning; event label is only a locked UI affordance until earned',async()=>{
+ for(const name of ['First Keeper','24h Keeper','Ring 1','Ring 5','Ring 10','Chain of 3',EVENT_BADGE])assert.ok(badgeDescription(name).length>20);
+ assert.match(badgeDescription('Chain of 3'),/third or later raid in an unbroken chain/);assert.match(badgeDescription(EVENT_BADGE),/13–15 Nov 2026/);assert.equal(badgeDescription('__proto__'),'');
+ const {readFile}=await import('node:fs/promises');const html=await readFile('public/atlas.html','utf8');assert.ok(html.indexOf('id="keeper-scores"')<html.indexOf('<nav'));assert.equal(html.includes('Reading recorded scores'),false);assert.match(html,/Recorded journeys only; the first hold and past raiders are unknown/);
+});

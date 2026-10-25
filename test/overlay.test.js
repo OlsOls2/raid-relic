@@ -147,3 +147,20 @@ test('fresh server clock changes across reads while committed snapshot revision/
   assert.deepEqual(firstState, secondState);
   assert.equal(firstTime, 1000); assert.equal(secondTime, 1003);
 });
+
+test('five-ring live-shape snapshot accepts canonical WSS Origin only; old tag HTTP stays public without origin expansion',async t=>{
+ const {createServer}=await import('node:http');const {attachOverlaySockets}=await import('../src/overlay-sockets.js');const {pilotFixture,HOME,OTHER,BOT}=await import('../test-support/pilot-fixture.js');
+ const canonical='https://raid-relic-760724762396.us-central1.run.app',oldTag='https://p5-scoreboard---raid-relic-vz4bhnskgq-uc.a.run.app';
+ for(const kind of ['memory','firestore']){
+  const f=await pilotFixture(kind);for(const id of[BOT,HOME,OTHER])await f.login(id);for(const id of[HOME,OTHER]){await f.control(id,'bootstrap');f.advance();await f.control(id,'keep');f.advance();}
+  for(let i=0;i<5;i++){const from=i%2?OTHER:HOME,to=i%2?HOME:OTHER;await f.control(from,`send:${to}`);f.advance();await f.raid(from,to,1);await f.chat(from,from,'!offer');await f.chat(to,to,'!accept');f.advance();}
+  f.advance(180001);await f.signed('stream.offline',{broadcaster_user_id:OTHER},OTHER);const calls=f.calls.length;if(f.db)f.db.writes.length=0;
+  const server=createServer(f.runtime.handler),sockets=attachOverlaySockets(server,f.runtime.overlayFeeds,{origins:[canonical]});let ws;
+  try{
+   try{await new Promise((r,j)=>{server.once('error',j);server.listen(5191,'127.0.0.1',r);});}catch(error){if(error.code!=='EPERM')throw error;t.skip('Sandbox denies fixed loopback5191 (EPERM)');return;}
+   const http=await(await fetch(`${origin}/api/overlay/${OTHER}`,{headers:{Origin:oldTag}})).json();assert.equal(http.lineageRings,5);assert.equal(http.status,'waiting');
+   ws=new WebSocket(`ws://127.0.0.1:5191/ws/${OTHER}`,{origin:canonical});const next=inbox(ws);await once(ws,'open');const pushed=await next();assert.equal(pushed.lineageRings,5);assert.equal(pushed.status,'waiting');assert.equal(sockets.clients.size,1);
+   const denied=await new Promise((resolve,reject)=>{const bad=new WebSocket(`ws://127.0.0.1:5191/ws/${OTHER}`,{origin:oldTag});bad.on('error',()=>{});bad.once('open',()=>{bad.terminate();reject(Error('Wrong Origin accepted'));});bad.once('unexpected-response',(_req,res)=>{const status=res.statusCode;res.resume();bad.terminate();resolve(status);});});assert.equal(denied,403);assert.equal(sockets.clients.size,1);assert.equal(f.calls.length,calls);if(f.db)assert.equal(f.db.writes.length,0);
+  }finally{ws?.terminate();sockets.close();server.closeAllConnections();if(server.listening)await new Promise(r=>server.close(r));}
+ }
+});
