@@ -1,0 +1,379 @@
+{
+  "verifiedAt": "2026-10-25T11:47:31.680Z",
+  "revision": "raid-relic-raiddiag1025",
+  "sourceCommit": "22ecde62c0d5133c1a90eb77889109e75a88a613",
+  "imageDigest": "sha256:4c567507b26ddc7bf7bc815e16d69bd6430d9a4bd4ccd1e950bbdc7b0a1664b4",
+  "buildId": "2abc5771-3a59-461f-8baf-281d917d08ba",
+  "trafficPercent": 100,
+  "health": {
+    "status": "ok",
+    "releaseCommit": "22ecde62c0d5133c1a90eb77889109e75a88a613",
+    "phase": "raid-pilot",
+    "readiness": "owner-test-ready",
+    "liveValidated": false
+  },
+  "assets": [
+    {
+      "path": "/",
+      "sha256": "8437321dc240cc9dcc9d1e9cd114c90f0c7a689fb287055b62f746c14942ecca"
+    },
+    {
+      "path": "/atlas",
+      "sha256": "8437321dc240cc9dcc9d1e9cd114c90f0c7a689fb287055b62f746c14942ecca"
+    },
+    {
+      "path": "/atlas/",
+      "sha256": "8437321dc240cc9dcc9d1e9cd114c90f0c7a689fb287055b62f746c14942ecca"
+    },
+    {
+      "path": "/atlas.css",
+      "sha256": "9b7c6d7ba9c1a274f42c226a385cde16327099665b32583464da601ce7bc9a40"
+    },
+    {
+      "path": "/atlas.js",
+      "sha256": "b2272e817dd3155384815c0ab68e8fcfba8cabc18c87ff2c993a61bf4bf57b56"
+    },
+    {
+      "path": "/control.js",
+      "sha256": "aa56af18611c67376b059f6b75824aa0a96f8c3b9a0730320ced25984984a378"
+    },
+    {
+      "path": "/control.css",
+      "sha256": "842c36c994b47cc5130f8f9beca6f2348962a38c617b20f8a39f8c68c54117de"
+    },
+    {
+      "path": "/arrival.js",
+      "sha256": "08d406d8638856acabbe207140bb2af79f8b53adbc05893c82c2cca89066c63a"
+    },
+    {
+      "path": "/overlay",
+      "sha256": "c05fc8df84da1c066d7eed843a81f4db04fcf3b6065b1186a2651391aa2c3e7d"
+    },
+    {
+      "path": "/relic.svg",
+      "sha256": "0819680dad1da4c1bfea060243468bfb1f385c8fa53d1d1960f62d9bbd7a575e"
+    },
+    {
+      "path": "/style.css",
+      "sha256": "893d7cb0d26b5c3a2c798f32fb10b9599bf66e853f6b64bca4600803d92ebcb0"
+    },
+    {
+      "path": "/overlay.css",
+      "sha256": "2cdf01b1b923caccbc93e552ce5426829dcbe051f1cda02c730415400f575379"
+    },
+    {
+      "path": "/overlay.js",
+      "sha256": "2814a9f7c1552da9bc3f21eb226c46c43162e0307912d6b5461afa8d9edeade8"
+    },
+    {
+      "path": "/overlay-client.js",
+      "sha256": "6f2a9bd07e3137725e1642609ffbf4c81c564fb67046b51ebf865ebc910aa9a0"
+    },
+    {
+      "path": "/crystal.svg",
+      "sha256": "6fba39ea1b1bb6c49156c24a1e7eee6ecb3431fb95f9138915cd9089cf845013"
+    }
+  ],
+  "grantCount": 3,
+  "grantMetadataUnchanged": true,
+  "configurationPreserved": true,
+  "previewTagsPreserved": true,
+  "oldIntentPreserved": true,
+  "oldIntentStatus": "rejected",
+  "tests": {
+    "total": 243,
+    "passed": 243,
+    "failed": 0,
+    "skipped": 0
+  },
+  "mockPilotBrowserChecks": 8,
+  "liveControlPagesOpened": false,
+  "streamsTouched": false,
+  "raidOrCancelOrChatRequestsByAssistant": 0,
+  "historical": {
+    "at": "2026-10-25T10:44:04.670Z",
+    "logAt": "2026-10-25T10:44:05.262675Z",
+    "sourceId": "1591805230",
+    "targetId": "1591806023",
+    "grantRole": "streamer/source Keeper user",
+    "scope": "channel:manage:raids",
+    "httpStatus": null,
+    "httpStatusRange": [
+      400,
+      499
+    ],
+    "message": null,
+    "exactResponseUnrecoverable": true,
+    "underlyingProviderCauseUnresolved": true
+  },
+  "nextStep": "Owner checks old intent rejected and NO native pending raid, both streams live/reconciled/eligible; one explicit diagnostic Send Off only, not Process. Stop on accepted/unknown/409 and inspect safe diagnostic. No blind retry or settings relaxation.",
+  "sourceFiles": [
+    {
+      "file": "public/arrival.js",
+      "sha256": "08d406d8638856acabbe207140bb2af79f8b53adbc05893c82c2cca89066c63a"
+    },
+    {
+      "file": "public/atlas.css",
+      "sha256": "9b7c6d7ba9c1a274f42c226a385cde16327099665b32583464da601ce7bc9a40"
+    },
+    {
+      "file": "public/atlas.html",
+      "sha256": "8437321dc240cc9dcc9d1e9cd114c90f0c7a689fb287055b62f746c14942ecca"
+    },
+    {
+      "file": "public/atlas.js",
+      "sha256": "b2272e817dd3155384815c0ab68e8fcfba8cabc18c87ff2c993a61bf4bf57b56"
+    },
+    {
+      "file": "public/control.css",
+      "sha256": "842c36c994b47cc5130f8f9beca6f2348962a38c617b20f8a39f8c68c54117de"
+    },
+    {
+      "file": "public/control.html",
+      "sha256": "d17dc21673f0662e25cd10cc2f2f60d7037bc80738cafa16549b32dd3c72d280"
+    },
+    {
+      "file": "public/control.js",
+      "sha256": "aa56af18611c67376b059f6b75824aa0a96f8c3b9a0730320ced25984984a378"
+    },
+    {
+      "file": "public/crystal.svg",
+      "sha256": "6fba39ea1b1bb6c49156c24a1e7eee6ecb3431fb95f9138915cd9089cf845013"
+    },
+    {
+      "file": "public/overlay-client.js",
+      "sha256": "6f2a9bd07e3137725e1642609ffbf4c81c564fb67046b51ebf865ebc910aa9a0"
+    },
+    {
+      "file": "public/overlay-live.html",
+      "sha256": "0bc14fc5ffa4a35a0d40f329cb0e2312ba0425cf3074ef69d476dc5003e702e3"
+    },
+    {
+      "file": "public/overlay.css",
+      "sha256": "2cdf01b1b923caccbc93e552ce5426829dcbe051f1cda02c730415400f575379"
+    },
+    {
+      "file": "public/overlay.html",
+      "sha256": "c05fc8df84da1c066d7eed843a81f4db04fcf3b6065b1186a2651391aa2c3e7d"
+    },
+    {
+      "file": "public/overlay.js",
+      "sha256": "2814a9f7c1552da9bc3f21eb226c46c43162e0307912d6b5461afa8d9edeade8"
+    },
+    {
+      "file": "public/relic.svg",
+      "sha256": "0819680dad1da4c1bfea060243468bfb1f385c8fa53d1d1960f62d9bbd7a575e"
+    },
+    {
+      "file": "public/style.css",
+      "sha256": "893d7cb0d26b5c3a2c798f32fb10b9599bf66e853f6b64bca4600803d92ebcb0"
+    },
+    {
+      "file": "scripts/browser-smoke-pilot.js",
+      "sha256": "a74123bc793e79f7b0a63c9e98656d6f0ddbf36f853038234a1f766054479ec5"
+    },
+    {
+      "file": "scripts/browser-smoke.js",
+      "sha256": "a26a6e3c1c07f95db5ec05e35da1961bbc5aff51158df849a75d6fc78bfe71fc"
+    },
+    {
+      "file": "scripts/release-files.js",
+      "sha256": "ddd409d57e259a33bbf180a38e18c8b3e53e24eb7c186b7e5c608fc485c0e7a5"
+    },
+    {
+      "file": "scripts/simulate-journey.js",
+      "sha256": "24dddfcd9853ff70fc1b674f65f832a1eca56d0e08aa1270578a74b287064799"
+    },
+    {
+      "file": "scripts/simulate-overlay.js",
+      "sha256": "87f54dfdaa4a1578d7576081b75480c933932a7ce0adfc009eef8520190ccc94"
+    },
+    {
+      "file": "src/app.js",
+      "sha256": "625f77d56cdfe468933b8115f8004344f4dd77ac584454f27f7b475df7b98652"
+    },
+    {
+      "file": "src/bot.js",
+      "sha256": "8ca5b9fd515ec933e57f173faaa7becc2c11072e6dd7c293f6aafe05c072d032"
+    },
+    {
+      "file": "src/claims.js",
+      "sha256": "081def0e6564403309a29774d1d7005501c3ea5c79f1560d539228b2773d21ce"
+    },
+    {
+      "file": "src/control.js",
+      "sha256": "d4c2900cd1c05d8ac05c1321794802032d2446829291b0032a53253029fa9870"
+    },
+    {
+      "file": "src/crypto.js",
+      "sha256": "fd59442ff91b9eb38341d4de5487a7236a2c05faec8ac9756060b06b3444c45e"
+    },
+    {
+      "file": "src/lifecycle.js",
+      "sha256": "0626dad68cd6d40ac62ca7af2b888424663ebc236558cfa5fb820274033e8bbd"
+    },
+    {
+      "file": "src/marks.js",
+      "sha256": "c324451062f8b5cc9b253779d7c4f4fd94ec87afeec6ea4174ca9a953bcc0bb3"
+    },
+    {
+      "file": "src/oauth.js",
+      "sha256": "9f8ce2cdd908353ce5e4d04ac6e73c5909f3106caff7f7a53eb26192f2ed1be6"
+    },
+    {
+      "file": "src/overlay-feed.js",
+      "sha256": "8270aa97a1070a1e45e3f365c12ab867fbe8f8c20f7e019a594ffd9ec0a71420"
+    },
+    {
+      "file": "src/overlay-sockets.js",
+      "sha256": "fb029b33fb5a47ca528d0f01cc3d991acdb0218126adc799543b16826b36596c"
+    },
+    {
+      "file": "src/pilot.js",
+      "sha256": "7ff96b767301c78c5a6e980eba202fb33f2b9009b1329c8b2da5e346c5d68f2e"
+    },
+    {
+      "file": "src/public-view.js",
+      "sha256": "bd70ca9ef0eb5d2dd2e98b873312124cb6ba38fc31a9dd85981c84d5f30695aa"
+    },
+    {
+      "file": "src/release.js",
+      "sha256": "d01c1e1bc111357c95e85b0511cafa9caaf400658060f65e5ba3858db8e31ccf"
+    },
+    {
+      "file": "src/runtime.js",
+      "sha256": "3e9ba3cc69a2c0bc274fbd783225a9d7b44fd88b45c3a9209bd458976e056c3c"
+    },
+    {
+      "file": "src/send-off.js",
+      "sha256": "8ab6570841a3f7a9bc46f7b435632daee143caa0b6295fc5909ffde5bc8b149f"
+    },
+    {
+      "file": "src/send-state.js",
+      "sha256": "1fcc3e93918060e8404d8d0da5494e6e50ee6824a9bedd5f952697057983b446"
+    },
+    {
+      "file": "src/server.js",
+      "sha256": "9bb710f3b7ae807f08c8c6db5358a8ba9a86556565d420c00cc242f831d52ae3"
+    },
+    {
+      "file": "src/state.js",
+      "sha256": "e63a1b91d4dfa3c6772fa513dd1cb1082c13aec8207ecf4533c478052632bee3"
+    },
+    {
+      "file": "src/store.js",
+      "sha256": "dde3bab7aee620be1d81b1839a444ffc91412a3fbfe95e8e7385e2d615297ccb"
+    },
+    {
+      "file": "src/subscriptions.js",
+      "sha256": "5c302e9fb817713db7df9b6397a68a1e51891349597613c70003b2ef0daebb6f"
+    },
+    {
+      "file": "test-support/fake-firestore.js",
+      "sha256": "ec5e5cc596d2c60a6d088284a868bdc2aff2443fa9227f4304d264b980a0596d"
+    },
+    {
+      "file": "test-support/journey-fixture.js",
+      "sha256": "fb8c96c527850ae84aaa3b50d9b54ca02bd6639230bf7b3d6ccc4c1c6d311aed"
+    },
+    {
+      "file": "test-support/local-tls.js",
+      "sha256": "593269e065210afcad76b2a947fc0041c806902671e28390210e8e8eaf4f6766"
+    },
+    {
+      "file": "test-support/overlay-fixture.js",
+      "sha256": "a37fd5d9666a57e7fe934746e97f31f0de1c25455be4c0ed4b280ba4b4d7fcef"
+    },
+    {
+      "file": "test-support/pilot-fixture.js",
+      "sha256": "8cc2aec1735d51b645a08e4a4194692ce4b9216e79f1f0723e8c9752c55bde8a"
+    },
+    {
+      "file": "test/app.test.js",
+      "sha256": "3fe473767f8ec61203204558ff050d61efbb13d56b96cd050965f66e38c112f6"
+    },
+    {
+      "file": "test/atlas.test.js",
+      "sha256": "42b1f99eb328d5f9a348aab50c7398ba04aa20413696ab5564e30cdae3cb66c9"
+    },
+    {
+      "file": "test/bot.test.js",
+      "sha256": "ef9c3af66129dc1ec41270a52c6eb94de705589e491be2f7aa02c602b5af1f16"
+    },
+    {
+      "file": "test/claims.test.js",
+      "sha256": "cb709d6f9fb0b641c16c9ca60f3f871f1fa3d9279a9a0d7b55d142b3f8961be0"
+    },
+    {
+      "file": "test/cloudbuild.test.js",
+      "sha256": "1c4f9d6a11b72351d15fdae7206c9c33cb3fe9d82559336c488390c435899d03"
+    },
+    {
+      "file": "test/control.test.js",
+      "sha256": "b68314191f2300b299d7c631fee1d19a1b99504ee7de3371707dfd42052371d6"
+    },
+    {
+      "file": "test/firestore.test.js",
+      "sha256": "59173803010f47517473f634c45f7af768a8d90c9bb03e5e6832841e570aea49"
+    },
+    {
+      "file": "test/lifecycle.test.js",
+      "sha256": "22c906d51839573053b444dc3051649bf82366575b719ac3ac5296aa89bb820b"
+    },
+    {
+      "file": "test/live-restart.test.js",
+      "sha256": "c03e96ef10e766bdbf0dc5b440a508ce8aa09835b662206932b16b8522142b2a"
+    },
+    {
+      "file": "test/local-tls.test.js",
+      "sha256": "1dda0048aa4a0feb06da97faea3bfab403f79b1b0d154fc9b90b304d5bde3698"
+    },
+    {
+      "file": "test/marks.test.js",
+      "sha256": "1aa66a0deb215c24e37605f05c0f12aa2ffea062948b99c9ec179088a13e8490"
+    },
+    {
+      "file": "test/oauth.test.js",
+      "sha256": "d356f1fbc314b2023d18859d25dc071e33c8bf3f7051a10b2621d84da1477b0a"
+    },
+    {
+      "file": "test/overlay.test.js",
+      "sha256": "8d5830af2218bcbf1b600a8b2334997c31d91b576319c00d79005f2a4c1c3675"
+    },
+    {
+      "file": "test/pilot.test.js",
+      "sha256": "658e9cfca061c66ba3dcfc4b58d0b073b18e85d7aa3e57ff14c2358c2b3a309c"
+    },
+    {
+      "file": "test/release.test.js",
+      "sha256": "1e54719cb999e522cc32fb1b585e9659670c1bb4a0b8da38e1d96733300a3242"
+    },
+    {
+      "file": "test/send-off.test.js",
+      "sha256": "9e396333c9789b04cb68071f07ba828a6e78530648030186b361c526e7e66e5c"
+    },
+    {
+      "file": "test/subscriptions.test.js",
+      "sha256": "25fa62c7a7e10aaea88e7a797df08236bf97a4543c4ad56017783aee7994659e"
+    },
+    {
+      "file": "src/raid-diagnostic.js",
+      "sha256": "79a887e2c443941b8c97ec2c3f9bddd614b52b13df12c23602c6c7baaf3b8703"
+    },
+    {
+      "file": "test/raid-diagnostic.test.js",
+      "sha256": "d9ac1c74dc7e0b2e3a9d44ef1fa9dc84c33f0e31a180d7abfe6bd42e18949608"
+    }
+  ],
+  "execution": {
+    "isolation": "bubblewrap private PID/network, loopback only; read-only snapshot/toolchain/dependencies; cleared allowlisted environment; fresh disposableHOME",
+    "writableTmpfsBytes": 536870912,
+    "nodeHeapMiB": 256,
+    "chromiumHeapMiB": 128,
+    "chromiumSandbox": true,
+    "cpuSeconds": 120,
+    "perScriptWallMs": 150000,
+    "externalNetwork": false,
+    "credentialsMounted": false
+  }
+}
