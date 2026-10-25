@@ -9,7 +9,7 @@ export function validSnapshot(value) {
     && Number.isInteger(value.lineageRings) && value.lineageRings >= 0 && value.lineageRings <= 16
     && (value.handoff === undefined || value.handoff === null || (Number.isFinite(value.serverNow) && validHandoff(value.handoff))) && Array.isArray(value.marks) && value.marks.length <= 160
     && value.approvedCount === value.marks.length && value.marks.every(mark => typeof mark.id === 'string'
-      && /^m[1-9]\d{0,8}$/.test(mark.id) && typeof mark.runeSvg === 'string' && mark.runeSvg.length < 1024);
+      && (mark.faded === undefined || typeof mark.faded === 'boolean') && /^m[1-9]\d{0,8}$/.test(mark.id) && typeof mark.runeSvg === 'string' && mark.runeSvg.length < 1024);
 }
 
 export function connectOverlay({ url, render, status, WebSocketImpl = WebSocket, setTimer = setTimeout, clearTimer = clearTimeout }) {

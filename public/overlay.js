@@ -36,7 +36,8 @@ function render(snapshot) {
   count.textContent = `${snapshot.approvedCount} approved marks · charge ${snapshot.approvedCount}/160`;
   document.querySelector('#charge').style.width = `${snapshot.approvedCount / 160 * 100}%`;
   snapshot.marks.forEach((mark, index) => {
-    const image = document.createElement('img'); image.className = 'rune'; image.alt = 'Approved community rune';
+    const image = document.createElement('img'); image.className = 'rune'; image.alt = mark.faded ? 'Approved carried rune, dimmed after three holder stream closures; retained, not deleted' : 'Approved community rune';
+    if (mark.faded) image.classList.add('faded');
     image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(mark.runeSvg)}`;
     const angle = index * 2.399963; const radius = 30 + index % 3 * 5;
     image.style.setProperty('--x', `${Math.cos(angle) * radius}%`); image.style.setProperty('--y', `${Math.sin(angle) * radius}%`);

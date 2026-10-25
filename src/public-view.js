@@ -27,7 +27,7 @@ export function handoffView(registry, channel, now) {
 export function withCarriedMarks(view, lineage, registry, host) {
   if (registry?.holderId !== host || !['ready', 'paused'].includes(view.status)) return view;
   const last = lineage?.stops?.at(-1);
-  const carried = last?.to === host ? last.marks.map(({ id, text }) => ({ id, runeSvg: runeSvg(text) })) : [];
+  const carried = last?.to === host ? last.marks.map(({ id, text }) => ({ id, runeSvg: runeSvg(text), ...(registry.carriedClosures === 3 ? { faded: true } : {}) })) : [];
   return { ...view, marks: [...carried, ...view.marks].slice(-160) };
 }
 

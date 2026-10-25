@@ -12,3 +12,5 @@
 .corner .rune{width:10px;height:10px}
 .corner .archive[data-phase=streak] .crystal{transform:translateX(calc((1 - var(--arrival))* -100%)) rotate(-25deg)}
 #sound-toggle{font:12px system-ui,sans-serif;color:#dce4ed;background:#26394f;border:1px solid #829bb3;padding:3px 7px;cursor:pointer}#sound-toggle:focus-visible{outline:2px solid #f0c581;outline-offset:1px}#sound-toggle[hidden]{display:none}.corner #sound-toggle{position:absolute;z-index:2;top:87px;right:5px;width:44px;height:20px;padding:1px;font-size:9px}
+
+.rune.faded { opacity: 0.28; }

@@ -50,6 +50,10 @@ export function reduceLifecycle({ registry, channel, marks, host, event, chat, p
   registry = structuredClone(registry ?? emptyRegistry());
   channel = structuredClone(channel ?? emptyChannel());
   marks = structuredClone(marks ?? emptyMarkDocument());
+  const countHolderClosure = () => {
+    if (registry.holderId === host && channel.online && channel.streamId && !channel.closedIds.includes(channel.streamId))
+      registry.carriedClosures = Math.min(3, (Number.isInteger(registry.carriedClosures) && registry.carriedClosures >= 0 ? Math.min(3, registry.carriedClosures) : 0) + 1);
+  };
   if (policy) {
     if (typeof policy.banned !== 'boolean' || !Array.isArray(policy.blockedUserIds) || policy.blockedUserIds.length > 128
       || !policy.blockedUserIds.every(id => typeof id === 'string' && /^\d{1,32}$/.test(id))) throw new Error('Bounded trusted channel policy required');
@@ -58,7 +62,7 @@ export function reduceLifecycle({ registry, channel, marks, host, event, chat, p
   if (event?.type === 'online' && event.sentAt > channel.lifecycleAt && event.startedAt > channel.closedThrough
     && !channel.closedIds.includes(event.streamId) && event.streamId !== channel.streamId
     && (!channel.online || event.startedAt > channel.startedAt)) {
-    if (channel.online) closeStream(channel, marks);
+    if (channel.online) { countHolderClosure(); closeStream(channel, marks); }
     channel.online = true; channel.streamId = event.streamId; channel.startedAt = event.startedAt; channel.lifecycleAt = event.sentAt; channel.lifecycleSource = event.provenance ?? 'eventsub';
   }
   if (event?.type === 'offline' && event.sentAt >= channel.lifecycleAt) {
@@ -67,6 +71,7 @@ export function reduceLifecycle({ registry, channel, marks, host, event, chat, p
     if (channel.online && channel.streamId) channel.retiredStream = {
       streamId: channel.streamId, startedAt: channel.startedAt, offlineAt: event.sentAt,
     };
+    countHolderClosure();
     closeStream(channel, marks);
     channel.closedThrough = Math.max(channel.closedThrough, event.sentAt);
     channel.lifecycleAt = event.sentAt; channel.lifecycleSource = event.provenance ?? 'eventsub'; channel.online = false; channel.streamId = null; channel.startedAt = null;
