@@ -1,3 +1,5 @@
+> CURRENT 16:17 P3 authorization: same original session/feature/raid-relic-polish only; receipt-seeking target comet/impact/approved-word flight and actual-claim fusion, source provisional charge/verified release. Preserve all P1 safety/P2 budgets/vendor; no P4+. Parent alone reviews/commits/deploys; no Codex stage/commit/branch/delegation/cloud/provider/live pages/streams/chat/raids/credentials/export. Both paid gates OFF. Parent reports P2 raid-relic-p2crystal1025 / core40c1a5f,447/447 zero skips and13 mock flows54checks; Grok physical P2 test remains pending.
+
 > CURRENT 15:24 P2 authorization: same original session/feature/raid-relic-polish only. Original procedural Three.js renderer, reviewed free MIT local vendor/licence and SVG fallback; no P3+. Parent QA/commits/deploys. No Codex staging/commit/branch/delegation/cloud/provider/credentials/live pages/streams/chat/raids/export; paid gates OFF. Grok-reported actual P1 pass is distinct from local test evidence and does not alter health liveValidated semantics. P4 recovery/voice/moved-on copy is backlog only.
 
 # Raid Relic authoring rules
