@@ -88,7 +88,7 @@ try {
       ? Boolean(match && Math.abs(Number(match[1]) - expectedSeconds) <= 2
         && Number(match[2]) === meter.offers && Number(match[3]) === meter.threshold
         && Number(match[4]) === meter.accepts && Number(match[5]) === meter.threshold
-        && timing.startsWith(meter.awaitingRaid ? 'Awaiting verified raid · provisional' : 'Verified raid · claim'))
+        && timing.startsWith(meter.awaitingRaid ? 'Awaiting verified raid · gathering light' : 'The raid arrived · claim the relic'))
       : Boolean(timing);
     return { width: r.width, height: r.height, scrollHeight: document.documentElement.scrollHeight, labels, timingMatches };
   });

@@ -18,30 +18,47 @@ export function validSnapshot(value) {
       && (mark.flightText === undefined || validFlightText(mark.flightText)) && (mark.faded === undefined || typeof mark.faded === 'boolean') && /^m[1-9]\d{0,8}$/.test(mark.id) && typeof mark.runeSvg === 'string' && mark.runeSvg.length < 1024);
 }
 
-export function connectOverlay({ url, render, status, WebSocketImpl = WebSocket, setTimer = setTimeout, clearTimer = clearTimeout }) {
-  let socket; let stopped = false; let retry; let watchdog; let backoff = 500; let revision = -1;
-  const stale = () => { status('stale'); render(null); };
-  const alive = () => { clearTimer(watchdog); watchdog = setTimer(() => { stale(); socket.close(); }, 35000); };
+export function connectOverlay({ url, render, status, WebSocketImpl = WebSocket, setTimer = setTimeout, clearTimer = clearTimeout,
+  windowEvents = globalThis.window, documentEvents = globalThis.document }) {
+  let socket = null, stopped = false, retry = null, watchdog = null, opening = null, backoff = 500, epoch = 0;
+  const clear = () => { clearTimer(watchdog); clearTimer(opening); watchdog = opening = null; };
+  function lost(own, kind = 'reconnecting') {
+    if (stopped || own !== epoch) return;
+    const old = socket; socket = null; epoch++; clear(); status(kind); render(null);
+    try { old?.close(); } catch { /* Error/close delivery is not required for recovery. */ }
+    if (retry !== null) return;
+    const ticket = setTimer(() => { if (retry !== ticket || stopped) return; clearTimer(ticket); retry = null; connect(); }, backoff);
+    retry = ticket; backoff = Math.min(backoff * 2, 10000);
+  }
   function connect() {
-    if (stopped) return;
-    revision = -1; status('connecting');
-    socket = new WebSocketImpl(url);
-    socket.onopen = alive;
-    socket.onmessage = event => {
-      if (typeof event.data !== 'string' || event.data.length > 131072) { socket.close(); return; }
-      let value; try { value = JSON.parse(event.data); } catch { socket.close(); return; }
+    if (stopped || socket) return;
+    const own = ++epoch; let revision = -1; status('connecting');
+    opening = setTimer(() => lost(own, 'stale'), 8000); // socket AND first valid snapshot
+    let active;
+    try { active = new WebSocketImpl(url); socket = active; } catch { lost(own); return; }
+    const current = () => !stopped && own === epoch && socket === active;
+    const alive = () => { if (!current()) return; clearTimer(watchdog); watchdog = setTimer(() => lost(own, 'stale'), 35000); };
+    active.onopen = alive;
+    active.onmessage = event => {
+      if (!current()) return;
+      if (typeof event.data !== 'string' || event.data.length > 131072) { lost(own); return; }
+      let value; try { value = JSON.parse(event.data); } catch { lost(own); return; }
       if (value?.type === 'heartbeat') { alive(); return; }
-      if (!validSnapshot(value)) { socket.close(); return; }
-      alive();
+      if (!validSnapshot(value)) { lost(own); return; }
+      clearTimer(opening); opening = null; alive();
       if (value.revision <= revision) return;
       revision = value.revision; backoff = 500; status('connected'); render(value);
     };
-    socket.onerror = () => socket.close();
-    socket.onclose = () => {
-      clearTimer(watchdog); status('reconnecting'); render(null);
-      if (!stopped) { retry = setTimer(connect, backoff); backoff = Math.min(backoff * 2, 10000); }
-    };
+    active.onerror = () => lost(own);
+    active.onclose = () => lost(own);
   }
+  const wake = () => {
+    if (stopped || socket || documentEvents?.hidden) return;
+    clearTimer(retry); retry = null; connect();
+  };
+  windowEvents?.addEventListener?.('online', wake); documentEvents?.addEventListener?.('visibilitychange', wake);
   connect();
-  return () => { stopped = true; clearTimer(retry); clearTimer(watchdog); socket.close(); };
+  return () => { stopped = true; epoch++; clearTimer(retry); retry = null; clear(); const old = socket; socket = null;
+    windowEvents?.removeEventListener?.('online', wake); documentEvents?.removeEventListener?.('visibilitychange', wake);
+    try { old?.close(); } catch {} };
 }

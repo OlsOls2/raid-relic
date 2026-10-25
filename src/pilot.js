@@ -1,3 +1,4 @@
+import { boundedCall } from './bounded.js';
 import { reservationReason } from './send-state.js';
 import { subscriptionFailureDiagnostic } from './subscriptions.js';
 import { randomBytes } from 'node:crypto';
@@ -46,7 +47,7 @@ export function createPilot({ replies, forge, chronicle, state, store, oauth, su
       stage = 'keeper-grant';
       const token = await oauth.accessTokenForKeeper(id);
       stage = 'stream-observation';
-      const response = await transport(`https://api.twitch.tv/helix/streams?user_id=${id}`, { headers: { Authorization: `Bearer ${token}`, 'Client-Id': clientId } });
+      const response = await boundedCall(signal => transport(`https://api.twitch.tv/helix/streams?user_id=${id}`, { signal, headers: { Authorization: `Bearer ${token}`, 'Client-Id': clientId } }));
       if (response.status !== 200 || !Array.isArray(response.data?.data) || response.data.data.length > 1) throw new Error('Stream observation failed');
       const stream = response.data.data[0]; let event;
       if (!stream) event = { host: id, type: 'offline', sentAt: started };
@@ -110,7 +111,11 @@ export function createPilot({ replies, forge, chronicle, state, store, oauth, su
     },
     async status(id) {
       if (!ids.includes(id)) throw new Error('Unconfigured Keeper');
-      const channel = await state.getStreamStatus(id); const registry = await state.getKeeperRegistry();
+      const channel = await state.getStreamStatus(id); let registry = await state.getKeeperRegistry();
+      if (registry.holderId === id && registry.send?.sourceId === id && registry.send.status === 'confirmed' && registry.pendingHop && !registry.pendingHop.finalized && now() >= registry.pendingHop.endsAt) {
+        await state.sendOffStep({ type: 'reconcile-ended', source: id, actor: id, id: registry.send.id, generation: registry.send.generation, hopId: registry.pendingHop.eventId }, now());
+        registry = await state.getKeeperRegistry();
+      }
       return { chronicle: chronicle?.enabled ? 'Paid generation enabled: one attempt per received stop; fiction only.' : 'Off: handwritten template fiction; no model calls.', candidates: await state.getKeeperCandidates(id), candidatesObservedAt: now(), mode: simulator ? 'simulator' : 'live', account: KEEPERS[id], online: channel?.online ?? false, optedIn: channel?.optedIn ?? false, paused: channel?.paused ?? false,
         bothReadiness: Object.fromEntries(await Promise.all(ids.map(async keeper => [KEEPERS[keeper], (await store.getJob(keeper))?.ready === true]))),
         ownerStep: 'Wait for both readiness flags true; Bootstrap / reconcile pending channels after callback verification. Reconnect missing grants.',

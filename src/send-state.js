@@ -17,16 +17,29 @@ export function eligible(registry, channels, marks, source, target, retired = fa
     && !marks[source]?.blocked?.includes(target) && !marks[target]?.blocked?.includes(source);
 }
 export function sendState(previous, channels, marks, config, op, now) {
-  const registry = structuredClone(previous ?? { holderId: null, originated: false }); let result = null; let ritual = null;
+  let registry = structuredClone(previous ?? { holderId: null, originated: false }); let result = null; let ritual = null;
+  let automaticallyRetired = false; const priorSendWatermark = registry.sendWatermark ?? -1; const retiredDeadline = registry.pendingHop?.endsAt;
+  if (['reserve', 'reconcile-ended'].includes(op.type) && config.channels.includes(op.source) && op.actor === op.source
+    && registry.send?.status === 'confirmed' && registry.pendingHop && now >= registry.pendingHop.endsAt
+    && (op.type === 'reserve' || (op.id === registry.send.id && op.generation === registry.send.generation && op.hopId === registry.pendingHop.eventId))) {
+    const retired = sendState(registry, channels, marks, config, { type: 'expire-handoff', source: op.source, actor: op.actor, id: registry.send.id, hopId: registry.pendingHop.eventId }, now);
+    if (retired.result?.status === 'expired-handoff') { registry = retired.registry; automaticallyRetired = true; result = retired.result; }
+  }
   const intent = registry.send;
   if (op.type === 'reserve') {
     const targetId = config.logins[op.login];
-    const reason = reservationReason(registry, channels, marks, config, op, now);
+    // Only a request genuinely after the proved old window may cross this
+    // transaction's retirement watermark. Persisted watermarks never rewind.
+    const postWindow = automaticallyRetired && Number.isFinite(op.sentAt) && op.sentAt <= now
+      && now - op.sentAt <= SEND_LIMITS.confirmationMs && op.sentAt > priorSendWatermark
+      && (op.sentAt > retiredDeadline || (op.sentAt === retiredDeadline && op.sentAt === now));
+    const reason = reservationReason(registry, channels, marks, config, op, now,
+      { watermark: postWindow ? priorSendWatermark : registry.sendWatermark ?? -1 });
     if (reason) result = { status: 'blocked', reason };
     else {
-      registry.send = { id: hash(op.id), generation: hash(`send-generation:${op.id}:${op.sentAt}`), sourceId: op.source, targetId, targetLogin: op.login, status: 'queued', createdAt: now,
+      registry.send = { id: hash(op.id), generation: hash(`send-generation:${op.id}:${op.sentAt}`), sourceId: op.source, targetId, targetLogin: op.login, requestedAt: op.sentAt, status: 'queued', createdAt: now,
         sourceStreamId: channels[op.source].streamId, targetStreamId: channels[targetId].streamId, expiresAt: now + SEND_LIMITS.queueMs };
-      registry.sendWatermark = op.sentAt;
+      registry.sendWatermark = Math.max(registry.sendWatermark ?? -1, op.sentAt);
       result = { status: 'reserved', intentId: registry.send.id };
     }
   }
@@ -48,7 +61,7 @@ export function sendState(previous, channels, marks, config, op, now) {
       && hop.sourceStreamId === intent.sourceStreamId && hop.targetStreamId === intent.targetStreamId
       && Number.isFinite(hop.raidSentAt) && hop.raidSentAt >= (intent.dispatchAt ?? intent.createdAt)
       && Number.isFinite(hop.endsAt) && now >= hop.endsAt && (streamMatches || provenClosed)) {
-      hop.cancelled = true; hop.expired = true; delete hop.offers; delete hop.accepts;
+      hop.cancelled = true; hop.expired = true; delete hop.offers; delete hop.accepts; delete hop.movedOffers;
       intent.status = 'expired-handoff'; intent.retiredAt = now; intent.confirmedEventId = hop.eventId; intent.confirmedRaidSentAt = hop.raidSentAt;
       registry.raidWatermark = Math.max(registry.raidWatermark ?? -1, now);
       registry.sendWatermark = Math.max(registry.sendWatermark ?? -1, now);
@@ -114,13 +127,13 @@ export function sendState(previous, channels, marks, config, op, now) {
 }
 
 // Closed enums only: safe to expose in private controls/logs; never upstream data.
-export function reservationReason(registry, channels, marks, config, op, now) {
+export function reservationReason(registry, channels, marks, config, op, now, { watermark = registry.sendWatermark ?? -1 } = {}) {
   const target = config.logins[op.login];
   if (!config.channels.includes(op.source) || op.actor !== op.source) return 'source-actor';
   if (!target || target === op.source) return 'target-config';
   if (busy(registry.send)) return 'existing-intent';
   if (registry.pendingHop?.endsAt > now && !registry.pendingHop.finalized && !registry.pendingHop.cancelled) return 'pending-handoff';
-  if (!Number.isFinite(op.sentAt) || op.sentAt <= (registry.sendWatermark ?? -1)) return 'send-watermark';
+  if (!Number.isFinite(op.sentAt) || op.sentAt > now || op.sentAt <= watermark) return 'send-watermark';
   if (registry.holderId !== op.source) return 'source-not-holder';
   for (const [role, id] of [['source', op.source], ['target', target]]) {
     const c = channels[id], m = marks[id];

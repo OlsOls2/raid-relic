@@ -15,6 +15,7 @@ import { parseLifecycle } from './lifecycle.js';
 export const MAX_BODY_BYTES = 65536;
 export const REPLAY_WINDOW_MS = 10 * 60 * 1000;
 const assets = new Map([
+  ['/control-read.js', ['control-read.js', 'text/javascript; charset=utf-8']],
   ['/cinematic.js', ['cinematic.js', 'text/javascript; charset=utf-8']],
   ['/relic3d.js', ['relic3d.js', 'text/javascript; charset=utf-8']],
   ['/vendor/three.module.js', ['vendor/three.module.js', 'text/javascript; charset=utf-8']],
@@ -31,6 +32,7 @@ const assets = new Map([
   ['/recap.css', ['recap.css', 'text/css; charset=utf-8']],
   ['/recap.js', ['recap.js', 'text/javascript; charset=utf-8']],
   ['/atlas.css', ['atlas.css', 'text/css; charset=utf-8']],
+  ['/atlas-hero.js', ['atlas-hero.js', 'text/javascript; charset=utf-8']],
   ['/atlas.js', ['atlas.js', 'text/javascript; charset=utf-8']],
   ['/control.js', ['control.js', 'text/javascript; charset=utf-8']],
   ['/control.css', ['control.css', 'text/css; charset=utf-8']],

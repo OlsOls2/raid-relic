@@ -91,7 +91,7 @@ function frame() {
   if (progress) {
     document.querySelector('#offer-arc').style.strokeDashoffset = String(339.292 * (1 - progress.offers));
     document.querySelector('#accept-arc').style.strokeDashoffset = String(307.876 * (1 - progress.accepts));
-    document.querySelector('#claim-label').textContent = `${meter.awaitingRaid ? 'Awaiting verified raid · provisional' : 'Verified raid · claim'} · ${progress.seconds}s · Offer ${meter.offers}/${meter.threshold} · Accept ${meter.accepts}/${meter.threshold}`;
+    document.querySelector('#claim-label').textContent = `${meter.awaitingRaid ? 'Awaiting verified raid · gathering light' : 'The raid arrived · claim the relic'} · ${progress.seconds}s · Offer ${meter.offers}/${meter.threshold} · Accept ${meter.accepts}/${meter.threshold}`;
   } else document.querySelector('#claim-label').textContent = '';
   const cinematic = cinema.frame(current, time, { reduced: motion.matches, hidden: document.hidden });
   const chargeLevel = document.hidden ? 0 : cinematic.chargeLevel;

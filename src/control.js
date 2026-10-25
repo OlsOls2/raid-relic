@@ -1,3 +1,4 @@
+import { boundedCall } from './bounded.js';
 import { strictJSON, forgeDescription } from './forge.js';
 import { readFile } from 'node:fs/promises';
 import { randomBytes } from 'node:crypto';
@@ -46,7 +47,7 @@ export function createControl({ store, keeperIds, origin, secure, now = Date.now
           if (!pilot || headers.origin !== origin || headers['content-type'] !== 'application/json') return reply(403, 'Control authorization required');
           let body; try { body = strictJSON(rawBody); } catch { return reply(403, 'Control authorization required'); }
           if (!body || Object.keys(body).sort().join(',') !== 'csrf,generation,intentId' || !/^[a-f0-9]{64}$/.test(body.intentId ?? '') || !/^[a-f0-9]{64}$/.test(body.generation ?? '')) return reply(403, 'Control authorization required');
-          const record = await session(id, headers);
+          const record = await boundedCall(() => session(id, headers));
           if (!record || typeof body.csrf !== 'string' || hash(body.csrf) !== record.csrfHash) return reply(403, 'Control authorization required');
           return reply(200, JSON.stringify(await pilot.cancelQueued(id, body.intentId, body.generation)), 'application/json');
         }
@@ -54,7 +55,7 @@ export function createControl({ store, keeperIds, origin, secure, now = Date.now
           if (!pilot || headers.origin !== origin || headers['content-type'] !== 'application/json') return reply(403, 'Control authorization required');
           let body; try { body = strictJSON(rawBody); } catch { return reply(403, 'Control authorization required'); }
           if (!body || Object.keys(body).sort().join(',') !== 'acknowledge,csrf,description' || typeof body.acknowledge !== 'boolean') return reply(403, 'Control authorization required');
-          const record = await session(id, headers);
+          const record = await boundedCall(() => session(id, headers));
           if (!record || typeof body.csrf !== 'string' || hash(body.csrf) !== record.csrfHash) return reply(403, 'Control authorization required');
           const description = forgeDescription(body.description);
           return reply(200, JSON.stringify(await pilot.forgeDesign(id, description, body.acknowledge)), 'application/json');
@@ -84,11 +85,13 @@ export function createControl({ store, keeperIds, origin, secure, now = Date.now
           return reply(200, 'Control session ended; Twitch authorization unchanged', undefined, { 'set-cookie': cookie(id, '', 0) });
         }
         if (method !== 'GET') return reply(405, 'Method not allowed');
-        const record = await session(id, headers);
+        const record = await boundedCall(() => session(id, headers));
         if (!record) return reply(401, `<p>Keeper authorization required.</p><a href="/oauth/keeper/${id}/start">Connect this Keeper</a>`, 'text/html; charset=utf-8');
         if (match[2] === '/cancel-queued') return reply(405, 'Use authenticated confirmation');
         if (match[2] === '/forge') return pilot ? reply(200, await readFile(new URL('../public/forge-owner.html', import.meta.url)), 'text/html; charset=utf-8') : reply(404, 'Not found');
-        if (match[2]) return reply(200, JSON.stringify({ forgeEnabled: pilot?.forgeEnabled === true, keeperId: id, expiresAt: record.expiresAt, csrf: csrf(record.secret), actions: ['logout', ...(pilot?.actions(id) ?? [])], ...(pilot ? { pilot: await pilot.status(id) } : {}) }), 'application/json');
+        if (match[2]) {
+          let pilotStatus; try { pilotStatus = pilot ? await boundedCall(() => pilot.status(id)) : undefined; } catch { return reply(503, JSON.stringify({ error: 'Status unavailable' }), 'application/json'); }
+          return reply(200, JSON.stringify({ forgeEnabled: pilot?.forgeEnabled === true, keeperId: id, expiresAt: record.expiresAt, csrf: csrf(record.secret), actions: ['logout', ...(pilot?.actions(id) ?? [])], ...(pilot ? { pilot: pilotStatus } : {}) }), 'application/json'); }
         if (pilot) return reply(200, await readFile(new URL('../public/control.html', import.meta.url)), 'text/html; charset=utf-8');
         return reply(200, `<h1>Keeper control</h1><p>Authenticated Keeper ${id}.</p><p>Worker and subscription bootstrap actions are not available yet.</p><a href="/control/${id}/status">Private session status</a>`, 'text/html; charset=utf-8');
       } catch { return reply(403, 'Control authorization required'); }

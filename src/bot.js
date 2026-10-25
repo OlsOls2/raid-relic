@@ -1,3 +1,4 @@
+import { boundedCall } from './bounded.js';
 export class ChatSendError extends Error { constructor(stage, httpStatus = null, dropKind = null, isSent = null) { super('Chat message not sent'); this.diagnostic = { stage, httpStatus, dropKind, isSent }; } }
 import { httpTransport } from './oauth.js';
 import { hash } from './crypto.js';
@@ -41,7 +42,7 @@ export function parseChat(payload, { streamerId, botId, includeMarkCommands = fa
 export function createBot({ oauth, clientId, clientSecret, streamerId, botId, callbackUrl, webhookSecret, transport = httpTransport }) {
   if (!oauth || !clientId || !clientSecret || !/^\d+$/.test(streamerId ?? '') || !/^\d+$/.test(botId ?? '') || streamerId === botId) throw new Error('Bot configuration required');
   async function call(url, options) {
-    try { return await transport(url, options); } catch { throw new Error('Bot request failed'); }
+    try { return await boundedCall(signal => transport(url, { ...options, signal })); } catch { throw new Error('Bot request failed'); }
   }
   const headers = token => ({ Authorization: `Bearer ${token}`, 'Client-Id': clientId, 'content-type': 'application/json' });
   async function sendChat(message, { retryUnauthorized = true } = {}) {

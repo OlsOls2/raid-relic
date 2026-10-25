@@ -1,3 +1,5 @@
+import { boundedCall } from './bounded.js';
+import { boundedResponse } from '../public/control-read.js';
 import { createControl } from './control.js';
 import { randomBytes } from 'node:crypto';
 import { hash, createTokenCipher } from './crypto.js';
@@ -7,8 +9,9 @@ const nonce = () => randomBytes(32).toString('base64url');
 const TOKEN_URL = 'https://id.twitch.tv/oauth2/token';
 export async function httpTransport(url, options) {
   try {
-    const response = await fetch(url, { ...options, signal: AbortSignal.timeout(8000), redirect: 'error' });
-    return { status: response.status, data: await response.json() };
+    const response = await boundedResponse(url, { ...options, redirect: 'error' }, { json: false });
+    let data; try { data = JSON.parse(response.text); } catch { throw Error('Invalid upstream response'); }
+    return { status: response.status, data };
   } catch { throw new Error('Upstream request failed'); }
 }
 
@@ -32,7 +35,7 @@ export function createOAuth({ clientId, clientSecret, redirectUri, redirectAllow
   const cookie = (value, age) => `${cookieName}=${value}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${age}${secure ? '; Secure' : ''}`;
   const context = role => `${clientId}:${role}:${accounts[role]}`;
   const safeCall = async (url, options) => {
-    try { return await transport(url, options); } catch { throw new Error('Twitch request failed'); }
+    try { return await boundedCall(signal => transport(url, { ...options, signal })); } catch { throw new Error('Twitch request failed'); }
   };
   async function exchange(parameters) {
     const response = await safeCall(TOKEN_URL, { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' },

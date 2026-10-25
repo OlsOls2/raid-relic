@@ -1,3 +1,4 @@
+import { boundedCall } from './bounded.js';
 import { httpTransport } from './oauth.js';
 
 // Twitch may include the unused raid direction as an empty string. Nothing
@@ -47,7 +48,7 @@ export function createSubscriptionManager({ oauth, bot, clientId, clientSecret, 
     ].map(item => ({ ...item, version: '1', transport: { ...chat.transport } })).concat(chat);
   }
   async function call(url, options, stage, payload) {
-    try { return await transport(url, options); } catch { throw new SubscriptionFailure(stage, undefined, payload); }
+    try { return await boundedCall(signal => transport(url, { ...options, signal })); } catch { throw new SubscriptionFailure(stage, undefined, payload); }
   }
   async function reconcile({ readiness = false } = {}) {
     const desired = payloads();

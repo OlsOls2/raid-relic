@@ -72,8 +72,8 @@ export async function pilotFixture(kind = 'memory', { extraKeeperScopes = [], ch
     return request('/eventsub', 'POST', { 'twitch-eventsub-message-id': id, 'twitch-eventsub-message-timestamp': timestamp,
       'twitch-eventsub-message-type': 'notification', 'twitch-eventsub-message-signature': `sha256=${createHmac('sha256', secret).update(id).update(timestamp).update(rawBody).digest('hex')}` }, rawBody);
   }
-  const chat = (host, user, text) => signed('channel.chat.message', { broadcaster_user_id: host, chatter_user_id: user, chatter_user_login: `viewer${user}`,
-    message_id: `chat-${++seq}`, badges: [], message: { text, fragments: [] } }, host, { broadcaster_user_id: host, user_id: BOT });
+  const chat = (host, user, text, options = {}) => signed('channel.chat.message', { broadcaster_user_id: host, chatter_user_id: user, chatter_user_login: `viewer${user}`,
+    message_id: options.messageId ?? `chat-${++seq}`, badges: [], message: { text, fragments: [] } }, host, { broadcaster_user_id: host, user_id: BOT }, options);
   const raid = (from = HOME, to = OTHER, viewers = 1) => signed('channel.raid', { from_broadcaster_user_id: from, to_broadcaster_user_id: to, viewers }, from, { from_broadcaster_user_id: from });
   return { runtime, db, request, control, login, cookies, calls, subscriptions, streams, chat, raid, signed, now: () => time,
     chatFailure(mode) { chatFailure = mode; },
