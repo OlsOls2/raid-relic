@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
 import { createRuntime } from '../src/runtime.js';
 import { fakeFirestore } from './fake-firestore.js';
@@ -8,7 +9,7 @@ export async function pilotFixture(kind = 'memory', { origin = 'https://pilot.ex
   const secret = 'synthetic-pilot-hmac-secret';
   const streams = new Map([[HOME, { user_id: HOME, id: '9001', type: 'live', started_at: new Date(time - 10000).toISOString() }],
     [OTHER, { user_id: OTHER, id: '9002', type: 'live', started_at: new Date(time - 10000).toISOString() }]]);
-  const calls = [], subscriptions = []; const revoked = new Set(); let streamsHook; let conflict = false; let timeoutRaid = false;
+  const calls = [], subscriptions = []; const revoked = new Set(); let streamsHook; let conflict = false; let timeoutRaid = false; let chatFailure = null;
   const transport = async (url, options = {}) => {
     calls.push({ url, ...options }); const u = new URL(url);
     if (u.pathname.endsWith('/token')) {
@@ -34,6 +35,15 @@ export async function pilotFixture(kind = 'memory', { origin = 'https://pilot.ex
     }
     if (u.pathname.endsWith('/streams')) { await streamsHook?.(u); return { status: 200, data: { data: u.searchParams.getAll('user_id').map(id => streams.get(id)).filter(Boolean) } }; }
     if (u.pathname.endsWith('/users')) { const id = u.searchParams.get('login') === 'raidrelichq' ? HOME : OTHER; return { status: 200, data: { data: [{ id, login: u.searchParams.get('login') }] } }; }
+    if (u.pathname === '/helix/chat/messages') {
+      assert.equal(options.method, 'POST'); assert.equal(options.headers.Authorization, `Bearer access-${BOT}`);
+      const body = JSON.parse(options.body); assert.deepEqual(Object.keys(body).sort(), ['broadcaster_id', 'message', 'sender_id']);
+      assert.equal(body.sender_id, BOT); assert.ok([HOME, OTHER].includes(body.broadcaster_id)); assert.equal(typeof body.message, 'string'); assert.ok(body.message.length <= 500);
+      if (chatFailure === 'transport') throw Error('synthetic-token-sensitive-network-error');
+      if (chatFailure === '401') return { status: 401, data: { message: 'synthetic-sensitive-body' } };
+      if (chatFailure === 'drop') return { status: 200, data: { data: [{ is_sent: false, drop_reason: { code: 'untrusted-sensitive-code', message: 'synthetic-sensitive-body' } }] } };
+      return { status: 200, data: { data: [{ is_sent: true, message_id: `mock-chat-${calls.length}` }] } };
+    }
     if (u.pathname.endsWith('/raids')) { if (timeoutRaid) throw new Error('synthetic ambiguous result'); return { status: 200, data: { data: [{}] } }; }
     throw new Error('Unexpected mocked route');
   };
@@ -66,5 +76,6 @@ export async function pilotFixture(kind = 'memory', { origin = 'https://pilot.ex
     message_id: `chat-${++seq}`, badges: [], message: { text, fragments: [] } }, host, { broadcaster_user_id: host, user_id: BOT });
   const raid = (from = HOME, to = OTHER, viewers = 1) => signed('channel.raid', { from_broadcaster_user_id: from, to_broadcaster_user_id: to, viewers }, from, { from_broadcaster_user_id: from });
   return { runtime, db, request, control, login, cookies, calls, subscriptions, streams, chat, raid, signed, now: () => time,
+    chatFailure(mode) { chatFailure = mode; },
     revoke(id) { revoked.add(id); }, advance(ms = 1) { time += ms; }, hook(fn) { streamsHook = fn; }, conflict() { conflict = true; }, timeout() { timeoutRaid = true; } };
 }

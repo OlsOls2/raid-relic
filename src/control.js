@@ -37,10 +37,24 @@ export function createControl({ store, keeperIds, origin, secure, now = Date.now
       return cookie(id, secret, 3600);
     }, authorizePost,
     async route({ path, method, headers = {}, rawBody }) {
-      const match = /^\/control\/(\d{1,32})(\/status)?$/.exec(path);
+      const match = /^\/control\/(\d{1,32})(\/status|\/expire-handoff)?$/.exec(path);
       if (!match || !keeperIds.includes(match[1])) return reply(404, 'Not found');
       const id = match[1];
       try {
+        if (match[2] === '/expire-handoff') {
+          if (method !== 'POST') return reply(405, 'Method not allowed');
+          let body;
+          try {
+            if (rawBody.length > 1024) throw Error();
+            const text = new TextDecoder('utf-8', { fatal: true }).decode(rawBody);
+            if ((text.match(/"(?:csrf|intentId|hopId)"\s*:/g) ?? []).length !== 3) throw Error();
+            body = JSON.parse(text);
+            if (Object.keys(body).sort().join(',') !== 'csrf,hopId,intentId' || !/^[a-f0-9]{64}$/.test(body.intentId) || !/^[a-f0-9]{64}$/.test(body.hopId)) throw Error();
+          } catch { return reply(403, 'Control authorization required'); }
+          const auth = await authorizePost({ keeperId: id, headers, rawBody: Buffer.from(JSON.stringify({ action: 'expire-handoff', csrf: body.csrf })) }, ['expire-handoff']);
+          if (!auth || !pilot) return reply(403, 'Control authorization required');
+          return reply(200, JSON.stringify(await pilot.expireHandoff(id, body.intentId, body.hopId)), 'application/json');
+        }
         if (method === 'POST' && !match[2]) {
           const auth = await authorizePost({ keeperId: id, headers, rawBody }, ['logout', ...(pilot?.actions(id) ?? [])]);
           if (!auth) return reply(403, 'Control authorization required');

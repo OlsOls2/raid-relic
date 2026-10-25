@@ -1,3 +1,4 @@
+import { ackDocument, ackSeen, ackStep } from './claim-ack.js';
 import { hash as observationHash } from './crypto.js';
 import { atlasPage, handoffView, withCarriedMarks, withIncomingPreview } from './public-view.js';
 import { reduceClaims, emptyLineage, publicJourney } from './claims.js';
@@ -13,7 +14,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
   const seen = new Map();
   const rituals = new Map();
   const chatReceipts = new Map();
-  const markDocs = new Map();
+  const markDocs = new Map(); const ackDocs = new Map();
   return {
     lifecycleEnabled: Boolean(config),
     accept({ id, expiresAt, now, raid, chat, lifecycle: providedEvent, observation, sentAt = now }) {
@@ -41,9 +42,11 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
         const op = raid ? { type: 'raid', raid, id, sentAt } : chat?.markAction?.type === 'send'
           ? { type: 'reserve', source: host, actor: chat.chatterId, login: chat.markAction.login, id, sentAt } : { type: 'noop' };
         sending = sendState(transition?.registry ?? registry, channelMap, markMap, config, op, now);
-        claiming = reduceClaims(sending.registry, channelMap, markMap, lineage, chat, now, sentAt);
+        claiming = reduceClaims(sending.registry, channelMap, markMap, lineage, ackSeen(ackDocs.get(host), chat, now) ? null : chat, now, sentAt);
       }
+      const ackNext = claiming && host ? ackDocument(ackDocs.get(host), chat, claiming.acknowledgement, transition?.channel, claiming.marks[host], now, claiming.ackDeadline) : null;
       // No await between check and insertion: atomic within this process.
+      if (ackNext) ackDocs.set(host, ackNext);
       seen.set(id, expiresAt);
       if (raid && !config) rituals.set(raid.to_broadcaster_user_id, {
         eventId: id,
@@ -73,6 +76,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
       const transition = config ? reduceLifecycle({ registry, channel: channels.get(host), marks: markDocs.get(host), host, chat: { ...actor, markAction: action }, now, sentAt: now }) : null;
       const doc = transition ? transition.marks : reduceMark(markDocs.get(host), host, actor, action, now);
       if (transition) { registry = transition.registry; channels.set(host, transition.channel); }
+      if (config) ackDocs.set(host, ackDocument(ackDocs.get(host), { ...actor, markAction: action }, null, transition.channel, doc, now));
       markDocs.set(host, doc);
       if (config) { const next = reduceClaims(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), lineage, null, now); registry = next.registry; lineage = next.lineage; }
       if (action.type === 'forgetme' && chatReceipts.get(host)?.chatterId === actor.chatterId) chatReceipts.delete(host);
@@ -82,11 +86,14 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
       const next = sendState(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), config, op, now);
       registry = next.registry; return next.result;
     },
+    getPrivateClaimAcks(host) { return structuredClone(ackDocs.get(host)); },
+    claimAckStep(host, op, now) { if (!config?.channels.includes(host)) throw Error('Unconfigured ACK'); const next = ackStep(ackDocs.get(host), op, channels.get(host), markDocs.get(host), now); ackDocs.set(host, next.doc); return next.result; },
     getKeeperRegistry() { return structuredClone(registry); },
     getStreamStatus(host) { return structuredClone(channels.get(host)); },
     setChannelPolicy(host, policy, now = Date.now()) {
       if (!config?.channels.includes(host)) throw new Error('Unconfigured lifecycle channel');
       const next = reduceLifecycle({ registry, channel: channels.get(host), marks: markDocs.get(host), host, policy, now, sentAt: now });
+      ackDocs.set(host, ackDocument(ackDocs.get(host), { broadcasterId: host }, null, next.channel, next.marks, now));
       registry = next.registry; channels.set(host, next.channel); markDocs.set(host, next.marks);
       const checked = reduceClaims(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), lineage, null, now); registry = checked.registry; lineage = checked.lineage;
     },

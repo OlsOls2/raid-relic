@@ -1,3 +1,4 @@
+import { ackDocument, ackSeen, ackStep } from './claim-ack.js';
 import { hash as observationHash } from './crypto.js';
 import { atlasPage, handoffView, withCarriedMarks, withIncomingPreview } from './public-view.js';
 import { reduceClaims, publicJourney } from './claims.js';
@@ -73,6 +74,8 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
           markMap[channelId] = (await tx.get(ref('markChannels', channelId))).data();
         }
         const lineage = managed ? (await tx.get(ref('lineage', 'single'))).data() : null;
+        const ackRef = managed && host ? ref('claimAcks', host) : null;
+        const ackDoc = ackRef ? (await tx.get(ackRef)).data() : null;
         const channel = channelMap[host];
         if (observation) {
           if (!managed || observationHash(JSON.stringify(channel ?? null)) !== observation.baseline) return 'superseded';
@@ -90,8 +93,9 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
           const op = raid ? { type: 'raid', raid, id, sentAt } : chat?.markAction?.type === 'send'
             ? { type: 'reserve', source: host, actor: chat.chatterId, login: chat.markAction.login, id, sentAt } : { type: 'noop' };
           sending = sendState(transition?.registry ?? registry, channelMap, markMap, config, op, now);
-          claiming = reduceClaims(sending.registry, channelMap, markMap, lineage, chat, now, sentAt);
+          claiming = reduceClaims(sending.registry, channelMap, markMap, lineage, ackSeen(ackDoc, chat, now) ? null : chat, now, sentAt);
         }
+        if (claiming && ackRef) tx.set(ackRef, ackDocument(ackDoc, chat, claiming.acknowledgement, transition?.channel, claiming.marks[host], now, claiming.ackDeadline));
         tx.set(eventRef, { expiresAt });
         if (transition) { tx.set(ref('keeperRegistry', 'single'), transition.registry); tx.set(ref('streamChannels', host), transition.channel); }
         if (raid && !config) tx.set(ref('rituals', raid.to_broadcaster_user_id), ritualFor(id, now, raid));
@@ -105,6 +109,15 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         if (receipt && receipt.chatterId === chat?.chatterId) tx.delete(receiptRef);
         if (chat && !chat.markAction) tx.set(ref('chatReceipts', chat.broadcasterId), { messageId: chat.messageId, chatterId: chat.chatterId, receivedAt: now });
         return observation ? (transition.channel.lifecycleAt === event.sentAt && transition.channel.lifecycleSource === 'helix-observation' ? 'applied' : 'no-change') : sending?.result ?? 'accepted';
+      });
+    },
+    async getPrivateClaimAcks(host) { return (await ref('claimAcks', host).get()).data(); },
+    async claimAckStep(host, op, now) {
+      if (!config?.channels.includes(host)) throw Error('Unconfigured ACK');
+      return db.runTransaction(async tx => {
+        const doc = ref('claimAcks', host), previous = (await tx.get(doc)).data();
+        const channel = (await tx.get(ref('streamChannels', host))).data(), marks = (await tx.get(ref('markChannels', host))).data();
+        const next = ackStep(previous, op, channel, marks, now); tx.set(doc, next.doc); return next.result;
       });
     },
     async getRitual(hostId) { return (await ref('rituals', hostId).get()).data(); },
@@ -129,9 +142,11 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
           const channel = (await tx.get(ref('streamChannels', host))).data();
           const history = (await tx.get(ref('lineage', 'single'))).data(); const channelMap = {}; const markMap = {};
           for (const key of config.channels) { channelMap[key] = (await tx.get(ref('streamChannels', key))).data(); markMap[key] = (await tx.get(ref('markChannels', key))).data(); }
+          const ackRef = ref('claimAcks', host), ackDoc = (await tx.get(ackRef)).data();
           const transition = reduceLifecycle({ registry, channel, marks: previous, host, chat: { ...actor, markAction: action }, now, sentAt: now });
           channelMap[host] = transition.channel; markMap[host] = transition.marks;
           const checked = reduceClaims(transition.registry, channelMap, markMap, history, null, now);
+          tx.set(ackRef, ackDocument(ackDoc, { ...actor, markAction: action }, null, transition.channel, transition.marks, now));
           tx.set(ref('lineage', 'single'), checked.lineage);
           tx.set(ref('keeperRegistry', 'single'), checked.registry); tx.set(ref('streamChannels', host), transition.channel); next = transition.marks;
         } else next = reduceMark(previous, host, actor, action, now);
@@ -160,9 +175,11 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         const marks = (await tx.get(ref('markChannels', host))).data();
         const history = (await tx.get(ref('lineage', 'single'))).data(); const channelMap = {}; const markMap = {};
         for (const key of config.channels) { channelMap[key] = (await tx.get(ref('streamChannels', key))).data(); markMap[key] = (await tx.get(ref('markChannels', key))).data(); }
+        const ackRef = ref('claimAcks', host), ackDoc = (await tx.get(ackRef)).data();
         const next = reduceLifecycle({ registry, channel, marks, host, policy, now, sentAt: now });
         channelMap[host] = next.channel; markMap[host] = next.marks;
         const checked = reduceClaims(next.registry, channelMap, markMap, history, null, now);
+        tx.set(ackRef, ackDocument(ackDoc, { broadcasterId: host }, null, next.channel, next.marks, now));
         tx.set(ref('lineage', 'single'), checked.lineage);
         tx.set(ref('keeperRegistry', 'single'), checked.registry); tx.set(ref('streamChannels', host), next.channel); tx.set(ref('markChannels', host), next.marks);
       });

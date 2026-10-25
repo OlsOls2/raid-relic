@@ -1,3 +1,4 @@
+export class ChatSendError extends Error { constructor(stage, httpStatus = null, dropKind = null, isSent = null) { super('Chat delivery failed'); this.diagnostic = { stage, httpStatus, dropKind, isSent }; } }
 import { httpTransport } from './oauth.js';
 import { parseMarkCommand } from './marks.js';
 
@@ -11,6 +12,11 @@ export function parseChat(payload, { streamerId, botId, includeMarkCommands = fa
     || !event.message.fragments.every(fragment => fragment && ['text', 'emote', 'cheermote', 'mention'].includes(fragment.type) && typeof fragment.text === 'string')) throw new Error('Invalid chat payload');
   const chat = { broadcasterId: streamerId, chatterId: event.chatter_user_id, messageId: event.message_id };
   if (event.chatter_user_id === botId) chat.isBot = true;
+  const origin = event.source_broadcaster_user_id, sourceMessage = event.source_message_id;
+  if (origin != null || sourceMessage != null) {
+    if (typeof origin !== 'string' || !/^\d{1,32}$/.test(origin) || typeof sourceMessage !== 'string' || !/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(sourceMessage)) throw Error('Invalid copied chat metadata');
+    if (origin !== streamerId) { chat.copied = true; return chat; }
+  }
   if (includeMarkCommands) {
     const action = parseMarkCommand(event.message.text);
     if (action) {
@@ -28,15 +34,19 @@ export function createBot({ oauth, clientId, clientSecret, streamerId, botId, ca
     try { return await transport(url, options); } catch { throw new Error('Bot request failed'); }
   }
   const headers = token => ({ Authorization: `Bearer ${token}`, 'Client-Id': clientId, 'content-type': 'application/json' });
-  async function sendChat(message) {
+  async function sendChat(message, { retryUnauthorized = true } = {}) {
     if (typeof message !== 'string' || !message.trim() || [...message].length > 500) throw new Error('Invalid chat message');
     for (let attempt = 0; attempt < 2; attempt++) {
-      const token = await oauth.accessToken('bot', { refresh: attempt === 1 });
-      const response = await call('https://api.twitch.tv/helix/chat/messages', { method: 'POST', headers: headers(token),
-        body: JSON.stringify({ broadcaster_id: streamerId, sender_id: botId, message }) });
-      if (response.status === 401 && attempt === 0) continue;
+      let token; try { token = await oauth.accessToken('bot', { refresh: attempt === 1 }); } catch { throw new ChatSendError('bot-grant'); }
+      let response; try { response = await call('https://api.twitch.tv/helix/chat/messages', { method: 'POST', headers: headers(token),
+        body: JSON.stringify({ broadcaster_id: streamerId, sender_id: botId, message }) }); } catch { throw new ChatSendError('transport'); }
+      if (response.status === 401 && attempt === 0 && retryUnauthorized) continue;
       const sent = response.data?.data?.[0];
-      if (response.status !== 200 || sent?.is_sent !== true || typeof sent.message_id !== 'string') throw new Error('Chat message not sent');
+      if (response.status !== 200 || sent?.is_sent !== true || typeof sent.message_id !== 'string') {
+        const known = ['automod_held', 'user_banned', 'channel_suspended', 'msg_banned', 'msg_duplicate', 'msg_ratelimit'];
+        const code = sent?.drop_reason?.code;
+        throw new ChatSendError('response', Number.isInteger(response.status) && response.status >= 100 && response.status <= 599 ? response.status : null, typeof code === 'string' ? known.includes(code) ? code : 'other' : sent?.is_sent === false ? 'not-sent' : response.status === 200 ? 'malformed-response' : null, typeof sent?.is_sent === 'boolean' ? sent.is_sent : null);
+      }
       return { messageId: sent.message_id };
     }
   }

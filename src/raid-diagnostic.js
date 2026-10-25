@@ -30,12 +30,12 @@ function safeText(value, token, max) {
 export function raidDiagnostic(intent, response, token, at, completedAt) {
   const status = Number.isInteger(response?.status) && response.status >= 100 && response.status <= 599 ? response.status : null;
   const message = safeText(response?.data?.message, token, 180), error = safeText(response?.data?.error, token, 40);
-  const category = response?.malformed ? 'malformed-response' : status === 200 ? 'accepted-not-travel' : status === 401 ? 'source-grant' : status === 403 ? 'provider-forbidden' : status === 429 ? 'rate-limited' : status === 409 ? 'pending-native-raid' : status === 404 ? 'target-not-found' : status === 400 ? (/block|does not accept|doesn't accept|restriction|too many viewers|not accept/i.test(message.text ?? '') ? 'incoming-raid-policy' : 'native-state-review') : status >= 400 && status < 500 ? 'request-rejected' : 'unknown-reconcile-only';
+  const category = response?.malformed ? 'malformed-response' : status === 200 ? 'accepted-not-travel' : status === 401 ? 'source-grant' : status === 403 ? 'provider-forbidden' : status === 429 ? 'rate-limited' : status === 409 ? 'pending-native-raid' : status === 404 ? 'target-not-found' : status === 400 ? (/block|settings do not allow|does not accept|doesn't accept|restriction|too many viewers|not accept/i.test(message.text ?? '') ? 'incoming-raid-policy' : 'native-state-review') : status >= 400 && status < 500 ? 'request-rejected' : 'unknown-reconcile-only';
   const nextStep = category === 'source-grant' ? 'Review source ID, token/client match and channel:manage:raids; reconnect source if needed. No automatic retry.'
     : category === 'provider-forbidden' ? 'Provider forbidden: owner reviews exact message; this status alone does not prove policy, account age or scope.'
     : category === 'pending-native-raid' ? 'STOP: native raid already in process. No new Send Off or Process while pending.'
     : category === 'target-not-found' ? 'Owner reviews target identity: Twitch reported target not found.'
-    : category === 'incoming-raid-policy' ? 'Owner reviews incoming-raid settings, blocks and viewer/account criteria against the message; do not auto-relax.'
+    : category === 'incoming-raid-policy' ? `${/^[a-z0-9_]{1,25}$/.test(intent.targetLogin ?? '') ? intent.targetLogin : 'Target channel'} raid settings block this raider: check Raid Settings minimum account age/viewers. Owner review; no auto-relax.`
     : category === 'rate-limited' ? 'Limit: 10 requests per 10 minutes. Wait for observed reset/retryAfter; review native state before new owner attempt.'
     : category === 'native-state-review' ? 'Owner reviews invalid/equal IDs, actual live/native state and exact message before considering a new attempt.'
     : category === 'accepted-not-travel' ? 'Accepted only; wait for verified raid EventSub, not another POST.'

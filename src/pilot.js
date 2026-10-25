@@ -17,7 +17,7 @@ export function createPilot({ state, store, oauth, subscriptions, sends, now = D
   }
   async function blocked(id, reason, diagnostic) {
     try { await logger(JSON.stringify({ severity: 'WARNING', event: 'raid_relic_send_blocked', keeperId: id, reason })); } catch {}
-    return { status: 'blocked', reason, ...(diagnostic ? { diagnostic } : {}), message: 'Send Off blocked: ' + reason + '. Refresh both channel statuses; do not retry accepted/unknown dispatches.' };
+    return { status: 'blocked', reason, ...(diagnostic ? { diagnostic } : {}), message: (diagnostic?.nextStep ? diagnostic.nextStep + ' ' : '') + 'Send Off blocked: ' + reason + '. Refresh both channel statuses; do not retry accepted/unknown dispatches.' };
   }
   async function readiness(id) {
     const other = ids.find(candidate => candidate !== id);
@@ -66,6 +66,10 @@ export function createPilot({ state, store, oauth, subscriptions, sends, now = D
     await store.finishJob(id, owner, result); return result;
   }
   return {
+    async expireHandoff(id, intentId, hopId) {
+      if (!ids.includes(id) || !/^[a-f0-9]{64}$/.test(intentId ?? '') || !/^[a-f0-9]{64}$/.test(hopId ?? '')) return { status: 'blocked', reason: 'handoff-expiry-proof' };
+      return state.sendOffStep({ type: 'expire-handoff', source: id, actor: id, id: intentId, hopId }, now());
+    },
     actions, authorizeSend: readiness,
     async execute(id, action) {
       if (!ids.includes(id) || !actions(id).includes(action)) throw new Error('Action unavailable');
@@ -101,6 +105,8 @@ export function createPilot({ state, store, oauth, subscriptions, sends, now = D
         bothReadiness: Object.fromEntries(await Promise.all(ids.map(async keeper => [KEEPERS[keeper], (await store.getJob(keeper))?.ready === true]))),
         ownerStep: 'Wait for both readiness flags true; Bootstrap / reconcile pending channels after callback verification. Reconnect missing grants.',
         eligibility: await eligibility(id),
+        claimProgress: registry.pendingHop && [registry.pendingHop.from, registry.pendingHop.to].includes(id) ? { threshold: registry.pendingHop.threshold, offers: registry.pendingHop.offers?.length ?? null, accepts: registry.pendingHop.accepts?.length ?? null, endsAt: registry.pendingHop.endsAt, finalized: registry.pendingHop.finalized === true, cancelled: registry.pendingHop.cancelled === true } : null,
+        expiryRecovery: registry.send?.sourceId === id && registry.holderId === id && registry.send.status === 'confirmed' && registry.pendingHop && !registry.pendingHop.finalized ? { intentId: registry.send.id, hopId: registry.pendingHop.eventId, endsAt: registry.pendingHop.endsAt, canExpire: now() >= registry.pendingHop.endsAt } : null,
         dispatchDiagnostic: registry.send?.sourceId === id ? registry.send.diagnostic ?? null : null,
         holder: registry.holderId, subscriptions: await store.getJob(id), intent: registry.send?.sourceId === id ? registry.send.status : null,
         handoff: handoffView(registry, id, now()) };

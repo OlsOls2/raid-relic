@@ -1,3 +1,4 @@
+import { ackKey } from './claim-ack.js';
 import { matchesSubscriptionCondition } from './subscriptions.js';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
@@ -29,7 +30,7 @@ const assets = new Map([
 const header = (headers, name) => typeof headers[name] === 'string' ? headers[name] : '';
 const result = (status, body = '', type = 'text/plain; charset=utf-8') => ({ status, body, type });
 
-export function createApp({ secret, state = createMemoryState(), now = Date.now, oauth, chatContext, overlayFeed, overlayFeeds, raidPilot = false, releaseCommit, publicBudget = { burst: 60, perSecond: 1 } } = {}) {
+export function createApp({ claimAcks, secret, state = createMemoryState(), now = Date.now, oauth, chatContext, overlayFeed, overlayFeeds, raidPilot = false, releaseCommit, publicBudget = { burst: 60, perSecond: 1 } } = {}) {
   const keepers = chatContext?.keeperIds ?? (chatContext ? [chatContext.streamerId] : []);
   if (!Array.isArray(keepers) || keepers.length > 4 || (chatContext && !keepers.length)
     || !keepers.every(id => typeof id === 'string' && /^\d{1,32}$/.test(id))
@@ -143,6 +144,9 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
     }
     const accepted = await state.accept({ id, now: receivedAt, sentAt, expiresAt: sentAt + REPLAY_WINDOW_MS, raid, chat, lifecycle });
     if (accepted === 'full') return result(503, 'Event capacity reached');
+    if (claimAcks && chat && !chat.isBot && !chat.copied && ['offer', 'accept'].includes(chat.markAction?.type)) {
+      try { await claimAcks.process(chat.broadcasterId, ackKey(chat)); } catch {}
+    }
     return result(204);
   }
 
