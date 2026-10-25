@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+import { createChronicle } from './chronicle.js';
 import { createApp } from './app.js';
 import { createMemoryState } from './state.js';
 import { createMemoryAuthStore, createFirestoreStore } from './store.js';
@@ -10,7 +12,7 @@ import { createSubscriptionManager } from './subscriptions.js';
 import { createSendOff } from './send-off.js';
 
 export const PROJECT_ID = 'raid-relic-hackathon';
-export async function createRuntime(env, { firestoreClient, transport, now = Date.now, simulator = false, loadSDK = () => import('@google-cloud/firestore') } = {}) {
+export async function createRuntime(env, { firestoreClient, transport, chronicleHTTP, now = Date.now, simulator = false, loadSDK = () => import('@google-cloud/firestore') } = {}) {
   const production = env.NODE_ENV === 'production';
   if (production && simulator) throw new Error('Simulator forbidden in production');
   const releaseCommit = validateReleaseCommit(env.RELEASE_COMMIT, { required: production });
@@ -58,7 +60,9 @@ export async function createRuntime(env, { firestoreClient, transport, now = Dat
       subscriptionManagers[id] = createSubscriptionManager({ oauth: scoped, bot: channelBot, clientId: env.TWITCH_CLIENT_ID, clientSecret: env.TWITCH_CLIENT_SECRET, streamerId: id, transport });
       sends[id] = createSendOff({ state, oauth: scoped, clientId: env.TWITCH_CLIENT_ID, streamerId: id, transport, now, authorize: source => pilot.authorizeSend(source) });
     }
-    pilot = createPilot({ state, store, oauth, subscriptions: subscriptionManagers, sends, now, simulator, clientId: env.TWITCH_CLIENT_ID, transport });
+    const chronicle = createChronicle({ state, enabled: env.CHRONICLE_ENABLED === 'true', allowPaid: env.CHRONICLE_ALLOW_PAID === 'true',
+      key: env.OPENAI_API_KEY, transport: chronicleHTTP, claimId: randomUUID });
+    pilot = createPilot({ chronicle, state, store, oauth, subscriptions: subscriptionManagers, sends, now, simulator, clientId: env.TWITCH_CLIENT_ID, transport });
     oauth.control.bindPilot(pilot);
   }
   return { ...createApp({ secret: env.TWITCH_EVENTSUB_SECRET, state, oauth, overlayFeed, overlayFeeds, raidPilot, now, releaseCommit: releaseCommit ?? undefined,

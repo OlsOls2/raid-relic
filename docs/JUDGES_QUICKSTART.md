@@ -35,3 +35,13 @@ The dedicated read-only POST endpoint accepts query/offset/limit in a≤1024-byt
 ## Frozen live owner instructions
 
 The existing [owner-test guide](LIVE_TEST.md) and [deployed release handoff](DEPLOYMENT.md) describe revision00003/sourcefd05. They are not permission to redeploy this branch or perform live actions during local review. The owner may carry out the separately authorized actual test against that frozen deployment; this new selector will not appear there. Actual live verification remains unproven by local mocked tests. No claim that all Musts/Shoulds are complete.
+
+## Local branch Should #3: Chronicle fiction, off by default
+
+Start with the branch's local tests and labelled Simulator, not the frozen live owner-test service. Atlas and completed stop pages now present a short **Fiction · template** line even offline from providers. It is a handwritten metaphor; it does not identify whose mark travelled. Existing shared-text search and stop navigation are preserved.
+
+The authenticated recipient control offers **Write Chronicle for latest received stop**. With the default `CHRONICLE_ENABLED=false`, `CHRONICLE_ALLOW_PAID=false` and no key, it explains that templates are used and makes no provider calls. The owner intends to leave it off. Do not provision a key or enable it as part of this review. Paid mode would need separate prior owner approval, both gates and a secret reference; even `gpt-4.1-mini` can incur charges. One persisted attempt per stop, output moderation, strict bounds and fallback are mock-tested only. No query/mark/identity data goes to the model. Should #3 has not been deployed; live owner instructions still refer to frozen revision `00003-kwp` / source `fd05`.
+
+Parent verified Should #2: host 231/231 tests and Atlas browser PASS, pushed `b3e7f57` + `b5a135f`. New Chronicle visual/provider proof is not claimed. No Should #4/#5 is included.
+
+Latest review: parent host **243/243 PASS**; the Chronicle Atlas browser run failed on a missing optional caption field. That compatibility bug is corrected with bounded optional caption rendering and fallback; the exact literal-XSS mark assertion remains, with extra caption tests. **Parent browser rerun pending**. Earlier Should #2 Atlas PASS is historical, not proof of this correction.

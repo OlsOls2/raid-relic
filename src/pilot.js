@@ -5,9 +5,9 @@ import { handoffView } from './public-view.js';
 import { httpTransport } from './oauth.js';
 
 export const KEEPERS = Object.freeze({ '1591805230': 'raidrelichq', '1591806023': 'olsols2' });
-export function createPilot({ state, store, oauth, subscriptions, sends, now = Date.now, simulator = false, clientId, transport = httpTransport }) {
+export function createPilot({ chronicle, state, store, oauth, subscriptions, sends, now = Date.now, simulator = false, clientId, transport = httpTransport }) {
   const ids = Object.keys(KEEPERS);
-  const actions = id => ['bootstrap', 'keep', 'pause', 'resume', 'opt-out', 'process', `send:${ids.find(other => other !== id)}`];
+  const actions = id => [...(chronicle ? ['chronicle'] : []), 'bootstrap', 'keep', 'pause', 'resume', 'opt-out', 'process', `send:${ids.find(other => other !== id)}`];
   async function mutate(id, action) {
     const time = now();
     return state.accept({ id: `owner:${randomBytes(24).toString('hex')}`, now: time, sentAt: time, expiresAt: time + 600000,
@@ -48,6 +48,7 @@ export function createPilot({ state, store, oauth, subscriptions, sends, now = D
     actions, authorizeSend: readiness,
     async execute(id, action) {
       if (!ids.includes(id) || !actions(id).includes(action)) throw new Error('Action unavailable');
+      if (action === 'chronicle') return chronicle.write(id);
       if (action === 'bootstrap') return bootstrap(id);
       if (action === 'process') {
         const intent = (await state.getKeeperRegistry()).send;
@@ -67,7 +68,7 @@ export function createPilot({ state, store, oauth, subscriptions, sends, now = D
     async status(id) {
       if (!ids.includes(id)) throw new Error('Unconfigured Keeper');
       const channel = await state.getStreamStatus(id); const registry = await state.getKeeperRegistry();
-      return { candidates: await state.getKeeperCandidates(id), candidatesObservedAt: now(), mode: simulator ? 'simulator' : 'live', account: KEEPERS[id], online: channel?.online ?? false, optedIn: channel?.optedIn ?? false, paused: channel?.paused ?? false,
+      return { chronicle: chronicle?.enabled ? 'Paid generation enabled: one attempt per received stop; fiction only.' : 'Off: handwritten template fiction; no model calls.', candidates: await state.getKeeperCandidates(id), candidatesObservedAt: now(), mode: simulator ? 'simulator' : 'live', account: KEEPERS[id], online: channel?.online ?? false, optedIn: channel?.optedIn ?? false, paused: channel?.paused ?? false,
         bothReadiness: Object.fromEntries(await Promise.all(ids.map(async keeper => [KEEPERS[keeper], (await store.getJob(keeper))?.ready === true]))),
         ownerStep: 'Wait for both readiness flags true; Bootstrap / reconcile pending channels after callback verification. Reconnect missing grants.',
         holder: registry.holderId, subscriptions: await store.getJob(id), intent: registry.send?.sourceId === id ? registry.send.status : null,

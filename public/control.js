@@ -3,7 +3,7 @@ const names = { '1591805230': 'raidrelichq', '1591806023': 'olsols2' };
 let csrf; let busy = false; let candidates = [];
 const target = document.getElementById('raid-target');
 const empty = document.getElementById('target-empty');
-const labels = { bootstrap: 'Bootstrap / reconcile this channel', keep: 'Opt in / Keep', pause: 'Pause', resume: 'Resume', 'opt-out': 'Opt out', process: 'Process queued own send' };
+const labels = { chronicle: 'Write Chronicle for latest received stop', bootstrap: 'Bootstrap / reconcile this channel', keep: 'Opt in / Keep', pause: 'Pause', resume: 'Resume', 'opt-out': 'Opt out', process: 'Process queued own send' };
 const status = document.getElementById('result');
 function disable(value) { busy = value; document.querySelectorAll('button').forEach(b => { b.disabled = value; }); target.disabled = value || !candidates.length; }
 async function refresh() {
@@ -13,7 +13,7 @@ async function refresh() {
     const response = await fetch(`/control/${id}/status`, { cache: 'no-store' });
     if (!response.ok) throw new Error(); const value = await response.json(); csrf = value.csrf; document.getElementById('simulator').hidden = value.pilot.mode !== 'simulator';
     document.getElementById('account').textContent = `${names[id]} · Keeper control`;
-    for (const key of ['account', 'online', 'optedIn', 'paused', 'holder', 'subscriptions', 'bothReadiness', 'ownerStep', 'intent', 'handoff']) {
+    for (const key of ['chronicle', 'account', 'online', 'optedIn', 'paused', 'holder', 'subscriptions', 'bothReadiness', 'ownerStep', 'intent', 'handoff']) {
       const dt = document.createElement('dt'); dt.textContent = key; const dd = document.createElement('dd'); dd.textContent = JSON.stringify(value.pilot[key], null, 2); document.getElementById('ledger').append(dt, dd);
     }
     for (const group of ['setup', 'keeper', 'raid']) document.getElementById(group).replaceChildren();

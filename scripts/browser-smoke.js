@@ -37,11 +37,24 @@ try {
   await page.locator('.stop a').first().click(); await page.locator('.gallery img').first().waitFor();
   await capture(page, 'stop-after');
   const url = page.url();
+  let optionalChronicle;
   await page.route('**/api/atlas/stops/**', route => route.fulfill({ json: { rings: 1, mode: 'simulator', total: 1, nextOffset: null,
-    stop: { ringIndex: 1, from: '1', to: '2', claimedAt: Date.now(), raidSize: 1 },
+    stop: { ringIndex: 1, from: '1', to: '2', claimedAt: Date.now(), raidSize: 1, chronicle: optionalChronicle },
     marks: [{ id: 'm1', text: '<img src=x onerror=alert(1)>', runeSvg: '<svg xmlns="http://www.w3.org/2000/svg"/>' }] } }));
   await page.goto(url); await page.getByText('<img src=x onerror=alert(1)>', { exact: true }).waitFor();
   if (await page.locator('.gallery img').count() !== 1) throw new Error('Text interpreted as markup');
+  await page.getByText('Fiction · template: Beneath quiet stars, the relic gathered another ring of shared light.', { exact: true }).waitFor();
+  checks.push({ name: 'Missing optional Chronicle preserves literal XSS mark gallery', pass: true });
+  optionalChronicle = { source: 'model', fiction: true, line: '<img src=x onerror=alert(2)>' };
+  await page.goto(url);
+  await page.getByText('Fiction · model: <img src=x onerror=alert(2)>', { exact: true }).waitFor();
+  await page.getByText('<img src=x onerror=alert(1)>', { exact: true }).waitFor();
+  if (await page.locator('#journey img, #journey script').count() !== 0 || await page.locator('.gallery img').count() !== 1) throw new Error('Chronicle interpreted as markup');
+  optionalChronicle = { source: 'unexpected', line: 42 };
+  await page.goto(url); await page.getByText('<img src=x onerror=alert(1)>', { exact: true }).waitFor();
+  await page.getByText('Fiction · template: Beneath quiet stars, the relic gathered another ring of shared light.', { exact: true }).waitFor();
+  checks.push({ name: 'Optional Chronicle HTML stays literal; malformed caption preserves gallery', pass: true });
+
   await page.goto('http://127.0.0.1:5191/overlay/1591805230?corner=1');
   await page.locator('#compact-count').filter({ hasText: 'Rings 1' }).waitFor();
   await page.setViewportSize({ width: 160, height: 160 });
