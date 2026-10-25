@@ -20,6 +20,13 @@ try {
     const url = new URL(route.request().url());
     return url.origin === 'http://127.0.0.1:5191' ? route.continue() : route.abort();
   });
+  await context.addInitScript(() => {
+    window.__overlayAudioContexts = 0;
+    const NativeAudioContext = window.AudioContext;
+    if (NativeAudioContext) window.AudioContext = class extends NativeAudioContext {
+      constructor(...args) { super(...args); window.__overlayAudioContexts++; }
+    };
+  });
   const page = await context.newPage(); const errors = []; page.on('pageerror', error => errors.push(error.message));
   await page.goto('http://127.0.0.1:5191/atlas/'); await page.locator('.stop a').first().waitFor();
   if (await page.locator('#simulator').isHidden()) throw new Error('Missing simulator label');
@@ -92,6 +99,22 @@ try {
   if (!wholeWord) throw new Error('Headline word split: ' + JSON.stringify(word));
   await page.locator('.stop a').first().click(); await page.locator('.gallery img').first().waitFor();
   await capture(page, 'stop-mobile-after'); await fits(page, 'Stop 375px');
+  await page.setViewportSize({ width: 160, height: 160 });
+  for (const suffix of ['?corner=1', '?corner=1&sound=0']) {
+    await page.goto(`http://127.0.0.1:5191/overlay/1591805230${suffix}`);
+    await page.locator('#compact-count').filter({ hasText: 'Rings 1' }).waitFor();
+    if (await page.evaluate(() => window.__overlayAudioContexts) !== 0 || !await page.locator('#sound-toggle').isHidden()) throw new Error('Muted overlay created audio context or sound control');
+  }
+  checks.push({ name: 'Default and sound=0 construct no AudioContext', pass: true });
+  await page.goto('http://127.0.0.1:5191/overlay/1591805230?sound=1&corner=1');
+  await page.locator('#compact-count').filter({ hasText: 'Rings 1' }).waitFor();
+  if (await page.evaluate(() => window.__overlayAudioContexts) !== 0) throw new Error('Opt-in created audio before gesture');
+  await page.getByRole('button', { name: 'Enable optional overlay sounds', exact: true }).click();
+  await page.waitForFunction(() => window.__overlayAudioContexts === 1);
+  const audioBounds = await page.locator('#sound-toggle').evaluate(el => { const r = el.getBoundingClientRect(); return r.left >= 0 && r.top >= 0 && r.right <= 160 && r.bottom <= 160 && document.documentElement.scrollHeight <= 160; });
+  if (!audioBounds) throw new Error('Sound control outside 160px canvas');
+  await fits(page, 'Sound opt-in corner 160px'); await capture(page, 'overlay-sound-corner-after');
+  checks.push({ name: 'Only explicit local gesture constructs opted-in context; no listening proof', pass: true });
   if (errors.length) throw new Error('Browser errors: ' + errors.join(', '));
   checks.push({ name: 'Browser errors', pass: errors.length === 0 });
 } catch (error) { failure = error; }

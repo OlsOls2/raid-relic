@@ -45,3 +45,13 @@ The authenticated recipient control offers **Write Chronicle for latest received
 Parent verified Should #2: host 231/231 tests and Atlas browser PASS, pushed `b3e7f57` + `b5a135f`. New Chronicle visual/provider proof is not claimed. No Should #4/#5 is included.
 
 Latest review: parent host **243/243 PASS**; the Chronicle Atlas browser run failed on a missing optional caption field. That compatibility bug is corrected with bounded optional caption rendering and fallback; the exact literal-XSS mark assertion remains, with extra caption tests. **Parent browser rerun pending**. Earlier Should #2 Atlas PASS is historical, not proof of this correction.
+
+## Local branch Should #4: optional original oscillator cues
+
+Parent verified Should #3 host244/244 and Atlas browser PASS, pushed `483b898`. Should #4 is unpublished local branch work; frozen LIVE `00003-kwp`/`fd05` has none of these new sound controls. No Should #5 is included.
+
+For a local configured channel, the ordinary overlay URL or `?sound=0` is silent and creates no AudioContext. Use `http://127.0.0.1:5191/overlay/1591805230?sound=1` or `http://127.0.0.1:5191/overlay/1591806023?corner=1&sound=1` only with the appropriate local fixture; combined query order does not matter. Existing Simulator labels remain visible. Click **Sound** (in OBS use Browser Source → Interact) to arm/resume; **Mute** stops audio. Browser autoplay permission and OBS source/audio routing are still required, so without a gesture it may stay quiet. No autoplay bypass, samples or network audio are used. Close sources when idle.
+
+Only new verified receipt transitions produce distinct gentle source/host cues, and a genuine subsequent two-chat completion can cue the claim. API acceptance, ordinary chat/counts, initial/reconnect snapshots and stale/expired/cancelled/policy-blocked receipts stay quiet. Missed cues are never queued for a later gesture. Reduced motion and the 20-second visual seek timeline are independent. App-local 90s timing is not Twitch synchronized.
+
+Local Should #4:253 tests/248pass/five sandbox EPERM skips,0fail;20 test files,44 release files/diff pass. Extended host browser checks await parent rerun. Fake audio tests and context-count checks do not prove physical audibility or live OBS/Twitch behavior. OAuth scopes remain exactly unchanged.

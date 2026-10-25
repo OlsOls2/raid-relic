@@ -1,3 +1,4 @@
+import { createOverlayAudio, createCueTracker } from './overlay-audio.js';
 import { arrivalPhase } from './arrival.js';
 import { connectOverlay } from './overlay-client.js';
 const channel = /^\/overlay\/(\d{1,32})$/.exec(location.pathname)?.[1];
@@ -5,9 +6,21 @@ const runes = document.querySelector('#runes');
 const state = document.querySelector('#status');
 const count = document.querySelector('#count');
 document.body.classList.toggle('corner', new URLSearchParams(location.search).get('corner') === '1');
+const audio = createOverlayAudio({ optedIn: new URLSearchParams(location.search).get('sound') === '1' });
+const cueFor = createCueTracker();
+const soundButton = document.querySelector('#sound-toggle');
+soundButton.hidden = new URLSearchParams(location.search).get('sound') !== '1';
+soundButton.onclick = async event => {
+  if (!event.isTrusted) return;
+  if (soundButton.getAttribute('aria-pressed') === 'true') { await audio.mute(); soundButton.setAttribute('aria-pressed', 'false'); soundButton.textContent = 'Sound'; soundButton.setAttribute('aria-label', 'Enable optional overlay sounds'); }
+  else { const enabled = await audio.arm(); soundButton.setAttribute('aria-pressed', String(enabled)); soundButton.textContent = enabled ? 'Mute' : 'Sound'; soundButton.setAttribute('aria-label', enabled ? 'Mute overlay sounds' : 'Enable optional overlay sounds; browser permission required'); }
+};
+addEventListener('pagehide', () => { audio.teardown(); cueFor(null); soundButton.setAttribute('aria-pressed', 'false'); soundButton.textContent = 'Sound'; soundButton.setAttribute('aria-label', 'Enable optional overlay sounds'); });
 let current = null; let receivedAt = 0; let receiptServerTime = 0;
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
 function render(snapshot) {
+  const cue = cueFor(snapshot); if (!snapshot || !['ready', 'incoming', 'waiting'].includes(snapshot.status) || (snapshot.status === 'waiting' && !snapshot.handoff?.completed)) audio.silence();
+  if (cue) audio.cue(cue);
   current = snapshot; receivedAt = performance.now(); receiptServerTime = snapshot?.serverNow ?? Date.now();
   document.querySelector('#rings').replaceChildren();
   document.querySelector('#lineage').textContent = snapshot ? `${snapshot.lineageRings} completed growth rings` : 'No current lineage state';
@@ -39,6 +52,7 @@ if (channel) connectOverlay({ url: `${location.protocol === 'https:' ? 'wss' : '
 
 function frame() {
   const time = receiptServerTime + performance.now() - receivedAt;
+  if (current?.handoff && time >= current.handoff.endsAt) audio.silence();
   const arrival = arrivalPhase(current?.handoff, time, motion.matches);
   const archive = document.querySelector('.archive'); archive.dataset.phase = arrival.phase;
   archive.style.setProperty('--arrival', arrival.progress);

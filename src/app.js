@@ -16,6 +16,7 @@ const assets = new Map([
   ['/atlas.js', ['atlas.js', 'text/javascript; charset=utf-8']],
   ['/control.js', ['control.js', 'text/javascript; charset=utf-8']],
   ['/control.css', ['control.css', 'text/css; charset=utf-8']],
+  ['/overlay-audio.js', ['overlay-audio.js', 'text/javascript; charset=utf-8']],
   ['/arrival.js', ['arrival.js', 'text/javascript; charset=utf-8']],
   ['/overlay', ['overlay.html', 'text/html; charset=utf-8']],
   ['/relic.svg', ['relic.svg', 'image/svg+xml']],
@@ -88,14 +89,16 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
       try { return result(200, JSON.stringify(await state.getAtlasPage({ offset: 0, limit: 8 })), 'application/json'); }
       catch { return result(503, 'Atlas unavailable'); }
     }
-    const feedPath = /^(?:\/api)?\/overlay\/(\d{1,32})(?:\?corner=1)?$/.exec(path);
-    const selected = feedPath ? (overlayFeeds ?? (overlayFeed ? { [overlayFeed.channel]: overlayFeed } : {}))[feedPath[1]] : null;
-    if (method === 'GET' && selected && path === `/api/overlay/${selected.channel}`) return result(200, JSON.stringify(await selected.snapshot()), 'application/json');
-    if (method === 'GET' && selected && (path === `/overlay/${selected.channel}` || path === `/overlay/${selected.channel}?corner=1`)) return result(200, await readFile(new URL('../public/overlay-live.html', import.meta.url)), 'text/html; charset=utf-8');
-    if (method === 'GET' && overlayFeed && path === `/api/overlay/${overlayFeed.channel}`) {
-      return result(200, JSON.stringify(await overlayFeed.snapshot()), 'application/json');
-    }
-    if (method === 'GET' && overlayFeed && (path === `/overlay/${overlayFeed.channel}` || path === `/overlay/${overlayFeed.channel}?corner=1`)) {
+    const feedPath = /^(\/api)?\/overlay\/(\d{1,32})(?:\?(.*))?$/.exec(path);
+    if (feedPath) {
+      const selected = (overlayFeeds ?? (overlayFeed ? { [overlayFeed.channel]: overlayFeed } : {}))[feedPath[2]];
+      if (!selected) return result(404, 'Not found');
+      if (method !== 'GET') return result(404, 'Read only');
+      const params = new URLSearchParams(feedPath[3] ?? '');
+      if (feedPath[1] && feedPath[3] !== undefined) return result(400, 'Invalid query');
+      if ([...params].some(([key, value]) => !['corner', 'sound'].includes(key) || params.getAll(key).length !== 1
+        || (key === 'corner' ? value !== '1' : !['0', '1'].includes(value)))) return result(400, 'Invalid query');
+      if (feedPath[1]) return result(200, JSON.stringify(await selected.snapshot()), 'application/json');
       return result(200, await readFile(new URL('../public/overlay-live.html', import.meta.url)), 'text/html; charset=utf-8');
     }
     if (method === 'GET' && assets.has(path)) {
