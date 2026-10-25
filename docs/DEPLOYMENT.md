@@ -1,85 +1,71 @@
-# Foundation deployment handoff
+# Deployed owner-test pilot handoff
 
-The parent verified the following deployment on 2026-10-25. Codex records the report only: no cloud, credential, live Twitch or deployed-service checks were performed in this documentation run. This is **foundation / not-ready-for-raids**.
+All deployment/host facts below are **parent verified**, recorded by Codex without cloud/Twitch calls or credential reads. This is **raid-pilot / owner-test-ready / liveValidated:false**: ready for owner-operated live validation, not already live proven. No claim that all Musts are complete.
 
-## Exact deployed release
+## Current immutable release
 
 | Item | Parent-verified value |
 | --- | --- |
 | Project / region | `raid-relic-hackathon` / `us-central1` |
-| Runtime source commit | `74f490123acc982eaa0426ff9b9ffb33369f2fd9` |
-| Immutable image | `us-central1-docker.pkg.dev/raid-relic-hackathon/raid-relic/app@sha256:825be3f01479013cb977a6dd22ce368ac1372b1e96d34be850eeb835e6096e7c` |
-| Build | `90a0eeea-6e9f-433f-bdd8-9b6cda04802f` |
-| Revision / traffic | `raid-relic-00002-9hx` / 100% |
-| Scaling | min 0 / max 1 |
-| Runtime resources | Request CPU allocation, 1 vCPU / 256 Mi; startup CPU boost off |
-| Runtime service account | `raid-relic-runtime` |
-| Canonical origin | `https://raid-relic-760724762396.us-central1.run.app` |
+| Runtime source | `fd05a5ee67f841b1ac92ebb221581db227d2353f` |
+| Image | `us-central1-docker.pkg.dev/raid-relic-hackathon/raid-relic/app@sha256:235f0751476eb087dc914ba29b2af6d76cd687de208eb181e5ca1b2938c6e304` |
+| Build | `69655ba0-1a89-433b-a1f8-99c499a0ab42` |
+| Revision / traffic | `raid-relic-00003-kwp` / 100% |
+| Origin | `https://raid-relic-760724762396.us-central1.run.app` |
+| Pilot configuration | `RAID_PILOT_ENABLED=true`, `KEEPER_CHANNEL_IDS=1591805230,1591806023` |
+| Effective scaling | min0; service and revision max1 |
+| Runtime / resources | `raid-relic-runtime`; request CPU1vCPU /256Mi; startup boost off |
 
-The parent will commit these docs separately. **The deployed runtime remains the exact `74f490123acc982eaa0426ff9b9ffb33369f2fd9` release**, not the later documentation commit. No rebuild, image change, traffic change or deployment is implied by this handoff.
+All other environment values, secret references and resources were preserved by the parent. Three existing named Secret Manager references use `latest`; no values were disclosed. Parent-reported roles remain project `datastore.user`, `secretAccessor` only on the three required objects, and build-SA `run.builder`. Narrow `_Default` OAuth/auth request-URL exclusion remains; other logs preserved. No wider logging/IAM guarantee is inferred.
 
-Non-release environment values and secret references were preserved byte for byte by the parent; service account, scaling and resources are unchanged. These are parent-reported facts, not inspected by Codex.
+Parent commits these docs separately. **Runtime stays the exact fd05 source above, not the later docs commit.** No rebuild or deployment occurs in this documentation turn.
 
-## Historical first release / rollback only
+## Verified scope
 
-The first source `40bac966e410f1073d9a5bc1b0cb981315979970`, revision `raid-relic-00001-snh`, image digest `sha256:832a33bf69641a3a8e348128b746183be68fec4fdd198ecc7b42684767a1eee2`, build `df23edab-e567-472b-8b35-5099f548bcc0` is retained for rollback only, not serving current traffic. Its eight-asset parity check and 98/98 host suite were first-release evidence, not the current verification below.
+- Production health200, exact fd05 source, `phase:raid-pilot`, `readiness:owner-test-ready`, `liveValidated:false`.
+- Fourteen public assets byte-matched, including both overlay HTML paths and control CSS/JS.
+- Both public overlay APIs and cloud WSS returned waiting/zero rings; actual Firestore Atlas returned zero rings. No fake production seed.
+- Both private control GETs401 and unauthenticated POSTs403; DENY framing/no-referrer headers verified.
+- Bot, home and second Keeper OAuth starts followed by denial cleanup exercised real Firestore state creation/consumption **without visiting Twitch**.
+- Unsigned EventSub403 and unknown overlay404.
+- Host **216/216 tests pass, zero skips**, npm audit zero vulnerabilities. Latest sandbox result is211 pass/five EPERM socket skips, distinct from host proof.
+- Sandboxed local-HTTPS mocked pilot browser **eight checks** and Atlas/mobile browser **six checks** passed. Parent viewed saved labelled Simulator captures: correct controls, approved incoming rune with Rings0, target Ring1 after claim, source waiting. These are not live Twitch/OBS proof or recordings.
 
-## Links and account scope
+**Neither parent nor Codex performed actual Twitch login, consent, chat, raid, bootstrap or Send Off.** Deployed empty reads, denial-state cleanup and local mocked workflows do not prove live token grants, webhook subscription verification, Twitch raid delivery or live OBS rendering.
 
-- [Atlas](https://raid-relic-760724762396.us-central1.run.app/) — read-only completed journey, currently empty.
-- [Atlas canonical page](https://raid-relic-760724762396.us-central1.run.app/atlas/).
-- Stop route pattern: `/stops/<64-lowercase-hex-stopId>`, linked only from real completed history; no fabricated stop URL.
-- [OBS overlay](https://raid-relic-760724762396.us-central1.run.app/overlay/1591805230).
-- [160px corner overlay](https://raid-relic-760724762396.us-central1.run.app/overlay/1591805230?corner=1).
-- [Health](https://raid-relic-760724762396.us-central1.run.app/health).
-- [Public snapshot](https://raid-relic-760724762396.us-central1.run.app/api/overlay/1591805230).
-- [Streamer OAuth connection start](https://raid-relic-760724762396.us-central1.run.app/oauth/streamer/start).
-- [Bot OAuth connection start](https://raid-relic-760724762396.us-central1.run.app/oauth/bot/start).
-- Exact Twitch application redirect to register: [https://raid-relic-760724762396.us-central1.run.app/auth/callback](https://raid-relic-760724762396.us-central1.run.app/auth/callback). Registration still needs owner confirmation; loading a callback without its bound state is not a registration or login test.
+## Exact accounts and links
 
-The current deployment supports only Keeper/channel **raidrelichq (`1591805230`)** and bot **`1591804828`**. **OlsOls2 (`1591806023`) is a future second channel, not supported now.** No two-channel claim, transfer or raid path has been validated. The configured callback is `/auth/callback`; legacy `/oauth/callback` is not an alias on this deployment.
+- Bot **raidrelicbot1591804828**: [connect bot](https://raid-relic-760724762396.us-central1.run.app/oauth/bot/start).
+- Home **raidrelichq1591805230**: [connect home](https://raid-relic-760724762396.us-central1.run.app/oauth/keeper/1591805230/start), [home private control](https://raid-relic-760724762396.us-central1.run.app/control/1591805230).
+- Second **OlsOls2 / login olsols2 /1591806023**: [connect second](https://raid-relic-760724762396.us-central1.run.app/oauth/keeper/1591806023/start), [second private control](https://raid-relic-760724762396.us-central1.run.app/control/1591806023).
+- Exact callback registration to confirm with owner: [https://raid-relic-760724762396.us-central1.run.app/auth/callback](https://raid-relic-760724762396.us-central1.run.app/auth/callback). The legacy `/oauth/callback` is not an alias on this configuration; `/oauth/streamer/start` aliases home.
+- [Atlas root](https://raid-relic-760724762396.us-central1.run.app/), [Atlas canonical page](https://raid-relic-760724762396.us-central1.run.app/atlas/), [health](https://raid-relic-760724762396.us-central1.run.app/health).
+- Stop pattern `/stops/<64-lowercase-hex-stopId>` links actual completed history only, not a fabricated stop.
+- [Home OBS](https://raid-relic-760724762396.us-central1.run.app/overlay/1591805230), [home160×160 corner](https://raid-relic-760724762396.us-central1.run.app/overlay/1591805230?corner=1).
+- [Second OBS](https://raid-relic-760724762396.us-central1.run.app/overlay/1591806023), [second160×160 corner](https://raid-relic-760724762396.us-central1.run.app/overlay/1591806023?corner=1).
 
-Grok can assist with **OAuth connection and OBS source setup only**. Confirm the exact redirect registration and intended accounts; actual consent requires account-owner authorization. Adding an OBS browser source does not enable raids or establish Keeper/stream context. No consent, login, chat or raid was performed in the parent verification below.
+## Owner next steps
 
-## What the parent verified
+Follow [LIVE_TEST.md](LIVE_TEST.md), without automation from this document. Owner starts both streams; completes the three consents sequentially in correct Twitch accounts/profiles; opens each control in its matching browser profile; bootstraps sequentially until **all five subscriptions/channel enabled** and both readiness flags true; opts in/Keeps both; refreshes source control to confirm home holder and both live/opted-in/ready. Reload both OBS sources after deploy; optional corners are160×160.
 
-- Health HTTP 200 with `phase: foundation`, `readiness: not-ready-for-raids` and the exact deployed source commit above.
-- Twelve static assets byte-matched the current release.
-- Actual Firestore Atlas read returned zero rings/stops in live mode; overlay returned `waiting`, zero rings and null handoff. No production seed data was added.
-- Streamer and bot OAuth starts followed by denial cleanup exercised persisted state creation and transactional consumption **without visiting Twitch**. This validates deployed state handling, not consent, token exchange/refresh, identity grants or logged-in sessions.
-- Real cloud WSS at `wss://raid-relic-760724762396.us-central1.run.app/ws/1591805230` returned the same initial `waiting`, zero-ring, null-handoff snapshot in `live` mode. This is live transport mode, not a live raid or populated relic state.
-- Public Atlas POST returned HTTP 405; unsigned EventSub was rejected with HTTP 403. No genuine Twitch webhook delivery was tested.
-- Current host-local suite: **183 tests, 183 pass, 0 fail, 0 skip**; npm audit **0 vulnerabilities**, all parent verified. Latest sandbox suite remains 179 pass / four EPERM loopback skips, not a host blocker.
-- Sandboxed Playwright (`chromiumSandbox:true`) passed all six browser checks after screenshot-driven fixes: desktop Atlas/stop, whole-word headline and no overflow at 375px, and true 160×160 corner bounds/visible labels. Parent viewed before/after Simulator screenshots. `artifacts/*-after.png` and `artifacts/browser-results.json` exist per parent report. These are **local Simulator** checks, not live OBS/Twitch validation or screen recordings. Earlier screenshot-write/overflow failures are historical, now superseded for these local checks.
+Only an explicit home **Send Off to olsols2** request initiates the API call. Twitch's native countdown/**Raid Now** is external; only the actual eligible signed raid EventSub starts incoming arrival and the app-local90s claim. Source chat `!offer` and target chat `!accept` require distinct non-bot users, threshold per side `min(10,ceil(sqrt(max(1,viewers))))`; for tinyT1 the two distinct streamer accounts can count. Chat location is not proof of actual raid membership. Only both thresholds transfer holder/add Atlas stop and ring; source then waits. Native raids outside this app cannot be gated; signed chat Send Off commands only queue and need source owner **Process queued own send**. No automatic worker runs.
 
-The three supplied secrets are mounted through named Secret Manager references using **`latest`**; no values were disclosed. Runtime roles are project `datastore.user` and `secretAccessor` on only the three named required secret objects. Parent reports build-SA `run.builder`. No additional IAM grants are inferred or independently inspected. The `_Default` sink excludes OAuth request URLs narrowly for service `raid-relic` and `/auth`/`/oauth` paths; other logs are preserved. This is not a guarantee about every other sink, proxy, browser history or external system.
+Unknown dispatch outcome means **do not blindly repeat**; use status and parent review. Close OBS when idle to contain usage. Open WebSockets may keep Cloud Run active/billable; min0/max1/budget alerts do not guarantee free use. Cross-instance/overlapping-revision/external-writer fanout, automatic ban sync, retention expansion, stuck-intent reconciliation controls and comprehensive live/database validation remain pending.
 
-## Still pending
+## Historical releases and rollback caution
 
-Signed stream/Keeper lifecycle, Send Off service foundations, two-chat claims/atomic transfer, bounded lineage, public Atlas/stop pages and receipt-driven arrival presentation are implemented and locally tested in this release. **Current configuration still supports only the home Keeper**. Second OAuth/channel onboarding and consent, subscription bootstrap/backfill, an authenticated Send Off worker/control plane, automatic channel-ban synchronization and full end-to-end validation remain pending. Internal services do not run automatically at startup. No real Twitch login, chat, raid or production claim has been tested; zero rings/empty history and waiting overlay are correct.
+- Prior source `74f490123acc982eaa0426ff9b9ffb33369f2fd9`, revision `raid-relic-00002-9hx`, image `sha256:825be3f01479013cb977a6dd22ce368ac1372b1e96d34be850eeb835e6096e7c`, build `90a0eeea-6e9f-433f-bdd8-9b6cda04802f`: retained metadata, not current traffic. Its183-test/12-asset foundation evidence is historical.
+- First source `40bac966e410f1073d9a5bc1b0cb981315979970`, revision `raid-relic-00001-snh`, image `sha256:832a33bf69641a3a8e348128b746183be68fec4fdd198ecc7b42684767a1eee2`, build `df23edab-e567-472b-8b35-5099f548bcc0`: historical98-test/eight-asset evidence.
 
-Marks fail closed without actual signed stream IDs, explicit owner opt-in and holder/policy eligibility. OAuth or an OBS connection cannot fabricate context. A claim requires distinct participation in source and host chat, which proves chat location, not actual raid membership. The receipt-based 90-second window is app-local, never Twitch synchronized.
+**Rollback after future pilot writes requires state/schema compatibility review, not blind restoration of an old revision.**
 
-Deployed Firestore empty public reads and OAuth-state creation/consumption are parent verified; this does not validate all claim/quota/concurrency/token paths against real Firestore. Local Simulator visual QA now passes; real OBS and broader database/live integration validation remain pending.
-Fanout remains in-process: min 0 / max 1 is the current deployment, not cross-instance synchronization. Overlapping revisions/external writers still need a shared notification design. Open OBS WebSockets keep requests active and can incur charges; scale-to-zero and budget alerts do not guarantee no cost. Close OBS browser sources when idle to contain usage.
-
-## Five-minute manual handoff checklist
-
-No checks run automatically from this document. Setup only; do not perform a real raid, send chat, create subscriptions, claim the relic or simulate lineage.
-
-1. **Minute 0–1: confirm release.** Open Health. Expect HTTP 200, the exact `74f490123acc982eaa0426ff9b9ffb33369f2fd9` commit and `foundation / not-ready-for-raids`. Open either Atlas URL; expect zero completed stops/rings, with no invented journey. A different hash needs parent review, not an automatic redeploy.
-2. **Minute 1–2: confirm account/callback configuration.** Owner checks that the Twitch app registers exactly `https://raid-relic-760724762396.us-central1.run.app/auth/callback`. Grok may help choose the streamer/bot connection links above. Expect the intended role/account authorization setup; do not infer a connected grant from a start redirect. Do not consent or log in without the account owner's explicit authorization. Never share callback query strings, codes, state cookies or tokens.
-3. **Minute 2–3: add OBS source.** Reload an existing OBS browser source after deploy to load the new assets, or add the exact overlay URL. Set corner source width and height to 160×160. Expect transparent idle relic, waiting for trusted Keeper/stream state, zero approved marks and zero growth rings. No simulated/test activity should appear. Local Simulator rendering is parent-verified; actual live OBS rendering remains manual QA.
-4. **Minute 3–4: observe connection only.** Expect the read-only socket's initial `waiting`, `live` snapshot and reconnect behavior; no private text, user IDs, quotas or tokens. A waiting overlay is correct while trusted lifecycle/consent and subscription bootstrap are absent. Do not submit marks or create a trusted context to make the display look active.
-5. **Minute 4–5: review safe log metadata and finish.** Parent may run the scoped command below; expect recent status/severity/revision metadata or no rows if quiet. Do not dump full entries or URLs. Close temporary OBS/browser connections after setup and report outcomes, without codes/tokens. Actual ongoing OBS use remains an owner decision because connections may incur costs.
-
-Safe parent-only log watch (manually rerun for a recent window; **not executed by Codex**):
+Parent-only safe metadata log read (not executed by Codex):
 
 ```sh
 gcloud logging read \
-  'resource.type="cloud_run_revision" AND resource.labels.service_name="raid-relic" AND resource.labels.location="us-central1" AND resource.labels.revision_name="raid-relic-00002-9hx" AND NOT (httpRequest.requestUrl =~ "/(auth|oauth)/")' \
+  'resource.type="cloud_run_revision" AND resource.labels.service_name="raid-relic" AND resource.labels.location="us-central1" AND resource.labels.revision_name="raid-relic-00003-kwp" AND NOT (httpRequest.requestUrl =~ "/(auth|oauth)/")' \
   --project=raid-relic-hackathon --freshness=10m --limit=20 --order=desc \
   --format='table(timestamp,severity,httpRequest.status,resource.labels.revision_name)'
 ```
 
-Region is restricted in the log filter, not a nonexistent logging `--region` flag. Output intentionally omits request URLs, text/JSON payloads and error messages that might contain codes or tokens. Do not add `--log-http`, debug verbosity, raw payload/URL output, or paste complete log entries into handoff chat. If deeper debugging is needed, ask the parent for a narrowly redacted review.
+Do not output raw URLs, payloads, cookies, codes or tokens, or enable HTTP/debug logging. Region is restricted in the filter. No checks run automatically from this handoff.

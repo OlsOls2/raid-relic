@@ -2,9 +2,17 @@
 
 A raid-only traveling community relic, authored by Codex in the original thread recorded in [CODEX_SESSION.md](CODEX_SESSION.md). All future code and documentation work must resume that thread. No subagents or other threads are used. MIT licensed; see [LICENSE](LICENSE).
 
+## Current deployed owner-test pilot
+
+Parent verified source **`fd05a5ee67f841b1ac92ebb221581db227d2353f`**, revision **`raid-relic-00003-kwp`**,100% traffic at [Raid Relic](https://raid-relic-760724762396.us-central1.run.app/). Image `sha256:235f0751476eb087dc914ba29b2af6d76cd687de208eb181e5ca1b2938c6e304`; build `69655ba0-1a89-433b-a1f8-99c499a0ab42`. Pilot gate and both Keeper IDs are enabled; other environment/secret references/resources preserved, effective min0 and service/revision max1. Runtime remains **fd05**, not the later docs commit. Prior74f metadata is historical; rollback after future pilot writes needs compatibility review.
+
+Parent verified health200/exact source with **raid-pilot / owner-test-ready / liveValidated:false**,14 asset matches, both overlay API/WSS waiting0rings, Firestore Atlas0rings, private control GET401/unauthPOST403 and anti-framing/referrer headers, three OAuth starts→denial cleanup through real Firestore without visiting Twitch, unsigned EventSub403 and unknown overlay404. **No actual Twitch login/consent/chat/raid/bootstrap/Send Off or fake production seed occurred.** Host216/216 zero skips/audit0 and local mocked pilot8/Atlas6 browser passes with viewed labelled Simulator captures do not prove live Twitch/OBS operation.
+
+Use [the current deployment handoff](docs/DEPLOYMENT.md) and [exact owner workflow](docs/LIVE_TEST.md): start both streams; three consents sequentially in correct accounts/profiles; controls in matching profiles; sequential bootstrap until five enabled subscriptions per channel; Keep both and Refresh source to verify home holder/both live/opted-in/ready. Both numeric OBS links and private controls are in the handoff. Only actual eligible raid EventSub starts arrival/app-local90s claims; only both distinct non-bot chat thresholds transfer/add stop/ring. No automatic worker. Unknown outcome: do not blindly repeat. Close OBS when idle to contain usage. Ready for owner live validation, **not already proven or all Musts complete**. Codex performed no deploy/cloud/live/credential operations in this docs-only turn.
+
 ## Current local release gates: parent verified
 
-Parent reports **216/216 host tests pass, zero skips**. Both sandboxed browser gates passed: local-HTTPS `browser-smoke-pilot.js` **eight checks** and Atlas/mobile `browser-smoke.js` **six checks**. Parent viewed the saved, explicitly labelled Simulator captures: correct account controls, incoming approved-rune preview with Rings0, claimed target Ring1 and waiting source. These are local mocked tests, **not actual Twitch or live OBS proof**. The deployed source remains **`74f490123acc982eaa0426ff9b9ffb33369f2fd9`** until the parent deploys a reviewed new hash; this copy/docs update does not deploy it.
+Parent reports **216/216 host tests pass, zero skips**. Both sandboxed browser gates passed: local-HTTPS `browser-smoke-pilot.js` **eight checks** and Atlas/mobile `browser-smoke.js` **six checks**. Parent viewed the saved, explicitly labelled Simulator captures: correct account controls, incoming approved-rune preview with Rings0, claimed target Ring1 and waiting source. These are local mocked tests, **not actual Twitch or live OBS proof**. The parent subsequently deployed fd05 as recorded above; these local QA facts do not change its runtime identity.
 
 For owner setup, run channel bootstraps **sequentially**, waiting for each to finish, to avoid contention on shared token leases. After both finish, click **Refresh status** on the source control and verify both readiness flags true. Pending callbacks require later explicit reconciliation. See [owner workflow](docs/LIVE_TEST.md). No optional mark-ID guesses: the owner guide does not require a rune submission/approval step because a private pending-moderation UI is not supplied. All control account fields stay private.
 
@@ -30,9 +38,9 @@ The target's verified incoming handoff now previews approved source runes **befo
 
 Latest local validation: **213 tests,208 pass,zero failures,five sandboxEPERM skips**, all prior206 tests retained; release inventory42 files. Parent subsequently passed both browser gates; deployment still requires parent review and a new release hash. This iteration is owner-test capability only, not live validated; no Codex cloud/live/credential/deploy/commit actions occurred.
 
-## Local raid-pilot integration (pending parent review/deploy)
+## Raid-pilot integration (deployed fd05; live validation pending)
 
-Owner controls are now callable behind **`RAID_PILOT_ENABLED=true`**, requiring both exact Keeper IDs, OAuth controls and canonical callback configuration. See [the exact owner workflow and environment schema](docs/LIVE_TEST.md). Parent deploys after gates; Codex has performed no cloud/live/credential operations. Current verified runtime remains74f until parent reports a new release.
+Owner controls are now callable behind **`RAID_PILOT_ENABLED=true`**, requiring both exact Keeper IDs, OAuth controls and canonical callback configuration. See [the exact owner workflow and environment schema](docs/LIVE_TEST.md). Parent deploys after gates; Codex has performed no cloud/live/credential operations. Current verified runtime is fd05 as recorded above.
 
 Private `/control/:id` now provides own-channel Bootstrap/reconcile, Opt in/Keep, Pause/Resume/Opt out, named Send Off to the other explicit Keeper, Process queued own send, Refresh status and session logout. Scoped session+exact Origin+CSRF+strict two-field JSON are checked before effects. Bootstrap uses own validated Keeper token plus bot grant, five subscription types, bounded409 relist and per-channel distributed lease. Authenticated Get Streams backfill commits only against the unchanged pre-network lifecycle baseline, uses observation-start time, preserves real numeric stream IDs and quotas, and never invents EventSub. Offline delivered during backfill wins. No external HTTP executes inside a transaction.
 
@@ -44,7 +52,7 @@ Prior pilot tests: **206 total,201pass,zero failures,five sandboxEPERM skips** (
 
 ## Local next increment: two-Keeper OAuth and private control sessions
 
-Not deployed by Codex. The owner authorizes the parent to redeploy this feature after review/gates; the currently verified runtime remains `74f490123acc982eaa0426ff9b9ffb33369f2fd9`. Readiness stays foundation/not-ready-for-raids. Worker/bootstrap actions are **implemented by the subsequent gated raid-pilot integration above**; gate-off controls still expose only session logout.
+Not deployed by Codex. The owner authorizes the parent to redeploy this feature after review/gates; the current deployed pilot is fd05, owner-test-ready/liveValidated:false. Worker/bootstrap actions are **implemented by the subsequent gated raid-pilot integration above**; gate-off controls still expose only session logout.
 
 For the two-account configuration set `KEEPER_CHANNEL_IDS=1591805230,1591806023`, primary streamer `1591805230` (raidrelichq), bot `1591804828` (raidrelicbot), public client `6ggythtvgo572dxu8jo4xoaqtn37ix`. These are the only allowed runtime IDs when the explicit Keeper list is supplied; arbitrary OAuth paths fail closed. The default single configured account remains compatible. `/oauth/keeper/1591805230/start` and `/oauth/keeper/1591806023/start` use the same exact allowlisted `/auth/callback` redirect. Legacy `/oauth/streamer/start` remains home, `/oauth/bot/start` remains bot. Keepers request only `channel:bot channel:manage:raids`; bot retains its three existing scopes. No live consent or Twitch grant validation was performed here.
 
@@ -56,11 +64,11 @@ Successful Keeper consent creates a fresh 32-byte random **control session**, on
 
 Memory and fake-Firestore tests cover two consents, same-browser roles, denial/account/scope errors, encrypted context isolation, refresh/legacy compatibility, rotation/expiry, CSRF/origin/body/action/cookie failures, hash-only records and logout isolation. Latest sandbox: **191 tests, 187 pass, four EPERM socket skips, zero failures**. The earlier parent 183/183/browser pass applies to the deployed Atlas release, not this new feature. Live two-channel onboarding, authenticated worker/bootstrap and end-to-end owner testing remain pending.
 
-## Deployed foundation handoff
+## Historical foundation handoff (74f, superseded by fd05)
 
-Parent safely redeployed [Raid Relic](https://raid-relic-760724762396.us-central1.run.app/) at runtime source **`74f490123acc982eaa0426ff9b9ffb33369f2fd9`**, revision **`raid-relic-00002-9hx`**, 100% traffic. Readiness remains **foundation / not-ready-for-raids**. Image digest: `sha256:825be3f01479013cb977a6dd22ce368ac1372b1e96d34be850eeb835e6096e7c`; build `90a0eeea-6e9f-433f-bdd8-9b6cda04802f`. See [deployment handoff](docs/DEPLOYMENT.md) for exact links, verification and checklist. These documentation changes do not change the deployed source identity; parent commits docs separately. First release `40bac966e410f1073d9a5bc1b0cb981315979970` / `raid-relic-00001-snh` is rollback history only.
+For the previous release, parent safely redeployed [Raid Relic](https://raid-relic-760724762396.us-central1.run.app/) at runtime source **`74f490123acc982eaa0426ff9b9ffb33369f2fd9`**, revision **`raid-relic-00002-9hx`**, 100% traffic. That release reported **foundation / not-ready-for-raids**. Historical image digest: `sha256:825be3f01479013cb977a6dd22ce368ac1372b1e96d34be850eeb835e6096e7c`; build `90a0eeea-6e9f-433f-bdd8-9b6cda04802f`. See [deployment handoff](docs/DEPLOYMENT.md) for exact links, verification and checklist. These documentation changes do not change the deployed source identity; parent commits docs separately. First release `40bac966e410f1073d9a5bc1b0cb981315979970` / `raid-relic-00001-snh` is rollback history only.
 
-Current configuration supports only home Keeper raidrelichq `1591805230` and bot `1591804828`. Claims/lineage backend, signed lifecycle and Atlas/arrival presentation are implemented and locally tested. Second OAuth/channel onboarding and consent, subscription bootstrap/backfill, the authenticated Send Off worker and full end-to-end validation remain pending; automatic ban sync is also pending. OlsOls2 `1591806023` remains future scope. Grok may assist OAuth/OBS setup only. No real Twitch login/chat/raid or production seed occurred.
+The prior74f configuration supported only home Keeper raidrelichq `1591805230` and bot `1591804828`. Claims/lineage backend, signed lifecycle and Atlas/arrival presentation are implemented and locally tested. Second OAuth/channel onboarding and consent, subscription bootstrap/backfill, the authenticated Send Off worker and full end-to-end validation remain pending; automatic ban sync is also pending. OlsOls2 `1591806023` remains future scope. Grok may assist OAuth/OBS setup only. No real Twitch login/chat/raid or production seed occurred.
 
 ## Atlas, stop pages and receipt-driven overlay
 
@@ -102,7 +110,7 @@ The parent completed the authorized safe redeploy after gates; current identity 
 
 ## Implemented Must: two-chat claims and bounded lineage
 
-This backend increment is included in current release `74f490123acc982eaa0426ff9b9ffb33369f2fd9`; health remains **foundation / not-ready-for-raids** because operational setup is pending. All HTTP/database tests use synthetic identities, injected transports and memory/fake Firestore; no consent, chat, raid, database or cloud operation was performed.
+This backend was present in74f and is now deployed in fd05 with gated owner-test readiness; live validation remains pending. All HTTP/database tests use synthetic identities, injected transports and memory/fake Firestore; no consent, chat, raid, database or cloud operation was performed.
 
 A verified eligible `channel.raid` persists a receipt-based 90-second pending handoff with threshold **`min(10, ceil(sqrt(max(1, viewers))))` per side**. Viewers must be a signed finite integer from 0 through 1,000,000. During that window, **`!offer` in source chat** and **`!accept` in target chat** each count distinct authenticated user IDs. One user cannot count on both sides, the configured bot never counts, and blocked participants cannot submit proof. Command text cannot assert a channel or raid membership. Chat location proves participation in that channel, **not actual membership in the incoming Twitch raid**. Claims timestamped before receipt of the pending handoff do not count. This local window is never a Twitch-synchronized countdown.
 
@@ -116,7 +124,7 @@ Hard limits: **16 retained stops, 160 approved marks per stop, 512 KiB private l
 
 ## Implemented second Must: Send Off service and verified raid foundations
 
-This second increment is included in current release `74f490123acc982eaa0426ff9b9ffb33369f2fd9`, with authenticated worker wiring still pending. No actual Twitch raid/chat, OAuth login, cloud operation, credential read or deployment was performed. Release health still says foundation/not-ready-for-raids. The subsequent local claims increment above implements transfer/lineage; arrival presentation is implemented as described above.
+This increment is deployed in fd05 with authenticated request-scoped worker wiring. No actual Twitch raid/chat, OAuth login, cloud operation, credential read or deployment was performed. Pilot health is owner-test-ready/liveValidated:false; gate-off health remains foundation/not-ready-for-raids. The subsequent local claims increment above implements transfer/lineage; arrival presentation is implemented as described above.
 
 A signed **broadcaster-only `!relic send @targetlogin`** command reserves one private bounded intent in the global registry and acknowledges promptly. A moderator badge never authorizes sending. No command-supplied ID is trusted. Source must hold the relic, and source/target must be explicitly configured, opted-in, online and unpaused/unbanned/unblocked. Commands predating current stream/consent or the send watermark are rejected. The target login must come from a trusted bounded lifecycle `logins` mapping; at most four channel/login entries are allowed. Reservation, event dedupe and lifecycle/mark context are one memory operation / Firestore transaction. No HTTP call is performed by the webhook.
 
@@ -390,7 +398,7 @@ The operator reports the following cloud facts as verified for `raid-relic-hacka
 - A project-specific **GBP 1 monthly budget** has **50/90/100% actual-spend alerts** and default IAM email recipients enabled.
 - The default Firestore database is **native Standard**, located in **`us-central1`**, with **`freeTier=true`** and **PITR disabled**.
 - Cloud Run, Firestore, Secret Manager and billing control APIs are enabled.
-- Parent deployed current `raid-relic-00002-9hx` in us-central1 with min 0 / max 1, request CPU 1 vCPU / 256 Mi and startup boost off. Three supplied secrets are mounted by references using `latest`; no values were disclosed to Codex. See docs/DEPLOYMENT.md for exact release identity and verified results.
+- Parent deployed current `raid-relic-00003-kwp` in us-central1 with min 0 / max 1, request CPU 1 vCPU / 256 Mi and startup boost off. Three supplied secrets are mounted by references using `latest`; no values were disclosed to Codex. See docs/DEPLOYMENT.md for exact release identity and verified results.
 
 Budget alerts are not a spending cap, and scale-to-zero is not a zero-cost guarantee. Parent verified limited actual Firestore snapshot/OAuth-state integration; comprehensive adapter/emulator and token-lifecycle validation remains pending. No cloud operations, deploys, IAM/billing changes, or costs were initiated by Codex. Do not commit until parent review.
 
