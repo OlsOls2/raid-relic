@@ -24,6 +24,16 @@ try {
   await page.goto('http://127.0.0.1:5191/atlas/'); await page.locator('.stop a').first().waitFor();
   if (await page.locator('#simulator').isHidden()) throw new Error('Missing simulator label');
   await capture(page, 'atlas-after');
+  const atlasURL = page.url();
+  await page.getByLabel('Approved mark text (one word or emoji)').fill('ｍＯＯＮ');
+  const searched = page.waitForResponse(r => new URL(r.url()).pathname === '/api/atlas/search' && r.request().method() === 'POST');
+  await page.getByRole('button', { name: 'Search approved text', exact: true }).click();
+  const searchResponse = await searched; if (searchResponse.status() !== 200) throw new Error('Local search failed');
+  await page.locator('#search-matches img').first().waitFor();
+  if (page.url() !== atlasURL) throw new Error('Search changed URL');
+  checks.push({ name: 'Shared approved-text search uses POST without URL change', pass: true });
+  await page.getByRole('button', { name: 'Clear search', exact: true }).click();
+
   await page.locator('.stop a').first().click(); await page.locator('.gallery img').first().waitFor();
   await capture(page, 'stop-after');
   const url = page.url();
@@ -50,6 +60,12 @@ try {
   await page.setViewportSize({ width: 375, height: 800 }); await page.goto('http://127.0.0.1:5191/atlas/');
   await page.locator('.stop a').first().waitFor();
   await capture(page, 'atlas-mobile-after'); await fits(page, 'Atlas 375px');
+  await page.getByLabel('Approved mark text (one word or emoji)').fill('moon');
+  await page.getByLabel('Approved mark text (one word or emoji)').press('Enter');
+  await page.locator('#search-matches img').first().waitFor(); await fits(page, 'Search results 375px');
+  if (new URL(page.url()).search) throw new Error('Search query leaked into URL');
+  await page.getByRole('button', { name: 'Clear search', exact: true }).click();
+
   const word = await page.evaluate(() => {
     const heading = document.getElementById('title'); const text = heading.firstChild;
     const start = text.textContent.indexOf('communities');

@@ -26,9 +26,45 @@ async function load() {
   } catch { if (current !== generation) return; clear(); $('status').textContent = 'Archive unavailable. Previous content hidden. Refresh to try again.'; }
   finally { clearTimeout(timer); if (current === generation) $('refresh').disabled = false; }
 }
-$('refresh').onclick = () => { offset = 0; load(); };
+$('refresh').onclick = () => { clearSearch(); $('search-status').textContent = 'Previous matches cleared. Submit a fresh shared-text search.'; offset = 0; load(); };
 $('next').onclick = () => { if (next !== null) { offset = next; load(); } };
 // No polling. Hide old content when leaving; a restored page must read anew.
 addEventListener('pagehide', () => { generation++; controller?.abort(); clear(); });
 addEventListener('pageshow', event => { if (event.persisted) load(); });
 load();
+
+// Transient query only, sent in a POST body; no URL/history/storage/polling.
+let searchGeneration = 0, searchController, searchNext = null;
+function clearSearch(eraseInput = false) {
+  searchGeneration++; searchController?.abort(); $('search-matches').replaceChildren(); searchNext = null; $('search-next').hidden = true;
+  if (eraseInput) $('search-query').value = '';
+}
+async function search(searchOffset = 0) {
+  const query = $('search-query').value; clearSearch(); const current = searchGeneration;
+  if (!query) { $('search-status').textContent = 'Enter one word or emoji to search shared approved text.'; return; }
+  const active = new AbortController(); searchController = active; const timer = setTimeout(() => active.abort(), 8000);
+  $('search-status').textContent = 'Searching completed stops…';
+  try {
+    const response = await fetch('/api/atlas/search', { method: 'POST', cache: 'no-store', signal: active.signal,
+      headers: { 'content-type': 'application/json' }, body: JSON.stringify({ query, offset: searchOffset, limit: 20 }) });
+    if (!response.ok) throw new Error(); const data = await response.json(); if (current !== searchGeneration) return;
+    $('simulator').hidden = data.mode !== 'simulator';
+    $('search-status').textContent = data.matches.length ? `Shared text matches ${searchOffset + 1}–${searchOffset + data.matches.length} of ${data.total}. Not proof of personal ownership.` : data.total ? 'No further shared-text matches on this page.' : 'No approved shared-text matches at completed stops.';
+    for (const match of data.matches) {
+      const item = node('li'); const image = node('img'); image.alt = 'Approved shared mark rune'; image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(match.runeSvg)}`;
+      const link = node('a', `Ring ${match.ringIndex}: channel ${match.from} to ${match.to}`); link.href = `/stops/${match.stopId}`;
+      item.append(image, node('span', match.text), node('span', new Date(match.claimedAt).toLocaleString()), link); $('search-matches').append(item);
+    }
+    searchNext = data.nextOffset; $('search-next').hidden = searchNext === null;
+  } catch { if (current !== searchGeneration) return; $('search-matches').replaceChildren(); $('search-status').textContent = 'Search unavailable or invalid. Previous matches hidden; use one word or emoji and try again.'; }
+  finally { clearTimeout(timer); }
+}
+$('mark-search').onsubmit = event => { event.preventDefault(); search(); };
+$('search-clear').onclick = () => { clearSearch(true); $('search-status').textContent = 'Search cleared. Enter shared mark text to search.'; $('search-query').focus(); };
+$('search-query').oninput = () => { clearSearch(); $('search-status').textContent = 'Submit to search shared approved text.'; };
+$('search-next').onclick = () => { if (searchNext !== null) search(searchNext); };
+addEventListener('pagehide', () => clearSearch(true));
+addEventListener('pageshow', event => { if (event.persisted) { clearSearch(true); $('search-status').textContent = 'Enter shared mark text to search.'; } });
+
+// Enable only after preventDefault is installed; no GET form fallback.
+$('search-query').disabled = false; $('search-submit').disabled = false;

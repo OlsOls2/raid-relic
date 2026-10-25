@@ -1,5 +1,5 @@
 import { hash as observationHash } from './crypto.js';
-import { atlasPage, handoffView, withCarriedMarks, withIncomingPreview, keeperCandidates } from './public-view.js';
+import { atlasPage, atlasSearch, handoffView, withCarriedMarks, withIncomingPreview, keeperCandidates } from './public-view.js';
 import { reduceClaims, publicJourney } from './claims.js';
 import { sendState } from './send-state.js';
 import { lifecycleConfig, reduceLifecycle } from './lifecycle.js';
@@ -175,6 +175,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         tx.set(ref('keeperRegistry', 'single'), checked.registry); tx.set(ref('streamChannels', host), next.channel); tx.set(ref('markChannels', host), next.marks);
       });
     },
+    async searchPublicMarks(options) { return atlasSearch((await ref('lineage', 'single').get()).data(), options); },
     async getAtlasPage(options) { return atlasPage((await ref('lineage', 'single').get()).data(), options); },
     async getPublicPresentation(host, now) {
       return db.runTransaction(async tx => {

@@ -10,3 +10,4 @@ img{max-width:100%}
 /* The mobile title owns its line; the crystal never squeezes words. */
 h1{overflow-wrap:normal;word-break:normal;hyphens:none}
 @media(max-width:480px){.intro{grid-template-columns:minmax(0,1fr);gap:4px}.intro img{width:72px;justify-self:end}.intro h1{font-size:clamp(30px,9vw,40px);max-width:none}.intro p{margin-bottom:0}}
+#mark-search{display:flex;flex-wrap:wrap;gap:12px;align-items:center}#mark-search label{flex-basis:100%}#search-query{min-width:0;max-width:100%;width:240px;font:inherit;padding:10px;background:var(--slate);color:var(--moon);border:1px solid #8092a9}#search-query:focus-visible{outline:2px solid var(--amber);outline-offset:4px}#search-status{min-height:2em}

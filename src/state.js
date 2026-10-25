@@ -1,5 +1,5 @@
 import { hash as observationHash } from './crypto.js';
-import { atlasPage, handoffView, withCarriedMarks, withIncomingPreview, keeperCandidates } from './public-view.js';
+import { atlasPage, atlasSearch, handoffView, withCarriedMarks, withIncomingPreview, keeperCandidates } from './public-view.js';
 import { reduceClaims, emptyLineage, publicJourney } from './claims.js';
 import { sendState } from './send-state.js';
 import { lifecycleConfig, reduceLifecycle, emptyRegistry } from './lifecycle.js';
@@ -91,6 +91,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
       registry = next.registry; channels.set(host, next.channel); markDocs.set(host, next.marks);
       const checked = reduceClaims(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), lineage, null, now); registry = checked.registry; lineage = checked.lineage;
     },
+    searchPublicMarks(options) { return atlasSearch(lineage, options); },
     getAtlasPage(options) { return atlasPage(lineage, options); },
     getPublicPresentation(host, now) { return { rings: lineage.stops.length, handoff: handoffView(registry, host, now) }; },
     getPublicJourney() { return publicJourney(lineage); },

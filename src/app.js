@@ -2,7 +2,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { createMemoryState } from './state.js';
 import { parseChat } from './bot.js';
-import { createMarkService } from './marks.js';
+import { createMarkService, normalizeMark } from './marks.js';
 import { validateReleaseCommit } from './release.js';
 import { parseLifecycle } from './lifecycle.js';
 
@@ -50,6 +50,20 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
     }
     if (method === 'GET' && path === '/health') {
       return result(200, JSON.stringify({ status: 'ok', releaseCommit: release, phase: raidPilot ? 'raid-pilot' : 'foundation', readiness: raidPilot ? 'owner-test-ready' : 'not-ready-for-raids', ...(raidPilot ? { liveValidated: false } : {}) }), 'application/json');
+    }
+    if (path.startsWith('/api/atlas/search')) {
+      if (path !== '/api/atlas/search') return result(400, 'Invalid search path');
+      if (method !== 'POST') return result(405, 'Search requires read-only POST');
+      if (headers['content-type'] !== 'application/json' || !Buffer.isBuffer(rawBody) || rawBody.length > 1024) return result(400, 'Invalid search request');
+      let body; try {
+        const text = new TextDecoder('utf-8', { fatal: true }).decode(rawBody); body = JSON.parse(text);
+        if (!body || Array.isArray(body) || Object.keys(body).some(key => !['query', 'offset', 'limit'].includes(key))
+          || (text.match(/"(?:query|offset|limit)"\s*:/g) ?? []).length !== Object.keys(body).length) return result(400, 'Invalid search request');
+      } catch { return result(400, 'Invalid search request'); }
+      const query = normalizeMark(body.query), offset = Object.hasOwn(body, 'offset') ? body.offset : 0, limit = Object.hasOwn(body, 'limit') ? body.limit : 20;
+      if (!query || !Number.isInteger(offset) || offset < 0 || offset > 2560 || !Number.isInteger(limit) || limit < 1 || limit > 20) return result(400, 'Invalid search request');
+      try { return result(200, JSON.stringify({ ...await state.searchPublicMarks({ query, offset, limit }), mode: overlayFeed?.simulator ? 'simulator' : 'live' }), 'application/json'); }
+      catch { return result(503, 'Search unavailable; previous matches must be cleared'); }
     }
     if (path.startsWith('/api/atlas')) {
       if (method !== 'GET') return result(405, 'Read only');

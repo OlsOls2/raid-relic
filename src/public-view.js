@@ -53,3 +53,15 @@ export function keeperCandidates(registry, channels, docs, config, host) {
     observedOnline: true, optedIn: true, eligible: true,
   }));
 }
+
+// Only the bounded completed public archive is searched; no identity lookup.
+export function atlasSearch(lineage, { query, offset = 0, limit = 20 }) {
+  if (!query || !Number.isInteger(offset) || offset < 0 || offset > 2560 || !Number.isInteger(limit) || limit < 1 || limit > 20) throw new Error('Invalid search');
+  const stops = lineage?.stops ?? [];
+  if (stops.length > 16 || stops.some(stop => stop.marks.length > 160)) throw new Error('Archive capacity exceeded');
+  const matches = [];
+  for (const stop of stops) for (const mark of stop.marks) if (mark.text.includes(query)) matches.push({ stop, mark });
+  return { total: matches.length, offset, nextOffset: offset + limit < matches.length ? offset + limit : null,
+    matches: matches.slice(offset, offset + limit).map(({ stop, mark }) => ({ stopId: stop.stopId, from: stop.from, to: stop.to,
+      claimedAt: stop.claimedAt, ringIndex: stop.ringIndex, text: mark.text, runeSvg: runeSvg(mark.text) })) };
+}
