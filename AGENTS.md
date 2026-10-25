@@ -1,3 +1,5 @@
+> CURRENT 15:24 P2 authorization: same original session/feature/raid-relic-polish only. Original procedural Three.js renderer, reviewed free MIT local vendor/licence and SVG fallback; no P3+. Parent QA/commits/deploys. No Codex staging/commit/branch/delegation/cloud/provider/credentials/live pages/streams/chat/raids/export; paid gates OFF. Grok-reported actual P1 pass is distinct from local test evidence and does not alter health liveValidated semantics. P4 recovery/voice/moved-on copy is backlog only.
+
 # Raid Relic authoring rules
 
 > CURRENT13:56 P1-only owner priority supersedes Must-gap work: same original session, feature/raid-relic-polish only;180s accepted-request voting/source-seen target offers/aggregate overlays with verified raid mandatory before transfer/arrival, no P2+. Parent QA/commits/deploys finished increments separately; no Codex staging/commit/branch/fork/delegation/provider/cloud/livepages/streams/chat/raids/credentials/traffic/export/raw logs. Park ban foundation unwired, paid gates OFF, original SVG/no dependencies. Production claimfix1025/bbd distinct from undeployed branch. Freeze31Oct18:00 UK; demo31Oct–1Nov.
