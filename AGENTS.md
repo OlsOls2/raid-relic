@@ -1,5 +1,7 @@
 # Raid Relic authoring rules
 
+> CURRENT11:16 emergency authorization: only this fd05-based fix/raid-relic-live-restart-send worktree, same original session; bounded private raid POST diagnostics/tests/operator docs. Parent reviews/commits/deploys; no Codex staging/commit/branch/delegation/cloud/provider/credentials/control/stream/live actions. Preserve OAuth, dispatch at-most-once and CAS. Historical dispatch-rejected exact status/message unrecoverable; no speculative response or replay. Do not touch/promote polish.
+
 > CURRENT10:12 emergency authorization: same original thread, only this fd05/d529 hotfix worktree on fix/raid-relic-live-restart-send. Local lifecycle recovery/explicit Send Off diagnostics plus tests/docs only; parent reviews/commits/deploys. No Codex cloud/provider/credentials/live actions, branches or delegation. Preserve grants, holder, closed IDs and budgets. No polish/Coulds promotion.
 
 Codex is the sole code author. All code and documentation changes must be authored in the original thread recorded in CODEX_SESSION.md. Always resume that thread; never create or fork a thread or delegate to other agents. Work only in this repository.

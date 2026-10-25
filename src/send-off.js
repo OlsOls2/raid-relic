@@ -1,7 +1,8 @@
+import { raidDiagnostic, raidHTTP } from './raid-diagnostic.js';
 import { randomBytes } from 'node:crypto';
 import { httpTransport } from './oauth.js';
 
-export function createSendOff({ state, oauth, clientId, streamerId, transport = httpTransport, now = Date.now, authorize }) {
+export function createSendOff({ state, oauth, clientId, streamerId, transport = httpTransport, now = Date.now, authorize, logger = line => console.warn(line) }) {
   async function processPending(expectedId) {
     const owner = randomBytes(24).toString('hex');
     const intent = await state.sendOffStep({ type: 'claim', source: streamerId, owner, ...(expectedId ? { expectedId } : {}) }, now());
@@ -32,14 +33,17 @@ export function createSendOff({ state, oauth, clientId, streamerId, transport = 
     if (!dispatched) return { status: 'rejected-or-lease-lost' };
     // Irreversible dispatch boundary is persisted BEFORE HTTP. Never retry this
     // request, even on 401. Crash/timeout/5xx outcomes require reconciliation.
-    let status = 'unknown';
+    let status = 'unknown', response; const at = now();
     try {
-      const response = await transport(`https://api.twitch.tv/helix/raids?from_broadcaster_id=${intent.sourceId}&to_broadcaster_id=${intent.targetId}`,
+      response = await (transport === httpTransport ? raidHTTP : transport)(`https://api.twitch.tv/helix/raids?from_broadcaster_id=${intent.sourceId}&to_broadcaster_id=${intent.targetId}`,
         { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Client-Id': clientId } });
-      status = response.status === 200 ? 'accepted' : response.status >= 400 && response.status < 500 ? 'rejected' : 'unknown';
+      status = response.malformed || !response.data || typeof response.data !== 'object' ? 'unknown' : response.status === 200 ? 'accepted' : response.status >= 400 && response.status < 500 ? 'rejected' : 'unknown';
     } catch { /* May have reached Twitch: no automatic retry. */ }
-    await finish(status);
-    return { status };
+    const diagnostic = raidDiagnostic(intent, response, token, at, now());
+    // Independent logging preserves evidence even if the final CAS cannot commit.
+    try { await logger(JSON.stringify({ severity: status === 'accepted' ? 'INFO' : 'WARNING', event: 'raid_relic_raid_dispatch', diagnostic })); } catch {}
+    try { await state.sendOffStep({ type: 'finish', id: intent.id, owner, status, diagnostic }, now()); } catch { return { status: 'unknown', diagnostic }; }
+    return { status, diagnostic };
   }
   return { processPending };
 }

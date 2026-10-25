@@ -1,3 +1,4 @@
+import { validRaidDiagnostic } from './raid-diagnostic.js';
 import { hash } from './crypto.js';
 
 export const SEND_LIMITS = Object.freeze({ leaseMs: 30000, queueMs: 120000, confirmationMs: 600000, ritualMs: 90000 });
@@ -42,7 +43,10 @@ export function sendState(previous, channels, marks, config, op, now) {
     else { intent.status = 'dispatching'; intent.dispatchAt = now; result = structuredClone(intent); }
   }
   if (op.type === 'finish' && owns && !['confirmed', 'rejected'].includes(intent.status)) {
-    if (intent.status === 'dispatching') intent.status = ['accepted', 'rejected', 'unknown'].includes(op.status) ? op.status : 'unknown';
+    if (intent.status === 'dispatching') {
+      intent.status = ['accepted', 'rejected', 'unknown'].includes(op.status) ? op.status : 'unknown';
+      if (validRaidDiagnostic(op.diagnostic, intent)) intent.diagnostic = op.diagnostic;
+    }
     else if (intent.status === 'preflight' && intent.leaseUntil > now && op.status === 'rejected') intent.status = 'rejected';
   }
   if (op.type === 'raid' && Number.isInteger(op.raid?.viewers) && op.raid.viewers >= 0 && op.raid.viewers <= 1000000) {

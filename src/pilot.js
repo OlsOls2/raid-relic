@@ -15,9 +15,9 @@ export function createPilot({ state, store, oauth, subscriptions, sends, now = D
     return state.accept({ id: `owner:${randomBytes(24).toString('hex')}`, now: time, sentAt: time, expiresAt: time + 600000,
       chat: { broadcasterId: id, chatterId: id, markAction: action } });
   }
-  async function blocked(id, reason) {
+  async function blocked(id, reason, diagnostic) {
     try { await logger(JSON.stringify({ severity: 'WARNING', event: 'raid_relic_send_blocked', keeperId: id, reason })); } catch {}
-    return { status: 'blocked', reason, message: 'Send Off blocked: ' + reason + '. Refresh both channel statuses; do not retry accepted/unknown dispatches.' };
+    return { status: 'blocked', reason, ...(diagnostic ? { diagnostic } : {}), message: 'Send Off blocked: ' + reason + '. Refresh both channel statuses; do not retry accepted/unknown dispatches.' };
   }
   async function readiness(id) {
     const other = ids.find(candidate => candidate !== id);
@@ -87,7 +87,7 @@ export function createPilot({ state, store, oauth, subscriptions, sends, now = D
             intentId = reserved.intentId;
           }
           const outcome = await sends[id].processPending(intentId);
-          if (outcome.status !== 'accepted') return blocked(id, outcome.status === 'unknown' ? 'dispatch-unknown' : outcome.status === 'rejected-preflight' ? 'preflight-rejected' : outcome.status === 'rejected' ? 'dispatch-rejected' : 'worker-reconcile-only');
+          if (outcome.status !== 'accepted') return blocked(id, outcome.status === 'unknown' ? 'dispatch-unknown' : outcome.status === 'rejected-preflight' ? 'preflight-rejected' : outcome.status === 'rejected' ? 'dispatch-rejected' : 'worker-reconcile-only', outcome.diagnostic);
           return outcome;
         } catch { return blocked(id, 'request-outcome-unavailable'); }
       }
@@ -101,6 +101,7 @@ export function createPilot({ state, store, oauth, subscriptions, sends, now = D
         bothReadiness: Object.fromEntries(await Promise.all(ids.map(async keeper => [KEEPERS[keeper], (await store.getJob(keeper))?.ready === true]))),
         ownerStep: 'Wait for both readiness flags true; Bootstrap / reconcile pending channels after callback verification. Reconnect missing grants.',
         eligibility: await eligibility(id),
+        dispatchDiagnostic: registry.send?.sourceId === id ? registry.send.diagnostic ?? null : null,
         holder: registry.holderId, subscriptions: await store.getJob(id), intent: registry.send?.sourceId === id ? registry.send.status : null,
         handoff: handoffView(registry, id, now()) };
     },
