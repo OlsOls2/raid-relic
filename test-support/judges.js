@@ -46,7 +46,7 @@ export async function createJudges({ intent = false, env = process.env } = {}) {
     if (!flags.setup) throw Error('Run simulated setup first');
     if (action === 'mymarks') {
       if (!flags.accept || !flags.mark) throw Error('Complete the approved simulated carry first');
-      await fixture.chat(HOME, '811', '!relic mymarks');
+      await fixture.chat(HOME, '811', '!relic mymarks @VIEWER811');
       const doc = await fixture.runtime.state.getPrivateMarks(HOME, { broadcasterId: HOME, chatterId: HOME });
       const row = doc.shares?.find(s => s.actor === '811'); if (!row) throw Error('No simulated share');
       ownSharePath = `/my-marks#${row.token}`; return;

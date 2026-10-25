@@ -1,4 +1,4 @@
-import { shareRequestHash } from './my-marks.js';
+import { canonicalLogin, shareRequestHash } from './my-marks.js';
 import { parseBan } from './bans.js';
 import { matchesSubscriptionCondition } from './subscriptions.js';
 import { strictJSON, templateDesign, forgeResult } from './forge.js';
@@ -72,8 +72,9 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
       try {
         if (!shares || headers['content-type'] !== 'application/json') throw Error();
         const body = strictJSON(rawBody);
-        if (!body || Object.keys(body).some(k => !['capability', 'offset', 'limit'].includes(k))) throw Error();
+        if (!body || Object.keys(body).some(k => !['capability', 'offset', 'limit', 'login'].includes(k))) throw Error();
         const payload = shares.open(body.capability), offset = Object.hasOwn(body, 'offset') ? body.offset : 0, limit = Object.hasOwn(body, 'limit') ? body.limit : 20;
+        if (Object.hasOwn(body, 'login') && canonicalLogin(body.login) !== payload.login) throw Error();
         if (!Number.isInteger(offset) || offset < 0 || offset > 2560 || !Number.isInteger(limit) || limit < 1 || limit > 20) throw Error();
         return { ...result(200, JSON.stringify({ ...await state.getOwnMarks(payload, now(), offset, limit), mode: overlayFeed?.simulator ? 'simulator' : 'live' }), 'application/json'), headers: { 'cache-control': 'no-store', 'referrer-policy': 'no-referrer' } };
       } catch { return result(403, 'Shared history unavailable or expired; previous content must be cleared'); }
@@ -210,7 +211,7 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
         }
       }
     }
-    const share = chat?.markAction?.type === 'mymarks' && shares && !chat.isBot && !chat.copied ? shares.issue(chat.broadcasterId, chat.chatterId, receivedAt) : undefined;
+    const share = chat?.markAction?.type === 'mymarks' && shares && !chat.isBot && !chat.copied && chat.chatterLogin && (!chat.markAction.login || chat.markAction.login === chat.chatterLogin) ? shares.issue(chat.broadcasterId, chat.chatterId, receivedAt, chat.chatterLogin) : undefined;
     const accepted = await state.accept({ share, id, now: receivedAt, sentAt, expiresAt: sentAt + REPLAY_WINDOW_MS, raid, chat, lifecycle });
     if (accepted === 'full') return result(503, 'Event capacity reached');
     // Exact proven request only; duplicates can recover an unclaimed row, never another viewer's.

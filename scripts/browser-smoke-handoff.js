@@ -20,8 +20,30 @@ try {
   await shared.locator('#matches img').waitFor();
   if (new URL(shared.url()).hash || new URL(shared.url()).search) throw Error('Capability retained in address/history');
   if (!(await shared.title()).includes('SIMULATOR') || !(await shared.locator('#status').textContent()).includes('1 retained approved')) throw Error('Missing safe Simulator history');
+  if (await shared.locator('#self-login').inputValue() !== 'viewer811') throw Error('Missing proven named binding');
   captures.set('handoff-simulator-own-history', await shared.screenshot({ fullPage: true }));
-  checks.push({ name: 'Original-chat opt-in, explicit mocked bot reply, encrypted fragment removed, safe own approved history', pass: true });
+  checks.push({ name: 'Original-chat named opt-in, automatic exact mocked bot reply, encrypted fragment removed, safe own approved history', pass: true });
+  await shared.locator('#self-login').fill('someone_else');
+  await shared.getByRole('button', { name: 'Show this shared name', exact: true }).click();
+  await shared.locator('#status').filter({ hasText: 'Previous content hidden' }).waitFor();
+  if (await shared.locator('#matches li').count()) throw Error('Cross-name history leaked');
+  await shared.locator('#self-login').fill('@VIEWER811');
+  await shared.getByRole('button', { name: 'Show this shared name', exact: true }).click();
+  await shared.locator('#matches img').waitFor();
+  let releaseResponse;
+  const held = new Promise(resolve => { releaseResponse = resolve; });
+  let intercepted, delivered;
+  const finished = new Promise(resolve => { delivered = resolve; });
+  const arrived = new Promise(resolve => { intercepted = resolve; });
+  await shared.route('**/api/my-marks', async route => {
+    const response = await route.fetch(); intercepted(); await held;
+    try { await route.fulfill({ response }); } catch { /* Input invalidation may abort the old request. */ } finally { delivered(); }
+  });
+  await shared.getByRole('button', { name: 'Refresh shared history', exact: true }).click();
+  await arrived; await shared.locator('#self-login').fill('different_name'); releaseResponse(); await finished;
+  await shared.unroute('**/api/my-marks');
+  if (await shared.locator('#matches li').count()) throw Error('Stale response survived input invalidation');
+  await shared.locator('#self-login').fill('viewer811');
   await step('forget'); await shared.getByRole('button', { name: 'Refresh shared history', exact: true }).click();
   await shared.locator('#status').filter({ hasText: 'Previous content hidden' }).waitFor();
   if (await shared.locator('#matches li').count()) throw Error('Forgotten content survived');

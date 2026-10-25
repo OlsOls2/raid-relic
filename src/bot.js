@@ -25,6 +25,7 @@ export function parseChat(payload, { streamerId, botId, includeMarkCommands = fa
     }
   }
 
+  if (typeof event.chatter_user_login === 'string' && /^[a-zA-Z0-9_]{1,25}$/.test(event.chatter_user_login)) chat.chatterLogin = event.chatter_user_login.toLowerCase();
   if (includeMarkCommands) {
     const action = parseMarkCommand(event.message.text);
     if (action) {

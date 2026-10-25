@@ -36,7 +36,8 @@ export function parseMarkCommand(text) {
   if (send) return { type: 'send', login: send[1].toLowerCase() };
   const mark = /^!mark(?: (.*))?$/iu.exec(text);
   if (mark) return { type: 'mark', text: normalizeMark(mark[1]) };
-  if (text === '!relic mymarks') return { type: 'mymarks' };
+  const own = /^!relic mymarks(?: @([a-zA-Z0-9_]{1,25}))?$/.exec(text);
+  if (own) return { type: 'mymarks', ...(own[1] ? { login: own[1].toLowerCase() } : {}) };
   if (text === '!relic forgetme') return { type: 'forgetme' };
   if (text === '!relic veto-last') return { type: 'veto-last' };
   if (text === '!offer') return { type: 'offer' };
