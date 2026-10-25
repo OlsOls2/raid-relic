@@ -1,6 +1,33 @@
-# Current work: Could #2 Relic Forge (feature branch only)
+# Raid Relic — Coulds release preparation
 
-**Final Coulds local evidence (parent verified): 287/287 host tests PASS, zero skips; all five browser workflows PASS; npm audit zero vulnerabilities;54 release files and diff check PASS.** Recap `c63ec31` is pushed on the feature branch; Forge `523d772af6ba6f0460d7486d9f3434ea242fdcc3` is committed/pushed on `feature/raid-relic-coulds`. Coulds are not on main, Shoulds tag or live. Three-stream fade and shared-chat resonance are **deferred, not implemented**; this does not complete all Coulds. Both paid flags remainfalse on preview, with no actual paid Chronicle/Forge calls. Main072317a, live00003 at100% and Shoulds00004 at0% remain frozen; no further cloud/provider/key actions by Codex or parent are authorized. Older pending QA notes below are historical and superseded by this parent proof.
+Owner authorizes parent to merge reviewed Coulds candidate **52e1a04** into main/push and deploy a **NEW no-normal-traffic `coulds` tag**. Expected host **https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app** is **pending deployment**, not yet active/verified. Main's freeze is lifted for this reviewed merge/docs only. Preserve canonical00003/sourcefd05 at100% and Shoulds00004/source0723 at0%; Shoulds does not contain Coulds. Paid gates stayOFF, existing resources/secret references/min0max1 preserved. Codex authors docs only, with no cloud/provider/credential/live actions or commit.
+
+Parent baseline: **312/312 host tests; seven sandboxed browser workflows/33 checks PASS; audit0;55 release files; diff pass**. Local Simulator proof is not actual Twitch/Shared Chat/physical OBS/AI validation. Candidate includes recap, Forge, carried-rune fade and bounded decorative copied-word echo in the existing curated two-Keeper prototype; no all-Coulds/live-ready claim. [Preview safety and preserved release facts](docs/TAGGED_PREVIEW.md).
+
+## Judges: two-minute preview once parent verifies the new tag
+
+1. Open expected [Coulds Atlas](https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app/atlas/): manual refresh shows **actual** completed stops/rings or honest0/empty history. Search matches approved shared text, not personal ownership. No fake journey is seeded.
+2. Open [Forge templates](https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app/forge) for a deterministic design preview/JSON/SVG, never live customization; [recap](https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app/recap) downloads actual retained summary SVG/PNG. Chronicle is template fiction, not paid AI.
+3. Read-only overlays: [raidrelichq1591805230](https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app/overlay/1591805230) and [OlsOls2 1591806023](https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app/overlay/1591806023), optional `?corner=1` at160×160. Waiting is honest if no trusted active context; do not bootstrap or raid for a public demo. Close idle sockets.
+
+Actual owner setup/raids require the [detailed owner checklist and mandatory webhook-routing gate](docs/LIVE_TEST.md). OAuth redirect changes **do not retarget EventSub**;409 old-callback conflicts need independently reviewed operator migration, never broad deletion or split routing. Tags share real Firestore/auth/control rows and separate fanout; use one origin at a time.
+
+For the isolated local Simulator, use an authorized clone/reviewer archive, Node22+, then:
+
+```sh
+npm ci
+npm run judges
+```
+
+Open **http://127.0.0.1:5191/judges**, the exact URL enforced by `scripts/judges.js`/its wrapper. Although localhost often means loopback, **`http://localhost:5191/judges` is rejected by this wrapper's exact Host/Origin guard**; use127.0.0.1 without changing security. Click labelled simulated setup/mark/send/receipt/offer/accept; no Twitch/cloud/OpenAI credentials, flags or cloud DB needed. Every page/export stays SIMULATOR. Ctrl-C stops only this local process. No `/judges` route is included on cloud. [Full local guide](docs/JUDGES_QUICKSTART.md).
+
+---
+
+## Historical increment notes — superseded by release preparation above
+
+### Historical Could #2 Relic Forge increment
+
+**Final Coulds local evidence (parent verified): 287/287 host tests PASS, zero skips; all five browser workflows PASS; npm audit zero vulnerabilities;54 release files and diff check PASS.** Recap `c63ec31` is pushed on the feature branch; Forge `523d772af6ba6f0460d7486d9f3434ea242fdcc3` is committed/pushed on `feature/raid-relic-coulds`. Coulds are not on main, Shoulds tag or live. At that earlier Forge-only cutoff, three-stream fade and shared-chat resonance were deferred; both bounded implementations now exist in the reviewed Coulds candidate; this does not complete all Coulds. Both paid flags remainfalse on preview, with no actual paid Chronicle/Forge calls. Main072317a, live00003 at100% and Shoulds00004 at0% remain frozen; no further cloud/provider/key actions by Codex or parent are authorized. Older pending QA notes below are historical and superseded by this parent proof.
 
 Only `feature/raid-relic-coulds` is being authored. **Main0723, canonical00003/sourcefd05 and Shoulds tag00004/source0723 remain frozen**; Could #1 and #2 are not merged/deployed. Parent verified Could #1 **274/274 + actual recap SVG/1200×630 PNG downloads PASS**, reviewed canonical moon parity and visible Simulator watermarks, and pushed `c63ec31`. [Shared-state tagged-preview precautions](docs/TAGGED_PREVIEW.md) remain binding. No fade or resonance is included.
 

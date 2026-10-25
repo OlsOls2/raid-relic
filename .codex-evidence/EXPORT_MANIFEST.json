@@ -2,22 +2,22 @@
   "formatVersion": 1,
   "sessionID": "01a1705c-a87d-7143-80f6-021e47b78ced",
   "inputLeaf": "rollout-2026-10-25T00-01-23-01a1705c-a87d-7143-80f6-021e47b78ced.jsonl",
-  "rawSnapshotSHA256": "c874e937fc5c1fcab768adfd78f685a4bbb4756683f80590d6ddb58868785864",
-  "rawBytes": 16929688,
+  "rawSnapshotSHA256": "c756a353b44afedf588c9ba011b1946a22058bb6b215beacc69be32c55d6cb03",
+  "rawBytes": 17248346,
   "eventCounts": {
     "session_meta": 1,
-    "event_msg": 1684,
-    "response_item": 1449,
+    "event_msg": 1714,
+    "response_item": 1474,
     "world_state": 41,
-    "turn_context": 46,
-    "token_usage_record": 419,
+    "turn_context": 47,
+    "token_usage_record": 427,
     "compacted": 3
   },
-  "exportedEntries": 967,
+  "exportedEntries": 985,
   "omissions": {
     "private": 46,
     "media": 2,
-    "unselected": 2675,
+    "unselected": 2721,
     "truncated": 2,
     "credentialLookingItems": 21,
     "credentialReasons": {
@@ -26,9 +26,9 @@
     }
   },
   "firstTimestamp": "2026-10-25T00:01:23.357Z",
-  "cutoff": "2026-10-25T06:59:15.278Z",
-  "exportSHA256": "285fd7c88e6affc00b3179c3ad87fc5ef78c8ff673131529b68a91f425212c1c",
-  "exportBytes": 2845229,
+  "cutoff": "2026-10-25T07:21:42.421Z",
+  "exportSHA256": "fe43afdaa087ff4d1476dc533063613b2c0f77270c4fdcbd444636ac8f166abd",
+  "exportBytes": 2944013,
   "sourceRunLogs": [
     {
       "leaf": "run-000.jsonl",
@@ -259,6 +259,11 @@
       "leaf": "run-045.jsonl",
       "bytes": 78384,
       "sha256": "ff3368b4b9747e1e502c006c258d6c6f41f40bcd424896e7d582416d7eeb24ee"
+    },
+    {
+      "leaf": "run-046.jsonl",
+      "bytes": 146553,
+      "sha256": "f49ed8759ab925a5555b499134a26a99c27b3f7dc569c22948dd5f969b2ea1fd"
     }
   ],
   "scope": "Selected sanitized native JSONL; private/internal/media omitted and per-item output bounded. Raw snapshot remains local ignored."

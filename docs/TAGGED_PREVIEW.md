@@ -1,52 +1,44 @@
-# Frozen Shoulds tagged preview — parent-reported handoff
+# Tagged previews: Coulds preparation and preserved Shoulds release
 
-These are parent-verified facts, recorded without Codex cloud/provider calls or credential reads. **Main and BOTH revisions are now frozen until owner tests.** The previous freeze exception authorized only the parent's already completed Shoulds tagged deployment. It does not authorize further builds, deployment, promotion, consent, subscription bootstrap or Send Off by Codex. New work is only `feature/raid-relic-coulds`, original saved thread; Could #1 recap and Could #2 Forge exist only on that feature branch, not merged/deployed on either revision. No Forge is included in the CLOUD release; Forge is implemented on the feature branch only. Three-stream fade and shared-chat resonance are deferred and not implemented anywhere.
+## Current authorization — pending new Coulds deployment
 
-| Item | Parent-verified value |
+Owner authorizes **parent only** to merge reviewed `feature/raid-relic-coulds` candidate `52e1a04` into main/push and build/deploy a NEW no-normal-traffic tag **`coulds`**, expected https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app . Main's freeze is lifted only for this reviewed merge/docs; this is **not production traffic promotion**. New merged release hash/revision/image/build are not yet reported: do not claim this tag active or verified. Parent changes only the new revision's OAuth redirect/allowlist, EventSub callback and OVERLAY origin to the Coulds host, preserving existing resources/secret references, min0/max1 and both paid gatesfalse. No new services.
+
+Canonical `raid-relic-00003-kwp` / sourcefd05 remains100%; Shoulds `raid-relic-00004-kul` / source0723 remains0% and preserved. Codex is authorized for docs only here: no cloud/build/deploy, credentials/provider calls, actual consent/bootstrap/chat/raid/public actions or commits; same original thread/no delegation. Parent supplies deployment proof separately. No raw evidence backup read/export by Codex; parent refreshes a scanned fixed snapshot after this run.
+
+Coulds candidate implements recap, Forge templates/optional cost-gated mock model path, three-completed-holder-stream **carried-rune visual fade**, and bounded decorative approved copied-word echo within the existing curated two-Keeper prototype. No all-Coulds or live-validation claim. Those features are **not included in the preserved Shoulds/cloud00004 release**. Older “fade/resonance deferred” notes described earlier branch state; they are no longer current implementation status.
+
+Parent baseline:312/312 host tests/zero skips, seven sandboxed browser flows/33 checks PASS (Atlas13,pilot8,judges3,recap3,Forge2,fade2,resonance2), audit0/release55/diff pass. Parent viewed labelled Simulator captures, stable fade count1/same dimmed glyph and echo outline leaving runeDIM. These are not actual Twitch/Shared Chat/physical OBS/AI proof. Paid Chronicle/Forge were not called; keep gatesOFF.
+
+## Mandatory shared-state and callback-routing precautions
+
+All tags share the live Firestore, OAuth/state/token and control-session rows. They are **not isolated staging**. Cookies are host-specific but reauthorization can invalidate an older live control. Finish old-origin owner testing and close its controls/OBS; use **one origin at a time**. Never seed/reset/delete shared state for a demonstration; judges is local memory only and excluded from all cloud releases.
+
+Existing Twitch subscriptions do not move when OAuth redirects or tag environment change. Independent in-process fanout means canonical webhook deliveries do not push into Coulds sockets. Before any new-tag Send Off, owner/operator must verify all ten exact version1 conditions (five per Keeper, including both raid directions and exact bot chat ID) route to `https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app/eventsub` and are enabled. A409 conflict cannot be resolved by pretending readiness or repeating bootstrap indefinitely.
+
+[The authoritative owner checklist](LIVE_TEST.md) specifies scoped same-app subscription inspection, independent ownership/ID/condition/callback review, operator-approved deletion of **only reviewed old canonical/Shoulds IDs**, then sequential new-tag reconciliation. Never bulk-delete or split channels/conditions across revisions. If review is uncertain, stop and request the operator. OAuth app registration needs only the one additional exact Coulds `/auth/callback`, retaining canonical/Shoulds callbacks; never register `/eventsub` as OAuth or per-role callbacks.
+
+## Preserved Shoulds release history — not Coulds deployment proof
+
+| Item | Parent-verified historical value |
 | --- | --- |
-| Merged green main / preview source | `072317a2f127fc3a67137812ba9b762fe1f34ead` (261/261 host tests) |
-| Build identifier supplied by parent | `c40be500` |
-| Immutable image digest | `sha256:69a3dc185158c35cf8d4a23a413ecf5432ad86c1d3643d536f5a33f98437bfa1` |
-| Tagged revision | `raid-relic-00004-kul`, tag `shoulds`, no normal traffic |
-| Tagged origin | https://shoulds---raid-relic-vz4bhnskgq-uc.a.run.app |
-| Canonical live revision / traffic | `raid-relic-00003-kwp`,100%; source `fd05a5ee67f841b1ac92ebb221581db227d2353f` |
+| Main / Shoulds preview source before proposed merge | `072317a2f127fc3a67137812ba9b762fe1f34ead` (261/261 host at that release) |
+| Shoulds build identifier supplied by parent | `c40be500` |
+| Shoulds immutable image | `sha256:69a3dc185158c35cf8d4a23a413ecf5432ad86c1d3643d536f5a33f98437bfa1` |
+| Shoulds revision / traffic | `raid-relic-00004-kul`, tag `shoulds`,0% normal traffic |
+| Shoulds origin | https://shoulds---raid-relic-vz4bhnskgq-uc.a.run.app |
+| Preserved canonical revision / traffic | `raid-relic-00003-kwp`,100%; source `fd05a5ee67f841b1ac92ebb221581db227d2353f` |
 | Canonical origin | https://raid-relic-760724762396.us-central1.run.app |
-| Preview scaling / resources | min0/max1; existing secret references and resources preserved |
-| Paid Chronicle gates | `CHRONICLE_ENABLED=false`, `CHRONICLE_ALLOW_PAID=false` |
+| Scaling / resources | min0/max1; existing resources/secret references preserved |
+| Paid gates | `CHRONICLE_ENABLED=false`, `CHRONICLE_ALLOW_PAID=false` |
 
-Parent verified tagged health matches0723,15 public assets byte-match, read-only search and protected401 boundaries, both initial WebSocket snapshots in live mode waiting, and judges404/excluded. Canonical live health still identifiesfd05. No actual OAuth consent, Twitch or model calls were performed; waiting cloud snapshots are not proof of Twitch delivery or live raid validation. Neither revision contains Could #1 recap or Could #2 Forge. Historical Shoulds-freeze descriptions in older notes predate this completed tagged deployment.
+Parent verified Shoulds health0723,15 public assets parity, read-only search/protected401, both initial WSS live-mode waiting, judges404/excluded; canonical healthfd05. No actual Twitch consent/bootstrap/chat/raid/model validation followed from those checks. Shoulds has the five Shoulds, not recap/Forge/fade/decorative echo. Its OAuth/allowlist/EventSub/OVERLAY origins are tagged Shoulds values.
 
-## Shared database — NOT isolated staging
+## After owner-approved parent deployment — manual checks only
 
-The tag **shares live Firestore, OAuth token/state and control-session rows**. Reauthorizing can rotate live browser controls. Dual bootstrap/Send Off can conflict. Each revision has independent in-process fanout: a write through one does not automatically publish to WebSockets connected to the other. No isolated staging database or cross-revision fanout was added. Never treat this tag as a safe place to seed/reset real data; the local judges Simulator is the isolated-memory path.
+1. Parent records actual new Coulds source/revision/image and confirms no-traffic tag, unchanged canonical100%/Shoulds0%, resources/secret references and both paid flagsOFF. Until then all Coulds URLs are expected/pending.
+2. Owner follows [LIVE_TEST.md](LIVE_TEST.md): exact profiles/three sequential consents, coordinated callback-routing gate, sequential bootstrap of both channels, both readiness flags/all five conditions enabled each, Opt in/Keep and fresh source status with actual holder. No concurrent cross-origin workers.
+3. Read-only Coulds Atlas/search, recap download and Forge template preview must show actual retained data or honest empty state. New-tag OBS uses numeric channel URLs; optional sound needs a gesture, initial/reconnect silent. No judges route/cloud Simulator activation.
+4. At end, close unused browser/OBS sources; at most16 clients, active WebSockets can incur usage. Min0/max1/free-tier eligibility/budget alerts are not a zero-cost guarantee.
 
-The parent configured tagged `OVERLAY_ORIGIN`, `OAUTH_REDIRECT_URI`, `OAUTH_REDIRECT_ALLOWLIST` and `EVENTSUB_CALLBACK_URL` against the tag origin, with exact `/auth/callback` and `/eventsub` paths. The owner has been warned to register the additional tagged callback and avoid concurrent bootstrap/Send Off across origins. Codex must not register it or run consent/bootstrap/raids. Even scale-to-zero/tagged0% is not a no-cost guarantee; active WebSockets/requests can incur usage. Close idle browser/OBS sources.
-
-## Owner/parent checklist — no automatic testing
-
-- Keep main, canonical100% and tagged0% frozen until the owner coordinates actual tests. Check the existing parent proof above; this document does not start requests.
-- Before any owner consent, confirm exact tagged callback registration and the intended account/browser profile. Coordinate shared control-session/token effects with canonical users.
-- Use only one origin for bootstrap/Send Off at a time. Account for external-write fanout limitations; manually reconnect/refresh the other origin rather than assuming its state is current.
-- Keep both Chronicle gates off. A future paid mode would need separate prior owner approval plus both gates and a key binding; no key or current price is asserted here.
-- **Before any future promotion**, the parent must restore canonical origin settings from the saved **pre-tag configuration metadata**: `OVERLAY_ORIGIN`, `OAUTH_REDIRECT_URI`, the exact `OAUTH_REDIRECT_ALLOWLIST` and `EVENTSUB_CALLBACK_URL`. Expected canonical paths remain `/auth/callback` and `/eventsub`; do not copy tag-origin values into canonical traffic. Preserve all other saved secret references/resources and review state/schema compatibility. This is a future review requirement, not promotion authorization.
-- Review Could #1/#2 separately on their feature branch. Keep both paid gates off; Forge never auto-applies a design. SVG/PNG files are local snapshots; old downloads cannot be recalled after privacy removal. Do not claim it is present on either frozen revision.
-
-The frozen actual-owner guide remains [LIVE_TEST.md](LIVE_TEST.md). Local judges setup is [JUDGES_QUICKSTART.md](JUDGES_QUICKSTART.md). No cloud configuration was written by Codex.
-
-
-## Final Coulds branch evidence — not cloud release evidence
-
-Parent verifies **287/287 host tests,zero skips**, **all five sandboxed browser workflows PASS**: Forge actual JSON/SVG downloads2 checks; recap actual SVG/1200×630 PNG3; judges3; pilot8; Atlas13. Audit0 vulnerabilities,54 release files and diff PASS. Actual Forge desktop/375px and recap PNG/mobile captures were viewed: clear Simulator/template/no-live-apply labels and canonical moon rune consistency. No physical listening/live AI/Twitch proof. Recapc63ec31 is pushed; Forge `523d772af6ba6f0460d7486d9f3434ea242fdcc3` is committed/pushed on `feature/raid-relic-coulds`. `/recap`, `/forge` and `/control/:id/forge` are Coulds FEATURE-BRANCH additions, absent from main0723, Shoulds00004 and live00003. No actual paid Chronicle/Forge calls occurred; both preview flags remainfalse. This is not proof that all Coulds are complete.
-
-## Short Shoulds-tag owner checklist — coordinated future tests only
-
-- Finish the old canonical **00003** owner test before preview OAuth. Current freeze still prohibits further cloud mutations/provider-key actions by either Codex or parent; this checklist does not authorize deployment or automated testing.
-- Register the extra exact callback `https://shoulds---raid-relic-vz4bhnskgq-uc.a.run.app/auth/callback` **without removing the canonical callback**, only as part of an owner-authorized setup. At the tag host the existing paths remain `/oauth/bot/start`, `/oauth/keeper/1591805230/start`, `/oauth/keeper/1591806023/start`, `/control/1591805230`, `/control/1591806023`, `/overlay/1591805230` and `/overlay/1591806023`.
-- Cookies are host-specific, but token/auth/control-session rows are SHARED. Preview reauthorization can invalidate a current live control session. Avoid concurrent bootstrap/Send Off across origins.
-- Existing Twitch subscriptions point to the canonical service; tag configuration does not independently receive canonical webhook deliveries. Independent in-process fanout does not push external writes into tag sockets. Use manual reload/fresh read-only observations; this is **not isolated full-raid staging**.
-- Check the holder picker only for observed-eligible/opted-in candidates, approved-text Atlas search, template Chronicle with paid generation off, and optional `?sound=1` plus local gesture (initial snapshots remain quiet). Judges is **local only**, not a tag endpoint. Do not expect branch-only recap/Forge on this tag.
-- **Do not promote00004 as-is.** Its OAuth redirect/allowlist, EventSub callback and OVERLAY origins are TAGGED. A future explicitly owner-approved promotion requires a reviewed NEW revision with canonical origins restored from pre-tag metadata, preserving other resources/secret references and reviewing state compatibility. No promotion/redeploy is authorized now.
-- Min0/max1/resources remain preserved. Usage beyond free quotas can incur costs; scale-to-zero and budgets are not guarantees. Close idle browser/OBS sources. Scopes remain Keeper `channel:bot channel:manage:raids`; bot `user:read:chat user:write:chat user:bot`.
-
-
-Final factual correction (parent verified): Forge `523d772af6ba6f0460d7486d9f3434ea242fdcc3` is committed/pushed on `feature/raid-relic-coulds`; recap `c63ec31` is already pushed. Actual QA files report Forge2 + recap3 (not4) + judges3 + pilot8 + Atlas13 = **29 checks across five workflows, all PASS**; host287/287, audit0, release54. Parent verified final metadata/health: canonical00003/sourcefd05 at100%, Shoulds00004/source0723 at0%, both Chronicle/paid flagsfalse and service caps1. Remote main remains072317a; all freezes remain. The parent reported the tree clean after the Forge push; this later docs-only correction does not change either runtime identity. No new cloud/provider/key actions, application/config/test changes or Codex commit.
+No tag is approved for normal traffic promotion as-is. A future explicit owner authorization requires a reviewed NEW revision restoring canonical `OVERLAY_ORIGIN`, `OAUTH_REDIRECT_URI`, exact `OAUTH_REDIRECT_ALLOWLIST` and `EVENTSUB_CALLBACK_URL` from reviewed pre-tag metadata; preserve other resources/secret references and review state/schema compatibility. Routing rollback also requires scoped same-app IDs/conditions/callback review, never a global delete or blind old-runtime restore after new writes.
