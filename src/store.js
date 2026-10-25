@@ -1,3 +1,4 @@
+import { enqueueP7, p7Mutation, cancelP7 } from './p7.js';
 import { journeyMap } from './journey-map.js';
 import { reduceScores, retainedScores, scoreboard, scoreMessage, isScoreCommand, scoreAckDocument, scoreAckMutation } from './scoreboard.js';
 import { updatePresence, presenceKey, revokePresenceActor } from './presence.js';
@@ -62,8 +63,9 @@ export function createMemoryAuthStore() {
   };
 }
 
-export function createFirestoreStore(db, { lifecycle } = {}) {
+export function createFirestoreStore(db, { lifecycle, p7Enabled = false } = {}) {
   const config = lifecycleConfig(lifecycle);
+  p7Enabled=Boolean(p7Enabled&&config);
   const ref = (collection, key) => db.collection(collection).doc(hash(key));
   return {
     lifecycleEnabled: Boolean(config),
@@ -107,6 +109,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         }
         const ackMap={};if(managed)for(const target of config.channels)ackMap[target]=(await tx.get(ref('claimAcks',target))).data();
         const ackRef=managed&&host?ref('claimAcks',host):null, ackDoc=ackMap[host];
+        const p7Cancel={};if(p7Enabled&&managed&&(['forgetme','pause','opt-out','block','veto'].includes(chat?.markAction?.type)||event?.type==='ban'))for(const id of config.channels)p7Cancel[id]=(await tx.get(ref('p7Actions',id))).data();
         const scoreAckRef = managed && isScoreCommand(chat) ? ref('scoreAcks', host) : null;
         const scoreAckPrevious = scoreAckRef ? (await tx.get(scoreAckRef)).data() : null;
         const channel = channelMap[host];
@@ -144,6 +147,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         if(managed && (['forgetme','pause','opt-out','block'].includes(chat?.markAction?.type)||event?.type==='ban'))for(const target of config.channels){const c=channelMap[target],m=claiming.marks[target],d=ackMap[target];ackUpdates.set(target,cancelCompletionNotices(ackDocument(ackUpdates.get(target)??d,chat,null,c,m,now)));}
         const completionAcks=[];let completionSkipped=0;
         if(claiming?.completedScore){const h=claiming.registry.pendingHop;for(const target of[h.from,h.to]){const value=completionAck(ackUpdates.get(target)??ackMap[target],target,h.eventId,h.endsAt,now,h,channelMap);ackUpdates.set(target,value.doc);if(value.key)completionAcks.push({host:target,key:value.key});else completionSkipped++;}}
+        for(const[target,doc]of Object.entries(p7Cancel))if(doc)tx.set(ref('p7Actions',target),cancelP7(doc));
         for(const[target,doc]of ackUpdates)tx.set(ref('claimAcks',target),doc);
         if (managed) for (const [key, doc] of Object.entries(presenceNext)) tx.set(ref('presence', key), doc);
         tx.set(eventRef, {expiresAt,...(completionAcks.length?{completionAcks}:{})});
@@ -172,9 +176,16 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
       return db.runTransaction(async tx => {
         const doc = ref('claimAcks', host), previous = (await tx.get(doc)).data();
         const channel = (await tx.get(ref('streamChannels', host))).data(), marks = (await tx.get(ref('markChannels', host))).data();
-        const registry=(await tx.get(ref('keeperRegistry','single'))).data(),channels={},markMap={};for(const id of config.channels){channels[id]=(await tx.get(ref('streamChannels',id))).data();markMap[id]=(await tx.get(ref('markChannels',id))).data();}const next = ackStep(previous, op, channel, marks, now, completionEligible(previous,op.key,registry,channels,markMap,now)); tx.set(doc, next.doc); return next.result;
+        const registry=(await tx.get(ref('keeperRegistry','single'))).data(),channels={},markMap={};for(const id of config.channels){channels[id]=(await tx.get(ref('streamChannels',id))).data();markMap[id]=(await tx.get(ref('markChannels',id))).data();}
+        const active=p7Enabled&&op.p7Finish&&previous?.rows?.some(r=>r.key===op.key&&r.status==='dispatching'&&r.p7Proof?.to===host);const history=active?(await tx.get(ref('lineage','single'))).data():null,jobs=active?(await tx.get(ref('p7Actions',host))).data():null;
+        const next=ackStep(previous,op,channel,marks,now,completionEligible(previous,op.key,registry,channels,markMap,now));let result=next.result,queued;
+        if(active){try{queued=enqueueP7(jobs,next.doc.rows.find(r=>r.key===op.key),host,op.messageId,op.p7Finish,registry,history,channels,markMap,now);result={p7Keys:queued.keys};}catch{} }
+        for(const r of next.doc.rows)if(r.status!=='dispatching')delete r.p7Proof;
+        if(queued?.doc)tx.set(ref('p7Actions',host),queued.doc);tx.set(doc,next.doc);return result;
       });
     },
+    async p7Step(host,op,now){if(!p7Enabled||!op.flags?.enabled)return null;if(!config?.channels.includes(host))throw Error('Unconfigured P7');return db.runTransaction(async tx=>{const r=ref('p7Actions',host),previous=(await tx.get(r)).data(),registry=(await tx.get(ref('keeperRegistry','single'))).data(),history=(await tx.get(ref('lineage','single'))).data(),channels={},marks={};for(const id of config.channels){channels[id]=(await tx.get(ref('streamChannels',id))).data();marks[id]=(await tx.get(ref('markChannels',id))).data();}const n=p7Mutation(previous,op,op.flags,registry,history,channels,marks,now);if(n.doc)tx.set(r,n.doc);return n.result;});},
+    async getPrivateP7(host){return(await ref('p7Actions',host).get()).data();},
     async getRitual(hostId) { return (await ref('rituals', hostId).get()).data(); },
     async setKeeperContext(host, context) {
       if (config) throw new Error('Use signed lifecycle; raw context injection disabled');
@@ -200,7 +211,10 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
           for (const key of config.channels) { channelMap[key] = (await tx.get(ref('streamChannels', key))).data(); markMap[key] = (await tx.get(ref('markChannels', key))).data(); presenceMap[key] = (await tx.get(ref('presence', key))).data(); }
           const ackRef = ref('claimAcks', host), ackDoc = (await tx.get(ackRef)).data();
         const otherAcks={};for(const target of config.channels)if(target!==host)otherAcks[target]=(await tx.get(ref('claimAcks',target))).data();
+        const p7Cancel={};if(p7Enabled&&['forgetme','pause','opt-out','block','veto'].includes(action.type))for(const id of config.channels)p7Cancel[id]=(await tx.get(ref('p7Actions',id))).data();
         const scoreRef = ref('scoreboard','single'), scores = (await tx.get(scoreRef)).data();
+        for(const[id,doc]of Object.entries(p7Cancel))if(doc)tx.set(ref('p7Actions',id),cancelP7(doc));
+
           const transition = reduceLifecycle({ registry, channel, marks: previous, host, chat: { ...actor, markAction: action }, now, sentAt: now });
           channelMap[host] = transition.channel; markMap[host] = transition.marks;
           for (const key of config.channels) { presenceMap[key] = updatePresence(presenceMap[key], key, channelMap[key], markMap[key], null, now, now); if (action.type === 'forgetme') presenceMap[key] = revokePresenceActor(presenceMap[key], key, actor.chatterId, now); }
@@ -256,7 +270,10 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
           for (const key of config.channels) { channelMap[key] = (await tx.get(ref('streamChannels', key))).data(); markMap[key] = (await tx.get(ref('markChannels', key))).data(); presenceMap[key] = (await tx.get(ref('presence', key))).data(); }
         const ackRef = ref('claimAcks', host), ackDoc = (await tx.get(ackRef)).data();
         const otherAcks={};for(const target of config.channels)if(target!==host)otherAcks[target]=(await tx.get(ref('claimAcks',target))).data();
+        const p7Cancel={};if(p7Enabled)for(const id of config.channels)p7Cancel[id]=(await tx.get(ref('p7Actions',id))).data();
         const scoreRef = ref('scoreboard','single'), scores = (await tx.get(scoreRef)).data();
+        for(const[id,doc]of Object.entries(p7Cancel))if(doc)tx.set(ref('p7Actions',id),cancelP7(doc));
+
         const next = reduceLifecycle({ registry, channel, marks, host, policy, now, sentAt: now });
         channelMap[host] = next.channel; markMap[host] = next.marks;
         for (const key of config.channels) presenceMap[key] = updatePresence(presenceMap[key], key, channelMap[key], markMap[key], null, now, now);

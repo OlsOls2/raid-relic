@@ -1,3 +1,4 @@
+import { P7_SCOPES } from './p7-scopes.js';
 import { boundedCall } from './bounded.js';
 import { boundedResponse } from '../public/control-read.js';
 import { createControl } from './control.js';
@@ -45,12 +46,12 @@ export function createOAuth({ clientId, clientSecret, redirectUri, redirectAllow
       || token.token_type?.toLowerCase() !== 'bearer') throw new Error('Token exchange failed');
     return { access_token: token.access_token, refresh_token: token.refresh_token };
   }
-  async function validate(token, role) {
+  async function validate(token, role, required = scopes(role)) {
     const response = await safeCall('https://id.twitch.tv/oauth2/validate', { headers: { Authorization: `OAuth ${token.access_token}` } });
     if (response.status === 401) return false;
     const data = response.data;
     if (response.status !== 200 || data?.client_id !== clientId || data.user_id !== accounts[role] || !Array.isArray(data.scopes)
-      || !scopes(role).every(scope => data.scopes.includes(scope)) || !(data.expires_in > 0)) throw new Error('Token identity or grants invalid');
+      || !required.every(scope => data.scopes.includes(scope)) || !(data.expires_in > 0)) throw new Error('Token identity or grants invalid');
     return data.scopes;
   }
   async function locked(role, operation) {
@@ -58,17 +59,18 @@ export function createOAuth({ clientId, clientSecret, redirectUri, redirectAllow
     if (!await store.acquire(role, owner, now())) throw new Error('Token operation busy; retry later');
     try { return await operation(owner); } finally { await store.release(role, owner); }
   }
-  async function accessToken(role, { refresh = false, scopeCheck } = {}) {
+  async function accessToken(role, { refresh = false, scopeCheck, p7 = false } = {}) {
     if (!validRole(role)) throw new Error('Invalid role');
     // A distributed lease serializes rotated refresh tokens across instances.
     return locked(role, async owner => {
       const record = await store.getToken(role);
       if (!record) throw new Error('Authorization required');
       let token = cipher.open(record, context(role));
-      let granted = refresh ? false : await validate(token, role);
+      const required=p7&&role==='bot'?[...SCOPES.bot,...P7_SCOPES]:scopes(role);
+      let granted = refresh ? false : await validate(token, role, required);
       if (refresh || !granted) {
         token = await exchange({ grant_type: 'refresh_token', refresh_token: token.refresh_token });
-        granted = await validate(token, role); if (!granted) throw new Error('Authorization required');
+        granted = await validate(token, role, required); if (!granted) throw new Error('Authorization required');
         await store.saveToken(role, cipher.seal(token, context(role)), owner, now());
       }
       return scopeCheck ? granted.includes(scopeCheck) : token.access_token;
@@ -82,13 +84,14 @@ export function createOAuth({ clientId, clientSecret, redirectUri, redirectAllow
       const match = /^\/oauth\/(streamer|bot)\/start$/.exec(url.pathname);
       if (method !== 'GET') return response(405, 'Method not allowed');
       if (match || keeperMatch) {
-        if (url.search) return response(400, 'Invalid authorization request');
+        const p7=match?.[1]==='bot'&&url.searchParams.get('features')==='p7'&&[...url.searchParams].length===1;
+        if (url.search && !p7) return response(400, 'Invalid authorization request');
         const id = keeperMatch?.[1];
         if (id && !keeperIds.includes(id)) return response(404, 'Not found');
         const role = id ? (id === streamerId ? 'streamer' : `keeper:${id}`) : match[1]; const state = nonce(); const browser = nonce();
-        await store.createState(hash(state), { binding: hash(browser), role, expiresAt: now() + 300000 }, now());
+        await store.createState(hash(state), { binding: hash(browser), role, ...(p7?{p7:true}:{}), expiresAt: now() + 300000 }, now());
         const auth = new URL('https://id.twitch.tv/oauth2/authorize');
-        auth.search = new URLSearchParams({ client_id: clientId, redirect_uri: redirectUri, response_type: 'code', scope: scopes(role).join(' '), state, force_verify: 'true' }).toString();
+        auth.search = new URLSearchParams({ client_id: clientId, redirect_uri: redirectUri, response_type: 'code', scope: (p7?[...SCOPES.bot,...P7_SCOPES]:scopes(role)).join(' '), state, force_verify: 'true' }).toString();
         return response(302, '', { location: auth.href, 'set-cookie': cookie(browser, 300) });
       }
       if (url.pathname !== redirect.pathname || path.split('?')[0] !== redirect.pathname) return response(404, 'Not found');
@@ -99,13 +102,13 @@ export function createOAuth({ clientId, clientSecret, redirectUri, redirectAllow
       const browser = cookies.length === 1 ? cookies[0].slice(cookieName.length + 1) : '';
       if (!/^[\w-]{43}$/.test(state ?? '') || !/^[\w-]{43}$/.test(browser)) return failure();
       const stored = await store.consumeState(hash(state), hash(browser), now());
-      if (!stored || !validRole(stored.role)) return failure();
+      if (!stored || !validRole(stored.role) || (stored.p7 && stored.role!=='bot')) return failure();
       if (url.searchParams.has('error')) return failure();
       const code = url.searchParams.get('code');
       if (!code || code.length > 2048) return failure();
       await locked(stored.role, async owner => {
         const token = await exchange({ grant_type: 'authorization_code', code, redirect_uri: redirectUri });
-        if (!await validate(token, stored.role)) throw new Error('Authorization required');
+        if (!await validate(token, stored.role, stored.p7?[...SCOPES.bot,...P7_SCOPES]:scopes(stored.role))) throw new Error('Authorization required');
         await store.saveToken(stored.role, cipher.seal(token, context(stored.role)), owner, now());
       });
       const responseCookies = stored.role === 'bot' ? cookie('', 0) : [cookie('', 0), await control.issue(accounts[stored.role])];
@@ -115,7 +118,7 @@ export function createOAuth({ clientId, clientSecret, redirectUri, redirectAllow
       return response(400, 'Authorization failed; start again', { 'set-cookie': cookie('', 0) });
     }
   }
-  return { route, accessToken, control, hasBanGrant(id) {
+  return { route, accessToken, accessTokenForP7() { return accessToken('bot',{p7:true}); }, control, hasBanGrant(id) {
     if (!keeperIds.includes(id)) throw Error('Invalid Keeper');
     return accessToken(id === streamerId ? 'streamer' : `keeper:${id}`, { scopeCheck: 'channel:moderate' });
   }, accessTokenForKeeper(id, options) {

@@ -26,18 +26,19 @@ export function ackSeen(doc, chat, now) { return chat && doc?.rows?.some(r => r.
 export function ackStep(previous, op, channel, marks, now, completionAllowed = false) {
   const doc = ackDocument(previous, null, null, channel, marks, now); const row = doc.rows.find(r => r.key === op.key); let result = null;
   if (op.type === 'claim' && row?.status === 'queued' && row.completion && !completionAllowed) { row.status='cancelled';delete row.message;delete row.completion; }
-  if (op.type === 'claim' && row?.status === 'queued') { row.status = 'dispatching'; result = { message: row.message }; delete row.message; delete row.actorKey; delete row.ackUntil; delete row.completion; }
+  if (op.type === 'claim' && row?.status === 'queued') { row.status = 'dispatching'; result = { message: row.message }; if(op.p7 && row.completion)row.p7Proof=structuredClone(row.completion);delete row.message; delete row.actorKey; delete row.ackUntil; delete row.completion; }
   if (op.type === 'finish' && row?.status === 'dispatching') row.status = op.sent ? 'sent' : 'unknown';
   return { doc, result };
 }
-export function createClaimAcks({ state, bots, now = Date.now, logger = line => console.warn(line) }) {
+export function createClaimAcks({ state, bots, now = Date.now, logger = line => console.warn(line), p7 }) {
   let queue = Promise.resolve();
   return { process(host, key) {
     const work = queue.then(async () => {
-      const row = await state.claimAckStep(host, { type: 'claim', key }, now()); if (!row) return;
-      let sent = false; let diagnostic = { stage: 'response', httpStatus: 200, dropKind: null, isSent: true };
-      try { await bots[host].sendChat(row.message, { retryUnauthorized: false }); sent = true; } catch (error) { diagnostic = error instanceof ChatSendError ? error.diagnostic : { stage: 'unknown', httpStatus: null, dropKind: null, isSent: null }; }
-      try { await state.claimAckStep(host, { type: 'finish', key, sent }, now()); } catch {}
+      const row = await state.claimAckStep(host, { type: 'claim', key, ...(p7?.enabled?{p7:true}:{}) }, now()); if (!row) return;
+      let sent = false,messageId=null; let diagnostic = { stage: 'response', httpStatus: 200, dropKind: null, isSent: true };
+      try { const result=await bots[host].sendChat(row.message, { retryUnauthorized: false });messageId=result?.messageId;sent = true; } catch (error) { diagnostic = error instanceof ChatSendError ? error.diagnostic : { stage: 'unknown', httpStatus: null, dropKind: null, isSent: null }; }
+      let actions;try { actions=await state.claimAckStep(host, { type: 'finish', key, sent, ...(p7?.enabled?{p7Finish:p7.config,messageId:messageId??null}:{}) }, now()); } catch {}
+      if(p7?.enabled&&Array.isArray(actions?.p7Keys))for(const action of actions.p7Keys.slice(0,3)){try{await p7.process(host,action);}catch{}}
       try { await logger(JSON.stringify({ severity: sent ? 'INFO' : 'WARNING', event: 'raid_relic_claim_ack', host, key, outcome: sent ? 'sent' : 'unknown', diagnostic })); } catch {}
     }); queue = work.catch(() => {}); return work;
   } };
@@ -68,5 +69,5 @@ export function completionEligible(doc, key, registry, channels, marks, now) {
 }
 
 export function cancelCompletionNotices(previous) {
-  const doc=structuredClone(previous??{rows:[]});for(const row of doc.rows)if(row.status==='queued'&&row.completion){row.status='cancelled';delete row.message;delete row.completion;delete row.ackUntil;}return doc;
+  const doc=structuredClone(previous??{rows:[]});for(const row of doc.rows){delete row.p7Proof;if(row.status==='queued'&&row.completion){row.status='cancelled';delete row.message;delete row.completion;delete row.ackUntil;}}return doc;
 }

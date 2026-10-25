@@ -8,7 +8,7 @@ import { handoffView } from './public-view.js';
 import { httpTransport } from './oauth.js';
 
 export const KEEPERS = Object.freeze({ '1591805230': 'raidrelichq', '1591806023': 'olsols2' });
-export function createPilot({ replies, forge, chronicle, state, store, oauth, subscriptions, sends, now = Date.now, simulator = false, clientId, transport = httpTransport, logger = line => console.warn(line) }) {
+export function createPilot({ p7, replies, forge, chronicle, state, store, oauth, subscriptions, sends, now = Date.now, simulator = false, clientId, transport = httpTransport, logger = line => console.warn(line) }) {
   const ids = Object.keys(KEEPERS);
   const actions = id => [...(chronicle ? ['chronicle'] : []), 'bootstrap', 'keep', 'pause', 'resume', 'opt-out', 'process', ...(replies ? ['mark-links'] : []), `send:${ids.find(other => other !== id)}`];
   async function mutate(id, action) {
@@ -116,7 +116,7 @@ export function createPilot({ replies, forge, chronicle, state, store, oauth, su
         await state.sendOffStep({ type: 'reconcile-ended', source: id, actor: id, id: registry.send.id, generation: registry.send.generation, hopId: registry.pendingHop.eventId }, now());
         registry = await state.getKeeperRegistry();
       }
-      return { chronicle: chronicle?.enabled ? 'Paid generation enabled: one attempt per received stop; fiction only.' : 'Off: handwritten template fiction; no model calls.', candidates: await state.getKeeperCandidates(id), candidatesObservedAt: now(), mode: simulator ? 'simulator' : 'live', account: KEEPERS[id], online: channel?.online ?? false, optedIn: channel?.optedIn ?? false, paused: channel?.paused ?? false,
+      return { optionalBotActions:p7?.status()??{enabled:false,reason:'disabled'}, chronicle: chronicle?.enabled ? 'Paid generation enabled: one attempt per received stop; fiction only.' : 'Off: handwritten template fiction; no model calls.', candidates: await state.getKeeperCandidates(id), candidatesObservedAt: now(), mode: simulator ? 'simulator' : 'live', account: KEEPERS[id], online: channel?.online ?? false, optedIn: channel?.optedIn ?? false, paused: channel?.paused ?? false,
         botGrantStored: Boolean(await store.getToken('bot')),
         bothReadiness: Object.fromEntries(await Promise.all(ids.map(async keeper => [KEEPERS[keeper], (await store.getJob(keeper))?.ready === true]))),
         ownerStep: 'Wait for both readiness flags true; Bootstrap / reconcile pending channels after callback verification. Reconnect missing grants.',

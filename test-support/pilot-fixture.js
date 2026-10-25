@@ -3,7 +3,7 @@ import { createHmac } from 'node:crypto';
 import { createRuntime } from '../src/runtime.js';
 import { fakeFirestore } from './fake-firestore.js';
 export const HOME = '1591805230', OTHER = '1591806023', BOT = '1591804828';
-export async function pilotFixture(kind = 'memory', { simulator = true, extraKeeperScopes = [], chronicleEnv = {}, chronicleHTTP, forgeHTTP, origin = 'https://pilot.example' } = {}) {
+export async function pilotFixture(kind = 'memory', { simulator = true, extraKeeperScopes = [], extraBotScopes = [], p7HTTP, chronicleEnv = {}, chronicleHTTP, forgeHTTP, origin = 'https://pilot.example' } = {}) {
   const db = kind === 'firestore' ? fakeFirestore() : undefined;
   let time = Date.parse('2026-10-25T12:00:00Z'); let seq = 0;
   const secret = 'synthetic-pilot-hmac-secret';
@@ -23,7 +23,7 @@ export async function pilotFixture(kind = 'memory', { simulator = true, extraKee
       const id = options.headers.Authorization.slice('OAuth access-'.length);
       if (revoked.has(id)) return { status: 401, data: {} };
       return { status: 200, data: { client_id: 'public-client', user_id: id, expires_in: 3600,
-        scopes: id === BOT ? ['user:read:chat', 'user:write:chat', 'user:bot'] : ['channel:bot', 'channel:manage:raids', ...extraKeeperScopes] } };
+        scopes: id === BOT ? ['user:read:chat', 'user:write:chat', 'user:bot', ...extraBotScopes] : ['channel:bot', 'channel:manage:raids', ...extraKeeperScopes] } };
     }
     if (u.pathname.endsWith('/subscriptions')) {
       if (options.method === 'POST') {
@@ -51,11 +51,11 @@ export async function pilotFixture(kind = 'memory', { simulator = true, extraKee
     OAUTH_ENABLED: 'true', RAID_PILOT_ENABLED: 'true', KEEPER_CHANNEL_IDS: `${HOME},${OTHER}`, TWITCH_STREAMER_ID: HOME, TWITCH_BOT_ID: BOT,
     TWITCH_CLIENT_ID: 'public-client', TWITCH_CLIENT_SECRET: 'synthetic-client-secret', TWITCH_EVENTSUB_SECRET: secret,
     TOKEN_ENCRYPTION_KEY: Buffer.alloc(32, 5).toString('base64'), OAUTH_REDIRECT_URI: `${origin}/auth/callback`, OAUTH_REDIRECT_ALLOWLIST: `${origin}/auth/callback`, EVENTSUB_CALLBACK_URL: `${origin}/eventsub` },
-  { firestoreClient: db, transport, chronicleHTTP, forgeHTTP, simulator, now: () => time });
+  { firestoreClient: db, transport, p7HTTP, chronicleHTTP, forgeHTTP, simulator, now: () => time });
   const cookies = {};
   const request = (path, method = 'GET', headers = {}, rawBody = Buffer.alloc(0)) => runtime.dispatch({ path, method, headers, rawBody });
-  async function login(id) {
-    const start = await request(id === BOT ? '/oauth/bot/start' : `/oauth/keeper/${id}/start`);
+  async function login(id, { p7 = false } = {}) {
+    const start = await request(id === BOT ? `/oauth/bot/start${p7?'?features=p7':''}` : `/oauth/keeper/${id}/start`);
     const state = new URL(start.headers.location).searchParams.get('state');
     const result = await request(`/auth/callback?state=${state}&code=${id}`, 'GET', { cookie: start.headers['set-cookie'].split(';')[0] });
     if (result.status !== 200) throw new Error('Synthetic OAuth failed');

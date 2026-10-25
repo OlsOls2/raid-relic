@@ -1,3 +1,4 @@
+import { enqueueP7, p7Mutation, cancelP7 } from './p7.js';
 import { journeyMap } from './journey-map.js';
 import { reduceScores, retainedScores, scoreboard, scoreMessage, isScoreCommand, scoreAckDocument, scoreAckMutation } from './scoreboard.js';
 import { updatePresence, presenceKey, revokePresenceActor } from './presence.js';
@@ -15,12 +16,13 @@ import { lifecycleConfig, reduceLifecycle, emptyRegistry } from './lifecycle.js'
 import { setMarkContext, reduceMark, publicMarks, publicOverlayState, privateMarks, isModerator, isChatIdentity } from './marks.js';
 
 // Synchronous mutations are atomic within a single process; tests/dev only.
-export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
+export function createMemoryState({ maxEvents = 10000, lifecycle, p7Enabled = false } = {}) {
   const config = lifecycleConfig(lifecycle);
+  p7Enabled=Boolean(p7Enabled&&config);
   let lineage = emptyLineage(); let scores;
   let registry = emptyRegistry(); const channels = new Map();
   const seen = new Map(); const completionReceipts = new Map();
-  const rituals = new Map();
+  const rituals = new Map();const p7Docs=new Map();
   const chatReceipts = new Map();
   const markDocs = new Map(); const scoreAckDocs = new Map(); const ackDocs = new Map(); const presenceDocs = new Map();
   return {
@@ -103,6 +105,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
       if (sending) { registry = sending.registry; if (sending.ritual) rituals.set(raid.to_broadcaster_user_id, sending.ritual); }
       if (markDoc) markDocs.set(host, markDoc);
       if (claiming) { registry = claiming.registry; lineage = claiming.lineage; for (const [key, doc] of Object.entries(claiming.marks)) markDocs.set(key, doc); }
+      if(p7Enabled&&(['forgetme','pause','opt-out','block','veto'].includes(chat?.markAction?.type)||event?.type==='ban'))for(const target of config.channels)if(p7Docs.has(target))p7Docs.set(target,cancelP7(p7Docs.get(target)));
       if (chat?.markAction?.type === 'forgetme' && chatReceipts.get(chat.broadcasterId)?.chatterId === chat.chatterId) chatReceipts.delete(chat.broadcasterId);
       if (chat && !chat.markAction) chatReceipts.set(chat.broadcasterId, { broadcasterId: chat.broadcasterId, chatterId: chat.chatterId, messageId: chat.messageId, receivedAt: now });
       return (completionAcks.length||completionSkipped) ? {status:'accepted',completionAcks,completionSkipped} : (pk&&completionReceipts.has(pk)) ? {status:'accepted',completionAcks:completionReceipts.get(pk).rows} : observation ? (transition.channel.lifecycleAt === event.sentAt && transition.channel.lifecycleSource === 'helix-observation' ? 'applied' : 'no-change') : sending?.result ?? 'accepted';
@@ -126,6 +129,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
           if (action.type === 'forgetme') Object.assign(nextPresence, revokePresenceActor(nextPresence, key, actor.chatterId, now));
           presenceDocs.set(key, nextPresence); }
       }
+      if(p7Enabled&&['forgetme','pause','opt-out','block','veto'].includes(action.type))for(const target of config.channels)if(p7Docs.has(target))p7Docs.set(target,cancelP7(p7Docs.get(target)));
       if(config&&['forgetme','pause','opt-out','block'].includes(action.type))for(const target of config.channels)ackDocs.set(target,cancelCompletionNotices(ackDocs.get(target)));
       if (config) ackDocs.set(host, ackDocument(ackDocs.get(host), { ...actor, markAction: action }, null, transition.channel, doc, now));
       markDocs.set(host, doc);
@@ -143,11 +147,20 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
     getKeeperCandidates(host) { return keeperCandidates(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), config, host); },
     scoreAckStep(host, op, now) { if (!config?.channels.includes(host)) throw Error('Unconfigured score ACK'); const next=scoreAckMutation(scoreAckDocs.get(host),op,channels.get(host),markDocs.get(host),now,scores,lineage,registry,config,host);scoreAckDocs.set(host,next.doc);return next.result; },
     getPrivateClaimAcks(host) { return structuredClone(ackDocs.get(host)); },
-    claimAckStep(host, op, now) { if (!config?.channels.includes(host)) throw Error('Unconfigured ACK'); const next = ackStep(ackDocs.get(host), op, channels.get(host), markDocs.get(host), now, completionEligible(ackDocs.get(host),op.key,registry,Object.fromEntries(channels),Object.fromEntries(markDocs),now)); ackDocs.set(host, next.doc); return next.result; },
+    claimAckStep(host, op, now) {
+      if (!config?.channels.includes(host)) throw Error('Unconfigured ACK');const previous=ackDocs.get(host),cs=Object.fromEntries(channels),ms=Object.fromEntries(markDocs);
+      const next=ackStep(previous,op,channels.get(host),markDocs.get(host),now,completionEligible(previous,op.key,registry,cs,ms,now));let result=next.result;
+      if(p7Enabled&&op.p7Finish&&previous?.rows?.some(r=>r.key===op.key&&r.status==='dispatching'&&r.p7Proof?.to===host)){try{const row=next.doc.rows.find(r=>r.key===op.key),jobs=enqueueP7(p7Docs.get(host),row,host,op.messageId,op.p7Finish,registry,lineage,cs,ms,now);if(jobs.doc)p7Docs.set(host,jobs.doc);result={p7Keys:jobs.keys};}catch{} }
+      for(const r of next.doc.rows)if(r.status!=='dispatching')delete r.p7Proof;
+      ackDocs.set(host,next.doc);return result;
+    },
+    p7Step(host,op,now){if(!p7Enabled||!op.flags?.enabled)return null;if(!config?.channels.includes(host))throw Error('Unconfigured P7');const n=p7Mutation(p7Docs.get(host),op,op.flags,registry,lineage,Object.fromEntries(channels),Object.fromEntries(markDocs),now);if(n.doc)p7Docs.set(host,n.doc);return n.result;},
+    getPrivateP7(host){return structuredClone(p7Docs.get(host));},
     getKeeperRegistry() { return structuredClone(registry); },
     getStreamStatus(host) { return structuredClone(channels.get(host)); },
     setChannelPolicy(host, policy, now = Date.now()) {
       if (!config?.channels.includes(host)) throw new Error('Unconfigured lifecycle channel');
+      if(p7Enabled)for(const target of config.channels)if(p7Docs.has(target))p7Docs.set(target,cancelP7(p7Docs.get(target)));
       const next = reduceLifecycle({ registry, channel: channels.get(host), marks: markDocs.get(host), host, policy, now, sentAt: now });
       presenceDocs.set(host, updatePresence(presenceDocs.get(host), host, next.channel, next.marks, null, now, now));
       ackDocs.set(host, ackDocument(ackDocs.get(host), { broadcasterId: host }, null, next.channel, next.marks, now));
