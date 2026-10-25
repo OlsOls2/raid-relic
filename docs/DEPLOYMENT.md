@@ -1,3 +1,5 @@
+> **CURRENT canonical override (2026-10-25):** parent deployed minimal fd05-based source `d52937d8f107b2a540bd69e4846e91a328590ffe`, Git tag `bootstrap-hotfix-20261025`, revision `raid-relic-bootstrap1025`,100%. Build `15869b41-a42c-4273-b5a7-6f494f40cb76`; image `sha256:3c22790e783f20d4bfe73a44e46c00092b7b809d109f7d84273fdfd530aa851d`. Main0334042 is not deployed wholesale. [Full incident proof/owner retry](BOOTSTRAP_INCIDENT.md). Shoulds00004 and Coulds00005 stay0% preserved; resources/origins/secret references unchanged, paid gatesOFF. Older canonical00003-current claims below are historical. All source/cloud work frozen again; docs commits do not alter deployed identity or authorize redeploy.
+
 # Current deployment handoff — Coulds tagged preview
 
 All cloud/host facts here are **parent verified**, not independently inspected by Codex. Parent fast-forward merged/pushed reviewed Coulds and046 docs to main and completed a NEW no-normal-traffic deployment; canonical traffic was not promoted. Ready for owner-operated testing means **`owner-test-ready / liveValidated:false`**, not completed live Twitch validation or all Musts/Coulds.
