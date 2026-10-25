@@ -1,6 +1,7 @@
 import { httpTransport } from './oauth.js';
+import { parseMarkCommand } from './marks.js';
 
-export function parseChat(payload, { streamerId, botId }) {
+export function parseChat(payload, { streamerId, botId, includeMarkCommands = false }) {
   const event = payload.event; const condition = payload.subscription?.condition;
   if (payload.subscription?.type !== 'channel.chat.message' || payload.subscription?.version !== '1' || condition?.broadcaster_user_id !== streamerId || condition.user_id !== botId
     || event?.broadcaster_user_id !== streamerId || typeof event?.chatter_user_id !== 'string' || !/^\d+$/.test(event.chatter_user_id)
@@ -8,7 +9,16 @@ export function parseChat(payload, { streamerId, botId }) {
     || typeof event.message?.text !== 'string' || event.message.text.length > 2000
     || !Array.isArray(event.message.fragments) || event.message.fragments.length > 500
     || !event.message.fragments.every(fragment => fragment && ['text', 'emote', 'cheermote', 'mention'].includes(fragment.type) && typeof fragment.text === 'string')) throw new Error('Invalid chat payload');
-  return { broadcasterId: streamerId, chatterId: event.chatter_user_id, messageId: event.message_id };
+  const chat = { broadcasterId: streamerId, chatterId: event.chatter_user_id, messageId: event.message_id };
+  if (includeMarkCommands) {
+    const action = parseMarkCommand(event.message.text);
+    if (action) {
+      if (event.badges !== undefined && (!Array.isArray(event.badges) || event.badges.length > 100)) throw new Error('Invalid chat badges');
+      chat.markAction = action;
+      chat.isModerator = (event.badges ?? []).some(badge => badge?.set_id === 'moderator' && badge.id === '1');
+    }
+  }
+  return chat;
 }
 
 export function createBot({ oauth, clientId, clientSecret, streamerId, botId, callbackUrl, webhookSecret, transport = httpTransport }) {

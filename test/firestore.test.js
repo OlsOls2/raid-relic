@@ -5,42 +5,8 @@ import { createRuntime, PROJECT_ID } from '../src/runtime.js';
 import { createOAuth, SCOPES } from '../src/oauth.js';
 import { hash } from '../src/crypto.js';
 
-// Serialized, staged transactions: writes commit together or are discarded.
-// Optional retry executes and discards the first attempt, as an SDK retry can.
-function fakeFirestore() {
-  const docs = new Map(); let queue = Promise.resolve();
-  const db = {
-    docs, failCommit: false, retry: false,
-    collection(name) { return { doc(id) {
-      const key = `${name}/${id}`;
-      return { key, async get() { return snapshot(docs.get(key)); },
-        async create(value) { return db.runTransaction(async tx => {
-          const ref = { key }; if ((await tx.get(ref)).exists) throw new Error('Already exists'); tx.set(ref, value);
-        }); } };
-    } }; },
-    runTransaction(operation) {
-      const execute = async () => {
-        const attempt = async () => {
-          const staged = new Map(); let writing = false;
-          const tx = {
-            async get(ref) { assert.equal(writing, false, 'All transaction reads precede writes'); return snapshot(docs.get(ref.key)); },
-            set(ref, value) { writing = true; staged.set(ref.key, structuredClone(value)); },
-            delete(ref) { writing = true; staged.set(ref.key, undefined); },
-          };
-          return { result: await operation(tx), staged };
-        };
-        if (db.retry) { db.retry = false; await attempt(); }
-        const { result, staged } = await attempt();
-        if (db.failCommit) throw new Error('Synthetic commit failure');
-        for (const [key, value] of staged) { if (value === undefined) docs.delete(key); else docs.set(key, value); }
-        return result;
-      };
-      const result = queue.then(execute); queue = result.catch(() => {}); return result;
-    },
-  };
-  function snapshot(value) { return { exists: value !== undefined, data: () => structuredClone(value) }; }
-  return db;
-}
+import { fakeFirestore } from '../test-support/fake-firestore.js';
+
 const raid = { from_broadcaster_user_id: '111', to_broadcaster_user_id: '222', viewers: 10 };
 const event = { id: 'event/id-with-slash', now: 1000, expiresAt: 2000, raid };
 test('Firestore dedupe and ritual commit atomically, including concurrent instances and SDK retry', async () => {

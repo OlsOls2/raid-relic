@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { createMemoryState } from './state.js';
 import { parseChat } from './bot.js';
+import { createMarkService } from './marks.js';
 
 export const MAX_BODY_BYTES = 65536;
 export const REPLAY_WINDOW_MS = 10 * 60 * 1000;
@@ -59,7 +60,7 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
     if (type === 'notification') {
       if (subscription.type === 'channel.chat.message') {
         if (!chatContext) return result(503, 'Chat not configured');
-        try { chat = parseChat(payload, chatContext); } catch { return result(400, 'Invalid chat'); }
+        try { chat = parseChat(payload, { ...chatContext, includeMarkCommands: true }); } catch { return result(400, 'Invalid chat'); }
       } else {
         if (subscription.type !== 'channel.raid' || subscription.version !== '1') return result(400, 'Unsupported subscription');
         raid = payload.event;
@@ -103,5 +104,5 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
       else res.destroy();
     }
   }
-  return { dispatch, handler, state };
+  return { dispatch, handler, state, marks: createMarkService(state, { now }) };
 }
