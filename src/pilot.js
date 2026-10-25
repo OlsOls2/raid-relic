@@ -5,7 +5,7 @@ import { handoffView } from './public-view.js';
 import { httpTransport } from './oauth.js';
 
 export const KEEPERS = Object.freeze({ '1591805230': 'raidrelichq', '1591806023': 'olsols2' });
-export function createPilot({ chronicle, state, store, oauth, subscriptions, sends, now = Date.now, simulator = false, clientId, transport = httpTransport }) {
+export function createPilot({ forge, chronicle, state, store, oauth, subscriptions, sends, now = Date.now, simulator = false, clientId, transport = httpTransport }) {
   const ids = Object.keys(KEEPERS);
   const actions = id => [...(chronicle ? ['chronicle'] : []), 'bootstrap', 'keep', 'pause', 'resume', 'opt-out', 'process', `send:${ids.find(other => other !== id)}`];
   async function mutate(id, action) {
@@ -45,6 +45,8 @@ export function createPilot({ chronicle, state, store, oauth, subscriptions, sen
     await store.finishJob(id, owner, result); return result;
   }
   return {
+    forgeEnabled: forge?.enabled === true,
+    async forgeDesign(id, description, acknowledge) { if (!ids.includes(id) || !forge) throw Error('Unavailable'); return forge.write(id, description, acknowledge); },
     actions, authorizeSend: readiness,
     async execute(id, action) {
       if (!ids.includes(id) || !actions(id).includes(action)) throw new Error('Action unavailable');

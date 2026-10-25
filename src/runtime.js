@@ -1,3 +1,4 @@
+import { createForge } from './forge.js';
 import { randomUUID } from 'node:crypto';
 import { createChronicle } from './chronicle.js';
 import { createApp } from './app.js';
@@ -12,7 +13,7 @@ import { createSubscriptionManager } from './subscriptions.js';
 import { createSendOff } from './send-off.js';
 
 export const PROJECT_ID = 'raid-relic-hackathon';
-export async function createRuntime(env, { firestoreClient, transport, chronicleHTTP, now = Date.now, simulator = false, loadSDK = () => import('@google-cloud/firestore') } = {}) {
+export async function createRuntime(env, { firestoreClient, transport, chronicleHTTP, forgeHTTP, now = Date.now, simulator = false, loadSDK = () => import('@google-cloud/firestore') } = {}) {
   const production = env.NODE_ENV === 'production';
   if (production && simulator) throw new Error('Simulator forbidden in production');
   const releaseCommit = validateReleaseCommit(env.RELEASE_COMMIT, { required: production });
@@ -62,7 +63,8 @@ export async function createRuntime(env, { firestoreClient, transport, chronicle
     }
     const chronicle = createChronicle({ state, enabled: env.CHRONICLE_ENABLED === 'true', allowPaid: env.CHRONICLE_ALLOW_PAID === 'true',
       key: env.OPENAI_API_KEY, transport: chronicleHTTP, claimId: randomUUID });
-    pilot = createPilot({ chronicle, state, store, oauth, subscriptions: subscriptionManagers, sends, now, simulator, clientId: env.TWITCH_CLIENT_ID, transport });
+    const forge = createForge({ state, enabled: env.CHRONICLE_ENABLED === 'true', allowPaid: env.CHRONICLE_ALLOW_PAID === 'true', key: env.OPENAI_API_KEY, transport: forgeHTTP, claimId: randomUUID, simulator });
+    pilot = createPilot({ forge, chronicle, state, store, oauth, subscriptions: subscriptionManagers, sends, now, simulator, clientId: env.TWITCH_CLIENT_ID, transport });
     oauth.control.bindPilot(pilot);
   }
   return { ...createApp({ secret: env.TWITCH_EVENTSUB_SECRET, state, oauth, overlayFeed, overlayFeeds, raidPilot, now, releaseCommit: releaseCommit ?? undefined,

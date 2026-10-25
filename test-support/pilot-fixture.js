@@ -2,7 +2,7 @@ import { createHmac } from 'node:crypto';
 import { createRuntime } from '../src/runtime.js';
 import { fakeFirestore } from './fake-firestore.js';
 export const HOME = '1591805230', OTHER = '1591806023', BOT = '1591804828';
-export async function pilotFixture(kind = 'memory', { chronicleEnv = {}, chronicleHTTP, origin = 'https://pilot.example' } = {}) {
+export async function pilotFixture(kind = 'memory', { chronicleEnv = {}, chronicleHTTP, forgeHTTP, origin = 'https://pilot.example' } = {}) {
   const db = kind === 'firestore' ? fakeFirestore() : undefined;
   let time = Date.parse('2026-10-25T12:00:00Z'); let seq = 0;
   const secret = 'synthetic-pilot-hmac-secret';
@@ -41,7 +41,7 @@ export async function pilotFixture(kind = 'memory', { chronicleEnv = {}, chronic
     OAUTH_ENABLED: 'true', RAID_PILOT_ENABLED: 'true', KEEPER_CHANNEL_IDS: `${HOME},${OTHER}`, TWITCH_STREAMER_ID: HOME, TWITCH_BOT_ID: BOT,
     TWITCH_CLIENT_ID: 'public-client', TWITCH_CLIENT_SECRET: 'synthetic-client-secret', TWITCH_EVENTSUB_SECRET: secret,
     TOKEN_ENCRYPTION_KEY: Buffer.alloc(32, 5).toString('base64'), OAUTH_REDIRECT_URI: `${origin}/auth/callback`, OAUTH_REDIRECT_ALLOWLIST: `${origin}/auth/callback`, EVENTSUB_CALLBACK_URL: `${origin}/eventsub` },
-  { firestoreClient: db, transport, chronicleHTTP, simulator: true, now: () => time });
+  { firestoreClient: db, transport, chronicleHTTP, forgeHTTP, simulator: true, now: () => time });
   const cookies = {};
   const request = (path, method = 'GET', headers = {}, rawBody = Buffer.alloc(0)) => runtime.dispatch({ path, method, headers, rawBody });
   async function login(id) {

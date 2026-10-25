@@ -6,13 +6,13 @@ import { attachOverlaySockets } from '../src/overlay-sockets.js';
 export const JUDGES_ORIGIN = 'http://127.0.0.1:5191';
 const ids = [HOME, OTHER];
 const actions = ['setup', 'mark', 'send', 'raid', 'offer', 'accept', 'forget', 'expire', 'reset'];
-const assets = new Set(['/recap.js', '/recap.css','/atlas.css', '/atlas.js', '/overlay.css', '/overlay.js', '/overlay-client.js', '/overlay-audio.js', '/arrival.js', '/crystal.svg', '/relic.svg']);
+const assets = new Set(['/forge.js', '/forge.css','/recap.js', '/recap.css','/atlas.css', '/atlas.js', '/overlay.css', '/overlay.js', '/overlay-client.js', '/overlay-audio.js', '/arrival.js', '/crystal.svg', '/relic.svg']);
 const json = (status, value) => ({ status, type: 'application/json', body: JSON.stringify({ ...value, mode: 'simulator' }) });
 const html = body => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SIMULATOR · Raid Relic judges</title><link rel="stylesheet" href="/judges/style.css"></head><body><header class="sim-label">SIMULATOR · LOCAL MEMORY ONLY · NO REAL TWITCH</header>${body}</body></html>`;
 export async function createJudges({ intent = false, env = process.env } = {}) {
   if (intent !== true || env.NODE_ENV === 'production' || env.K_SERVICE !== undefined) throw new Error('Explicit local simulator intent required; cloud/production forbidden');
   // No env spread, credential lookup, SDK loader or real provider transport.
-  const fresh = () => pilotFixture('memory', { chronicleEnv: { CHRONICLE_ENABLED: 'false', CHRONICLE_ALLOW_PAID: 'false' }, chronicleHTTP: () => { throw new Error('Provider forbidden'); } });
+  const fresh = () => pilotFixture('memory', { chronicleEnv: { CHRONICLE_ENABLED: 'false', CHRONICLE_ALLOW_PAID: 'false' }, chronicleHTTP: () => { throw new Error('Provider forbidden'); }, forgeHTTP: () => { throw new Error('Provider forbidden'); } });
   let fixture = await fresh(), sockets, generation = 0, flags = {}, closed = false, queue = Promise.resolve(), tickAt = performance.now();
   const server = createServer({ requestTimeout: 5000, headersTimeout: 5000 }, handler);
   const attach = () => attachOverlaySockets(server, fixture.runtime.overlayFeeds, { origins: [JUDGES_ORIGIN], allowRead: fixture.runtime.allowPublicRead });
@@ -78,7 +78,7 @@ export async function createJudges({ intent = false, env = process.env } = {}) {
       if (headers.host !== '127.0.0.1:5191') return fail(421, 'Local host required');
       if (typeof path !== 'string' || !path.startsWith('/') || path.startsWith('//') || path.length > 512) return fail(400, 'Invalid local path');
       if (method !== 'GET') {
-        if (method !== 'POST' || !['/api/judges/action', '/api/atlas/search'].includes(path)) return fail(404, 'No such simulator action');
+        if (method !== 'POST' || !['/api/judges/action', '/api/atlas/search', '/api/forge'].includes(path)) return fail(404, 'No such simulator action');
         if (headers.origin !== JUDGES_ORIGIN || headers['content-type'] !== 'application/json') return fail(403, 'Exact local Origin and JSON required');
         if (!Buffer.isBuffer(rawBody) || rawBody.length > 1024) return fail(400, 'Bounded JSON required');
       }
@@ -93,7 +93,7 @@ export async function createJudges({ intent = false, env = process.env } = {}) {
         if (path === '/judges' && method === 'GET') return { status: 200, type: 'text/html; charset=utf-8', body: await readFile(new URL('./judges/index.html', import.meta.url), 'utf8') };
         if (['/judges/app.js', '/judges/style.css'].includes(path) && method === 'GET') return { status: 200, type: path.endsWith('.js') ? 'text/javascript' : 'text/css', body: await readFile(new URL(`./judges/${path.endsWith('.js') ? 'app.js' : 'style.css'}`, import.meta.url), 'utf8') };
         if (/^\/control\/(1591805230|1591806023)$/.test(path) && method === 'GET') return { status: 200, type: 'text/html; charset=utf-8', body: html('<main><h1>Simulated Keeper control</h1><p>No real consent or online assertion. Fixed mock actors only; no browser tokens or actual OAuth.</p><a href="/judges">Open simulator step controls and observed eligible picker</a></main>') };
-        const readable = assets.has(path) || ['/', '/atlas', '/atlas/', '/api/atlas', '/recap', '/api/recap', '/api/recap.svg'].includes(path) || /^\/stops\/[a-f0-9]{64}$/.test(path)
+        const readable = assets.has(path) || ['/', '/atlas', '/atlas/', '/api/atlas', '/recap', '/api/recap', '/api/recap.svg', '/forge', '/api/forge'].includes(path) || /^\/stops\/[a-f0-9]{64}$/.test(path)
           || /^\/api\/atlas\/stops\/[a-f0-9]{64}(?:\?.*)?$/.test(path) || /^\/api\/atlas\?.*$/.test(path)
           || /^\/(?:api\/)?overlay\/(?:1591805230|1591806023)(?:\?.*)?$/.test(path) || path === '/api/atlas/search';
         if (!readable) return fail(404, 'Only local simulator pages are available');

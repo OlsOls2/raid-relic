@@ -1,3 +1,5 @@
+const forgeLink = document.getElementById('forge-owner-link');
+if (forgeLink) forgeLink.href = `${location.pathname}/forge`;
 const id = /^\/control\/(\d+)$/.exec(location.pathname)?.[1];
 const names = { '1591805230': 'raidrelichq', '1591806023': 'olsols2' };
 let csrf; let busy = false; let candidates = [];

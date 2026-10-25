@@ -1,3 +1,4 @@
+import { forgeMutation } from './forge.js';
 import { recapProjection } from './recap.js';
 import { chronicleMutation } from './chronicle.js';
 import { hash as observationHash } from './crypto.js';
@@ -177,6 +178,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         tx.set(ref('keeperRegistry', 'single'), checked.registry); tx.set(ref('streamChannels', host), next.channel); tx.set(ref('markChannels', host), next.marks);
       });
     },
+    async forgeStep(input) { return db.runTransaction(async tx => { const r = ref('lineage', 'single'); const change = forgeMutation((await tx.get(r)).data(), input); if (change.next) tx.set(r, change.next); return change.result; }); },
     async chronicleStep(input) { return db.runTransaction(async tx => { const r = ref('lineage', 'single'); const change = chronicleMutation((await tx.get(r)).data(), input); if (change.next) tx.set(r, change.next); return change.result; }); },
     async getRecap() { return recapProjection((await ref('lineage', 'single').get()).data()); },
     async searchPublicMarks(options) { return atlasSearch((await ref('lineage', 'single').get()).data(), options); },

@@ -1,3 +1,4 @@
+import { forgeMutation } from './forge.js';
 import { recapProjection } from './recap.js';
 import { chronicleMutation } from './chronicle.js';
 import { hash as observationHash } from './crypto.js';
@@ -93,6 +94,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
       registry = next.registry; channels.set(host, next.channel); markDocs.set(host, next.marks);
       const checked = reduceClaims(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), lineage, null, now); registry = checked.registry; lineage = checked.lineage;
     },
+    forgeStep(input) { const change = forgeMutation(lineage, input); if (change.next) lineage = change.next; return change.result; },
     chronicleStep(input) { const change = chronicleMutation(lineage, input); if (change.next) lineage = change.next; return change.result; },
     getRecap() { return recapProjection(lineage); },
     searchPublicMarks(options) { return atlasSearch(lineage, options); },

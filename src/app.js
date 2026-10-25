@@ -1,3 +1,4 @@
+import { strictJSON, templateDesign, forgeResult } from './forge.js';
 import { recapSVG } from './recap.js';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
@@ -13,6 +14,9 @@ const assets = new Map([
   ['/', ['atlas.html', 'text/html; charset=utf-8']],
   ['/atlas', ['atlas.html', 'text/html; charset=utf-8']],
   ['/atlas/', ['atlas.html', 'text/html; charset=utf-8']],
+  ['/forge.css', ['forge.css', 'text/css; charset=utf-8']],
+  ['/forge.js', ['forge.js', 'text/javascript; charset=utf-8']],
+  ['/forge-owner.js', ['forge-owner.js', 'text/javascript; charset=utf-8']],
   ['/recap.css', ['recap.css', 'text/css; charset=utf-8']],
   ['/recap.js', ['recap.js', 'text/javascript; charset=utf-8']],
   ['/atlas.css', ['atlas.css', 'text/css; charset=utf-8']],
@@ -54,6 +58,18 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
     }
     if (method === 'GET' && path === '/health') {
       return result(200, JSON.stringify({ status: 'ok', releaseCommit: release, phase: raidPilot ? 'raid-pilot' : 'foundation', readiness: raidPilot ? 'owner-test-ready' : 'not-ready-for-raids', ...(raidPilot ? { liveValidated: false } : {}) }), 'application/json');
+    }
+    if (path === '/forge') {
+      if (method !== 'GET') return result(405, 'Read only');
+      return result(200, await readFile(new URL('../public/forge.html', import.meta.url)), 'text/html; charset=utf-8');
+    }
+    if (path.startsWith('/api/forge')) {
+      if (path !== '/api/forge') return result(400, 'Invalid Forge path');
+      if (method !== 'POST') return result(405, 'Template requires read-only POST');
+      if (headers['content-type'] !== 'application/json') return result(400, 'Invalid Forge request');
+      try { const body = strictJSON(rawBody); if (!body || Object.keys(body).join(',') !== 'description') return result(400, 'Invalid Forge request');
+        return result(200, JSON.stringify(forgeResult(templateDesign(body.description), 'template', overlayFeed?.simulator === true)), 'application/json');
+      } catch { return result(400, 'Invalid Forge description'); }
     }
     if ((path.startsWith('/recap') && !['/recap.js', '/recap.css'].includes(path)) || path.startsWith('/api/recap')) {
       if (!['/recap', '/api/recap', '/api/recap.svg'].includes(path)) return result(400, 'Invalid recap path');
