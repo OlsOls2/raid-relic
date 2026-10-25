@@ -66,15 +66,28 @@ try {
   await page.locator('#compact-count').filter({ hasText: 'Rings 1' }).waitFor();
   await page.setViewportSize({ width: 160, height: 160 });
   await capture(page, 'overlay-corner-after'); await fits(page, 'Overlay corner 160px');
-  const corner = await page.evaluate(() => {
+  const corner = await page.evaluate(async () => {
+    const snapshot = await (await fetch('/api/overlay/1591805230')).json();
+    const meter = snapshot.claimMeter;
+    const meterVisible = meter && !document.querySelector('#claim-meter').hidden;
+    const timingId = meterVisible ? 'claim-label' : 'compact-handoff';
     const r = document.querySelector('.relic-overlay').getBoundingClientRect();
-    const labels = ['simulator', 'compact-status', 'compact-count', 'compact-handoff'].map(id => {
+    const labels = ['simulator', 'compact-status', 'compact-count', timingId].map(id => {
       const el = document.getElementById(id), box = el.getBoundingClientRect();
       return { id, text: el.textContent, visible: !el.hidden && box.width > 0 && box.height > 0 && box.left >= 0 && box.right <= 160 && box.top >= 0 && box.bottom <= 160 };
     });
-    return { width: r.width, height: r.height, scrollHeight: document.documentElement.scrollHeight, labels };
+    const timing = document.getElementById(timingId).textContent;
+    const match = meterVisible ? / · (\d+)s · Offer (\d+)\/(\d+) · Accept (\d+)\/(\d+)$/.exec(timing) : null;
+    const expectedSeconds = meter ? Math.max(0, Math.ceil((meter.endsAt - snapshot.serverNow) / 1000)) : null;
+    const timingMatches = meterVisible
+      ? Boolean(match && Math.abs(Number(match[1]) - expectedSeconds) <= 2
+        && Number(match[2]) === meter.offers && Number(match[3]) === meter.threshold
+        && Number(match[4]) === meter.accepts && Number(match[5]) === meter.threshold
+        && timing.startsWith(meter.awaitingRaid ? 'Awaiting verified raid · provisional' : 'Verified raid · claim'))
+      : Boolean(timing);
+    return { width: r.width, height: r.height, scrollHeight: document.documentElement.scrollHeight, labels, timingMatches };
   });
-  const compactPass = corner.width === 160 && corner.height === 160 && corner.scrollHeight <= 160 && corner.labels.every(label => label.visible && label.text);
+  const compactPass = corner.width === 160 && corner.height === 160 && corner.scrollHeight <= 160 && corner.timingMatches && corner.labels.every(label => label.visible && label.text);
   checks.push({ name: 'Corner 160×160 and essential labels', ...corner, pass: compactPass });
   if (!compactPass) throw new Error('Corner canvas/labels: ' + JSON.stringify(corner));
   await page.setViewportSize({ width: 375, height: 800 }); await page.goto('http://127.0.0.1:5191/atlas/');

@@ -94,7 +94,7 @@ for (const kind of ['memory', 'firestore']) {
   });
   test(`${kind}: wrong side, same user, bot and forged channel never supply claim proof`, async () => {
     const f = fixture(kind); await open(f);
-    await f.chat('!accept', source, '555'); await f.chat('!offer', target, '555');
+    await f.chat('!accept', source, '556'); await f.chat('!offer', target, '555');
     await f.chat('!offer', source, bot); await f.chat('!accept', target, bot);
     assert.equal((await f.state.getKeeperRegistry()).pendingHop.offers.length, 0);
     await f.chat('!offer', source, '111'); await f.chat('!accept', target, '111');
@@ -117,7 +117,7 @@ for (const kind of ['memory', 'firestore']) {
   test(`${kind}: expiry and policy revocation permanently cancel old claims`, async () => {
     for (const action of ['expire', 'pause', 'opt-out', 'ban', 'block', 'offline', 'new-stream']) {
       const f = fixture(kind); await open(f); await f.chat('!offer', source, '111'); f.advance(1);
-      if (action === 'expire') f.advance(90000);
+      if (action === 'expire') f.advance(180000);
       if (action === 'pause') { await f.chat('!relic pause', target); await f.chat('!relic resume', target); }
       if (action === 'opt-out') { await f.chat('!relic opt-out', target); f.advance(1); await f.chat('!relic keep', target); }
       if (action === 'ban') { await f.state.setChannelPolicy(target, { banned: true, blockedUserIds: [] }, f.now()); await f.state.setChannelPolicy(target, { banned: false, blockedUserIds: [] }, f.now()); }

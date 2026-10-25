@@ -1,12 +1,15 @@
+import { validClaimMeter } from './claim-meter.js';
+export { validClaimMeter } from './claim-meter.js';
 function validHandoff(h) {
   return ['source', 'host'].includes(h.role) && Number.isFinite(h.startedAt) && Number.isFinite(h.endsAt)
-    && h.endsAt - h.startedAt === 90000 && Number.isInteger(h.threshold) && h.threshold >= 1 && h.threshold <= 10
+    && (h.clockPolicy === 'preclaim-v1' ? Number.isFinite(h.claimStartedAt) && h.endsAt - h.claimStartedAt === 180000 && h.startedAt >= h.claimStartedAt && h.startedAt < h.endsAt : h.endsAt - h.startedAt === 90000) && Number.isInteger(h.threshold) && h.threshold >= 1 && h.threshold <= 10
     && [h.offers, h.accepts].every(v => Number.isInteger(v) && v >= 0 && v <= h.threshold) && typeof h.completed === 'boolean';
 }
 export function resonanceActive(cue, now) { return Boolean(cue && now >= cue.receivedAt && now < cue.expiresAt); }
 export function validSnapshot(value) {
   return value?.type === 'snapshot' && Number.isSafeInteger(value.revision) && value.revision >= 0
     && (value.resonance === undefined || (value.resonance && Number.isFinite(value.resonance.receivedAt) && Number.isFinite(value.resonance.expiresAt) && value.resonance.expiresAt - value.resonance.receivedAt === 1200 && /^[a-f0-9]{64}$/.test(value.resonance.id)))
+    && (value.claimMeter == null || (Number.isFinite(value.serverNow) && validClaimMeter(value.claimMeter)))
     && ['live', 'simulator'].includes(value.mode) && ['ready', 'waiting', 'paused', 'incoming', 'unavailable'].includes(value.status)
     && Number.isInteger(value.lineageRings) && value.lineageRings >= 0 && value.lineageRings <= 16
     && (value.handoff === undefined || value.handoff === null || (Number.isFinite(value.serverNow) && validHandoff(value.handoff))) && Array.isArray(value.marks) && value.marks.length <= 160

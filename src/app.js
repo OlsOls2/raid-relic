@@ -1,6 +1,6 @@
 import { canonicalLogin, shareRequestHash } from './my-marks.js';
 import { parseBan } from './bans.js';
-import { ackKey } from './claim-ack.js';
+import { ackKey, completionAckKey } from './claim-ack.js';
 import { matchesSubscriptionCondition } from './subscriptions.js';
 import { strictJSON, templateDesign, forgeResult } from './forge.js';
 import { recapSVG } from './recap.js';
@@ -15,6 +15,7 @@ import { parseLifecycle } from './lifecycle.js';
 export const MAX_BODY_BYTES = 65536;
 export const REPLAY_WINDOW_MS = 10 * 60 * 1000;
 const assets = new Map([
+  ['/claim-meter.js', ['claim-meter.js', 'text/javascript; charset=utf-8']],
   ['/my-marks.js', ['my-marks.js', 'text/javascript; charset=utf-8']],
   ['/', ['atlas.html', 'text/html; charset=utf-8']],
   ['/atlas', ['atlas.html', 'text/html; charset=utf-8']],
@@ -215,6 +216,7 @@ export function createApp({ claimAcks, secret, state = createMemoryState(), now 
     const share = chat?.markAction?.type === 'mymarks' && shares && !chat.isBot && !chat.copied && chat.chatterLogin && (!chat.markAction.login || chat.markAction.login === chat.chatterLogin) ? shares.issue(chat.broadcasterId, chat.chatterId, receivedAt, chat.chatterLogin) : undefined;
     const accepted = await state.accept({ share, id, now: receivedAt, sentAt, expiresAt: sentAt + REPLAY_WINDOW_MS, raid, chat, lifecycle });
     if (accepted === 'full') return result(503, 'Event capacity reached');
+    if (claimAcks && raid) { try { await claimAcks.process(raid.to_broadcaster_user_id, completionAckKey(raid.to_broadcaster_user_id, id)); } catch {} }
     // Exact proven request only; duplicates can recover an unclaimed row, never another viewer's.
     if (share && replies) {
       try { await replies.processPending(chat.broadcasterId, shareRequestHash(chat)); } catch { /* No sensitive diagnostics or post-response worker. */ }

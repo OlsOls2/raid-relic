@@ -37,3 +37,17 @@ body:not(.corner) #handoff:empty{display:none}
 #sound-toggle:focus-visible{outline:2px solid #f0c581;outline-offset:2px}
 @media(min-width:681px) and (min-height:800px){body:not(.corner) .archive{width:min(100%,440px)}}
 @media(max-height:820px){body:not(.corner) .archive{width:min(100%,280px)}body:not(.corner) .relic-overlay{padding-top:12px;padding-bottom:12px}body:not(.corner) p{margin-top:5px;margin-bottom:5px}body:not(.corner) .charge-track{margin-top:12px;margin-bottom:6px}}
+
+#claim-arcs{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;transform:rotate(-90deg)}
+#claim-arcs[hidden],#claim-meter[hidden]{display:none}
+#claim-arcs circle{fill:none;stroke-width:2;stroke-linecap:round;opacity:.85}
+#offer-arc{stroke:#f0c581;stroke-dasharray:339.292;stroke-dashoffset:339.292}
+#accept-arc{stroke:#b4a0d5;stroke-dasharray:307.876;stroke-dashoffset:307.876}
+#claim-meter{font:12px/1.4 system-ui,sans-serif;color:#e3e8ef;max-width:40ch;margin:6px auto;text-align:center;background:#101d30e8;padding:4px 6px;border-radius:4px}
+.corner #claim-meter{position:absolute;bottom:0;left:0;width:160px;box-sizing:border-box;font-size:8px;line-height:10px;margin:0;padding:2px;max-height:34px;overflow-wrap:normal}
+/* Reserve distinct rows for status/count and the voting meter; no top/bottom squeeze. */
+.corner.voting .archive{left:40px;width:80px;height:80px}
+.corner.voting .charge-track{top:100px}
+.corner.voting .compact-state{top:104px;bottom:auto;font-size:8px;line-height:10px}
+.corner.voting #compact-handoff{display:none}
+@media(prefers-reduced-motion:reduce){#claim-arcs{transition:none}}

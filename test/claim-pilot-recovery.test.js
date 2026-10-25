@@ -39,7 +39,7 @@ for (const kind of ['memory', 'firestore']) {
     assert.equal(root.pendingHop.threshold, 2); assert.equal(root.holderId, HOME);
     assert.equal(JSON.parse((await expire(f, HOME, id, hopId)).body).status, 'blocked');
     assert.equal((await expire(f, HOME, id, hopId, { origin: 'https://wrong.example' })).status, 403);
-    f.advance(90000);
+    f.advance(180000);
     assert.equal(JSON.parse((await expire(f, OTHER, id, hopId)).body).status, 'blocked');
     assert.equal(JSON.parse((await expire(f, HOME, 'f'.repeat(64), hopId)).body).status, 'blocked');
     const calls = f.calls.length; assert.equal(JSON.parse((await expire(f, HOME, id, hopId)).body).status, 'expired-handoff');
@@ -138,7 +138,7 @@ for (const kind of ['memory', 'firestore']) {
     f.advance(); await f.signed('stream.offline', { broadcaster_user_id: HOME }, HOME);
     f.advance(1000);
     await f.signed('stream.online', { broadcaster_user_id: HOME, id: '9300', type: 'live', started_at: new Date(f.now()).toISOString() }, HOME);
-    f.advance(90000);
+    f.advance(180000);
     const result = await expire(f, HOME, before.send.id, before.pendingHop.eventId); assert.equal(JSON.parse(result.body).status, 'expired-handoff');
     const channel = await f.runtime.state.getStreamStatus(HOME); assert.equal(channel.streamId, '9300'); assert.equal(channel.online, true); assert.ok(channel.closedIds.includes(before.pendingHop.sourceStreamId));
     assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, HOME); assert.equal((await f.runtime.state.getPublicJourney()).rings, 0);
@@ -161,7 +161,7 @@ test('asynchronously rejected ACK logger cannot fail the committed vote or cause
 });
 
 for (const kind of ['memory', 'firestore']) test(`${kind}: both real runtime control HTML/status reload after expiry and completed T1`, async () => {
-  const f = await setup(kind, 3); const old = await f.runtime.state.getKeeperRegistry(); f.advance(90000);
+  const f = await setup(kind, 3); const old = await f.runtime.state.getKeeperRegistry(); f.advance(180000);
   assert.equal(JSON.parse((await expire(f, HOME, old.send.id, old.pendingHop.eventId)).body).status, 'expired-handoff');
   f.advance(); assert.equal(JSON.parse((await f.control(HOME, `send:${OTHER}`)).body).status, 'accepted'); f.advance(); await f.raid(HOME, OTHER, 2);
   await f.chat(HOME, HOME, '!offer'); await f.chat(OTHER, OTHER, '!accept');

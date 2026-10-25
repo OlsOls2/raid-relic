@@ -10,7 +10,7 @@ try {
   await new Promise((resolve, reject) => { server.once('error', reject); server.listen(5191, '127.0.0.1', resolve); });
   for (const id of [BOT, HOME, OTHER]) await f.login(id);
   for (const id of [HOME, OTHER]) { await f.control(id, 'bootstrap'); f.advance(); await f.control(id, 'keep'); f.advance(); }
-  await f.control(HOME, `send:${OTHER}`); f.advance(); await f.raid(HOME, OTHER, 3); f.advance(90000);
+  await f.control(HOME, `send:${OTHER}`); f.advance(); await f.raid(HOME, OTHER, 3); f.advance(180000);
   stage = 'browser-launch'; const { chromium } = await import('playwright'); browser = await chromium.launch({ executablePath: '/snap/bin/chromium', chromiumSandbox: true, headless: true });
   const context = await browser.newContext({ ignoreHTTPSErrors: true });
   await context.route('**/*', r => new URL(r.request().url()).origin === origin ? r.continue() : r.abort());

@@ -1,3 +1,4 @@
+import { meterProgress } from './claim-meter.js';
 import { createOverlayAudio, createCueTracker } from './overlay-audio.js';
 import { arrivalPhase } from './arrival.js';
 import { connectOverlay, resonanceActive } from './overlay-client.js';
@@ -33,7 +34,7 @@ function render(snapshot) {
   if (!snapshot) { count.textContent = 'No current state'; document.querySelector('#compact-count').textContent = 'No current state'; return; }
   document.querySelector('#simulator').hidden = snapshot.mode !== 'simulator';
   const messages = { incoming: 'Incoming relic · awaiting two-chat claim', ready: 'Relic connected', paused: 'Marks paused by Keeper', waiting: 'Waiting for an active Keeper holding the relic', unavailable: 'State unavailable; runes hidden' };
-  state.textContent = messages[snapshot.status];
+  state.textContent = snapshot.claimMeter?.awaitingRaid ? (snapshot.status === 'waiting' ? 'Voting open · awaiting verified raid' : 'Relic held here · voting open') : messages[snapshot.status];
   document.querySelector('#compact-status').textContent = { incoming: 'Incoming · claim pending', ready: 'Relic connected', paused: 'Marks paused', waiting: 'Waiting for Keeper', unavailable: 'State unavailable' }[snapshot.status];
   document.querySelector('#compact-count').textContent = `Charge ${snapshot.approvedCount}/160 · Rings ${snapshot.lineageRings}`;
   count.textContent = `${snapshot.approvedCount} approved marks · charge ${snapshot.approvedCount}/160`;
@@ -61,6 +62,15 @@ function frame() {
   if (echoNote.textContent !== note) echoNote.textContent = note;
   const time = receiptServerTime + performance.now() - receivedAt;
   if (current?.handoff && time >= current.handoff.endsAt) audio.silence();
+  const meter = current && ['ready', 'incoming', 'waiting'].includes(current.status) ? current.claimMeter : null;
+  const progress = meterProgress(meter, time);
+  document.querySelector('#claim-meter').hidden = !progress; document.querySelector('#claim-arcs').hidden = !progress;
+  document.body.classList.toggle('voting', Boolean(progress));
+  if (progress) {
+    document.querySelector('#offer-arc').style.strokeDashoffset = String(339.292 * (1 - progress.offers));
+    document.querySelector('#accept-arc').style.strokeDashoffset = String(307.876 * (1 - progress.accepts));
+    document.querySelector('#claim-label').textContent = `${meter.awaitingRaid ? 'Awaiting verified raid · provisional' : 'Verified raid · claim'} · ${progress.seconds}s · Offer ${meter.offers}/${meter.threshold} · Accept ${meter.accepts}/${meter.threshold}`;
+  } else document.querySelector('#claim-label').textContent = '';
   const arrival = arrivalPhase(current?.handoff, time, motion.matches);
   const archive = document.querySelector('.archive'); archive.dataset.phase = arrival.phase;
   archive.style.setProperty('--arrival', arrival.progress);

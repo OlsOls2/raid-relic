@@ -6,7 +6,7 @@ import { attachOverlaySockets } from '../src/overlay-sockets.js';
 export const JUDGES_ORIGIN = 'http://127.0.0.1:5191';
 const ids = [HOME, OTHER];
 const actions = ['setup', 'mark', 'send', 'raid', 'offer', 'accept', 'forget', 'expire', 'closure', 'mymarks', 'echo', 'copycommand', 'reset'];
-const assets = new Set(['/forge.js', '/forge.css','/recap.js', '/recap.css','/atlas.css', '/atlas.js', '/overlay.css', '/overlay.js', '/overlay-client.js', '/overlay-audio.js', '/arrival.js', '/crystal.svg', '/relic.svg']);
+const assets = new Set(['/claim-meter.js', '/forge.js', '/forge.css','/recap.js', '/recap.css','/atlas.css', '/atlas.js', '/overlay.css', '/overlay.js', '/overlay-client.js', '/overlay-audio.js', '/arrival.js', '/crystal.svg', '/relic.svg']);
 const json = (status, value) => ({ status, type: 'application/json', body: JSON.stringify({ ...value, mode: 'simulator' }) });
 const html = body => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SIMULATOR · Raid Relic judges</title><link rel="stylesheet" href="/judges/style.css"></head><body><header class="sim-label">SIMULATOR · LOCAL MEMORY ONLY · NO REAL TWITCH</header>${body}</body></html>`;
 export async function createJudges({ intent = false, env = process.env } = {}) {
@@ -27,8 +27,8 @@ export async function createJudges({ intent = false, env = process.env } = {}) {
     return { ownSharePath, generation, flags: { ...flags }, source: `Simulated raidrelichq (${HOME})`, target: `Simulated olsols2 (${OTHER})`,
       holder: registry.holderId ? `Simulated ${registry.holderId}` : null, candidates: source.candidates.map(({ id, login }) => ({ id, label: `Simulated ${login}`, observedOnline: true })),
       intent: registry.send?.status ?? null, rings: atlas.rings, chronicle: 'Handwritten template · not AI · no key',
-      handoff: h && !h.cancelled && fixture.now() < h.endsAt ? { completed: h.finalized === true, offers: h.offers?.length ?? h.threshold, accepts: h.accepts?.length ?? h.threshold, threshold: h.threshold } : null,
-      clock: 'Synthetic receipt clock plus local elapsed time; explicit expiry advances it 90s, never Twitch synchronized.' };
+      handoff: h && (h.policy !== 'preclaim-v1' || h.verified) && !h.cancelled && fixture.now() < h.endsAt ? { completed: h.finalized === true, offers: h.offers?.length ?? h.threshold, accepts: h.accepts?.length ?? h.threshold, threshold: h.threshold } : null,
+      clock: 'Synthetic receipt clock plus local elapsed time; explicit expiry advances it 180s, never Twitch synchronized.' };
   }
   async function step(action) {
     if (action === 'reset') { ownSharePath = null; const next = await fresh(); sockets.close(); fixture = next; generation++; flags = {}; tickAt = performance.now(); sockets = attach(); return; }
@@ -89,7 +89,7 @@ export async function createJudges({ intent = false, env = process.env } = {}) {
       if (!flags.mark) throw Error('Add the source mark first'); await fixture.chat(HOME, '811', '!relic forgetme');
     } else if (action === 'expire') {
       if (!flags.raid || flags.accept) throw Error('Expire before host acceptance');
-      fixture.advance(90001); await fixture.chat(HOME, HOME, '!offer');
+      fixture.advance(180001); await fixture.chat(HOME, HOME, '!offer');
     }
     flags[action] = true; fixture.advance();
   }

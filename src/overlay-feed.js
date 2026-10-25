@@ -1,3 +1,4 @@
+import { validClaimMeter } from '../public/claim-meter.js';
 // One mutation queue for every configured feed. Never wrap a wrapped store.
 export function createOverlayHub(store, channels, { simulator = false, now = Date.now } = {}) {
   if (!channels.length || channels.length > 4 || !channels.every(channel => /^\d{1,32}$/.test(channel))) throw new Error('Configured overlay channels required');
@@ -16,9 +17,10 @@ export function createOverlayHub(store, channels, { simulator = false, now = Dat
         if (faded !== undefined && typeof faded !== 'boolean') throw new Error('Invalid faded flag');
         return { id, runeSvg, ...(faded === true ? { faded: true } : {}) };
       });
+      if (journey.claimMeter != null && !validClaimMeter(journey.claimMeter)) throw Error('Invalid claim meter');
       const incoming = journey.handoff?.role === 'host' && !journey.handoff.completed;
       return { type: 'snapshot', revision, mode: simulator ? 'simulator' : 'live', status: incoming && state.status !== 'paused' ? 'incoming' : state.status,
-        marks, approvedCount: marks.length, lineageRings: journey.rings, handoff: journey.handoff, ...(resonance ? { resonance } : {}), serverNow };
+        marks, approvedCount: marks.length, lineageRings: journey.rings, handoff: journey.handoff, claimMeter: journey.claimMeter ?? null, ...(resonance ? { resonance } : {}), serverNow };
     } catch { return { type: 'snapshot', revision, mode: simulator ? 'simulator' : 'live', status: 'unavailable', marks: [], approvedCount: 0, lineageRings: 0 }; }
   }
   const wrapped = Object.create(store);
@@ -29,7 +31,7 @@ export function createOverlayHub(store, channels, { simulator = false, now = Dat
       if (name === 'accept') {
         const input = args[0];
         const quiet = input.chat && !input.chat.markAction && !input.raid && !input.lifecycle && !input.observation;
-        if ((quiet && result !== 'resonance') || !( ['accepted', 'resonance', 'applied'].includes(result) || result?.status === 'reserved')) return result;
+        if ((quiet && result !== 'resonance') || !( ['accepted', 'resonance', 'applied'].includes(result) || ['reserved', 'accepted'].includes(result?.status))) return result;
       }
       revision++;
       for (const channel of channels) { const snapshot = await read(channel); for (const listener of listeners.get(channel)) { try { listener(snapshot); } catch { /* Client cannot fail commit. */ } } }

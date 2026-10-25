@@ -39,3 +39,15 @@ export function createClaimAcks({ state, bots, now = Date.now, logger = line => 
     }); queue = work.catch(() => {}); return work;
   } };
 }
+
+export const completionAckKey = (host, eventId) => hash(`claim-completion:${host}:${eventId}`);
+export function completionAck(previous, host, eventId, deadline, now) {
+  const doc = structuredClone(previous ?? { rows: [] }); doc.rows = doc.rows.filter(r => r.expiresAt > now);
+  const key = completionAckKey(host, eventId);
+  if (!doc.rows.some(r => r.key === key)) {
+    if (doc.rows.length >= 128) throw Error('Claim ACK capacity reached');
+    doc.rows.push({ key, expiresAt: now + 600000, status: 'queued', message: 'Claim complete: verified raid and both chats reached the threshold. Relic transferred; one growth ring recorded.', ackUntil: deadline + 30000 });
+  }
+  if (Buffer.byteLength(JSON.stringify(doc)) > 65536) throw Error('Claim ACK capacity reached');
+  return { doc, key };
+}

@@ -8,7 +8,7 @@ export function createSendOff({ state, oauth, clientId, streamerId, transport = 
     const intent = await state.sendOffStep({ type: 'claim', source: streamerId, owner, ...(expectedId ? { expectedId } : {}) }, now());
     if (!intent) return { status: 'idle-or-reconcile-only' };
     const finish = status => state.sendOffStep({ type: 'finish', id: intent.id, owner, status }, now());
-    let token; let refreshed = false;
+    let viewerEstimate; let token; let refreshed = false;
     try {
       await authorize?.(intent.sourceId, intent.targetId);
       token = await oauth.accessToken('streamer');
@@ -24,12 +24,14 @@ export function createSendOff({ state, oauth, clientId, streamerId, transport = 
       const users = await get(`https://api.twitch.tv/helix/users?login=${encodeURIComponent(intent.targetLogin)}`);
       if (users.length !== 1 || users[0].id !== intent.targetId || users[0].login !== intent.targetLogin) throw new Error('Target mismatch');
       const streams = await get(`https://api.twitch.tv/helix/streams?user_id=${intent.sourceId}&user_id=${intent.targetId}`);
+      const count = streams.find(s => s.user_id === intent.sourceId)?.viewer_count;
+      if (Number.isInteger(count) && count >= 0 && count <= 1000000) viewerEstimate = count;
       for (const [id, stream] of [[intent.sourceId, intent.sourceStreamId], [intent.targetId, intent.targetStreamId]]) {
         if (!streams.some(item => item.user_id === id && item.id === stream && item.type === 'live')) throw new Error('Not live');
       }
     } catch { await finish('rejected'); return { status: 'rejected-preflight' }; }
     try { if (authorize) { await authorize(intent.sourceId, intent.targetId); token = await oauth.accessToken('streamer'); } } catch { await finish('rejected'); return { status: 'rejected-preflight' }; }
-    const dispatched = await state.sendOffStep({ type: 'dispatch', id: intent.id, owner }, now());
+    const dispatched = await state.sendOffStep({ type: 'dispatch', id: intent.id, owner, viewerEstimate }, now());
     if (!dispatched) return { status: 'rejected-or-lease-lost' };
     // Irreversible dispatch boundary is persisted BEFORE HTTP. Never retry this
     // request, even on 401. Crash/timeout/5xx outcomes require reconciliation.

@@ -11,7 +11,7 @@ export function publicJourney(lineage) {
   })) };
 }
 // All inputs are store-owned snapshots. No effects; caller commits every result together.
-export function reduceClaims(registry, channels, marks, previous, chat, now, sentAt = now) {
+export function reduceClaims(registry, channels, marks, previous, chat, now, sentAt = now, presence = {}) {
   registry = structuredClone(registry); marks = structuredClone(marks); const lineage = structuredClone(previous ?? emptyLineage()); let acknowledgement = null;
   // References are private and scoped to source channel/stream/mark/user. Purge
   // permanently when approval/content is removed; never regenerate archived entries.
@@ -35,29 +35,31 @@ export function reduceClaims(registry, channels, marks, previous, chat, now, sen
       && Array.isArray(hop.offers) && Array.isArray(hop.accepts) && now < hop.endsAt && eligible(registry, channels, marks, hop.from, hop.to, retired)
       && (retired ? source.retiredStream.streamId : source?.streamId) === hop.sourceStreamId
       && target?.streamId === hop.targetStreamId;
-    if (!valid) { hop.cancelled = true; delete hop.offers; delete hop.accepts; }
+    if (!valid && !(hop.policy === 'preclaim-v1' && !hop.verified && now < hop.endsAt && !source?.online && source?.retiredStream?.streamId === hop.sourceStreamId && target?.streamId === hop.targetStreamId && eligible(registry, channels, marks, hop.from, hop.to, true))) { hop.cancelled = true; delete hop.offers; delete hop.accepts; delete hop.movedOffers; }
     else {
       const allowed = (host, id) => !channels[host].blockedUserIds.includes(id) && !marks[host].blocked.includes(id);
-      hop.offers = hop.offers.filter(id => allowed(hop.from, id));
+      hop.offers = hop.offers.filter(id => allowed(hop.from, id) && allowed(hop.to, id) && (!hop.movedOffers?.includes(id) || (presence[hop.from]?.streamId === hop.sourceStreamId && presence[hop.from].actors.some(a => a.id === id))));
       hop.accepts = hop.accepts.filter(id => allowed(hop.to, id));
       if (chat?.markAction?.type === 'forgetme') {
         const side = chat.broadcasterId === hop.from ? 'offers' : chat.broadcasterId === hop.to ? 'accepts' : null;
-        if (side) hop[side] = hop[side].filter(id => id !== chat.chatterId);
+        if (side) { hop[side] = hop[side].filter(id => id !== chat.chatterId); if (hop.policy === 'preclaim-v1') { hop.offers = hop.offers.filter(id => id !== chat.chatterId); hop.accepts = hop.accepts.filter(id => id !== chat.chatterId); } }
       }
     }
     if (valid && chat && ['offer', 'accept'].includes(chat.markAction?.type) && !chat.isBot
       && /^\d{1,32}$/.test(chat.chatterId)
       && !channels[chat.broadcasterId]?.blockedUserIds.includes(chat.chatterId)
-      && !marks[chat.broadcasterId]?.blocked.includes(chat.chatterId) && sentAt >= hop.startedAt && sentAt < hop.endsAt) {
+      && !marks[chat.broadcasterId]?.blocked.includes(chat.chatterId) && sentAt >= (hop.policy === 'preclaim-v1' ? hop.claimStartedAt : hop.startedAt) && sentAt < hop.endsAt) {
       const side = chat.markAction.type === 'offer' ? 'offers' : 'accepts';
       const other = side === 'offers' ? 'accepts' : 'offers';
-      if (chat.broadcasterId === (side === 'offers' ? hop.from : hop.to)
+      if ((chat.broadcasterId === (side === 'offers' ? hop.from : hop.to) || (side === 'offers' && chat.broadcasterId === hop.to && hop.policy === 'preclaim-v1' && presence[hop.from]?.streamId === hop.sourceStreamId && presence[hop.from].actors.some(a => a.id === chat.chatterId && a.seenAt <= sentAt)))
         && !hop[other].includes(chat.chatterId) && !hop[side].includes(chat.chatterId)
-        && hop[side].length < hop.threshold) {
+        && hop[side].length < (hop.policy === 'preclaim-v1' ? 10 : hop.threshold)) {
         hop[side].push(chat.chatterId);
-        acknowledgement = `${side === 'offers' ? 'Offers' : 'Accepts'} ${hop[side].length}/${hop.threshold}. Both chats required within the app-local 90s window.`;
+        if (side === 'offers' && chat.broadcasterId === hop.to) { hop.movedOffers ??= []; hop.movedOffers.push(chat.chatterId); }
+        acknowledgement = `${hop.policy === 'preclaim-v1' && !hop.verified ? 'Provisional ' : ''}${side === 'offers' ? 'Offers' : 'Accepts'} ${hop[side].length}/${hop.threshold}. Both chats required within the app-local claim window; verified raid required.`;
       }
-      if (hop.offers.length === hop.threshold && hop.accepts.length === hop.threshold) {
+    }
+      if (valid && (hop.policy !== 'preclaim-v1' || hop.verified === true) && hop.offers.length >= hop.threshold && hop.accepts.length >= hop.threshold) {
         const doc = marks[hop.from]; const session = doc.sessions.find(s => s.streamId === hop.sourceStreamId);
         const approved = (session?.marks ?? []).filter(m => m.status === 'approved' && !doc.blocked.includes(m.userId)
           && !source.blockedUserIds.includes(m.userId));
@@ -72,9 +74,8 @@ export function reduceClaims(registry, channels, marks, previous, chat, now, sen
           delete registry.echo; registry.holderId = hop.to; registry.carriedClosures = 0; delete registry.send; hop.finalized = true;
           marks[hop.from].context.holdsRelic = false; marks[hop.to].context.holdsRelic = true;
         }
-        delete hop.offers; delete hop.accepts;
+        delete hop.offers; delete hop.accepts; delete hop.movedOffers;
       }
-    }
   }
   if (Buffer.byteLength(JSON.stringify(registry)) > 4096) throw new Error('Relic registry capacity reached');
   return { registry, marks, lineage, acknowledgement, ackDeadline: registry.pendingHop?.endsAt };

@@ -27,7 +27,15 @@ try {
   const accepted = await press('send'); if (accepted.rings !== 0 || accepted.handoff !== null) throw Error('API acceptance incorrectly travelled');
   await press('raid'); const target = page.frameLocator('iframe[title="SIMULATOR host overlay"]');
   await target.locator('#compact-status').filter({ hasText: 'Incoming' }).waitFor();
+  await target.locator('#claim-meter').waitFor({ state: 'visible' });
+  await target.locator('#claim-label').filter({ hasText: 'Verified raid · claim' }).waitFor();
+  const incoming = await page.evaluate(async () => (await fetch('/api/overlay/1591806023')).json());
+  if (incoming.status !== 'incoming' || !incoming.handoff || incoming.handoff.completed || incoming.claimMeter.awaitingRaid) throw Error('Verified incoming proof missing');
   await target.locator('#compact-count').filter({ hasText: 'Charge 1/160 · Rings 0' }).waitFor();
+  const statusBox = await target.locator('#compact-status').boundingBox();
+  const countBox = await target.locator('#compact-count').boundingBox();
+  const meterBox = await target.locator('#claim-meter').boundingBox();
+  if (!statusBox || !countBox || !meterBox || statusBox.y + statusBox.height > countBox.y || countBox.y + countBox.height > meterBox.y || meterBox.y + meterBox.height > statusBox.y - 104 + 160) throw Error('Incoming corner rows overlap or exceed canvas');
   await capture(page, 'judges-incoming'); await press('offer');
   const claimed = await press('accept'); if (claimed.rings !== 1) throw Error('Two chats did not complete hop');
   await target.locator('#compact-count').filter({ hasText: 'Rings 1' }).waitFor();

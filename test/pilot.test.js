@@ -185,9 +185,9 @@ test('ordinary managed chat and duplicate actions do not read/write ledgers or c
   for (const feed of Object.values(f.runtime.overlayFeeds)) feed.subscribe(s => received.push(s));
   f.db.reads.length = 0; f.db.writes.length = 0;
   await f.chat(HOME, '811', 'ordinary chatter');
-  assert.equal(f.db.reads.length, 1); assert.equal(f.db.writes.length, 2);
-  assert.ok(f.db.reads.every(key => key.startsWith('events/')));
-  assert.ok(f.db.writes.every(key => /^(events|chatReceipts)\//.test(key))); assert.equal(received.length, 0);
+  assert.equal(f.db.reads.length, 5); assert.equal(f.db.writes.length, 4);
+  assert.ok(f.db.reads.every(key => ['events/', 'streamChannels/', 'markChannels/', 'presence/'].some(prefix => key.startsWith(prefix))));
+  assert.ok(f.db.writes.every(key => /^(events|chatReceipts|presence)\//.test(key))); assert.equal(received.length, 0);
   const input = { id: 'quiet-duplicate', now: f.now(), expiresAt: f.now() + 600000, chat: { broadcasterId: HOME, chatterId: '811', messageId: 'receipt' } };
   await f.runtime.state.accept(input); await f.runtime.state.accept(input); assert.equal(received.length, 0);
   const mark = { ...input, id: 'mark-duplicate', chat: { ...input.chat, markAction: { type: 'mark', text: 'moon' } } };

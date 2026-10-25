@@ -1,11 +1,12 @@
+import { updatePresence, presenceKey, revokePresenceActor } from './presence.js';
 import { reserveShare, sharePage, shareStep } from './my-marks.js';
 import { echoCandidate, reduceEcho, echoView } from './resonance.js';
 import { forgeMutation } from './forge.js';
 import { recapProjection } from './recap.js';
 import { chronicleMutation } from './chronicle.js';
-import { ackDocument, ackSeen, ackStep } from './claim-ack.js';
+import { ackDocument, ackSeen, ackStep, completionAck } from './claim-ack.js';
 import { hash as observationHash } from './crypto.js';
-import { atlasPage, atlasSearch, handoffView, withCarriedMarks, withIncomingPreview, keeperCandidates } from './public-view.js';
+import { atlasPage, atlasSearch, claimMeterView, handoffView, withCarriedMarks, withIncomingPreview, keeperCandidates } from './public-view.js';
 import { reduceClaims, publicJourney } from './claims.js';
 import { sendState } from './send-state.js';
 import { lifecycleConfig, reduceLifecycle } from './lifecycle.js';
@@ -64,6 +65,9 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         const eventRef = ref('events', id);
         const existing = await tx.get(eventRef);
         if (existing.exists && existing.data().expiresAt >= now) return 'duplicate';
+        const pk = presenceKey(chat); const proofRef = pk ? ref('events', pk) : null;
+        const previousProof = proofRef ? (await tx.get(proofRef)).data() : null;
+        const proofSeen = previousProof && previousProof.expiresAt >= now;
         const event = observation?.event ?? providedEvent;
         const host = event?.host ?? chat?.broadcasterId;
         if (config && host && !config.channels.includes(host)) throw new Error('Unconfigured lifecycle channel');
@@ -72,14 +76,19 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         }
         if (config && chat && !chat.copied && !chat.markAction && !raid && !event && !observation) {
           if (!isChatIdentity(chat, host)) throw new Error('Authenticated chat identity required');
+          const c = (await tx.get(ref('streamChannels', host))).data(), m = (await tx.get(ref('markChannels', host))).data();
+          const pr = ref('presence', host), pd = (await tx.get(pr)).data();
+          const updated = updatePresence(pd, host, c, m, proofSeen ? null : chat, now, sentAt);
+          tx.set(pr, updated); if (proofRef && !proofSeen) tx.set(proofRef, { expiresAt: now + 600000 });
           tx.set(eventRef, { expiresAt }); tx.set(ref('chatReceipts', host), { messageId: chat.messageId, chatterId: chat.chatterId, receivedAt: now }); return 'accepted';
         }
         const managed = config && (host || raid);
         const registry = managed ? (await tx.get(ref('keeperRegistry', 'single'))).data() : null;
-        const channelMap = {}; const markMap = {};
+        const channelMap = {}; const markMap = {}; const presenceNext = {};
         if (managed) for (const channelId of config.channels) {
           channelMap[channelId] = (await tx.get(ref('streamChannels', channelId))).data();
           markMap[channelId] = (await tx.get(ref('markChannels', channelId))).data();
+          presenceNext[channelId] = (await tx.get(ref('presence', channelId))).data();
         }
         const lineage = managed ? (await tx.get(ref('lineage', 'single'))).data() : null;
         if (chat?.copied) {
@@ -87,6 +96,8 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
           tx.set(eventRef, { expiresAt }); if (next) tx.set(ref('keeperRegistry', 'single'), next);
           return next ? 'resonance' : 'accepted';
         }
+        const raidAckRef = managed && raid ? ref('claimAcks', raid.to_broadcaster_user_id) : null;
+        const raidAckPrevious = raidAckRef ? (await tx.get(raidAckRef)).data() : null;
         const ackRef = managed && host ? ref('claimAcks', host) : null;
         const ackDoc = ackRef ? (await tx.get(ackRef)).data() : null;
         const channel = channelMap[host];
@@ -103,12 +114,22 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         let claiming; let sending;
         if (managed) {
           if (transition) { channelMap[host] = transition.channel; markMap[host] = transition.marks; }
+          for (const key of config.channels) {
+            presenceNext[key] = updatePresence(presenceNext[key], key, channelMap[key], markMap[key], key === host && !proofSeen ? chat : null, now, sentAt);
+            if (chat?.markAction?.type === 'forgetme') presenceNext[key] = revokePresenceActor(presenceNext[key], key, chat.chatterId, now);
+          }
           const op = raid ? { type: 'raid', raid, id, sentAt } : chat?.markAction?.type === 'send'
             ? { type: 'reserve', source: host, actor: chat.chatterId, login: chat.markAction.login, id, sentAt } : { type: 'noop' };
           sending = sendState(transition?.registry ?? registry, channelMap, markMap, config, op, now);
-          claiming = reduceClaims(sending.registry, channelMap, markMap, lineage, ackSeen(ackDoc, chat, now) ? null : chat, now, sentAt);
+          claiming = reduceClaims(sending.registry, channelMap, markMap, lineage, ackSeen(ackDoc, chat, now) ? null : chat, now, sentAt, presenceNext);
         }
         if (claiming && chat?.markAction?.type === 'mymarks') claiming.marks[host] = reserveShare(claiming.marks[host], claiming.lineage, chat, share, now);
+        if (proofRef && !proofSeen) tx.set(proofRef, { expiresAt: now + 600000 });
+        let raidAck;
+        if (raid && claiming?.registry.pendingHop?.finalized && !registry?.pendingHop?.finalized) {
+          const h = claiming.registry.pendingHop; raidAck = completionAck(raidAckPrevious, h.to, id, h.endsAt, now); raidAck.host = h.to; tx.set(raidAckRef, raidAck.doc);
+        }
+        if (managed) for (const [key, doc] of Object.entries(presenceNext)) tx.set(ref('presence', key), doc);
         if (claiming && ackRef) tx.set(ackRef, ackDocument(ackDoc, chat, claiming.acknowledgement, transition?.channel, claiming.marks[host], now, claiming.ackDeadline));
         tx.set(eventRef, { expiresAt });
         if (transition) { tx.set(ref('keeperRegistry', 'single'), transition.registry); tx.set(ref('streamChannels', host), transition.channel); }
@@ -122,7 +143,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         }
         if (receipt && receipt.chatterId === chat?.chatterId) tx.delete(receiptRef);
         if (chat && !chat.markAction) tx.set(ref('chatReceipts', chat.broadcasterId), { messageId: chat.messageId, chatterId: chat.chatterId, receivedAt: now });
-        return observation ? (transition.channel.lifecycleAt === event.sentAt && transition.channel.lifecycleSource === 'helix-observation' ? 'applied' : 'no-change') : sending?.result ?? 'accepted';
+        return raidAck ? { status: 'accepted', completionAck: { host: raidAck.host, key: raidAck.key } } : observation ? (transition.channel.lifecycleAt === event.sentAt && transition.channel.lifecycleSource === 'helix-observation' ? 'applied' : 'no-change') : sending?.result ?? 'accepted';
       });
     },
     async getPrivateClaimAcks(host) { return (await ref('claimAcks', host).get()).data(); },
@@ -155,12 +176,15 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
           const registry = (await tx.get(ref('keeperRegistry', 'single'))).data();
           const channel = (await tx.get(ref('streamChannels', host))).data();
           const history = (await tx.get(ref('lineage', 'single'))).data(); const channelMap = {}; const markMap = {};
-          for (const key of config.channels) { channelMap[key] = (await tx.get(ref('streamChannels', key))).data(); markMap[key] = (await tx.get(ref('markChannels', key))).data(); }
+          const presenceMap = {};
+          for (const key of config.channels) { channelMap[key] = (await tx.get(ref('streamChannels', key))).data(); markMap[key] = (await tx.get(ref('markChannels', key))).data(); presenceMap[key] = (await tx.get(ref('presence', key))).data(); }
           const ackRef = ref('claimAcks', host), ackDoc = (await tx.get(ackRef)).data();
           const transition = reduceLifecycle({ registry, channel, marks: previous, host, chat: { ...actor, markAction: action }, now, sentAt: now });
           channelMap[host] = transition.channel; markMap[host] = transition.marks;
-          const checked = reduceClaims(transition.registry, channelMap, markMap, history, null, now);
-          tx.set(ackRef, ackDocument(ackDoc, { ...actor, markAction: action }, null, transition.channel, transition.marks, now));
+          for (const key of config.channels) { presenceMap[key] = updatePresence(presenceMap[key], key, channelMap[key], markMap[key], null, now, now); if (action.type === 'forgetme') presenceMap[key] = revokePresenceActor(presenceMap[key], key, actor.chatterId, now); }
+          const checked = reduceClaims(transition.registry, channelMap, markMap, history, null, now, now, presenceMap);
+          for (const [key, doc] of Object.entries(presenceMap)) tx.set(ref('presence', key), doc);
+        tx.set(ackRef, ackDocument(ackDoc, { ...actor, markAction: action }, null, transition.channel, transition.marks, now));
           tx.set(ref('lineage', 'single'), checked.lineage);
           tx.set(ref('keeperRegistry', 'single'), checked.registry); tx.set(ref('streamChannels', host), transition.channel); next = transition.marks;
         } else next = reduceMark(previous, host, actor, action, now);
@@ -204,11 +228,14 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         const channel = (await tx.get(ref('streamChannels', host))).data();
         const marks = (await tx.get(ref('markChannels', host))).data();
         const history = (await tx.get(ref('lineage', 'single'))).data(); const channelMap = {}; const markMap = {};
-        for (const key of config.channels) { channelMap[key] = (await tx.get(ref('streamChannels', key))).data(); markMap[key] = (await tx.get(ref('markChannels', key))).data(); }
+        const presenceMap = {};
+          for (const key of config.channels) { channelMap[key] = (await tx.get(ref('streamChannels', key))).data(); markMap[key] = (await tx.get(ref('markChannels', key))).data(); presenceMap[key] = (await tx.get(ref('presence', key))).data(); }
         const ackRef = ref('claimAcks', host), ackDoc = (await tx.get(ackRef)).data();
         const next = reduceLifecycle({ registry, channel, marks, host, policy, now, sentAt: now });
         channelMap[host] = next.channel; markMap[host] = next.marks;
-        const checked = reduceClaims(next.registry, channelMap, markMap, history, null, now);
+        for (const key of config.channels) presenceMap[key] = updatePresence(presenceMap[key], key, channelMap[key], markMap[key], null, now, now);
+        const checked = reduceClaims(next.registry, channelMap, markMap, history, null, now, now, presenceMap);
+        for (const [key, doc] of Object.entries(presenceMap)) tx.set(ref('presence', key), doc);
         tx.set(ackRef, ackDocument(ackDoc, { broadcasterId: host }, null, next.channel, next.marks, now));
         tx.set(ref('lineage', 'single'), checked.lineage);
         tx.set(ref('keeperRegistry', 'single'), checked.registry); tx.set(ref('streamChannels', host), next.channel); tx.set(ref('markChannels', host), next.marks);
@@ -223,7 +250,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
       return db.runTransaction(async tx => {
         const registry = (await tx.get(ref('keeperRegistry', 'single'))).data();
         const lineage = (await tx.get(ref('lineage', 'single'))).data();
-        return { rings: lineage?.stops?.length ?? 0, handoff: handoffView(registry, host, now), ...(echoView(registry, host, now) ? { resonance: echoView(registry, host, now) } : {}) };
+        return { rings: lineage?.stops?.length ?? 0, handoff: handoffView(registry, host, now), claimMeter: claimMeterView(registry, host, now), ...(echoView(registry, host, now) ? { resonance: echoView(registry, host, now) } : {}) };
       });
     },
     async getPublicJourney() { return publicJourney((await ref('lineage', 'single').get()).data()); },

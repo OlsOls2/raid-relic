@@ -68,11 +68,16 @@ export function sendState(previous, channels, marks, config, op, now) {
   if (op.type === 'dispatch' && owns && intent.status === 'preflight' && intent.leaseUntil > now) {
     if (intent.expiresAt <= now || !eligible(registry, channels, marks, intent.sourceId, intent.targetId)
       || channels[intent.sourceId].streamId !== intent.sourceStreamId || channels[intent.targetId].streamId !== intent.targetStreamId) intent.status = 'rejected';
-    else { intent.status = 'dispatching'; intent.dispatchAt = now; result = structuredClone(intent); }
+    else { intent.status = 'dispatching'; intent.dispatchAt = now; if (Number.isInteger(op.viewerEstimate)) intent.viewerEstimate = op.viewerEstimate; result = structuredClone(intent); }
   }
   if (op.type === 'finish' && owns && !['confirmed', 'rejected'].includes(intent.status)) {
     if (intent.status === 'dispatching') {
       intent.status = ['accepted', 'rejected', 'unknown'].includes(op.status) ? op.status : 'unknown';
+      if (intent.status === 'accepted' && eligible(registry, channels, marks, intent.sourceId, intent.targetId) && channels[intent.sourceId].streamId === intent.sourceStreamId && channels[intent.targetId].streamId === intent.targetStreamId) {
+        intent.acceptedAt = now;
+        registry.pendingHop = { intentId: intent.id, eventId: intent.id, from: intent.sourceId, to: intent.targetId, sourceStreamId: intent.sourceStreamId, targetStreamId: intent.targetStreamId,
+          policy: 'preclaim-v1', provisional: true, verified: false, acceptedAt: now, claimStartedAt: now, claimEndsAt: now + 180000, startedAt: now, endsAt: now + 180000, threshold: claimThreshold(intent.viewerEstimate ?? 1), offers: [], accepts: [] };
+      }
       if (validRaidDiagnostic(op.diagnostic, intent)) intent.diagnostic = op.diagnostic;
     }
     else if (intent.status === 'preflight' && intent.leaseUntil > now && op.status === 'rejected') intent.status = 'rejected';
@@ -87,18 +92,21 @@ export function sendState(previous, channels, marks, config, op, now) {
     const sourceStreamId = retired ? closed.streamId : channels[source]?.streamId;
     const sourceStartedAt = retired ? closed.startedAt : channels[source]?.startedAt;
     const after = correlated ? (intent.dispatchAt ?? intent.createdAt) : Math.max(channels[source]?.startedAt ?? Infinity, channels[target]?.startedAt ?? Infinity);
-    if (!((registry.pendingHop?.endsAt > now && !registry.pendingHop.finalized && !registry.pendingHop.cancelled)) && sentAt > (registry.raidWatermark ?? -1) && sentAt >= after
+    if (((intent && registry.pendingHop?.intentId === intent.id && !registry.pendingHop.verified) || !((registry.pendingHop?.endsAt > now && !registry.pendingHop.finalized && !registry.pendingHop.cancelled))) && sentAt > (registry.raidWatermark ?? -1) && sentAt >= after
       && (!correlated || (intent.sourceId === source && intent.targetId === target && sentAt <= after + SEND_LIMITS.confirmationMs
         && sourceStreamId === intent.sourceStreamId && channels[target]?.streamId === intent.targetStreamId))
+      && (!correlated || intent.status !== 'confirmed')
       && eligible(registry, channels, marks, source, target, retired)
       && sentAt >= Math.max(sourceStartedAt, channels[target].startedAt, channels[source].consentAt, channels[target].consentAt)) {
       registry.raidWatermark = sentAt;
+      const preclaim = registry.pendingHop?.policy === 'preclaim-v1' && registry.pendingHop.intentId === intent?.id ? registry.pendingHop : null;
       registry.pendingHop = { eventId: hash(id), from: source, to: target, phase: 'pending-handoff', origin: correlated ? 'planned' : 'manual',
         sourceStreamId: sourceStreamId, targetStreamId: channels[target].streamId, retiredSource: Boolean(retired),
         raidSentAt: sentAt, raidSize: raid.viewers, threshold: claimThreshold(raid.viewers), thresholdPolicy: 'small-raid-v2', offers: [], accepts: [],
-        startedAt: now, snatchedUntil: now + 1500, endsAt: now + SEND_LIMITS.ritualMs };
+        startedAt: now, snatchedUntil: now + 1500, endsAt: now + 180000, policy: 'preclaim-v1', verified: true, provisional: false, verifiedRaidReceivedAt: now, arrivalStartedAt: now, claimStartedAt: now, claimEndsAt: now + 180000,
+        ...(preclaim ? { intentId: preclaim.intentId, acceptedAt: preclaim.acceptedAt, claimStartedAt: preclaim.claimStartedAt, claimEndsAt: preclaim.claimEndsAt, endsAt: preclaim.claimEndsAt, offers: preclaim.offers ?? [], accepts: preclaim.accepts ?? [], ...(preclaim.movedOffers ? { movedOffers: preclaim.movedOffers } : {}), cancelled: preclaim.cancelled === true || now >= preclaim.claimEndsAt } : {}) };
       if (correlated) intent.status = 'confirmed';
-      ritual = { eventId: id, incomingBroadcasterId: source, hostBroadcasterId: target, startedAt: now, endsAt: now + SEND_LIMITS.ritualMs };
+      ritual = { eventId: id, incomingBroadcasterId: source, hostBroadcasterId: target, startedAt: now, endsAt: registry.pendingHop.endsAt };
     }
   }
   if (Buffer.byteLength(JSON.stringify(registry)) > 4096) throw new Error('Relic registry capacity reached');

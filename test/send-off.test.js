@@ -76,7 +76,7 @@ for (const kind of ['memory', 'firestore']) {
     await Promise.all([f.worker().processPending(), f.worker().processPending()]);
     assert.equal(f.calls.filter(call => call.method === 'POST').length, 1);
     assert.equal((await f.state.getKeeperRegistry()).holderId, source);
-    assert.equal((await f.state.getKeeperRegistry()).pendingHop, undefined);
+    assert.notEqual((await f.state.getKeeperRegistry()).pendingHop?.verified, true);
     assert.equal(await f.state.getRitual(target), undefined);
     assert.ok(f.roles.every(item => item.role === 'streamer'));
   });
@@ -131,16 +131,16 @@ for (const kind of ['memory', 'firestore']) {
     f.advance(30001); await f.worker().processPending();
     assert.equal((await f.state.getKeeperRegistry()).send.status, 'unknown'); assert.equal(f.calls.length, 0);
   });
-  test(`${kind}: only matching signed actual raid confirms accepted/unknown intent and starts local 90s receipt window`, async () => {
+  test(`${kind}: only matching signed actual raid confirms accepted/unknown intent and binds existing180s voting clock with verified arrival`, async () => {
     for (const mode of ['ok', 'timeout']) {
     const f = fixture(kind, mode); await f.setup(); await f.chat('!relic send @targetkeeper'); await f.worker().processPending();
     assert.equal(await f.state.getRitual(target), undefined);
-    await f.raid('777'); assert.equal((await f.state.getKeeperRegistry()).pendingHop, undefined);
+    await f.raid('777'); assert.notEqual((await f.state.getKeeperRegistry()).pendingHop?.verified, true);
     assert.equal((await f.raid(target, { condition: { from_broadcaster_user_id: '777' } })).status, 400);
     assert.equal((await f.raid(target, { version: '2' })).status, 400);
     f.advance(5000); const receivedAt = f.now(); await f.raid(target, { sentAt: receivedAt - 1000, id: 'actual-raid' });
     const registry = await f.state.getKeeperRegistry(); assert.equal(registry.send.status, 'confirmed');
-    assert.equal(registry.pendingHop.startedAt, receivedAt); assert.equal(registry.pendingHop.endsAt, receivedAt + 90000);
+    assert.equal(registry.pendingHop.startedAt, receivedAt); assert.equal(registry.pendingHop.endsAt, (mode === 'timeout' ? receivedAt : base) + 180000);
     assert.equal(registry.holderId, source); assert.equal(registry.pendingHop.phase, 'pending-handoff');
     await f.raid(target, { sentAt: receivedAt - 1000, id: 'actual-raid' }); assert.equal((await f.state.getKeeperRegistry()).pendingHop.startedAt, receivedAt);
     assert.ok(!JSON.stringify(await f.state.getPublicMarks(source)).includes('pendingHop'));
@@ -149,7 +149,7 @@ for (const kind of ['memory', 'firestore']) {
   test(`${kind}: manual eligible raid opens snatched/pending handoff without transfer; stale events cannot overwrite newer hop`, async () => {
     const f = fixture(kind); await f.setup(); f.advance(1000); await f.raid();
     const first = (await f.state.getKeeperRegistry()).pendingHop; assert.equal(first.origin, 'manual'); assert.equal(first.snatchedUntil, f.now() + 1500);
-    f.advance(90001); await f.raid(); const second = (await f.state.getKeeperRegistry()).pendingHop;
+    f.advance(180001); await f.raid(); const second = (await f.state.getKeeperRegistry()).pendingHop;
     assert.ok(second.startedAt > first.startedAt); await f.raid(target, { sentAt: base + 500 });
     assert.deepEqual((await f.state.getKeeperRegistry()).pendingHop, second); assert.equal((await f.state.getKeeperRegistry()).holderId, source);
   });
@@ -182,7 +182,7 @@ for (const kind of ['memory', 'firestore']) {
       if (scenario === 'block') await f.state.controlMarks(source, actor, { type: 'block', userId: target }, f.now());
       if (scenario === 'ban') await f.state.setChannelPolicy(source, { banned: true, blockedUserIds: [] }, f.now());
       await f.raid(target, { sentAt: scenario === 'late' ? f.now() : raidAt });
-      assert.equal((await f.state.getKeeperRegistry()).pendingHop, undefined, scenario);
+      const hop = (await f.state.getKeeperRegistry()).pendingHop; assert.ok(!hop?.verified, scenario);
       assert.equal(await f.state.getRitual(target), undefined, scenario);
     }
   });
@@ -198,7 +198,7 @@ for (const kind of ['memory', 'firestore']) {
   test(`${kind}: unrelated or opted-out raid cannot use legacy naked ritual path`, async () => {
     const f = fixture(kind); await f.setup(); await f.raid('777'); assert.equal(await f.state.getRitual('777'), undefined);
     await f.chat('!relic opt-out', target); await f.raid(); assert.equal(await f.state.getRitual(target), undefined);
-    assert.equal((await f.state.getKeeperRegistry()).pendingHop, undefined);
+    assert.notEqual((await f.state.getKeeperRegistry()).pendingHop?.verified, true);
   });
 }
 test('Firestore reserve failure commits neither dedupe nor outbox; transaction retry performs no external effect', async () => {

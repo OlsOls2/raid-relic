@@ -53,7 +53,7 @@ test('judges full actual-kernel mock flow separates API acceptance/receipt/two c
 });
 test('reset replaces only local memory, independent instances, expiry and repeat steps remain bounded', async t => {
   const a = await fresh(t), b = await fresh(t); data(await action(a, 'setup')); data(await action(a, 'mark')); data(await action(a, 'send')); data(await action(a, 'raid'));
-  data(await action(a, 'expire')); assert.equal((await action(a, 'accept')).status, 400); assert.equal(data(await request(a, '/api/atlas')).rings, 0);
+  data(await action(a, 'expire')); assert.equal(data(await request(a, '/api/overlay/1591806023')).claimMeter, null); assert.equal(data(await request(a, '/api/judges/status')).handoff, null); assert.equal((await action(a, 'accept')).status, 400); assert.equal(data(await request(a, '/api/atlas')).rings, 0);
   for (let i = 0; i < 3; i++) data(await action(a, 'reset'));
   assert.equal(a.server.listenerCount('upgrade'), 1); assert.equal(data(await request(a, '/api/judges/status')).generation, 3);
   assert.equal(data(await request(a, '/api/judges/status')).flags.setup, undefined); assert.equal(data(await request(b, '/api/judges/status')).generation, 0);
@@ -75,4 +75,31 @@ test('concurrent simulator Send Off is serialized and JSON HTTP errors retain mo
     let status, headers, output; await f.handler(req, { writeHead(s, h) { status = s; headers = h; }, end(value) { output = value; } });
     assert.equal(status, expected); assert.equal(JSON.parse(output).mode, 'simulator'); assert.equal(headers['x-raid-relic-mode'], 'simulator'); assert.ok(!output.includes(body));
   }
+});
+
+test('judges overlay serves its complete module graph and projects actual carried/faded runes without changing receipt clocks', async t => {
+  const f = await fresh(t);
+  const visited = new Set();
+  async function module(path) {
+    if (visited.has(path)) return; visited.add(path);
+    const response = await request(f, path);
+    assert.equal(response.status, 200, path); assert.match(response.type, /javascript/, path);
+    for (const match of response.body.toString().matchAll(/(?:from\s*|import\s*)['"](\.\/[^'"]+)['"]/g)) {
+      await module(new URL(match[1], `http://local${path}`).pathname);
+    }
+  }
+  await module('/overlay.js'); assert.ok(visited.has('/claim-meter.js'));
+  const view = () => request(f, '/api/overlay/1591806023').then(data);
+  const empty = await view(); assert.equal(empty.status, 'waiting'); assert.equal(empty.approvedCount, 0); assert.equal(empty.handoff, null);
+  for (const step of ['setup', 'mark', 'send']) data(await action(f, step));
+  const accepted = await view(); assert.equal(accepted.status, 'waiting'); assert.equal(accepted.marks.length, 0); assert.equal(accepted.handoff, null); assert.equal(accepted.claimMeter.awaitingRaid, true);
+  data(await action(f, 'raid'));
+  const incoming = await view(); assert.equal(incoming.status, 'incoming'); assert.equal(incoming.marks.length, 1); assert.equal(incoming.claimMeter.awaitingRaid, false);
+  assert.equal(incoming.handoff.clockPolicy, 'preclaim-v1'); assert.ok(Number.isFinite(incoming.handoff.claimStartedAt));
+  for (const step of ['offer', 'accept']) data(await action(f, step));
+  const carried = await view(); assert.equal(carried.status, 'ready'); assert.equal(carried.approvedCount, 1); assert.equal(carried.marks.length, 1); assert.equal(carried.lineageRings, 1);
+  assert.equal(carried.handoff.startedAt, incoming.handoff.startedAt); assert.equal(carried.handoff.claimStartedAt, incoming.handoff.claimStartedAt);
+  for (let i = 0; i < 3; i++) data(await action(f, 'closure'));
+  const faded = await view(); assert.equal(faded.marks.length, 1); assert.equal(faded.marks[0].faded, true); assert.equal(faded.marks[0].runeSvg, carried.marks[0].runeSvg);
+  data(await action(f, 'forget')); assert.equal((await view()).marks.length, 0);
 });

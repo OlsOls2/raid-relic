@@ -18,9 +18,10 @@ export function atlasPage(lineage, { stopId, offset = 0, limit = 8 } = {}) {
 }
 export function handoffView(registry, channel, now) {
   const hop = registry?.pendingHop;
-  if (!hop || hop.cancelled || now >= hop.endsAt || ![hop.from, hop.to].includes(channel)) return null;
+  if (!hop || (hop.policy === 'preclaim-v1' && !hop.verified) || hop.cancelled || now >= hop.endsAt || ![hop.from, hop.to].includes(channel)) return null;
   return { role: hop.to === channel ? 'host' : 'source', startedAt: hop.startedAt, endsAt: hop.endsAt,
-    threshold: hop.threshold, offers: hop.offers?.length ?? hop.threshold, accepts: hop.accepts?.length ?? hop.threshold,
+    ...(hop.policy === 'preclaim-v1' ? { clockPolicy: hop.policy, claimStartedAt: hop.claimStartedAt } : {}),
+    threshold: hop.threshold, offers: Math.min(hop.threshold, hop.offers?.length ?? hop.threshold), accepts: Math.min(hop.threshold, hop.accepts?.length ?? hop.threshold),
     completed: hop.finalized === true };
 }
 
@@ -33,7 +34,7 @@ export function withCarriedMarks(view, lineage, registry, host) {
 
 export function withIncomingPreview(view, registry, host, channels, docs, now) {
   const hop = registry?.pendingHop;
-  if (!hop || hop.to !== host || hop.cancelled || hop.finalized || now >= hop.endsAt) return view;
+  if (!hop || (hop.policy === 'preclaim-v1' && !hop.verified) || hop.to !== host || hop.cancelled || hop.finalized || now >= hop.endsAt) return view;
   const source = channels[hop.from], target = channels[host], doc = docs[hop.from];
   const retired = !source?.online && source?.streamId === null && source?.retiredStream?.streamId === hop.sourceStreamId
     && hop.raidSentAt >= source.retiredStream.startedAt && hop.raidSentAt <= source.retiredStream.offlineAt;
@@ -65,4 +66,10 @@ export function atlasSearch(lineage, { query, offset = 0, limit = 20 }) {
   return { total: matches.length, offset, nextOffset: offset + limit < matches.length ? offset + limit : null,
     matches: matches.slice(offset, offset + limit).map(({ stop, mark }) => ({ stopId: stop.stopId, from: stop.from, to: stop.to,
       claimedAt: stop.claimedAt, ringIndex: stop.ringIndex, text: mark.text, runeSvg: runeSvg(mark.text) })) };
+}
+
+export function claimMeterView(registry, host, now) {
+  const hop = registry?.pendingHop;
+  if (!hop || ![hop.from, hop.to].includes(host) || hop.cancelled || hop.finalized || now >= hop.endsAt) return null;
+  return { startedAt: hop.claimStartedAt ?? hop.startedAt, endsAt: hop.endsAt, offers: Math.min(10, hop.offers?.length ?? 0), accepts: Math.min(10, hop.accepts?.length ?? 0), threshold: hop.threshold, provisional: hop.policy === 'preclaim-v1' && !hop.verified, awaitingRaid: hop.policy === 'preclaim-v1' && !hop.verified };
 }
