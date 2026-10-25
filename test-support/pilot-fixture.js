@@ -2,7 +2,7 @@ import { createHmac } from 'node:crypto';
 import { createRuntime } from '../src/runtime.js';
 import { fakeFirestore } from './fake-firestore.js';
 export const HOME = '1591805230', OTHER = '1591806023', BOT = '1591804828';
-export async function pilotFixture(kind = 'memory', { chronicleEnv = {}, chronicleHTTP, forgeHTTP, origin = 'https://pilot.example' } = {}) {
+export async function pilotFixture(kind = 'memory', { extraKeeperScopes = [], chronicleEnv = {}, chronicleHTTP, forgeHTTP, origin = 'https://pilot.example' } = {}) {
   const db = kind === 'firestore' ? fakeFirestore() : undefined;
   let time = Date.parse('2026-10-25T12:00:00Z'); let seq = 0;
   const secret = 'synthetic-pilot-hmac-secret';
@@ -22,7 +22,7 @@ export async function pilotFixture(kind = 'memory', { chronicleEnv = {}, chronic
       const id = options.headers.Authorization.slice('OAuth access-'.length);
       if (revoked.has(id)) return { status: 401, data: {} };
       return { status: 200, data: { client_id: 'public-client', user_id: id, expires_in: 3600,
-        scopes: id === BOT ? ['user:read:chat', 'user:write:chat', 'user:bot'] : ['channel:bot', 'channel:manage:raids'] } };
+        scopes: id === BOT ? ['user:read:chat', 'user:write:chat', 'user:bot'] : ['channel:bot', 'channel:manage:raids', ...extraKeeperScopes] } };
     }
     if (u.pathname.endsWith('/subscriptions')) {
       if (options.method === 'POST') {
@@ -34,6 +34,7 @@ export async function pilotFixture(kind = 'memory', { chronicleEnv = {}, chronic
     }
     if (u.pathname.endsWith('/streams')) { await streamsHook?.(u); return { status: 200, data: { data: u.searchParams.getAll('user_id').map(id => streams.get(id)).filter(Boolean) } }; }
     if (u.pathname.endsWith('/users')) { const id = u.searchParams.get('login') === 'raidrelichq' ? HOME : OTHER; return { status: 200, data: { data: [{ id, login: u.searchParams.get('login') }] } }; }
+    if (u.pathname.endsWith('/chat/messages')) return { status: 200, data: { data: [{ is_sent: true, message_id: 'synthetic-reply' }] } };
     if (u.pathname.endsWith('/raids')) { if (timeoutRaid) throw new Error('synthetic ambiguous result'); return { status: 200, data: { data: [{}] } }; }
     throw new Error('Unexpected mocked route');
   };

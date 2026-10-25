@@ -22,9 +22,16 @@ export function sendState(previous, channels, marks, config, op, now) {
     if (op.actor === op.source && targetId && !busy(intent) && !((registry.pendingHop?.endsAt > now && !registry.pendingHop.finalized && !registry.pendingHop.cancelled))
       && op.sentAt > (registry.sendWatermark ?? -1) && eligible(registry, channels, marks, op.source, targetId)
       && op.sentAt >= Math.max(channels[op.source].startedAt, channels[targetId].startedAt, channels[op.source].consentAt, channels[targetId].consentAt)) {
-      registry.send = { id: hash(op.id), sourceId: op.source, targetId, targetLogin: op.login, status: 'queued', createdAt: now,
+      registry.send = { id: hash(op.id), generation: hash(`send-generation:${op.id}:${op.sentAt}`), sourceId: op.source, targetId, targetLogin: op.login, status: 'queued', createdAt: now,
         sourceStreamId: channels[op.source].streamId, targetStreamId: channels[targetId].streamId, expiresAt: now + SEND_LIMITS.queueMs };
       registry.sendWatermark = op.sentAt;
+    }
+  }
+  if (op.type === 'cancel-queued' && config.channels.includes(op.source) && op.actor === op.source && registry.holderId === op.source && intent?.sourceId === op.source && intent.id === op.id && typeof intent.generation === 'string' && intent.generation === op.generation) {
+    // Generation CAS is the random event-derived intent hash. Retain the
+    // terminal record/watermark; never delete or mutate a claimed dispatch.
+    if (intent.status === 'queued' && !Object.hasOwn(intent, 'dispatchAt') && !Object.hasOwn(intent, 'owner') && !Object.hasOwn(intent, 'leaseUntil')) {
+      intent.status = 'rejected'; result = { status: 'cancelled-undispatched' };
     }
   }
   if (op.type === 'claim' && intent?.sourceId === op.source) {

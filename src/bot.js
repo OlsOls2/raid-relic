@@ -5,7 +5,7 @@ import { normalizeMark, parseMarkCommand } from './marks.js';
 export function parseChat(payload, { streamerId, botId, includeMarkCommands = false }) {
   const event = payload.event; const condition = payload.subscription?.condition;
   if (payload.subscription?.type !== 'channel.chat.message' || payload.subscription?.version !== '1' || condition?.broadcaster_user_id !== streamerId || condition.user_id !== botId
-    || event?.broadcaster_user_id !== streamerId || typeof event?.chatter_user_id !== 'string' || !/^\d+$/.test(event.chatter_user_id)
+    || event?.broadcaster_user_id !== streamerId || typeof event?.chatter_user_id !== 'string' || !/^\d{1,32}$/.test(event.chatter_user_id)
     || typeof event.message_id !== 'string' || !event.message_id || event.message_id.length > 256
     || typeof event.message?.text !== 'string' || event.message.text.length > 2000
     || !Array.isArray(event.message.fragments) || event.message.fragments.length > 500

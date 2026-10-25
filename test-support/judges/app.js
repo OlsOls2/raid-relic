@@ -2,6 +2,8 @@ let generation = null;
 const result = document.getElementById('result');
 const buttons = [...document.querySelectorAll('button')];
 function render(data) {
+  const share = document.getElementById('own-share'); share.hidden = !data.ownSharePath;
+  if (typeof data.ownSharePath === 'string' && /^\/my-marks#[A-Za-z0-9_-]+$/.test(data.ownSharePath)) share.href = data.ownSharePath; else share.removeAttribute('href');
   document.getElementById('ledger').textContent = JSON.stringify(data, null, 2).replace(/(?<!Simulated )\b(1591805230|1591806023|1591804828)\b/g, 'Simulated $1');
   const target = document.getElementById('target'); target.replaceChildren();
   for (const candidate of data.candidates) { const option = document.createElement('option'); option.value = candidate.id; option.textContent = `${candidate.label} · observed online / opted in`; target.append(option); }

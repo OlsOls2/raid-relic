@@ -38,10 +38,18 @@ export function createControl({ store, keeperIds, origin, secure, now = Date.now
       return cookie(id, secret, 3600);
     }, authorizePost,
     async route({ path, method, headers = {}, rawBody }) {
-      const match = /^\/control\/(\d{1,32})(\/(?:status|forge))?$/.exec(path);
+      const match = /^\/control\/(\d{1,32})(\/(?:status|forge|cancel-queued))?$/.exec(path);
       if (!match || !keeperIds.includes(match[1])) return reply(404, 'Not found');
       const id = match[1];
       try {
+        if (method === 'POST' && match[2] === '/cancel-queued') {
+          if (!pilot || headers.origin !== origin || headers['content-type'] !== 'application/json') return reply(403, 'Control authorization required');
+          let body; try { body = strictJSON(rawBody); } catch { return reply(403, 'Control authorization required'); }
+          if (!body || Object.keys(body).sort().join(',') !== 'csrf,generation,intentId' || !/^[a-f0-9]{64}$/.test(body.intentId ?? '') || !/^[a-f0-9]{64}$/.test(body.generation ?? '')) return reply(403, 'Control authorization required');
+          const record = await session(id, headers);
+          if (!record || typeof body.csrf !== 'string' || hash(body.csrf) !== record.csrfHash) return reply(403, 'Control authorization required');
+          return reply(200, JSON.stringify(await pilot.cancelQueued(id, body.intentId, body.generation)), 'application/json');
+        }
         if (method === 'POST' && match[2] === '/forge') {
           if (!pilot || headers.origin !== origin || headers['content-type'] !== 'application/json') return reply(403, 'Control authorization required');
           let body; try { body = strictJSON(rawBody); } catch { return reply(403, 'Control authorization required'); }
@@ -64,6 +72,7 @@ export function createControl({ store, keeperIds, origin, secure, now = Date.now
         if (method !== 'GET') return reply(405, 'Method not allowed');
         const record = await session(id, headers);
         if (!record) return reply(401, `<p>Keeper authorization required.</p><a href="/oauth/keeper/${id}/start">Connect this Keeper</a>`, 'text/html; charset=utf-8');
+        if (match[2] === '/cancel-queued') return reply(405, 'Use authenticated confirmation');
         if (match[2] === '/forge') return pilot ? reply(200, await readFile(new URL('../public/forge-owner.html', import.meta.url)), 'text/html; charset=utf-8') : reply(404, 'Not found');
         if (match[2]) return reply(200, JSON.stringify({ forgeEnabled: pilot?.forgeEnabled === true, keeperId: id, expiresAt: record.expiresAt, csrf: csrf(record.secret), actions: ['logout', ...(pilot?.actions(id) ?? [])], ...(pilot ? { pilot: await pilot.status(id) } : {}) }), 'application/json');
         if (pilot) return reply(200, await readFile(new URL('../public/control.html', import.meta.url)), 'text/html; charset=utf-8');

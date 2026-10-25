@@ -1,19 +1,23 @@
 const forgeLink = document.getElementById('forge-owner-link');
 if (forgeLink) forgeLink.href = `${location.pathname}/forge`;
 const id = /^\/control\/(\d+)$/.exec(location.pathname)?.[1];
+if (id) { document.getElementById('own-overlay').href = `/overlay/${id}`; document.getElementById('own-overlay-sound').href = `/overlay/${id}?sound=1`; }
 const names = { '1591805230': 'raidrelichq', '1591806023': 'olsols2' };
+let recovery = null;
 let csrf; let busy = false; let candidates = [];
 const target = document.getElementById('raid-target');
 const empty = document.getElementById('target-empty');
-const labels = { chronicle: 'Write Chronicle for latest received stop', bootstrap: 'Bootstrap / reconcile this channel', keep: 'Opt in / Keep', pause: 'Pause', resume: 'Resume', 'opt-out': 'Opt out', process: 'Process queued own send' };
+const labels = { 'mark-links': 'Send queued public mark-history link', chronicle: 'Write Chronicle for latest received stop', bootstrap: 'Bootstrap / reconcile this channel', keep: 'Opt in / Keep', pause: 'Pause', resume: 'Resume', 'opt-out': 'Opt out', process: 'Process queued own send' };
 const status = document.getElementById('result');
-function disable(value) { busy = value; document.querySelectorAll('button').forEach(b => { b.disabled = value; }); target.disabled = value || !candidates.length; }
+function disable(value) { busy = value; document.querySelectorAll('button').forEach(b => { b.disabled = value; }); target.disabled = value || !candidates.length; document.getElementById('cancel-queued').disabled = value || !recovery?.canCancel; }
 async function refresh() {
   document.getElementById('ledger').replaceChildren();
   candidates = []; target.replaceChildren(); target.disabled = true; empty.hidden = false; document.getElementById('raid').replaceChildren();
   try {
     const response = await fetch(`/control/${id}/status`, { cache: 'no-store' });
     if (!response.ok) throw new Error(); const value = await response.json(); csrf = value.csrf; document.getElementById('simulator').hidden = value.pilot.mode !== 'simulator';
+    recovery = value.pilot.recovery; document.getElementById('cancel-queued').disabled = !recovery?.canCancel;
+    document.getElementById('recovery-status').textContent = recovery ? JSON.stringify(recovery) : 'No own intent. No recovery mutation is needed.';
     document.getElementById('account').textContent = `${names[id]} · Keeper control`;
     for (const key of ['chronicle', 'account', 'online', 'optedIn', 'paused', 'holder', 'subscriptions', 'bothReadiness', 'ownerStep', 'intent', 'handoff']) {
       const dt = document.createElement('dt'); dt.textContent = key; const dd = document.createElement('dd'); dd.textContent = JSON.stringify(value.pilot[key], null, 2); document.getElementById('ledger').append(dt, dd);
@@ -30,7 +34,7 @@ async function refresh() {
       const button = document.createElement('button'); button.textContent = action.startsWith('send:') ? `Send Off to ${names[action.slice(5)]}` : labels[action];
       button.onclick = () => run(action); document.getElementById(action === 'bootstrap' ? 'setup' : action === 'process' || action.startsWith('send:') ? 'raid' : 'keeper').append(button);
     }
-  } catch { csrf = null; status.textContent = 'Session/status unavailable. Reconnect this Keeper to continue.'; }
+  } catch { csrf = null; recovery = null; document.getElementById('cancel-queued').disabled = true; document.getElementById('recovery-status').textContent = 'Recovery status unavailable. Reconnect and refresh; never repeat dispatch.'; status.textContent = 'Session/status unavailable. Reconnect this Keeper to continue.'; }
 }
 async function run(action) {
   if (busy || !csrf) return;
@@ -50,3 +54,13 @@ async function run(action) {
 document.getElementById('refresh').onclick = async () => { if (busy) return; disable(true); await refresh(); disable(false); };
 document.getElementById('logout').onclick = () => run('logout');
 refresh();
+
+document.getElementById('cancel-queued').onclick = async () => {
+  const intentId = document.getElementById('intent-confirm').value;
+  if (busy || !recovery?.canCancel || intentId !== recovery.intentId || !confirm('Cancel only this exact unclaimed queued intent? This cannot cancel a dispatched Twitch raid.')) return;
+  disable(true);
+  try { const result = await fetch(`${location.pathname}/cancel-queued`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ csrf, intentId, generation: recovery.generation }) });
+    const body = await result.json(); status.textContent = result.ok ? body.status : 'Recovery authorization failed';
+  } catch { status.textContent = 'Recovery unavailable. Refresh and inspect; do not repeat dispatch.'; }
+  finally { document.getElementById('intent-confirm').value = ''; disable(false); await refresh(); }
+};

@@ -5,7 +5,7 @@ import { pilotFixture, HOME, OTHER, BOT } from './pilot-fixture.js';
 import { attachOverlaySockets } from '../src/overlay-sockets.js';
 export const JUDGES_ORIGIN = 'http://127.0.0.1:5191';
 const ids = [HOME, OTHER];
-const actions = ['setup', 'mark', 'send', 'raid', 'offer', 'accept', 'forget', 'expire', 'closure', 'echo', 'copycommand', 'reset'];
+const actions = ['setup', 'mark', 'send', 'raid', 'offer', 'accept', 'forget', 'expire', 'closure', 'mymarks', 'echo', 'copycommand', 'reset'];
 const assets = new Set(['/forge.js', '/forge.css','/recap.js', '/recap.css','/atlas.css', '/atlas.js', '/overlay.css', '/overlay.js', '/overlay-client.js', '/overlay-audio.js', '/arrival.js', '/crystal.svg', '/relic.svg']);
 const json = (status, value) => ({ status, type: 'application/json', body: JSON.stringify({ ...value, mode: 'simulator' }) });
 const html = body => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SIMULATOR · Raid Relic judges</title><link rel="stylesheet" href="/judges/style.css"></head><body><header class="sim-label">SIMULATOR · LOCAL MEMORY ONLY · NO REAL TWITCH</header>${body}</body></html>`;
@@ -18,19 +18,20 @@ export async function createJudges({ intent = false, env = process.env } = {}) {
   const attach = () => attachOverlaySockets(server, fixture.runtime.overlayFeeds, { origins: [JUDGES_ORIGIN], allowRead: fixture.runtime.allowPublicRead });
   sockets = attach();
   const ordered = op => { const result = queue.then(op); queue = result.catch(() => {}); return result; };
+  let ownSharePath = null;
   async function summary() {
     const registry = await fixture.runtime.state.getKeeperRegistry();
     const source = await fixture.runtime.pilot.status(HOME);
     const atlas = await fixture.runtime.state.getAtlasPage();
     const h = registry.pendingHop;
-    return { generation, flags: { ...flags }, source: `Simulated raidrelichq (${HOME})`, target: `Simulated olsols2 (${OTHER})`,
+    return { ownSharePath, generation, flags: { ...flags }, source: `Simulated raidrelichq (${HOME})`, target: `Simulated olsols2 (${OTHER})`,
       holder: registry.holderId ? `Simulated ${registry.holderId}` : null, candidates: source.candidates.map(({ id, login }) => ({ id, label: `Simulated ${login}`, observedOnline: true })),
       intent: registry.send?.status ?? null, rings: atlas.rings, chronicle: 'Handwritten template · not AI · no key',
       handoff: h && !h.cancelled && fixture.now() < h.endsAt ? { completed: h.finalized === true, offers: h.offers?.length ?? h.threshold, accepts: h.accepts?.length ?? h.threshold, threshold: h.threshold } : null,
       clock: 'Synthetic receipt clock plus local elapsed time; explicit expiry advances it 90s, never Twitch synchronized.' };
   }
   async function step(action) {
-    if (action === 'reset') { const next = await fresh(); sockets.close(); fixture = next; generation++; flags = {}; tickAt = performance.now(); sockets = attach(); return; }
+    if (action === 'reset') { ownSharePath = null; const next = await fresh(); sockets.close(); fixture = next; generation++; flags = {}; tickAt = performance.now(); sockets = attach(); return; }
     if (action === 'setup') {
       if (flags.setup) throw Error('Already set up; reset for another run');
       for (const id of [BOT, HOME, OTHER]) await fixture.login(id);
@@ -43,6 +44,14 @@ export async function createJudges({ intent = false, env = process.env } = {}) {
       flags.setup = true; return;
     }
     if (!flags.setup) throw Error('Run simulated setup first');
+    if (action === 'mymarks') {
+      if (!flags.accept || !flags.mark) throw Error('Complete the approved simulated carry first');
+      await fixture.chat(HOME, '811', '!relic mymarks');
+      await fixture.control(HOME, 'mark-links');
+      const doc = await fixture.runtime.state.getPrivateMarks(HOME, { broadcasterId: HOME, chatterId: HOME });
+      const row = doc.shares?.find(s => s.actor === '811'); if (!row) throw Error('No simulated share');
+      ownSharePath = `/my-marks#${row.token}`; return;
+    }
     if (action === 'echo' || action === 'copycommand') {
       const registry = await fixture.runtime.state.getKeeperRegistry();
       const view = await fixture.runtime.state.getOverlayState(OTHER, fixture.now());
@@ -77,6 +86,7 @@ export async function createJudges({ intent = false, env = process.env } = {}) {
       if (!flags.raid || flags.expire) throw Error('Need unexpired simulated verified receipt');
       await fixture.chat(action === 'offer' ? HOME : OTHER, action === 'offer' ? HOME : OTHER, action === 'offer' ? '!offer' : '!accept');
     } else if (action === 'forget') {
+      ownSharePath = null;
       if (!flags.mark) throw Error('Add the source mark first'); await fixture.chat(HOME, '811', '!relic forgetme');
     } else if (action === 'expire') {
       if (!flags.raid || flags.accept) throw Error('Expire before host acceptance');
@@ -99,7 +109,7 @@ export async function createJudges({ intent = false, env = process.env } = {}) {
       if (headers.host !== '127.0.0.1:5191') return fail(421, 'Local host required');
       if (typeof path !== 'string' || !path.startsWith('/') || path.startsWith('//') || path.length > 512) return fail(400, 'Invalid local path');
       if (method !== 'GET') {
-        if (method !== 'POST' || !['/api/judges/action', '/api/atlas/search', '/api/forge'].includes(path)) return fail(404, 'No such simulator action');
+        if (method !== 'POST' || !['/api/judges/action', '/api/atlas/search', '/api/my-marks', '/api/forge'].includes(path)) return fail(404, 'No such simulator action');
         if (headers.origin !== JUDGES_ORIGIN || headers['content-type'] !== 'application/json') return fail(403, 'Exact local Origin and JSON required');
         if (!Buffer.isBuffer(rawBody) || rawBody.length > 1024) return fail(400, 'Bounded JSON required');
       }
@@ -116,7 +126,7 @@ export async function createJudges({ intent = false, env = process.env } = {}) {
         if (/^\/control\/(1591805230|1591806023)$/.test(path) && method === 'GET') return { status: 200, type: 'text/html; charset=utf-8', body: html('<main><h1>Simulated Keeper control</h1><p>No real consent or online assertion. Fixed mock actors only; no browser tokens or actual OAuth.</p><a href="/judges">Open simulator step controls and observed eligible picker</a></main>') };
         const readable = assets.has(path) || ['/', '/atlas', '/atlas/', '/api/atlas', '/recap', '/api/recap', '/api/recap.svg', '/forge', '/api/forge'].includes(path) || /^\/stops\/[a-f0-9]{64}$/.test(path)
           || /^\/api\/atlas\/stops\/[a-f0-9]{64}(?:\?.*)?$/.test(path) || /^\/api\/atlas\?.*$/.test(path)
-          || /^\/(?:api\/)?overlay\/(?:1591805230|1591806023)(?:\?.*)?$/.test(path) || path === '/api/atlas/search';
+          || /^\/(?:api\/)?overlay\/(?:1591805230|1591806023)(?:\?.*)?$/.test(path) || ['/api/atlas/search', '/api/my-marks', '/my-marks', '/my-marks.js'].includes(path);
         if (!readable) return fail(404, 'Only local simulator pages are available');
         const response = await fixture.request(path, method, headers, rawBody);
         if (response.status >= 400) return fail(response.status, 'Simulated request rejected');

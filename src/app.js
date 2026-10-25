@@ -1,3 +1,4 @@
+import { parseBan } from './bans.js';
 import { matchesSubscriptionCondition } from './subscriptions.js';
 import { strictJSON, templateDesign, forgeResult } from './forge.js';
 import { recapSVG } from './recap.js';
@@ -12,6 +13,7 @@ import { parseLifecycle } from './lifecycle.js';
 export const MAX_BODY_BYTES = 65536;
 export const REPLAY_WINDOW_MS = 10 * 60 * 1000;
 const assets = new Map([
+  ['/my-marks.js', ['my-marks.js', 'text/javascript; charset=utf-8']],
   ['/', ['atlas.html', 'text/html; charset=utf-8']],
   ['/atlas', ['atlas.html', 'text/html; charset=utf-8']],
   ['/atlas/', ['atlas.html', 'text/html; charset=utf-8']],
@@ -37,7 +39,7 @@ const assets = new Map([
 const header = (headers, name) => typeof headers[name] === 'string' ? headers[name] : '';
 const result = (status, body = '', type = 'text/plain; charset=utf-8') => ({ status, body, type });
 
-export function createApp({ secret, state = createMemoryState(), now = Date.now, oauth, chatContext, overlayFeed, overlayFeeds, raidPilot = false, releaseCommit, publicBudget = { burst: 60, perSecond: 1 } } = {}) {
+export function createApp({ secret, state = createMemoryState(), now = Date.now, oauth, chatContext, overlayFeed, overlayFeeds, raidPilot = false, releaseCommit, shares, banAuthorized, publicBudget = { burst: 60, perSecond: 1 } } = {}) {
   const keepers = chatContext?.keeperIds ?? (chatContext ? [chatContext.streamerId] : []);
   if (!Array.isArray(keepers) || keepers.length > 4 || (chatContext && !keepers.length)
     || !keepers.every(id => typeof id === 'string' && /^\d{1,32}$/.test(id))
@@ -59,6 +61,21 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
     }
     if (method === 'GET' && path === '/health') {
       return result(200, JSON.stringify({ status: 'ok', releaseCommit: release, phase: raidPilot ? 'raid-pilot' : 'foundation', readiness: raidPilot ? 'owner-test-ready' : 'not-ready-for-raids', ...(raidPilot ? { liveValidated: false } : {}) }), 'application/json');
+    }
+    if (path === '/my-marks') {
+      if (method !== 'GET') return result(405, 'Read only');
+      return { ...result(200, await readFile(new URL('../public/my-marks.html', import.meta.url)), 'text/html; charset=utf-8'), headers: { 'cache-control': 'no-store', 'referrer-policy': 'no-referrer', 'x-frame-options': 'DENY', 'content-security-policy': "frame-ancestors 'none'; base-uri 'none'" } };
+    }
+    if (path.startsWith('/api/my-marks')) {
+      if (path !== '/api/my-marks' || method !== 'POST') return result(400, 'Invalid shared history request');
+      try {
+        if (!shares || headers['content-type'] !== 'application/json') throw Error();
+        const body = strictJSON(rawBody);
+        if (!body || Object.keys(body).some(k => !['capability', 'offset', 'limit'].includes(k))) throw Error();
+        const payload = shares.open(body.capability), offset = Object.hasOwn(body, 'offset') ? body.offset : 0, limit = Object.hasOwn(body, 'limit') ? body.limit : 20;
+        if (!Number.isInteger(offset) || offset < 0 || offset > 2560 || !Number.isInteger(limit) || limit < 1 || limit > 20) throw Error();
+        return { ...result(200, JSON.stringify({ ...await state.getOwnMarks(payload, now(), offset, limit), mode: overlayFeed?.simulator ? 'simulator' : 'live' }), 'application/json'), headers: { 'cache-control': 'no-store', 'referrer-policy': 'no-referrer' } };
+      } catch { return result(403, 'Shared history unavailable or expired; previous content must be cleared'); }
     }
     if (path === '/forge') {
       if (method !== 'GET') return result(405, 'Read only');
@@ -168,7 +185,10 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
     const signedHost = subscription.condition?.broadcaster_user_id;
     const context = chatContext && keepers.includes(signedHost) ? { ...chatContext, streamerId: signedHost } : null;
     if (type === 'notification') {
-      if (['stream.online', 'stream.offline'].includes(subscription.type)) {
+      if (subscription.type === 'channel.ban') {
+        if (!context || !state.lifecycleEnabled) return result(400, 'Invalid ban channel');
+        try { lifecycle = parseBan(payload, signedHost, sentAt); if (!banAuthorized || !await banAuthorized(signedHost)) return result(403, 'Ban capability unavailable'); } catch { return result(400, 'Invalid ban event'); }
+      } else if (['stream.online', 'stream.offline'].includes(subscription.type)) {
         if (!chatContext || !state.lifecycleEnabled) return result(503, 'Lifecycle not configured');
         if (!context) return result(400, 'Unconfigured lifecycle channel');
         try { lifecycle = parseLifecycle(payload, context?.streamerId, sentAt); } catch { return result(400, 'Invalid lifecycle'); }
@@ -189,7 +209,8 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
         }
       }
     }
-    const accepted = await state.accept({ id, now: receivedAt, sentAt, expiresAt: sentAt + REPLAY_WINDOW_MS, raid, chat, lifecycle });
+    const share = chat?.markAction?.type === 'mymarks' && shares && !chat.isBot && !chat.copied ? shares.issue(chat.broadcasterId, chat.chatterId, receivedAt) : undefined;
+    const accepted = await state.accept({ share, id, now: receivedAt, sentAt, expiresAt: sentAt + REPLAY_WINDOW_MS, raid, chat, lifecycle });
     if (accepted === 'full') return result(503, 'Event capacity reached');
     return result(204);
   }

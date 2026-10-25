@@ -51,6 +51,7 @@ export function reduceLifecycle({ registry, channel, marks, host, event, chat, p
   if (event || chat?.markAction || policy) delete registry.echo;
   channel = structuredClone(channel ?? emptyChannel());
   marks = structuredClone(marks ?? emptyMarkDocument());
+  if (policy || event) delete marks.shares;
   const countHolderClosure = () => {
     if (registry.holderId === host && channel.online && channel.streamId && !channel.closedIds.includes(channel.streamId))
       registry.carriedClosures = Math.min(3, (Number.isInteger(registry.carriedClosures) && registry.carriedClosures >= 0 ? Math.min(3, registry.carriedClosures) : 0) + 1);
@@ -58,7 +59,8 @@ export function reduceLifecycle({ registry, channel, marks, host, event, chat, p
   if (policy) {
     if (typeof policy.banned !== 'boolean' || !Array.isArray(policy.blockedUserIds) || policy.blockedUserIds.length > 128
       || !policy.blockedUserIds.every(id => typeof id === 'string' && /^\d{1,32}$/.test(id))) throw new Error('Bounded trusted channel policy required');
-    channel.banned = policy.banned; channel.blockedUserIds = [...new Set(policy.blockedUserIds)];
+    channel.banned = policy.banned || channel.banCapacityReached === true; channel.blockedUserIds = [...new Set([...policy.blockedUserIds, ...(channel.observedBans ?? [])])];
+    if (channel.blockedUserIds.length > 128) throw Error('Policy capacity reached');
   }
   if (event?.type === 'online' && event.sentAt > channel.lifecycleAt && event.startedAt > channel.closedThrough
     && !channel.closedIds.includes(event.streamId) && event.streamId !== channel.streamId
@@ -77,6 +79,15 @@ export function reduceLifecycle({ registry, channel, marks, host, event, chat, p
     channel.closedThrough = Math.max(channel.closedThrough, event.sentAt);
     channel.lifecycleAt = event.sentAt; channel.lifecycleSource = event.provenance ?? 'eventsub'; channel.online = false; channel.streamId = null; channel.startedAt = null;
   }
+  if (event?.type === 'ban') {
+    channel.observedBans ??= [];
+    if (!channel.observedBans.includes(event.userId)) {
+      if (channel.observedBans.length >= 128 || channel.blockedUserIds.length >= 128 || marks.blocked.length >= 128) { channel.banned = true; channel.banCapacityReached = true; }
+      else { channel.observedBans.push(event.userId); channel.blockedUserIds = [...new Set([...channel.blockedUserIds, event.userId])]; marks.blocked = [...new Set([...marks.blocked, event.userId])]; }
+    }
+    for (const session of marks.sessions) session.marks = session.marks.filter(mark => mark.userId !== event.userId);
+    delete marks.shares;
+  }
   const action = chat?.markAction;
   const owner = chat?.broadcasterId === host && chat.chatterId === host;
   if (owner && action?.type === 'keep' && sentAt > channel.consentAt && !channel.banned && !channel.paused
@@ -84,6 +95,7 @@ export function reduceLifecycle({ registry, channel, marks, host, event, chat, p
     channel.optedIn = true; channel.consentAt = sentAt;
   }
   if (owner && action?.type === 'opt-out' && sentAt >= channel.consentAt) {
+    delete marks.shares;
     channel.optedIn = false; channel.consentAt = sentAt;
     for (const session of marks.sessions) session.marks = [];
   }

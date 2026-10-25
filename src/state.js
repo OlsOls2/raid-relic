@@ -1,3 +1,4 @@
+import { reserveShare, sharePage, shareStep } from './my-marks.js';
 import { echoCandidate, reduceEcho, echoView } from './resonance.js';
 import { forgeMutation } from './forge.js';
 import { recapProjection } from './recap.js';
@@ -20,7 +21,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
   const markDocs = new Map();
   return {
     lifecycleEnabled: Boolean(config),
-    accept({ id, expiresAt, now, raid, chat, lifecycle: providedEvent, observation, sentAt = now }) {
+    accept({ id, expiresAt, now, raid, chat, lifecycle: providedEvent, observation, share, sentAt = now }) {
       for (const [key, expiry] of seen) if (expiry < now) seen.delete(key);
       for (const [key, ritual] of rituals) if (ritual.endsAt <= now) rituals.delete(key);
       if (seen.has(id)) return 'duplicate';
@@ -54,6 +55,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
         sending = sendState(transition?.registry ?? registry, channelMap, markMap, config, op, now);
         claiming = reduceClaims(sending.registry, channelMap, markMap, lineage, chat, now, sentAt);
       }
+      if (claiming && chat?.markAction?.type === 'mymarks') claiming.marks[host] = reserveShare(claiming.marks[host], claiming.lineage, chat, share, now);
       // No await between check and insertion: atomic within this process.
       seen.set(id, expiresAt);
       if (raid && !config) rituals.set(raid.to_broadcaster_user_id, {
@@ -93,6 +95,8 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
       const next = sendState(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), config, op, now);
       registry = next.registry; return next.result;
     },
+    getOwnMarks(payload, now, offset, limit) { return sharePage(markDocs.get(payload.host), lineage, payload, now, offset, limit); },
+    shareReplyStep(host, op, now) { const next = shareStep(markDocs.get(host), op, now); if (next.doc) markDocs.set(host, next.doc); return next.result; },
     getKeeperCandidates(host) { return keeperCandidates(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), config, host); },
     getKeeperRegistry() { return structuredClone(registry); },
     getStreamStatus(host) { return structuredClone(channels.get(host)); },

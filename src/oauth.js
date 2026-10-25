@@ -48,26 +48,27 @@ export function createOAuth({ clientId, clientSecret, redirectUri, redirectAllow
     const data = response.data;
     if (response.status !== 200 || data?.client_id !== clientId || data.user_id !== accounts[role] || !Array.isArray(data.scopes)
       || !scopes(role).every(scope => data.scopes.includes(scope)) || !(data.expires_in > 0)) throw new Error('Token identity or grants invalid');
-    return true;
+    return data.scopes;
   }
   async function locked(role, operation) {
     const owner = nonce();
     if (!await store.acquire(role, owner, now())) throw new Error('Token operation busy; retry later');
     try { return await operation(owner); } finally { await store.release(role, owner); }
   }
-  async function accessToken(role, { refresh = false } = {}) {
+  async function accessToken(role, { refresh = false, scopeCheck } = {}) {
     if (!validRole(role)) throw new Error('Invalid role');
     // A distributed lease serializes rotated refresh tokens across instances.
     return locked(role, async owner => {
       const record = await store.getToken(role);
       if (!record) throw new Error('Authorization required');
       let token = cipher.open(record, context(role));
-      if (refresh || !await validate(token, role)) {
+      let granted = refresh ? false : await validate(token, role);
+      if (refresh || !granted) {
         token = await exchange({ grant_type: 'refresh_token', refresh_token: token.refresh_token });
-        if (!await validate(token, role)) throw new Error('Authorization required');
+        granted = await validate(token, role); if (!granted) throw new Error('Authorization required');
         await store.saveToken(role, cipher.seal(token, context(role)), owner, now());
       }
-      return token.access_token;
+      return scopeCheck ? granted.includes(scopeCheck) : token.access_token;
     });
   }
   async function route({ path, method, headers }) {
@@ -111,7 +112,10 @@ export function createOAuth({ clientId, clientSecret, redirectUri, redirectAllow
       return response(400, 'Authorization failed; start again', { 'set-cookie': cookie('', 0) });
     }
   }
-  return { route, accessToken, control, accessTokenForKeeper(id, options) {
+  return { route, accessToken, control, hasBanGrant(id) {
+    if (!keeperIds.includes(id)) throw Error('Invalid Keeper');
+    return accessToken(id === streamerId ? 'streamer' : `keeper:${id}`, { scopeCheck: 'channel:moderate' });
+  }, accessTokenForKeeper(id, options) {
     if (!keeperIds.includes(id)) throw new Error('Invalid Keeper');
     return accessToken(id === streamerId ? 'streamer' : `keeper:${id}`, options);
   }, callbackPath: redirect.pathname };

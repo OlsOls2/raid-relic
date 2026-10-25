@@ -1,3 +1,4 @@
+import { reserveShare, sharePage, shareStep } from './my-marks.js';
 import { echoCandidate, reduceEcho, echoView } from './resonance.js';
 import { forgeMutation } from './forge.js';
 import { recapProjection } from './recap.js';
@@ -57,7 +58,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
   const ref = (collection, key) => db.collection(collection).doc(hash(key));
   return {
     lifecycleEnabled: Boolean(config),
-    async accept({ id, expiresAt, now, raid, chat, lifecycle: providedEvent, observation, sentAt = now }) {
+    async accept({ id, expiresAt, now, raid, chat, lifecycle: providedEvent, observation, share, sentAt = now }) {
       return db.runTransaction(async tx => {
         const eventRef = ref('events', id);
         const existing = await tx.get(eventRef);
@@ -104,6 +105,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
           sending = sendState(transition?.registry ?? registry, channelMap, markMap, config, op, now);
           claiming = reduceClaims(sending.registry, channelMap, markMap, lineage, chat, now, sentAt);
         }
+        if (claiming && chat?.markAction?.type === 'mymarks') claiming.marks[host] = reserveShare(claiming.marks[host], claiming.lineage, chat, share, now);
         tx.set(eventRef, { expiresAt });
         if (transition) { tx.set(ref('keeperRegistry', 'single'), transition.registry); tx.set(ref('streamChannels', host), transition.channel); }
         if (raid && !config) tx.set(ref('rituals', raid.to_broadcaster_user_id), ritualFor(id, now, raid));
@@ -162,6 +164,14 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         tx.set(ref('keeperRegistry', 'single'), next.registry); return next.result;
       });
     },
+    async getOwnMarks(payload, now, offset, limit) { return db.runTransaction(async tx => {
+      const doc = (await tx.get(ref('markChannels', payload.host))).data(); const lineage = (await tx.get(ref('lineage', 'single'))).data();
+      return sharePage(doc, lineage, payload, now, offset, limit);
+    }); },
+    async shareReplyStep(host, op, now) { return db.runTransaction(async tx => {
+      const doc = ref('markChannels', host); const previous = (await tx.get(doc)).data(); const next = shareStep(previous, op, now);
+      if (next.doc) tx.set(doc, next.doc); return next.result;
+    }); },
     async getKeeperCandidates(host) {
       if (!config?.channels.includes(host)) return [];
       return db.runTransaction(async tx => {
