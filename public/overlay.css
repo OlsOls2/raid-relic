@@ -36,3 +36,4 @@ body:not(.corner) #handoff:empty{display:none}
 .corner #waiting-note{position:absolute;width:1px;height:1px;padding:0;margin:0;clip-path:inset(50%);overflow:hidden;white-space:nowrap}
 #sound-toggle:focus-visible{outline:2px solid #f0c581;outline-offset:2px}
 @media(min-width:681px) and (min-height:800px){body:not(.corner) .archive{width:min(100%,440px)}}
+@media(max-height:820px){body:not(.corner) .archive{width:min(100%,280px)}body:not(.corner) .relic-overlay{padding-top:12px;padding-bottom:12px}body:not(.corner) p{margin-top:5px;margin-bottom:5px}body:not(.corner) .charge-track{margin-top:12px;margin-bottom:6px}}
