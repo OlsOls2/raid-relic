@@ -1,0 +1,625 @@
+{
+  "verifiedAt": "2026-10-25T13:45:58.409Z",
+  "sourceCommit": "2d24b1f0c941eea0e75e56da9b8bb4137b8aa388",
+  "mergeCommit": "d2ca68d689db61e7bcecbd2493b5df117da6d49d",
+  "absorbedHotfix": "f4e437e870780dbf6e7f48c26c5da69ee3a633b1",
+  "branch": "feature/raid-relic-polish",
+  "tests": {
+    "total": 415,
+    "passed": 415,
+    "failed": 0,
+    "skipped": 0
+  },
+  "browsers": {
+    "flows": [
+      {
+        "name": "browser-results.json",
+        "passed": true,
+        "checks": 13,
+        "failure": null,
+        "stage": null,
+        "failureCategory": null
+      },
+      {
+        "name": "pilot-browser-results.json",
+        "passed": true,
+        "checks": 8,
+        "failure": null,
+        "stage": null,
+        "failureCategory": null
+      },
+      {
+        "name": "judges-browser-results.json",
+        "passed": true,
+        "checks": 3,
+        "failure": null,
+        "stage": null,
+        "failureCategory": null
+      },
+      {
+        "name": "recap-browser-results.json",
+        "passed": true,
+        "checks": 3,
+        "failure": null,
+        "stage": null,
+        "failureCategory": null
+      },
+      {
+        "name": "forge-browser-results.json",
+        "passed": true,
+        "checks": 2,
+        "failure": null,
+        "stage": null,
+        "failureCategory": null
+      },
+      {
+        "name": "fade-browser-results.json",
+        "passed": true,
+        "checks": 2,
+        "failure": null,
+        "stage": null,
+        "failureCategory": null
+      },
+      {
+        "name": "resonance-browser-results.json",
+        "passed": true,
+        "checks": 2,
+        "failure": null,
+        "stage": null,
+        "failureCategory": null
+      },
+      {
+        "name": "polish-browser-results.json",
+        "passed": true,
+        "checks": 4,
+        "failure": null,
+        "stage": null,
+        "failureCategory": null
+      },
+      {
+        "name": "handoff-browser-results.json",
+        "passed": true,
+        "checks": 2,
+        "failure": null,
+        "stage": null,
+        "failureCategory": null
+      },
+      {
+        "name": "claims-browser-results.json",
+        "passed": true,
+        "checks": 2,
+        "failure": null,
+        "stage": "complete",
+        "failureCategory": null
+      },
+      {
+        "name": "full-overlay-browser-results.json",
+        "passed": true,
+        "checks": 6,
+        "failure": null,
+        "stage": "complete",
+        "failureCategory": null
+      }
+    ],
+    "checks": 47,
+    "mocked": true
+  },
+  "canonicalRecording": {
+    "sourceCommit": "bbd673832450f26063e9c6a7ae865daaaa005e43",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "result": {
+      "name": "full-overlay-browser-results.json",
+      "passed": true,
+      "checks": 6,
+      "failure": null,
+      "stage": "complete",
+      "failureCategory": null
+    },
+    "scriptSha256": "b90bccd46bb36704fa69da4dfa7db87f873825c42e29efe22aac07061d0722bd",
+    "method": "Exact deployed source code in network-isolated local HTTPS browser with synthetic OAuth/EventSub/memory data; NO live pages opened",
+    "urls": [
+      "https://raid-relic-760724762396.us-central1.run.app/overlay/1591805230",
+      "https://raid-relic-760724762396.us-central1.run.app/overlay/1591806023",
+      "https://raid-relic-760724762396.us-central1.run.app/atlas/"
+    ],
+    "corner": false,
+    "soundQuery": false,
+    "capturesRetained": 0,
+    "physicalOBSProof": false
+  },
+  "mustAudit": "docs/MUST_STATUS.md",
+  "highestMustStarted": {
+    "module": "src/ban-safety.js",
+    "status": "private preparation foundation only; not imported by runtime",
+    "activated": false,
+    "globalReady": false,
+    "permissionsRequested": false,
+    "requiredFutureConsent": [
+      "channel:moderate",
+      "moderation:read"
+    ],
+    "actualBanOrUnbanOrSnapshotDBWrites": false
+  },
+  "freeze": {
+    "deploymentPerformed": false,
+    "liveControlsOpened": false,
+    "streamsOrRaidsOrChatsTouched": false,
+    "liveTwitchAccountAPICalls": false,
+    "defaultOAuthScopesChanged": false,
+    "defaultSubscriptionsChanged": false,
+    "paidGatesChanged": false
+  },
+  "deadlines": {
+    "musts": "2026-10-28",
+    "featureComplete": "2026-10-30"
+  },
+  "sourceFiles": [
+    {
+      "file": "public/arrival.js",
+      "sha256": "08d406d8638856acabbe207140bb2af79f8b53adbc05893c82c2cca89066c63a"
+    },
+    {
+      "file": "public/atlas.css",
+      "sha256": "afd6b7c424b9768b21e7b5145720a8ee092f0bd07eba43b91cfe6ca14ef6f909"
+    },
+    {
+      "file": "public/atlas.html",
+      "sha256": "51dab3c611270451e7e3001f1b8b94c85c19e895cb6f918f20fb2c03bf91ba97"
+    },
+    {
+      "file": "public/atlas.js",
+      "sha256": "9a340cdecb369e339b39195dad758bd24590a4b657fe5b75d1f48455ac36cd58"
+    },
+    {
+      "file": "public/control.css",
+      "sha256": "7cfc37f7661026a3fa2e202e7adf9cbb3c994d869598a31f46a4b9e57503f44f"
+    },
+    {
+      "file": "public/control.html",
+      "sha256": "b2a7bbf50a23abc7358e4749211c873705b135832c163fc6e75e2bcbdc99497c"
+    },
+    {
+      "file": "public/control.js",
+      "sha256": "68966914245cfa5bf28b0ae78cb985e55073694b798e045bad9762eafe687715"
+    },
+    {
+      "file": "public/crystal.svg",
+      "sha256": "6fba39ea1b1bb6c49156c24a1e7eee6ecb3431fb95f9138915cd9089cf845013"
+    },
+    {
+      "file": "public/forge-owner.html",
+      "sha256": "d8abddfdec97e02313b4ba1c6327a803461b3f1ed7dd9fed6d5787cb144bd4b1"
+    },
+    {
+      "file": "public/forge-owner.js",
+      "sha256": "0fe5a1b3f1fc47a382c20e2c50e978ffbc8e1d02ce7fc1dd33e5cdff7d2d3a1f"
+    },
+    {
+      "file": "public/forge.css",
+      "sha256": "255bed1a418729c5dad527f3334726b6259c5ddf14e33ce086393b5069b5ded7"
+    },
+    {
+      "file": "public/forge.html",
+      "sha256": "f5971334fcd013c754ffcd5c0a9a04f38429ac878923ca2bcd878f6eeaa8723f"
+    },
+    {
+      "file": "public/forge.js",
+      "sha256": "ec60da41df9a29b250443f5c7acc62935b2568b46d0df2e89a587d77fca57d94"
+    },
+    {
+      "file": "public/my-marks.html",
+      "sha256": "21a693fabd7cbd3f0812e4e3cbf8aaf1b0383265bf5ef7fccae38d383a212302"
+    },
+    {
+      "file": "public/my-marks.js",
+      "sha256": "00570438b3e98a59f4a0887102f5ff5cba33099b5af272127e15d57966637c6e"
+    },
+    {
+      "file": "public/overlay-audio.js",
+      "sha256": "6ddf4f78959ca9dbb9b59b534473a44cde89a66cb5a09abb07b7478ee62b47fd"
+    },
+    {
+      "file": "public/overlay-client.js",
+      "sha256": "c5ca43076f5522eb1147920c2c372c1f3f3cb84f94ef3d4cc253e1ca9adcc416"
+    },
+    {
+      "file": "public/overlay-live.html",
+      "sha256": "4385117f01b2f8a9a8dab279cd7004d27807497a17b774228dbdf33b8bb63286"
+    },
+    {
+      "file": "public/overlay.css",
+      "sha256": "43f7d80ef65829603427fb688357f575665047276f1d5d3f28c6c8bda98e797b"
+    },
+    {
+      "file": "public/overlay.html",
+      "sha256": "c05fc8df84da1c066d7eed843a81f4db04fcf3b6065b1186a2651391aa2c3e7d"
+    },
+    {
+      "file": "public/overlay.js",
+      "sha256": "294374ca2eb117cfe49723ff86ab3f2e558172d79254134127c4563ef7795aec"
+    },
+    {
+      "file": "public/recap.css",
+      "sha256": "984a3d64b10044f40b9eb514b93705c1ab73490257b9ce397a58546c06d0005b"
+    },
+    {
+      "file": "public/recap.html",
+      "sha256": "f8093db781c6c638cfc737e64b6cb9f8276c4b10c70c3dfd1d837a80717c7e04"
+    },
+    {
+      "file": "public/recap.js",
+      "sha256": "9e5eedfa8e1fde5f510381ae41b40f99ce446f1106919b276c65da85d0981371"
+    },
+    {
+      "file": "public/relic.svg",
+      "sha256": "0819680dad1da4c1bfea060243468bfb1f385c8fa53d1d1960f62d9bbd7a575e"
+    },
+    {
+      "file": "public/style.css",
+      "sha256": "893d7cb0d26b5c3a2c798f32fb10b9599bf66e853f6b64bca4600803d92ebcb0"
+    },
+    {
+      "file": "scripts/browser-smoke-claims.js",
+      "sha256": "6eaad8e6a22e79a85cd0dada181c50356ebab9ed8f2b0e3f2b22d7b8a85f6763"
+    },
+    {
+      "file": "scripts/browser-smoke-fade.js",
+      "sha256": "c5af90f42c25a4109537629ff4633d8357a35bd54ad423326959c9e1ebe90b32"
+    },
+    {
+      "file": "scripts/browser-smoke-forge.js",
+      "sha256": "ed099b50ba186bb3a1c5b665ac495b3d1cf061bbaf0ce9eb01138ece9708df4f"
+    },
+    {
+      "file": "scripts/browser-smoke-full-overlay.js",
+      "sha256": "b90bccd46bb36704fa69da4dfa7db87f873825c42e29efe22aac07061d0722bd"
+    },
+    {
+      "file": "scripts/browser-smoke-handoff.js",
+      "sha256": "6f5097d3dcb9f401b165a3f93481adc8aa2c2e36632b912a92be57148693211a"
+    },
+    {
+      "file": "scripts/browser-smoke-judges.js",
+      "sha256": "cd646f43af5719b28decfb50f5bbd94e52cdbcb27b3d8cfbe1380f5a4ae83246"
+    },
+    {
+      "file": "scripts/browser-smoke-pilot.js",
+      "sha256": "a74123bc793e79f7b0a63c9e98656d6f0ddbf36f853038234a1f766054479ec5"
+    },
+    {
+      "file": "scripts/browser-smoke-polish.js",
+      "sha256": "078322eab151000475e29e05857ddb5185e1a152f2d6ff7af5ba7aa032dcb3e8"
+    },
+    {
+      "file": "scripts/browser-smoke-recap.js",
+      "sha256": "88af59356a717e40810dfb9d1e05573ca24a7608e94700dad69e400627a15d32"
+    },
+    {
+      "file": "scripts/browser-smoke-resonance.js",
+      "sha256": "aa0bb5364616167695d44b949f28d67c0000f6e281b1aea57ae012dd93c5efe0"
+    },
+    {
+      "file": "scripts/browser-smoke.js",
+      "sha256": "81df96ca7aeec0b87c420a4d118e818584b2a870fdbabfa68faff6fc878b1051"
+    },
+    {
+      "file": "scripts/export-codex-evidence.js",
+      "sha256": "6f9017552716642bdc1ecace04ec7e32b8c426bf14d5a399a57781dde830bd68"
+    },
+    {
+      "file": "scripts/judges.js",
+      "sha256": "42271a55feec5841655271b6f33aa70edb4b9aefff4c00b4e75aa34b38568f9e"
+    },
+    {
+      "file": "scripts/release-files.js",
+      "sha256": "ddd409d57e259a33bbf180a38e18c8b3e53e24eb7c186b7e5c608fc485c0e7a5"
+    },
+    {
+      "file": "scripts/simulate-journey.js",
+      "sha256": "24dddfcd9853ff70fc1b674f65f832a1eca56d0e08aa1270578a74b287064799"
+    },
+    {
+      "file": "scripts/simulate-overlay.js",
+      "sha256": "87f54dfdaa4a1578d7576081b75480c933932a7ce0adfc009eef8520190ccc94"
+    },
+    {
+      "file": "src/app.js",
+      "sha256": "12aa0f1e2d0480acc6f935eec803eadabfb6a84721eca8c3daf00a43d731c038"
+    },
+    {
+      "file": "src/bans.js",
+      "sha256": "2e76b0794b972b8b2bc36d212a1a1662f11e4e908c3007e8dbbb9c5465ebb56b"
+    },
+    {
+      "file": "src/bot.js",
+      "sha256": "d677fb0a207bad9abda25434a860ca01e8e21208fb20e53a649bbbf0619c62d5"
+    },
+    {
+      "file": "src/chronicle.js",
+      "sha256": "7443b865227b4442e308d20a9c989c18bbda37c955c2c99a5b5f8b54f0e2a098"
+    },
+    {
+      "file": "src/claim-ack.js",
+      "sha256": "c7172db44c7df7b57b8412d65592f655b4d31be36811a073fc2979f3b5ec3f7d"
+    },
+    {
+      "file": "src/claims.js",
+      "sha256": "6711292d978a2c6f4d2258543252294b86c6a4b2877e9d56e47d93d5b290f599"
+    },
+    {
+      "file": "src/control.js",
+      "sha256": "ddcf0879c783e8a79f029704732749e92252dec9085766f414566d2ca8e115dd"
+    },
+    {
+      "file": "src/crypto.js",
+      "sha256": "fd59442ff91b9eb38341d4de5487a7236a2c05faec8ac9756060b06b3444c45e"
+    },
+    {
+      "file": "src/forge.js",
+      "sha256": "804b4c179f27263264eeb05404a712c3233aa71eac2ec38fca39d40b501ac0dd"
+    },
+    {
+      "file": "src/lifecycle.js",
+      "sha256": "0ebfe1bb5f97dd5e687b68e221c89dfceae7bd84ee7d57e8a1e4bbe05b49d3cf"
+    },
+    {
+      "file": "src/marks.js",
+      "sha256": "3d769b5ef494840ea53fede8a19db18b3525c04edd4e0366a6f91e7009fe8c21"
+    },
+    {
+      "file": "src/my-marks.js",
+      "sha256": "53066edb43e8a787985629355d66018d0aff7ae00ecbce18acac0e61caf4f06a"
+    },
+    {
+      "file": "src/oauth.js",
+      "sha256": "85ba60d7a5c209d49e967aa4b4bf6fb8164a3a25036daf2e49ead413735f32f6"
+    },
+    {
+      "file": "src/overlay-feed.js",
+      "sha256": "fddd510c7b441fb505700b2bd0c5632540e3f19f577bed18fdd5ac94bffc2234"
+    },
+    {
+      "file": "src/overlay-sockets.js",
+      "sha256": "fb029b33fb5a47ca528d0f01cc3d991acdb0218126adc799543b16826b36596c"
+    },
+    {
+      "file": "src/pilot.js",
+      "sha256": "cf4396b3bdcb716dce17e09658886b9cf2fe08f26f564e767ff503c2cc541ec0"
+    },
+    {
+      "file": "src/public-view.js",
+      "sha256": "160c4cb5f6994a09808dff9d88f4ec8972694ac2907a0e63e4a0937f93bf9e96"
+    },
+    {
+      "file": "src/raid-diagnostic.js",
+      "sha256": "6cfd662cc6ece58988ba65a3e86f21879d480c41f71416073b0f2bfa4cb2a090"
+    },
+    {
+      "file": "src/recap.js",
+      "sha256": "de6e9b1ddb45dd4e3dff6f7934b1011c3bbb44df92639c61a55355cbc46b61f8"
+    },
+    {
+      "file": "src/release.js",
+      "sha256": "d01c1e1bc111357c95e85b0511cafa9caaf400658060f65e5ba3858db8e31ccf"
+    },
+    {
+      "file": "src/resonance.js",
+      "sha256": "2c90348e5538ee8b956ab657f9b9f8ab1c2d40ff11206a8cdbbcf98d68323323"
+    },
+    {
+      "file": "src/runtime.js",
+      "sha256": "c09444eb24ff96d8278b0b0936dd04410341ad9ec48999b31c3d7634e6e1e4af"
+    },
+    {
+      "file": "src/send-off.js",
+      "sha256": "8ab6570841a3f7a9bc46f7b435632daee143caa0b6295fc5909ffde5bc8b149f"
+    },
+    {
+      "file": "src/send-state.js",
+      "sha256": "bcd86e6bde3188e3f35a8711f633c5b4cc41bdf7325c9f34cd7d98b84bd5618a"
+    },
+    {
+      "file": "src/server.js",
+      "sha256": "9bb710f3b7ae807f08c8c6db5358a8ba9a86556565d420c00cc242f831d52ae3"
+    },
+    {
+      "file": "src/state.js",
+      "sha256": "6c69c2c9bc681c2f17915269bc6975018d243490704530cc200d8809c579b61a"
+    },
+    {
+      "file": "src/store.js",
+      "sha256": "18341810d2a583346fc50e574d61b9a7434f76d97bda34435f521cfd2295f135"
+    },
+    {
+      "file": "src/subscriptions.js",
+      "sha256": "5c302e9fb817713db7df9b6397a68a1e51891349597613c70003b2ef0daebb6f"
+    },
+    {
+      "file": "test-support/fake-firestore.js",
+      "sha256": "0e8e834488d20adf262fb940da8774c4a60c1982553399b8c263f8819ccbc0c6"
+    },
+    {
+      "file": "test-support/journey-fixture.js",
+      "sha256": "7b0b082275e23dad35f845fc997270f42a990f74d6d798bb4d527569716d7b85"
+    },
+    {
+      "file": "test-support/judges.js",
+      "sha256": "c8cb6cdce3bd5c28e24bbf255ed6d737d14e86faa88f181f85eeca118edddbba"
+    },
+    {
+      "file": "test-support/judges/app.js",
+      "sha256": "6a19461e3c4bdcd89cbc0f8c6adc219ad640fec9b4409c8994294d19a487d27d"
+    },
+    {
+      "file": "test-support/judges/index.html",
+      "sha256": "89ad412f68b474383b7976f32bcf2a9cc6383cbba4da14bfd368899533eddb9c"
+    },
+    {
+      "file": "test-support/judges/style.css",
+      "sha256": "711c3dab899686ec4f49ab457c221738ec8fbc863a49051c07c394a4d500b617"
+    },
+    {
+      "file": "test-support/local-tls.js",
+      "sha256": "593269e065210afcad76b2a947fc0041c806902671e28390210e8e8eaf4f6766"
+    },
+    {
+      "file": "test-support/overlay-fixture.js",
+      "sha256": "a37fd5d9666a57e7fe934746e97f31f0de1c25455be4c0ed4b280ba4b4d7fcef"
+    },
+    {
+      "file": "test-support/pilot-fixture.js",
+      "sha256": "5ad3419116a9d61bf54e09efbba1602044dc032727e48f92dfb3693d9e2abf37"
+    },
+    {
+      "file": "test/app.test.js",
+      "sha256": "3fe473767f8ec61203204558ff050d61efbb13d56b96cd050965f66e38c112f6"
+    },
+    {
+      "file": "test/atlas-search.test.js",
+      "sha256": "fdff0b1cf52bd8320a100d90a28f4a9ec669bc8053076be30720330ae09917d6"
+    },
+    {
+      "file": "test/atlas.test.js",
+      "sha256": "42b1f99eb328d5f9a348aab50c7398ba04aa20413696ab5564e30cdae3cb66c9"
+    },
+    {
+      "file": "test/ban-recovery.test.js",
+      "sha256": "2309d862a31fe62eb3f151dcc0d96f9274768d188bc011f10b9307863ef7a89e"
+    },
+    {
+      "file": "test/bot.test.js",
+      "sha256": "8fdadeccf0967415b6a873fb8e3ab3bfee45e4a1eb7c413278429e6678a148f3"
+    },
+    {
+      "file": "test/chronicle.test.js",
+      "sha256": "d03ca99d5ac69df5703464a5afc1d5eb80ba95de9a6c5eb7614b6356c89f0e36"
+    },
+    {
+      "file": "test/claim-pilot-recovery.test.js",
+      "sha256": "0d52e4ca54f2db9757d9d764e41184a032395ddac7a8cf0576248a72c478db84"
+    },
+    {
+      "file": "test/claims.test.js",
+      "sha256": "cb709d6f9fb0b641c16c9ca60f3f871f1fa3d9279a9a0d7b55d142b3f8961be0"
+    },
+    {
+      "file": "test/cloudbuild.test.js",
+      "sha256": "1c4f9d6a11b72351d15fdae7206c9c33cb3fe9d82559336c488390c435899d03"
+    },
+    {
+      "file": "test/control.test.js",
+      "sha256": "b68314191f2300b299d7c631fee1d19a1b99504ee7de3371707dfd42052371d6"
+    },
+    {
+      "file": "test/evidence-export.test.js",
+      "sha256": "0fa42a960bc4c1783155c9838335bdd7c723c3409c76008c6c98fd76863141e0"
+    },
+    {
+      "file": "test/fade.test.js",
+      "sha256": "bd804f3cac7b1bb462ef3bc768b162f859b508d651807428bf86916320c73337"
+    },
+    {
+      "file": "test/firestore.test.js",
+      "sha256": "59173803010f47517473f634c45f7af768a8d90c9bb03e5e6832841e570aea49"
+    },
+    {
+      "file": "test/forge.test.js",
+      "sha256": "a3cb5b865624eb0227a3a6edfa2992c64a374a29d5ca2ea75b968eb5dbb693fd"
+    },
+    {
+      "file": "test/judges.test.js",
+      "sha256": "0fd7d4e1c5d400cddb4e9ea17785e3817eb165063e46d7268857aa3272b462e1"
+    },
+    {
+      "file": "test/keeper-candidates.test.js",
+      "sha256": "f25d6f1be5fd13b66169c1c02ac3d93d4dc65e717154a50611c5e32d9e669eaf"
+    },
+    {
+      "file": "test/lifecycle.test.js",
+      "sha256": "22c906d51839573053b444dc3051649bf82366575b719ac3ac5296aa89bb820b"
+    },
+    {
+      "file": "test/live-restart.test.js",
+      "sha256": "607d04b4ac54beba53306d3880041ac3093f8fb35b472438f32c4d6eb1fa5452"
+    },
+    {
+      "file": "test/local-tls.test.js",
+      "sha256": "1dda0048aa4a0feb06da97faea3bfab403f79b1b0d154fc9b90b304d5bde3698"
+    },
+    {
+      "file": "test/marks.test.js",
+      "sha256": "1aa66a0deb215c24e37605f05c0f12aa2ffea062948b99c9ec179088a13e8490"
+    },
+    {
+      "file": "test/my-marks.test.js",
+      "sha256": "f98f416c03674ecd92939236e1c5304adb87c94ae88b6c6f4e369edb5cf216cb"
+    },
+    {
+      "file": "test/oauth.test.js",
+      "sha256": "d356f1fbc314b2023d18859d25dc071e33c8bf3f7051a10b2621d84da1477b0a"
+    },
+    {
+      "file": "test/overlay-audio.test.js",
+      "sha256": "e28de6fc3c9a7b074c0f8ddca2c720a4b53e15eb74de40fe90ff94dcadd05cc9"
+    },
+    {
+      "file": "test/overlay.test.js",
+      "sha256": "8d5830af2218bcbf1b600a8b2334997c31d91b576319c00d79005f2a4c1c3675"
+    },
+    {
+      "file": "test/pilot.test.js",
+      "sha256": "658e9cfca061c66ba3dcfc4b58d0b073b18e85d7aa3e57ff14c2358c2b3a309c"
+    },
+    {
+      "file": "test/polish.test.js",
+      "sha256": "05094ad9ce25eec38435dba86086da50f4519200da30cf698f3cc16754ca9feb"
+    },
+    {
+      "file": "test/raid-diagnostic.test.js",
+      "sha256": "d9ac1c74dc7e0b2e3a9d44ef1fa9dc84c33f0e31a180d7abfe6bd42e18949608"
+    },
+    {
+      "file": "test/recap.test.js",
+      "sha256": "32393b60f520e410861998b36202938fa825851060b7fc697ceb236a67063888"
+    },
+    {
+      "file": "test/release.test.js",
+      "sha256": "1e54719cb999e522cc32fb1b585e9659670c1bb4a0b8da38e1d96733300a3242"
+    },
+    {
+      "file": "test/resonance.test.js",
+      "sha256": "f7aef9aafb261f7d11797ffa124e21339cd2671b6ff77e35043da8b5d80a2025"
+    },
+    {
+      "file": "test/send-off.test.js",
+      "sha256": "9e396333c9789b04cb68071f07ba828a6e78530648030186b361c526e7e66e5c"
+    },
+    {
+      "file": "test/subscriptions.test.js",
+      "sha256": "25fa62c7a7e10aaea88e7a797df08236bf97a4543c4ad56017783aee7994659e"
+    },
+    {
+      "file": "src/ban-safety.js",
+      "sha256": "634a1fa2473c96394df08b2038aacd09b9b9ca18048f116f16040429102cd260"
+    },
+    {
+      "file": "test/ban-safety.test.js",
+      "sha256": "d2977b78ab12d440f3f5119541ebc09e696ae7336c509a294f641b007b7550a6"
+    }
+  ],
+  "isolation": {
+    "privatePidAndNetwork": true,
+    "loopbackOnly": true,
+    "sourceReadonly": true,
+    "clearedEnvironment": true,
+    "credentialsMounted": false,
+    "disposableHOME": true,
+    "tmpfsBytes": 536870912,
+    "nodeHeapMiB": 256,
+    "chromiumHeapMiB": 128,
+    "chromiumSandbox": true
+  }
+}
