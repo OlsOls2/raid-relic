@@ -1,3 +1,4 @@
+import { reduceScores, retainedScores, scoreboard, scoreMessage, isScoreCommand, scoreAckDocument, scoreAckMutation } from './scoreboard.js';
 import { updatePresence, presenceKey, revokePresenceActor } from './presence.js';
 import { reserveShare, sharePage, shareStep } from './my-marks.js';
 import { echoCandidate, reduceEcho, echoView } from './resonance.js';
@@ -15,12 +16,12 @@ import { setMarkContext, reduceMark, publicMarks, publicOverlayState, privateMar
 // Synchronous mutations are atomic within a single process; tests/dev only.
 export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
   const config = lifecycleConfig(lifecycle);
-  let lineage = emptyLineage();
+  let lineage = emptyLineage(); let scores;
   let registry = emptyRegistry(); const channels = new Map();
   const seen = new Map();
   const rituals = new Map();
   const chatReceipts = new Map();
-  const markDocs = new Map(); const ackDocs = new Map(); const presenceDocs = new Map();
+  const markDocs = new Map(); const scoreAckDocs = new Map(); const ackDocs = new Map(); const presenceDocs = new Map();
   return {
     lifecycleEnabled: Boolean(config),
     accept({ id, expiresAt, now, raid, chat, lifecycle: providedEvent, observation, share, sentAt = now }) {
@@ -67,16 +68,26 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
         claiming = reduceClaims(sending.registry, channelMap, markMap, lineage, ackSeen(ackDocs.get(host), chat, now) ? null : chat, now, sentAt, presenceNext);
       }
       if (claiming && chat?.markAction?.type === 'mymarks') claiming.marks[host] = reserveShare(claiming.marks[host], claiming.lineage, chat, share, now);
+      let scoreNext;
+      if (claiming) {
+        const scoreChannels = Object.fromEntries(channels); if (transition) scoreChannels[host] = transition.channel;
+        scoreNext = reduceScores(scores, { channels: scoreChannels, marks: claiming.marks, chat, now, vote: claiming.scoreVote, completion: claiming.completedScore, hop: claiming.registry.pendingHop });
+        if (['top','badges'].includes(scoreNext.message)) scoreNext.message = scoreMessage(scoreNext.message, scoreboard(claiming.lineage, claiming.registry, scoreNext.doc, config, now), host);
+
+      }
       let raidAck;
       if (raid && claiming?.registry.pendingHop?.finalized && !registry.pendingHop?.finalized) {
         const h = claiming.registry.pendingHop; raidAck = completionAck(ackDocs.get(h.to), h.to, id, h.endsAt, now); raidAck.host = h.to;
       }
-      const ackNext = claiming && host ? ackDocument(ackDocs.get(host), chat, claiming.acknowledgement, transition?.channel, claiming.marks[host], now, claiming.ackDeadline, claiming.acknowledgementKind) : null;
+      const ackNext = claiming && host ? ackDocument(ackDocs.get(host), isScoreCommand(chat) ? null : chat, claiming.acknowledgement, transition?.channel, claiming.marks[host], now, claiming.ackDeadline, claiming.acknowledgementKind) : null;
+      const scoreAckNext = isScoreCommand(chat) ? scoreAckDocument(scoreAckDocs.get(host), chat, scoreNext?.message, transition?.channel, claiming?.marks[host], now) : null;
       // No await between check and insertion: atomic within this process.
       if (pk && !proofSeen) seen.set(pk, now + 600000);
       if (raidAck) ackDocs.set(raidAck.host, raidAck.doc);
       if (presenceNext) for (const [key, value] of Object.entries(presenceNext)) presenceDocs.set(key, value);
       if (ackNext) ackDocs.set(host, ackNext);
+      if (scoreNext) scores = scoreNext.doc;
+      if (scoreAckNext) scoreAckDocs.set(host, scoreAckNext);
       seen.set(id, expiresAt);
       if (raid && !config) rituals.set(raid.to_broadcaster_user_id, {
         eventId: id,
@@ -115,6 +126,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
       if (config) ackDocs.set(host, ackDocument(ackDocs.get(host), { ...actor, markAction: action }, null, transition.channel, doc, now));
       markDocs.set(host, doc);
       if (config) { const next = reduceClaims(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), lineage, null, now, now, Object.fromEntries(presenceDocs)); registry = next.registry; lineage = next.lineage; }
+      if (config) scores = reduceScores(scores, { channels: Object.fromEntries(channels), marks: Object.fromEntries(markDocs), chat: { ...actor, markAction: action }, now }).doc;
       if (action.type === 'forgetme' && chatReceipts.get(host)?.chatterId === actor.chatterId) chatReceipts.delete(host);
     },
     sendOffStep(op, now) {
@@ -125,6 +137,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
     getOwnMarks(payload, now, offset, limit) { return sharePage(markDocs.get(payload.host), lineage, payload, now, offset, limit); },
     shareReplyStep(host, op, now) { const next = shareStep(markDocs.get(host), op, now); if (next.doc) markDocs.set(host, next.doc); return next.result; },
     getKeeperCandidates(host) { return keeperCandidates(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), config, host); },
+    scoreAckStep(host, op, now) { if (!config?.channels.includes(host)) throw Error('Unconfigured score ACK'); const next=scoreAckMutation(scoreAckDocs.get(host),op,channels.get(host),markDocs.get(host),now,scores,lineage,registry,config,host);scoreAckDocs.set(host,next.doc);return next.result; },
     getPrivateClaimAcks(host) { return structuredClone(ackDocs.get(host)); },
     claimAckStep(host, op, now) { if (!config?.channels.includes(host)) throw Error('Unconfigured ACK'); const next = ackStep(ackDocs.get(host), op, channels.get(host), markDocs.get(host), now); ackDocs.set(host, next.doc); return next.result; },
     getKeeperRegistry() { return structuredClone(registry); },
@@ -136,9 +149,13 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
       ackDocs.set(host, ackDocument(ackDocs.get(host), { broadcasterId: host }, null, next.channel, next.marks, now));
       registry = next.registry; channels.set(host, next.channel); markDocs.set(host, next.marks);
       const checked = reduceClaims(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), lineage, null, now, now, Object.fromEntries(presenceDocs)); registry = checked.registry; lineage = checked.lineage;
+      scores = reduceScores(scores, { channels: Object.fromEntries(channels), marks: Object.fromEntries(markDocs), now }).doc;
     },
     forgeStep(input) { const change = forgeMutation(lineage, input); if (change.next) lineage = change.next; return change.result; },
     chronicleStep(input) { const change = chronicleMutation(lineage, input); if (change.next) lineage = change.next; return change.result; },
+    getScoreboard(now) {
+      return scoreboard(lineage, registry, retainedScores(scores, Object.fromEntries(channels), Object.fromEntries(markDocs)), config ?? { channels: [], logins: {} }, now);
+    },
     getRecap() { return recapProjection(lineage); },
     searchPublicMarks(options) { return atlasSearch(lineage, options); },
     getAtlasPage(options) { return atlasPage(lineage, options); },

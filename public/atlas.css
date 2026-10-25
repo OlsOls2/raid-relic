@@ -13,3 +13,5 @@ h1{overflow-wrap:normal;word-break:normal;hyphens:none}
 .atlas-relic.webgl-relic>img{visibility:hidden}
 @media(max-width:680px){.atlas-relic{width:150px;max-width:100%}}
 @media(max-width:480px){.atlas-relic{width:160px;justify-self:center}}
+
+.score-list{padding-left:24px;max-width:100%;overflow-wrap:anywhere}.score-list>li{padding:12px 0;border-bottom:1px solid #52617a}.score-list h3{color:var(--amber);margin:6px 0}.score-badges{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0}.score-badges li{border:1px solid var(--violet);padding:6px 10px;color:var(--moon);font-size:14px}#score-preview{border-left:3px solid var(--amber);padding:12px}#keeper-scores{scroll-margin-top:24px}

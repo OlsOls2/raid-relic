@@ -1,3 +1,4 @@
+import { reduceScores, retainedScores, scoreboard, scoreMessage, isScoreCommand, scoreAckDocument, scoreAckMutation } from './scoreboard.js';
 import { updatePresence, presenceKey, revokePresenceActor } from './presence.js';
 import { reserveShare, sharePage, shareStep } from './my-marks.js';
 import { echoCandidate, reduceEcho, echoView } from './resonance.js';
@@ -95,6 +96,8 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
           markMap[channelId] = (await tx.get(ref('markChannels', channelId))).data();
           presenceNext[channelId] = (await tx.get(ref('presence', channelId))).data();
         }
+        const scoreRef = managed ? ref('scoreboard', 'single') : null;
+        const scores = scoreRef ? (await tx.get(scoreRef)).data() : null;
         const lineage = managed ? (await tx.get(ref('lineage', 'single'))).data() : null;
         if (chat?.copied) {
           const next = reduceEcho(registry, channelMap, markMap, lineage, chat, now);
@@ -105,6 +108,8 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         const raidAckPrevious = raidAckRef ? (await tx.get(raidAckRef)).data() : null;
         const ackRef = managed && host ? ref('claimAcks', host) : null;
         const ackDoc = ackRef ? (await tx.get(ackRef)).data() : null;
+        const scoreAckRef = managed && isScoreCommand(chat) ? ref('scoreAcks', host) : null;
+        const scoreAckPrevious = scoreAckRef ? (await tx.get(scoreAckRef)).data() : null;
         const channel = channelMap[host];
         if (observation) {
           if (!managed || observationHash(JSON.stringify(channel ?? null)) !== observation.baseline) return 'superseded';
@@ -129,13 +134,19 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
           claiming = reduceClaims(sending.registry, channelMap, markMap, lineage, ackSeen(ackDoc, chat, now) ? null : chat, now, sentAt, presenceNext);
         }
         if (claiming && chat?.markAction?.type === 'mymarks') claiming.marks[host] = reserveShare(claiming.marks[host], claiming.lineage, chat, share, now);
+        if (claiming) {
+          const scoreNext = reduceScores(scores, { channels: channelMap, marks: claiming.marks, chat, now, vote: claiming.scoreVote, completion: claiming.completedScore, hop: claiming.registry.pendingHop });
+          if (['top','badges'].includes(scoreNext.message)) scoreNext.message = scoreMessage(scoreNext.message, scoreboard(claiming.lineage, claiming.registry, scoreNext.doc, config, now), host);
+          if (scoreAckRef) tx.set(scoreAckRef, scoreAckDocument(scoreAckPrevious, chat, scoreNext.message, transition?.channel, claiming.marks[host], now));
+          if (scores || scoreNext.doc.players.length || scoreNext.doc.receipts.length) tx.set(scoreRef, scoreNext.doc);
+        }
         if (proofRef && !proofSeen) tx.set(proofRef, { expiresAt: now + 600000 });
         let raidAck;
         if (raid && claiming?.registry.pendingHop?.finalized && !registry?.pendingHop?.finalized) {
           const h = claiming.registry.pendingHop; raidAck = completionAck(raidAckPrevious, h.to, id, h.endsAt, now); raidAck.host = h.to; tx.set(raidAckRef, raidAck.doc);
         }
         if (managed) for (const [key, doc] of Object.entries(presenceNext)) tx.set(ref('presence', key), doc);
-        if (claiming && ackRef) tx.set(ackRef, ackDocument(ackDoc, chat, claiming.acknowledgement, transition?.channel, claiming.marks[host], now, claiming.ackDeadline, claiming.acknowledgementKind));
+        if (claiming && ackRef) tx.set(ackRef, ackDocument(ackDoc, isScoreCommand(chat) ? null : chat, claiming.acknowledgement, transition?.channel, claiming.marks[host], now, claiming.ackDeadline, claiming.acknowledgementKind));
         tx.set(eventRef, { expiresAt });
         if (transition) { tx.set(ref('keeperRegistry', 'single'), transition.registry); tx.set(ref('streamChannels', host), transition.channel); }
         if (raid && !config) tx.set(ref('rituals', raid.to_broadcaster_user_id), ritualFor(id, now, raid));
@@ -150,6 +161,10 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         if (chat && !chat.markAction) tx.set(ref('chatReceipts', chat.broadcasterId), { messageId: chat.messageId, chatterId: chat.chatterId, receivedAt: now });
         return raidAck ? { status: 'accepted', completionAck: { host: raidAck.host, key: raidAck.key } } : observation ? (transition.channel.lifecycleAt === event.sentAt && transition.channel.lifecycleSource === 'helix-observation' ? 'applied' : 'no-change') : sending?.result ?? 'accepted';
       });
+    },
+    async scoreAckStep(host, op, now) {
+      if (!config?.channels.includes(host)) throw Error('Unconfigured score ACK');
+      return db.runTransaction(async tx=> { const r=ref('scoreAcks',host), doc=(await tx.get(r)).data(), c=(await tx.get(ref('streamChannels',host))).data(), m=(await tx.get(ref('markChannels',host))).data();const scores=(await tx.get(ref('scoreboard','single'))).data(), lineage=(await tx.get(ref('lineage','single'))).data(), registry=(await tx.get(ref('keeperRegistry','single'))).data();const next=scoreAckMutation(doc,op,c,m,now,scores,lineage,registry,config,host);tx.set(r,next.doc);return next.result; });
     },
     async getPrivateClaimAcks(host) { return (await ref('claimAcks', host).get()).data(); },
     async claimAckStep(host, op, now) {
@@ -184,11 +199,13 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
           const presenceMap = {};
           for (const key of config.channels) { channelMap[key] = (await tx.get(ref('streamChannels', key))).data(); markMap[key] = (await tx.get(ref('markChannels', key))).data(); presenceMap[key] = (await tx.get(ref('presence', key))).data(); }
           const ackRef = ref('claimAcks', host), ackDoc = (await tx.get(ackRef)).data();
+        const scoreRef = ref('scoreboard','single'), scores = (await tx.get(scoreRef)).data();
           const transition = reduceLifecycle({ registry, channel, marks: previous, host, chat: { ...actor, markAction: action }, now, sentAt: now });
           channelMap[host] = transition.channel; markMap[host] = transition.marks;
           for (const key of config.channels) { presenceMap[key] = updatePresence(presenceMap[key], key, channelMap[key], markMap[key], null, now, now); if (action.type === 'forgetme') presenceMap[key] = revokePresenceActor(presenceMap[key], key, actor.chatterId, now); }
           const checked = reduceClaims(transition.registry, channelMap, markMap, history, null, now, now, presenceMap);
-          for (const [key, doc] of Object.entries(presenceMap)) tx.set(ref('presence', key), doc);
+          if (scores) tx.set(scoreRef, reduceScores(scores, { channels: channelMap, marks: checked.marks, chat: { ...actor, markAction: action }, now }).doc);
+        for (const [key, doc] of Object.entries(presenceMap)) tx.set(ref('presence', key), doc);
         tx.set(ackRef, ackDocument(ackDoc, { ...actor, markAction: action }, null, transition.channel, transition.marks, now));
           tx.set(ref('lineage', 'single'), checked.lineage);
           tx.set(ref('keeperRegistry', 'single'), checked.registry); tx.set(ref('streamChannels', host), transition.channel); next = transition.marks;
@@ -236,10 +253,12 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         const presenceMap = {};
           for (const key of config.channels) { channelMap[key] = (await tx.get(ref('streamChannels', key))).data(); markMap[key] = (await tx.get(ref('markChannels', key))).data(); presenceMap[key] = (await tx.get(ref('presence', key))).data(); }
         const ackRef = ref('claimAcks', host), ackDoc = (await tx.get(ackRef)).data();
+        const scoreRef = ref('scoreboard','single'), scores = (await tx.get(scoreRef)).data();
         const next = reduceLifecycle({ registry, channel, marks, host, policy, now, sentAt: now });
         channelMap[host] = next.channel; markMap[host] = next.marks;
         for (const key of config.channels) presenceMap[key] = updatePresence(presenceMap[key], key, channelMap[key], markMap[key], null, now, now);
         const checked = reduceClaims(next.registry, channelMap, markMap, history, null, now, now, presenceMap);
+        if (scores) tx.set(scoreRef, reduceScores(scores, { channels: channelMap, marks: checked.marks, now }).doc);
         for (const [key, doc] of Object.entries(presenceMap)) tx.set(ref('presence', key), doc);
         tx.set(ackRef, ackDocument(ackDoc, { broadcasterId: host }, null, next.channel, next.marks, now));
         tx.set(ref('lineage', 'single'), checked.lineage);
@@ -248,6 +267,15 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
     },
     async forgeStep(input) { return db.runTransaction(async tx => { const r = ref('lineage', 'single'); const change = forgeMutation((await tx.get(r)).data(), input); if (change.next) tx.set(r, change.next); return change.result; }); },
     async chronicleStep(input) { return db.runTransaction(async tx => { const r = ref('lineage', 'single'); const change = chronicleMutation((await tx.get(r)).data(), input); if (change.next) tx.set(r, change.next); return change.result; }); },
+    async getScoreboard(now) {
+      return db.runTransaction(async tx => {
+        const lineage = (await tx.get(ref('lineage','single'))).data(), registry = (await tx.get(ref('keeperRegistry','single'))).data();
+        const scores = (await tx.get(ref('scoreboard','single'))).data();
+        const channels = {}, marks = {};
+        for (const id of config?.channels ?? []) { channels[id]=(await tx.get(ref('streamChannels',id))).data(); marks[id]=(await tx.get(ref('markChannels',id))).data(); }
+        return scoreboard(lineage, registry, retainedScores(scores, channels, marks), config ?? { channels: [], logins: {} }, now);
+      });
+    },
     async getRecap() { return recapProjection((await ref('lineage', 'single').get()).data()); },
     async searchPublicMarks(options) { return atlasSearch((await ref('lineage', 'single').get()).data(), options); },
     async getAtlasPage(options) { return atlasPage((await ref('lineage', 'single').get()).data(), options); },

@@ -1,3 +1,4 @@
+import { scoreCompletion } from './scoreboard.js';
 import { hash } from './crypto.js';
 import { runeSvg } from './marks.js';
 import { eligible } from './send-state.js';
@@ -12,7 +13,7 @@ export function publicJourney(lineage) {
 }
 // All inputs are store-owned snapshots. No effects; caller commits every result together.
 export function reduceClaims(registry, channels, marks, previous, chat, now, sentAt = now, presence = {}) {
-  registry = structuredClone(registry); marks = structuredClone(marks); const lineage = structuredClone(previous ?? emptyLineage()); let acknowledgement = null, acknowledgementKind, ackDeadline;
+  registry = structuredClone(registry); marks = structuredClone(marks); const lineage = structuredClone(previous ?? emptyLineage()); let acknowledgement = null, acknowledgementKind, ackDeadline, scoreVote, completedScore;
   // References are private and scoped to source channel/stream/mark/user. Purge
   // permanently when approval/content is removed; never regenerate archived entries.
   for (const stop of lineage.stops) stop.marks = stop.marks.filter(item => {
@@ -56,7 +57,7 @@ export function reduceClaims(registry, channels, marks, previous, chat, now, sen
       if ((chat.broadcasterId === (side === 'offers' ? hop.from : hop.to) || (side === 'offers' && chat.broadcasterId === hop.to && hop.policy === 'preclaim-v1' && presence[hop.from]?.streamId === hop.sourceStreamId && presence[hop.from].actors.some(a => a.id === chat.chatterId && a.seenAt <= sentAt)))
         && !hop[other].includes(chat.chatterId) && !hop[side].includes(chat.chatterId)
         && hop[side].length < (hop.policy === 'preclaim-v1' ? 10 : hop.threshold)) {
-        hop[side].push(chat.chatterId);
+        hop[side].push(chat.chatterId); scoreVote = chat.chatterId;
         if (side === 'offers' && chat.broadcasterId === hop.to) { hop.movedOffers ??= []; hop.movedOffers.push(chat.chatterId); }
         acknowledgement = `${side === 'offers' ? 'Offers' : 'Accepts'} ${hop[side].length}/${hop.threshold}. ${hop.policy === 'preclaim-v1' && !hop.verified ? 'The relic stirs… waiting for Twitch to confirm the raid. Both chats must bind it.' : 'Bound by two chats: keep offering and accepting before the ritual ends.'}`;
       }
@@ -72,6 +73,7 @@ export function reduceClaims(registry, channels, marks, previous, chat, now, sen
             streamId: hop.sourceStreamId, claimedAt: now, raidSize: hop.raidSize, ringIndex: lineage.stops.length + 1,
             marks: approved.map(({ id, userId, text }) => ({ id, userId, text })) });
           if (Buffer.byteLength(JSON.stringify(lineage)) > LINEAGE_LIMITS.bytes) throw new Error('Lineage capacity reached');
+          completedScore = scoreCompletion(hop, [...hop.offers, ...hop.accepts]);
           acknowledgement = 'Claim complete: both chats reached the threshold. Relic transferred; one growth ring recorded.';
           delete registry.echo; registry.holderId = hop.to; registry.carriedClosures = 0; delete registry.send; hop.finalized = true;
           marks[hop.from].context.holdsRelic = false; marks[hop.to].context.holdsRelic = true;
@@ -96,5 +98,5 @@ export function reduceClaims(registry, channels, marks, previous, chat, now, sen
     }
   }
   if (Buffer.byteLength(JSON.stringify(registry)) > 4096) throw new Error('Relic registry capacity reached');
-  return { registry, marks, lineage, acknowledgement, acknowledgementKind, ackDeadline: ackDeadline ?? registry.pendingHop?.endsAt };
+  return { registry, marks, lineage, scoreVote, completedScore, acknowledgement, acknowledgementKind, ackDeadline: ackDeadline ?? registry.pendingHop?.endsAt };
 }

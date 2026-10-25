@@ -15,6 +15,7 @@ import { parseLifecycle } from './lifecycle.js';
 export const MAX_BODY_BYTES = 65536;
 export const REPLAY_WINDOW_MS = 10 * 60 * 1000;
 const assets = new Map([
+  ['/scoreboard.js', ['scoreboard.js', 'text/javascript; charset=utf-8']],
   ['/fonts.css', ['fonts.css', 'text/css; charset=utf-8']],
   ['/fonts/Cinzel.ttf', ['fonts/Cinzel.ttf', 'font/ttf']],
   ['/fonts/OFL-Cinzel.txt', ['fonts/OFL-Cinzel.txt', 'text/plain; charset=utf-8']],
@@ -53,7 +54,7 @@ const assets = new Map([
 const header = (headers, name) => typeof headers[name] === 'string' ? headers[name] : '';
 const result = (status, body = '', type = 'text/plain; charset=utf-8') => ({ status, body, type });
 
-export function createApp({ claimAcks, secret, state = createMemoryState(), now = Date.now, oauth, chatContext, overlayFeed, overlayFeeds, raidPilot = false, releaseCommit, shares, replies, banAuthorized, publicBudget = { burst: 60, perSecond: 1 } } = {}) {
+export function createApp({ scoreAcks, claimAcks, secret, state = createMemoryState(), now = Date.now, oauth, chatContext, overlayFeed, overlayFeeds, raidPilot = false, previewReadOnly = false, releaseCommit, shares, replies, banAuthorized, publicBudget = { burst: 60, perSecond: 1 } } = {}) {
   const keepers = chatContext?.keeperIds ?? (chatContext ? [chatContext.streamerId] : []);
   if (!Array.isArray(keepers) || keepers.length > 4 || (chatContext && !keepers.length)
     || !keepers.every(id => typeof id === 'string' && /^\d{1,32}$/.test(id))
@@ -64,6 +65,8 @@ export function createApp({ claimAcks, secret, state = createMemoryState(), now 
   const release = validateReleaseCommit(releaseCommit);
   // Pure request boundary for tests: rawBody is never reserialized before HMAC.
   async function dispatch({ method, path, headers = {}, rawBody = Buffer.alloc(0) }) {
+    // Preview shares live storage: deny before authentication, DB access or effects.
+    if (previewReadOnly && (method !== 'GET' || path.startsWith('/control/') || path.startsWith('/oauth/') || path.split('?')[0] === '/auth/callback' || path.split('?')[0] === '/eventsub')) return { ...result(403, 'P5 read-only preview. Live chat commands are not enabled on canonical yet.'), headers: { 'cache-control': 'no-store' } };
     if ((path.startsWith('/control/') || path.startsWith('/api/') || path.split('?')[0] === '/auth/callback' || path.startsWith('/oauth/')) && !spend()) return result(429, 'Public request budget reached; retry later');
     if (path.startsWith('/control/')) {
       if (!oauth?.control) return result(503, 'Control not configured');
@@ -74,7 +77,13 @@ export function createApp({ claimAcks, secret, state = createMemoryState(), now 
       return oauth.route({ method, path, headers });
     }
     if (method === 'GET' && path === '/health') {
-      return result(200, JSON.stringify({ status: 'ok', releaseCommit: release, phase: raidPilot ? 'raid-pilot' : 'foundation', readiness: raidPilot ? 'owner-test-ready' : 'not-ready-for-raids', ...(raidPilot ? { liveValidated: false } : {}) }), 'application/json');
+      return result(200, JSON.stringify({ status: 'ok', ...(previewReadOnly ? { preview: 'P5 READ-ONLY PREVIEW; live Twitch chat commands not enabled on canonical yet' } : {}), releaseCommit: release, phase: raidPilot ? 'raid-pilot' : 'foundation', readiness: raidPilot ? 'owner-test-ready' : 'not-ready-for-raids', ...(raidPilot ? { liveValidated: false } : {}) }), 'application/json');
+    }
+    if (path.startsWith('/api/scores')) {
+      if (path !== '/api/scores' || rawBody.length) return result(400, 'Invalid score request');
+      if (method !== 'GET') return result(405, 'Read only');
+      try { return { ...result(200, JSON.stringify({ ...await state.getScoreboard(now()), mode: overlayFeed?.simulator ? 'simulator' : 'live', previewReadOnly }), 'application/json'), headers: { 'cache-control': 'no-store' } }; }
+      catch { return result(503, 'Scores unavailable; previous content must be cleared'); }
     }
     if (path === '/my-marks') {
       if (method !== 'GET') return result(405, 'Read only');
@@ -141,7 +150,7 @@ export function createApp({ claimAcks, secret, state = createMemoryState(), now 
       if (!Number.isInteger(offset) || !Number.isInteger(limit) || limit < 1) return result(400, 'Invalid paging');
       try {
         const page = await state.getAtlasPage({ stopId: match[1], offset, limit });
-        return page ? result(200, JSON.stringify({ ...page, pilotEnabled: raidPilot, mode: overlayFeed?.simulator ? 'simulator' : 'live' }), 'application/json') : result(404, 'Stop not found');
+        return page ? result(200, JSON.stringify({ ...page, pilotEnabled: raidPilot, ...(previewReadOnly ? { previewReadOnly: true } : {}), mode: overlayFeed?.simulator ? 'simulator' : 'live' }), 'application/json') : result(404, 'Stop not found');
       } catch { return result(503, 'Atlas unavailable; clear previous data and refresh later'); }
     }
     if (/^\/stops\/[a-f0-9]{64}$/.test(path)) {
@@ -167,7 +176,8 @@ export function createApp({ claimAcks, secret, state = createMemoryState(), now 
     }
     if (method === 'GET' && assets.has(path)) {
       const [file, type] = assets.get(path);
-      return result(200, await readFile(new URL(`../public/${file}`, import.meta.url)), type);
+      const bytes = await readFile(new URL(`../public/${file}`, import.meta.url));
+      return result(200, previewReadOnly && file === 'atlas.html' ? bytes.toString().replace('<body>', '<body><aside role="status">P5 READ-ONLY PREVIEW · Live Twitch chat commands are not enabled on canonical yet.</aside>') : bytes, type);
     }
     if (path !== '/eventsub') return result(404, 'Not found');
     if (method !== 'POST') return result(405, 'Method not allowed');
@@ -232,6 +242,7 @@ export function createApp({ claimAcks, secret, state = createMemoryState(), now 
     if (share && replies) {
       try { await replies.processPending(chat.broadcasterId, shareRequestHash(chat)); } catch { /* No sensitive diagnostics or post-response worker. */ }
     }
+    if (scoreAcks && chat && !chat.isBot && !chat.copied && ['scores-on','scores-off','top','badges'].includes(chat.markAction?.type)) { try { await scoreAcks.process(chat.broadcasterId, ackKey(chat)); } catch {} }
     if (claimAcks && chat && !chat.isBot && !chat.copied && ['offer', 'accept'].includes(chat.markAction?.type)) {
       try { await claimAcks.process(chat.broadcasterId, ackKey(chat)); } catch {}
     }

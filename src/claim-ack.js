@@ -11,7 +11,7 @@ export function ackDocument(previous, chat, message, channel, marks, now, deadli
     || [...(channel.blockedUserIds ?? []), ...(marks?.blocked ?? [])].some(id => row.actorKey === actorKey(chat?.broadcasterId ?? '', id)))) {
     row.status = 'cancelled'; delete row.message; delete row.actorKey; delete row.ackUntil;
   }
-  if (chat && ['offer', 'accept'].includes(chat.markAction?.type) && !chat.isBot && !chat.copied) {
+  if (chat && ['offer', 'accept', 'scores-on', 'scores-off', 'top', 'badges'].includes(chat.markAction?.type) && !chat.isBot && !chat.copied) {
     const key = ackKey(chat);
     if (!doc.rows.some(r => r.key === key)) {
       if (kind === 'closed' && doc.rows.some(r=>r.closedRateKey===actorKey(chat.broadcasterId,chat.chatterId)&&r.closedRateUntil>now)) message = null;

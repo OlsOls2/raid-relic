@@ -19,6 +19,8 @@ export async function createRuntime(env, { firestoreClient, transport, chronicle
   const production = env.NODE_ENV === 'production';
   if (production && simulator) throw new Error('Simulator forbidden in production');
   const releaseCommit = validateReleaseCommit(env.RELEASE_COMMIT, { required: production });
+  if (env.P5_PREVIEW_READ_ONLY && !['true','false'].includes(env.P5_PREVIEW_READ_ONLY)) throw Error('Explicit preview gate required');
+  const previewReadOnly = env.P5_PREVIEW_READ_ONLY === 'true';
   const raidPilot = env.RAID_PILOT_ENABLED === 'true';
   if (env.RAID_PILOT_ENABLED && !['true', 'false'].includes(env.RAID_PILOT_ENABLED)) throw new Error('Explicit pilot gate required');
   let state; let store;
@@ -56,7 +58,7 @@ export async function createRuntime(env, { firestoreClient, transport, chronicle
   const sendOff = oauth ? createSendOff({ state, oauth, clientId: env.TWITCH_CLIENT_ID, streamerId: env.TWITCH_STREAMER_ID, transport, now }) : undefined;
   const shares = oauth ? createMarkShares({ key: env.TOKEN_ENCRYPTION_KEY, channels: keeperIds, origin: new URL(env.OAUTH_REDIRECT_URI).origin, now }) : undefined;
   let replies; const bots = {};
-  let pilot, claimAcks; const sends = {}; const subscriptionManagers = {};
+  let pilot, claimAcks, scoreAcks; const sends = {}; const subscriptionManagers = {};
   if (raidPilot) {
     for (const id of keeperIds) {
       const scoped = { accessToken: (role, options) => role === 'streamer' ? oauth.accessTokenForKeeper(id, options) : oauth.accessToken(role, options) };
@@ -66,6 +68,7 @@ export async function createRuntime(env, { firestoreClient, transport, chronicle
       subscriptionManagers[id] = createSubscriptionManager({ oauth: scoped, bot: channelBot, clientId: env.TWITCH_CLIENT_ID, clientSecret: env.TWITCH_CLIENT_SECRET, streamerId: id, transport });
       sends[id] = createSendOff({ state, oauth: scoped, clientId: env.TWITCH_CLIENT_ID, streamerId: id, transport, now, authorize: source => pilot.authorizeSend(source) });
     }
+    scoreAcks = createClaimAcks({ state: { claimAckStep: (...args) => state.scoreAckStep(...args) }, bots, now });
     claimAcks = createClaimAcks({ state, bots, now });
     const chronicle = createChronicle({ state, enabled: env.CHRONICLE_ENABLED === 'true', allowPaid: env.CHRONICLE_ALLOW_PAID === 'true',
       key: env.OPENAI_API_KEY, transport: chronicleHTTP, claimId: randomUUID });
@@ -74,7 +77,7 @@ export async function createRuntime(env, { firestoreClient, transport, chronicle
     pilot = createPilot({ replies, forge, chronicle, state, store, oauth, subscriptions: subscriptionManagers, sends, now, simulator, clientId: env.TWITCH_CLIENT_ID, transport });
     oauth.control.bindPilot(pilot);
   }
-  return { ...createApp({ claimAcks, shares, replies, banAuthorized: async host => { const proof = (await store.getJob(host))?.banCapability; return proof?.scope === 'channel:moderate' && proof.expiresAt > now(); }, secret: env.TWITCH_EVENTSUB_SECRET, state, oauth, overlayFeed, overlayFeeds, raidPilot, now, releaseCommit: releaseCommit ?? undefined,
+  return { ...createApp({ previewReadOnly, scoreAcks, claimAcks, shares, replies, banAuthorized: async host => { const proof = (await store.getJob(host))?.banCapability; return proof?.scope === 'channel:moderate' && proof.expiresAt > now(); }, secret: env.TWITCH_EVENTSUB_SECRET, state, oauth, overlayFeed, overlayFeeds, raidPilot, now, releaseCommit: releaseCommit ?? undefined,
     chatContext: oauth ? { streamerId: env.TWITCH_STREAMER_ID, botId: env.TWITCH_BOT_ID, keeperIds } : undefined }), claimAcks, oauth, bot, store, subscriptions, sendOff, overlayFeed, overlayFeeds, pilot, shares, replies, subscriptionManagers, sends,
     overlayOrigins: production ? [env.OVERLAY_ORIGIN].filter(Boolean) : ['http://localhost:5191', 'http://127.0.0.1:5191'] };
 }
