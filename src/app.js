@@ -1,6 +1,7 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { createMemoryState } from './state.js';
+import { parseChat } from './bot.js';
 
 export const MAX_BODY_BYTES = 65536;
 export const REPLAY_WINDOW_MS = 10 * 60 * 1000;
@@ -13,9 +14,13 @@ const assets = new Map([
 const header = (headers, name) => typeof headers[name] === 'string' ? headers[name] : '';
 const result = (status, body = '', type = 'text/plain; charset=utf-8') => ({ status, body, type });
 
-export function createApp({ secret, state = createMemoryState(), now = Date.now } = {}) {
+export function createApp({ secret, state = createMemoryState(), now = Date.now, oauth, chatContext } = {}) {
   // Pure request boundary for tests: rawBody is never reserialized before HMAC.
   async function dispatch({ method, path, headers = {}, rawBody = Buffer.alloc(0) }) {
+    if (path.startsWith('/oauth/')) {
+      if (!oauth) return result(503, 'OAuth not configured');
+      return oauth.route({ method, path, headers });
+    }
     if (method === 'GET' && path === '/health') {
       return result(200, JSON.stringify({ status: 'ok' }), 'application/json');
     }
@@ -50,21 +55,26 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now 
     if (type !== 'notification' && type !== 'revocation') return result(400, 'Unsupported message type');
     const subscription = payload.subscription;
     if (!subscription || typeof subscription.type !== 'string') return result(400, 'Missing subscription');
-    let raid;
+    let raid; let chat;
     if (type === 'notification') {
-      if (subscription.type !== 'channel.raid' || subscription.version !== '1') return result(400, 'Unsupported subscription');
-      raid = payload.event;
-      if (!raid || !['from_broadcaster_user_id', 'to_broadcaster_user_id'].every(key => typeof raid[key] === 'string' && /^\d+$/.test(raid[key]))
-        || !Number.isInteger(raid.viewers) || raid.viewers < 0) return result(400, 'Invalid raid');
+      if (subscription.type === 'channel.chat.message') {
+        if (!chatContext) return result(503, 'Chat not configured');
+        try { chat = parseChat(payload, chatContext); } catch { return result(400, 'Invalid chat'); }
+      } else {
+        if (subscription.type !== 'channel.raid' || subscription.version !== '1') return result(400, 'Unsupported subscription');
+        raid = payload.event;
+        if (!raid || !['from_broadcaster_user_id', 'to_broadcaster_user_id'].every(key => typeof raid[key] === 'string' && /^\d+$/.test(raid[key]))
+          || !Number.isInteger(raid.viewers) || raid.viewers < 0) return result(400, 'Invalid raid');
+      }
     }
-    const accepted = await state.accept({ id, now: receivedAt, expiresAt: sentAt + REPLAY_WINDOW_MS, raid });
+    const accepted = await state.accept({ id, now: receivedAt, expiresAt: sentAt + REPLAY_WINDOW_MS, raid, chat });
     if (accepted === 'full') return result(503, 'Event capacity reached');
     return result(204);
   }
 
   async function handler(req, res) {
-    const send = ({ status, body, type }) => {
-      const headers = { 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' };
+    const send = ({ status, body, type, headers: extraHeaders }) => {
+      const headers = { ...extraHeaders, 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' };
       // 204 responses have no content or body framing headers.
       if (status === 204) {
         res.writeHead(status, headers);
