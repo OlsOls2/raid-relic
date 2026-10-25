@@ -46,7 +46,7 @@ function sync(registry, channel, marks, host) {
 }
 
 // Called inside one store transaction, including event dedupe. No external effects.
-export function reduceLifecycle({ registry, channel, marks, host, event, chat, policy, now, sentAt }) {
+export function reduceLifecycle({ registry, channel, marks, host, event, chat, policy, now, sentAt, observed = false }) {
   registry = structuredClone(registry ?? emptyRegistry());
   if (event || chat?.markAction || policy) delete registry.echo;
   channel = structuredClone(channel ?? emptyChannel());
@@ -62,7 +62,13 @@ export function reduceLifecycle({ registry, channel, marks, host, event, chat, p
     channel.banned = policy.banned || channel.banCapacityReached === true; channel.blockedUserIds = [...new Set([...policy.blockedUserIds, ...(channel.observedBans ?? [])])];
     if (channel.blockedUserIds.length > 128) throw Error('Policy capacity reached');
   }
-  if (event?.type === 'online' && event.sentAt > channel.lifecycleAt && event.startedAt > channel.closedThrough
+  // Twitch start times may be second-precision. A later signed receipt can
+  // establish a distinct stream in the same second as the offline watermark.
+  // A CAS-verified fresh Helix read may also recover a distinct stream whose
+  // delayed offline delivery crossed its start; known closed IDs never revive.
+  if (event?.type === 'online' && event.sentAt > channel.lifecycleAt && (event.startedAt > channel.closedThrough
+      || (event.startedAt >= Math.floor(channel.closedThrough / 1000) * 1000)
+      || (observed && !channel.online && (!channel.retiredStream || event.startedAt > channel.retiredStream.startedAt)))
     && !channel.closedIds.includes(event.streamId) && event.streamId !== channel.streamId
     && (!channel.online || event.startedAt > channel.startedAt)) {
     if (channel.online) { countHolderClosure(); closeStream(channel, marks); }

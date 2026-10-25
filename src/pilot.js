@@ -1,3 +1,4 @@
+import { reservationReason } from './send-state.js';
 import { subscriptionFailureDiagnostic } from './subscriptions.js';
 import { randomBytes } from 'node:crypto';
 import { hash } from './crypto.js';
@@ -14,12 +15,23 @@ export function createPilot({ replies, forge, chronicle, state, store, oauth, su
     return state.accept({ id: `owner:${randomBytes(24).toString('hex')}`, now: time, sentAt: time, expiresAt: time + 600000,
       chat: { broadcasterId: id, chatterId: id, markAction: action } });
   }
+  async function blocked(id, reason) {
+    try { await logger(JSON.stringify({ severity: 'WARNING', event: 'raid_relic_send_blocked', keeperId: id, reason })); } catch {}
+    return { status: 'blocked', reason, message: 'Send Off blocked: ' + reason + '. Refresh both channel statuses; do not retry accepted/unknown dispatches.' };
+  }
   async function readiness(id) {
     const other = ids.find(candidate => candidate !== id);
     if ((await store.getJob(id))?.ready !== true || (await store.getJob(other))?.ready !== true)
       throw new Error('Both channels need five enabled subscriptions; Bootstrap / reconcile each channel again after callbacks verify');
     try { await oauth.accessTokenForKeeper(id); await oauth.accessTokenForKeeper(other); await oauth.accessToken('bot'); }
     catch { throw new Error('Both Keeper grants and bot grant required; reconnect the affected account and reconcile'); }
+  }
+  async function eligibility(id) {
+    const channels = {}, marks = {};
+    for (const key of ids) { channels[key] = await state.getStreamStatus(key); marks[key] = await state.getPrivateMarks(key, { broadcasterId: key, chatterId: key }); }
+    const target = ids.find(key => key !== id);
+    const reason = reservationReason(await state.getKeeperRegistry(), channels, marks, { channels: ids, logins: Object.fromEntries(ids.map(key => [KEEPERS[key], key])) }, { source: id, actor: id, login: KEEPERS[target], sentAt: now() }, now());
+    return { eligible: reason === null, reason, observedOnline: Object.fromEntries(ids.map(key => [KEEPERS[key], channels[key]?.online === true])) };
   }
   async function bootstrap(id) {
     const owner = randomBytes(24).toString('hex');
@@ -68,17 +80,26 @@ export function createPilot({ replies, forge, chronicle, state, store, oauth, su
       if (action === 'chronicle') return chronicle.write(id);
       if (action === 'mark-links') return replies.processPending(id);
       if (action === 'bootstrap') return bootstrap(id);
-      if (action === 'process') {
-        const intent = (await state.getKeeperRegistry()).send;
-        if (intent?.sourceId === id && ['queued', 'preflight'].includes(intent.status)) { try { await readiness(id); } catch (error) { return { status: 'blocked', message: error.message }; } }
-        return sends[id].processPending();
-      }
-      if (action.startsWith('send:')) {
-        const target = action.slice(5);
-        try { await readiness(id); } catch (error) { return { status: 'blocked', message: error.message }; }
-        await mutate(id, { type: 'send', login: KEEPERS[target] });
-        // The HTTP request awaits the worker; never detached/post-response CPU.
-        return sends[id].processPending();
+      if (action === 'process' || action.startsWith('send:')) {
+        try {
+          let intentId;
+          if (action === 'process') {
+            const intent = (await state.getKeeperRegistry()).send;
+            if (!intent || intent.sourceId !== id) return blocked(id, 'no-own-queued-intent');
+            if (!['queued', 'preflight'].includes(intent.status)) return blocked(id, 'intent-reconcile-only');
+            intentId = intent.id;
+          }
+          try { await readiness(id); } catch (error) { return blocked(id, error.message.startsWith('Both channels') ? 'subscriptions-not-ready' : 'grants-unavailable'); }
+          if (action.startsWith('send:')) {
+            const target = action.slice(5);
+            const reserved = await mutate(id, { type: 'send', login: KEEPERS[target] });
+            if (reserved?.status !== 'reserved') return blocked(id, reserved?.reason ?? 'reservation-unavailable');
+            intentId = reserved.intentId;
+          }
+          const outcome = await sends[id].processPending(intentId);
+          if (outcome.status !== 'accepted') return blocked(id, outcome.status === 'unknown' ? 'dispatch-unknown' : outcome.status === 'rejected-preflight' ? 'preflight-rejected' : outcome.status === 'rejected' ? 'dispatch-rejected' : 'worker-reconcile-only');
+          return outcome;
+        } catch { return blocked(id, 'request-outcome-unavailable'); }
       }
       await mutate(id, action === 'pause' || action === 'resume' ? { type: 'pause', paused: action === 'pause' } : { type: action });
       return { status: 'processed', action };
@@ -90,6 +111,7 @@ export function createPilot({ replies, forge, chronicle, state, store, oauth, su
         bothReadiness: Object.fromEntries(await Promise.all(ids.map(async keeper => [KEEPERS[keeper], (await store.getJob(keeper))?.ready === true]))),
         ownerStep: 'Wait for both readiness flags true; Bootstrap / reconcile pending channels after callback verification. Reconnect missing grants.',
         recovery: registry.send?.sourceId === id ? { intentId: registry.send.id, generation: registry.send.generation ?? null, status: registry.send.status, dispatchMarked: Object.hasOwn(registry.send, 'dispatchAt'), claimed: Object.hasOwn(registry.send, 'owner') || Object.hasOwn(registry.send, 'leaseUntil'), canCancel: registry.holderId === id && typeof registry.send.generation === 'string' && registry.send.status === 'queued' && !Object.hasOwn(registry.send, 'dispatchAt') && !Object.hasOwn(registry.send, 'owner') && !Object.hasOwn(registry.send, 'leaseUntil'), instruction: 'Never clear or retry accepted/unknown/claimed/processing outcomes. Operator read-only reconciliation only.' } : null,
+        eligibility: await eligibility(id),
         holder: registry.holderId, subscriptions: await store.getJob(id), intent: registry.send?.sourceId === id ? registry.send.status : null,
         handoff: handoffView(registry, id, now()) };
     },

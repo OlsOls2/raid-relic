@@ -19,12 +19,13 @@ export function sendState(previous, channels, marks, config, op, now) {
   const intent = registry.send;
   if (op.type === 'reserve') {
     const targetId = config.logins[op.login];
-    if (op.actor === op.source && targetId && !busy(intent) && !((registry.pendingHop?.endsAt > now && !registry.pendingHop.finalized && !registry.pendingHop.cancelled))
-      && op.sentAt > (registry.sendWatermark ?? -1) && eligible(registry, channels, marks, op.source, targetId)
-      && op.sentAt >= Math.max(channels[op.source].startedAt, channels[targetId].startedAt, channels[op.source].consentAt, channels[targetId].consentAt)) {
+    const reason = reservationReason(registry, channels, marks, config, op, now);
+    if (reason) result = { status: 'blocked', reason };
+    else {
       registry.send = { id: hash(op.id), generation: hash(`send-generation:${op.id}:${op.sentAt}`), sourceId: op.source, targetId, targetLogin: op.login, status: 'queued', createdAt: now,
         sourceStreamId: channels[op.source].streamId, targetStreamId: channels[targetId].streamId, expiresAt: now + SEND_LIMITS.queueMs };
       registry.sendWatermark = op.sentAt;
+      result = { status: 'reserved', intentId: registry.send.id };
     }
   }
   if (op.type === 'cancel-queued' && config.channels.includes(op.source) && op.actor === op.source && registry.holderId === op.source && intent?.sourceId === op.source && intent.id === op.id && typeof intent.generation === 'string' && intent.generation === op.generation) {
@@ -34,7 +35,7 @@ export function sendState(previous, channels, marks, config, op, now) {
       intent.status = 'rejected'; result = { status: 'cancelled-undispatched' };
     }
   }
-  if (op.type === 'claim' && intent?.sourceId === op.source) {
+  if (op.type === 'claim' && intent?.sourceId === op.source && (!op.expectedId || intent.id === op.expectedId)) {
     if (intent.status === 'dispatching' && intent.leaseUntil <= now) intent.status = 'unknown';
     if (['queued', 'preflight'].includes(intent.status) && (intent.status === 'queued' || intent.leaseUntil <= now)) {
       if (intent.expiresAt <= now) intent.status = 'rejected';
@@ -77,4 +78,26 @@ export function sendState(previous, channels, marks, config, op, now) {
   }
   if (Buffer.byteLength(JSON.stringify(registry)) > 4096) throw new Error('Relic registry capacity reached');
   return { registry, result, ritual };
+}
+
+// Closed enums only: safe to expose in private controls/logs; never upstream data.
+export function reservationReason(registry, channels, marks, config, op, now) {
+  const target = config.logins[op.login];
+  if (!config.channels.includes(op.source) || op.actor !== op.source) return 'source-actor';
+  if (!target || target === op.source) return 'target-config';
+  if (busy(registry.send)) return 'existing-intent';
+  if (registry.pendingHop?.endsAt > now && !registry.pendingHop.finalized && !registry.pendingHop.cancelled) return 'pending-handoff';
+  if (!Number.isFinite(op.sentAt) || op.sentAt <= (registry.sendWatermark ?? -1)) return 'send-watermark';
+  if (registry.holderId !== op.source) return 'source-not-holder';
+  for (const [role, id] of [['source', op.source], ['target', target]]) {
+    const c = channels[id], m = marks[id];
+    if (!c?.online || !c.streamId) return role + '-offline';
+    if (!c.optedIn || m?.context?.optedIn !== true) return role + '-consent';
+    if (c.paused || m?.paused) return role + '-paused';
+    if (c.banned || c.blockedUserIds.includes(id) || m?.blocked?.includes(id) || m?.context?.blockedUserIds?.includes(id)) return role + '-blocked';
+    if (!m?.context || m.context.keeperId !== id || m.context.streamId !== c.streamId || (role === 'source' && m.context.holdsRelic !== true)) return role + '-mark-context';
+    if (!Number.isFinite(c.startedAt) || !Number.isFinite(c.consentAt) || op.sentAt < Math.max(c.startedAt, c.consentAt)) return role + '-timestamp';
+  }
+  if (!eligible(registry, channels, marks, op.source, target)) return 'cross-channel-block';
+  return null;
 }
