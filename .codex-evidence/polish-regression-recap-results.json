@@ -1,0 +1,31 @@
+{
+  "simulator": true,
+  "passed": true,
+  "checks": [
+    {
+      "name": "Fresh SVG and actual1200x630 PNG downloads from labelled Simulator card",
+      "pass": true
+    },
+    {
+      "name": "375px full route and fresh privacy erasure",
+      "pass": true
+    },
+    {
+      "name": "Read failure clears prior snapshot; persistent Simulator label",
+      "pass": true
+    }
+  ],
+  "downloadsVerified": [
+    "SVG",
+    "PNG"
+  ],
+  "downloadsStorage": "unique owned standard Downloads child; no private-tmp fallback",
+  "downloadsRetainedBecauseBrowserCloseFailed": false,
+  "captures": [
+    "recap-empty-before",
+    "recap-desktop-after",
+    "recap-mobile-after",
+    "recap-erased-after"
+  ],
+  "failure": null
+}

@@ -1,0 +1,27 @@
+{
+  "simulator": true,
+  "passed": true,
+  "checks": [
+    {
+      "name": "Labelled mock setup/API/receipt/two-chat claim and preview",
+      "pass": true
+    },
+    {
+      "name": "Shared search/template fiction/stop detail and post-forget privacy",
+      "pass": true
+    },
+    {
+      "name": "Reset isolation/rebound feeds and 375px layout",
+      "pass": true
+    }
+  ],
+  "captures": [
+    "judges-before",
+    "judges-incoming",
+    "judges-after",
+    "judges-stop-after",
+    "judges-reset-after",
+    "judges-mobile-after"
+  ],
+  "failure": null
+}

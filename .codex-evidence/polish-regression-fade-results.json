@@ -1,0 +1,20 @@
+{
+  "simulator": true,
+  "passed": true,
+  "checks": [
+    {
+      "name": "Actual kernel closures: bright at0/2, dim at3; accessible retained-content explanation",
+      "pass": true
+    },
+    {
+      "name": "Reconnect converges; self-forget removes faded rune",
+      "pass": true
+    }
+  ],
+  "captures": [
+    "fade-simulator-before",
+    "fade-simulator-after2",
+    "fade-simulator-after3"
+  ],
+  "failure": null
+}

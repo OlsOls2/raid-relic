@@ -1,0 +1,195 @@
+{
+  "generatedAt": "2026-10-25T09:12:16.238Z",
+  "branch": "feature/raid-relic-polish",
+  "sourceCommit": "aa7d566fc4f8dfa49044feb8052e13bbd8575b7f",
+  "codexSession": "01a1705c-a87d-7143-80f6-021e47b78ced",
+  "scope": "Local labelled Simulator only. No deployment, traffic, cloud, live raid/chat, physical OBS or provider validation.",
+  "productionActionsPerformed": false,
+  "hostTests": {
+    "total": 330,
+    "passed": 330,
+    "skipped": 0,
+    "failed": 0
+  },
+  "productionDependencyAuditVulnerabilities": 0,
+  "releaseFileCount": 55,
+  "workflows": [
+    {
+      "file": "artifacts/browser-results.json",
+      "passed": true,
+      "checks": 13,
+      "sha256": "787cc04eacb91cc471a2e5ea27ca1a7e6b2f81de71ffcbecd57159c8eabfa245",
+      "evidenceFile": ".codex-evidence/polish-regression-atlas-results.json"
+    },
+    {
+      "file": "artifacts/pilot-browser-results.json",
+      "passed": true,
+      "checks": 8,
+      "sha256": "8660f37fe42372043137e354b4e5f59f7c6ec5fa6fae5cffbe21ee9942e71814",
+      "evidenceFile": ".codex-evidence/polish-regression-pilot-results.json"
+    },
+    {
+      "file": "artifacts/judges-browser-results.json",
+      "passed": true,
+      "checks": 3,
+      "sha256": "197e90dcfb15c8b6f0bb739b0b64f63066b977bdbeec02f918216520d6f57578",
+      "evidenceFile": ".codex-evidence/polish-regression-judges-results.json"
+    },
+    {
+      "file": "artifacts/recap-browser-results.json",
+      "passed": true,
+      "checks": 3,
+      "sha256": "7dffe749653142a412aa36119a1a0354b264470c5f40a7dddc64ad19fca58c46",
+      "evidenceFile": ".codex-evidence/polish-regression-recap-results.json"
+    },
+    {
+      "file": "artifacts/forge-browser-results.json",
+      "passed": true,
+      "checks": 2,
+      "sha256": "305daf0c5117fedf5b4bb4a5f53f837f82261d982f2a203d9c74d313507bf1c5",
+      "evidenceFile": ".codex-evidence/polish-regression-forge-results.json"
+    },
+    {
+      "file": "artifacts/fade-browser-results.json",
+      "passed": true,
+      "checks": 2,
+      "sha256": "be113094b79a6a6980003f0e6a51ed028d44fb80282e5a2775a96a7eef917d39",
+      "evidenceFile": ".codex-evidence/polish-regression-fade-results.json"
+    },
+    {
+      "file": "artifacts/resonance-browser-results.json",
+      "passed": true,
+      "checks": 2,
+      "sha256": "aa898baddb4335f8dc65bcc6487c622fcc50bfd3361a8ef2cca475d3f0ff1fb2",
+      "evidenceFile": ".codex-evidence/polish-regression-resonance-results.json"
+    },
+    {
+      "file": "artifacts/polish-browser-results.json",
+      "passed": true,
+      "checks": 4,
+      "sha256": "3e0ed2860d644f7001e2d780921f96ec477aab21d2d40cba7caeae620f9ce65d",
+      "evidenceFile": ".codex-evidence/polish-browser-results.json"
+    }
+  ],
+  "sourceFiles": [
+    {
+      "file": "public/atlas.css",
+      "sha256": "afd6b7c424b9768b21e7b5145720a8ee092f0bd07eba43b91cfe6ca14ef6f909"
+    },
+    {
+      "file": "public/atlas.html",
+      "sha256": "51dab3c611270451e7e3001f1b8b94c85c19e895cb6f918f20fb2c03bf91ba97"
+    },
+    {
+      "file": "public/atlas.js",
+      "sha256": "9a340cdecb369e339b39195dad758bd24590a4b657fe5b75d1f48455ac36cd58"
+    },
+    {
+      "file": "public/overlay.css",
+      "sha256": "43f7d80ef65829603427fb688357f575665047276f1d5d3f28c6c8bda98e797b"
+    },
+    {
+      "file": "public/overlay-live.html",
+      "sha256": "4385117f01b2f8a9a8dab279cd7004d27807497a17b774228dbdf33b8bb63286"
+    },
+    {
+      "file": "public/overlay.js",
+      "sha256": "294374ca2eb117cfe49723ff86ab3f2e558172d79254134127c4563ef7795aec"
+    },
+    {
+      "file": "scripts/browser-smoke-polish.js",
+      "sha256": "078322eab151000475e29e05857ddb5185e1a152f2d6ff7af5ba7aa032dcb3e8"
+    }
+  ],
+  "captures": [
+    {
+      "file": ".codex-evidence/polish-simulator-atlas-empty-1920.png",
+      "width": 1920,
+      "height": 1671,
+      "bytes": 204603,
+      "sha256": "b2e4f79fb4e21f94edbb2df38d84c3fdea3d6a1418d48d6434e79d365260d8e3",
+      "mode": "simulator"
+    },
+    {
+      "file": ".codex-evidence/polish-simulator-new-channel-1920.png",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 87394,
+      "sha256": "6c37f429e368a5b08265657ca361fa6485619fc56f44ff84a309cb210eabf53a",
+      "mode": "simulator"
+    },
+    {
+      "file": ".codex-evidence/polish-simulator-new-channel-480.png",
+      "width": 480,
+      "height": 720,
+      "bytes": 57662,
+      "sha256": "938bb96b41ce5ec67bc7b45c77d892b920dec1e46bfffc6c364915a842f5c098",
+      "mode": "simulator"
+    },
+    {
+      "file": ".codex-evidence/polish-simulator-new-channel-waiting-corner-160.png",
+      "width": 160,
+      "height": 160,
+      "bytes": 10782,
+      "sha256": "609085413fe5808dacec5e7ed15576a62b64666dcfffaa1a488a44396d200775",
+      "mode": "simulator"
+    },
+    {
+      "file": ".codex-evidence/polish-simulator-atlas-empty-375.png",
+      "width": 375,
+      "height": 2108,
+      "bytes": 147881,
+      "sha256": "6351f1f1f350324c41beaa03810e16b5123c8b581bd824d81a57d6bf2ed7fce0",
+      "mode": "simulator"
+    },
+    {
+      "file": ".codex-evidence/polish-simulator-verified-arrival-1920.png",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 63562,
+      "sha256": "fe876fd649850f033c67222ca174722fecad7a01c2aef6ee6cc14a704ea062d9",
+      "mode": "simulator"
+    },
+    {
+      "file": ".codex-evidence/polish-simulator-claimed-1920.png",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 93370,
+      "sha256": "f99f1b2e2fe082d701a28dfa46236743d781baa1a60cabb0bd6bf8358bed8ae4",
+      "mode": "simulator"
+    },
+    {
+      "file": ".codex-evidence/polish-simulator-atlas-populated-1920.png",
+      "width": 1920,
+      "height": 1823,
+      "bytes": 216761,
+      "sha256": "8f5fca97b2f6025f3e453ea7748f5307f2b9ad86936a9ef14e39d45e87fbbb64",
+      "mode": "simulator"
+    },
+    {
+      "file": ".codex-evidence/polish-simulator-atlas-populated-viewport-1920x1080.png",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 157999,
+      "sha256": "1247462437f9da4f2e0f433a5ce7654b6abed2b2d1957eedac8065c051a1966a",
+      "mode": "simulator"
+    },
+    {
+      "file": ".codex-evidence/polish-simulator-search-375.png",
+      "width": 375,
+      "height": 2483,
+      "bytes": 164178,
+      "sha256": "db50395b949785238a6e1a41f7fe12381550453b2f5c15e2c96b27d4fa849083",
+      "mode": "simulator"
+    },
+    {
+      "file": ".codex-evidence/polish-simulator-corner-160.png",
+      "width": 160,
+      "height": 160,
+      "bytes": 13415,
+      "sha256": "3ade21a4cd859389550eab0537420348fc7eca6a06db5ff9a905fb4dca46fd67",
+      "mode": "simulator"
+    }
+  ],
+  "knownGap": "Public approved-text search is not authenticated account-name lookup or a complete personal lifetime route. Identity/consent design and data mapping are not implemented."
+}

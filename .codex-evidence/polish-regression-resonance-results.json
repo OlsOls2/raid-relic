@@ -1,0 +1,20 @@
+{
+  "simulator": true,
+  "passed": true,
+  "checks": [
+    {
+      "name": "Reduced-motion outline, faded rune unchanged, reconnect seeks expiry",
+      "pass": true
+    },
+    {
+      "name": "Copied moderator command suppressed; ordinary-motion echo cancelled by privacy commit",
+      "pass": true
+    }
+  ],
+  "captures": [
+    "resonance-simulator-before",
+    "resonance-simulator-during",
+    "resonance-simulator-after"
+  ],
+  "failure": null
+}

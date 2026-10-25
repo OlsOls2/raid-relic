@@ -1,0 +1,110 @@
+{
+  "passed": true,
+  "simulator": true,
+  "checks": [
+    {
+      "name": "Shared approved-text search uses POST without URL change",
+      "pass": true
+    },
+    {
+      "name": "Missing optional Chronicle preserves literal XSS mark gallery",
+      "pass": true
+    },
+    {
+      "name": "Optional Chronicle HTML stays literal; malformed caption preserves gallery",
+      "pass": true
+    },
+    {
+      "name": "Overlay corner 160px",
+      "width": 160,
+      "scrollWidth": 160,
+      "overflow": [],
+      "pass": true
+    },
+    {
+      "name": "Corner 160×160 and essential labels",
+      "width": 160,
+      "height": 160,
+      "scrollHeight": 160,
+      "labels": [
+        {
+          "id": "simulator",
+          "text": "Local simulator · test data",
+          "visible": true
+        },
+        {
+          "id": "compact-status",
+          "text": "Incoming · claim pending",
+          "visible": true
+        },
+        {
+          "id": "compact-count",
+          "text": "Charge 0/160 · Rings 1",
+          "visible": true
+        },
+        {
+          "id": "compact-handoff",
+          "text": "Local 88s · O0/2 A0/2",
+          "visible": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "name": "Atlas 375px",
+      "width": 375,
+      "scrollWidth": 375,
+      "overflow": [],
+      "pass": true
+    },
+    {
+      "name": "Search results 375px",
+      "width": 375,
+      "scrollWidth": 375,
+      "overflow": [],
+      "pass": true
+    },
+    {
+      "name": "Communities stays whole at 375px",
+      "rectangles": 1,
+      "width": 219.15625,
+      "available": 331,
+      "pass": true
+    },
+    {
+      "name": "Stop 375px",
+      "width": 375,
+      "scrollWidth": 375,
+      "overflow": [],
+      "pass": true
+    },
+    {
+      "name": "Default and sound=0 construct no AudioContext",
+      "pass": true
+    },
+    {
+      "name": "Sound opt-in corner 160px",
+      "width": 160,
+      "scrollWidth": 160,
+      "overflow": [],
+      "pass": true
+    },
+    {
+      "name": "Only explicit local gesture constructs opted-in context; no listening proof",
+      "pass": true
+    },
+    {
+      "name": "Browser errors",
+      "pass": true
+    }
+  ],
+  "captures": [
+    "atlas-after",
+    "stop-after",
+    "overlay-corner-after",
+    "atlas-mobile-after",
+    "stop-mobile-after",
+    "overlay-sound-corner-after"
+  ],
+  "failure": null
+}

@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "simulator": true,
+  "checks": [
+    {
+      "name": "Local HTTPS and Secure __Host Keeper cookies",
+      "passed": true
+    },
+    {
+      "name": "Bootstrap / reconcile this channel",
+      "status": "reconciled",
+      "passed": true
+    },
+    {
+      "name": "Opt in / Keep",
+      "status": "processed",
+      "passed": true
+    },
+    {
+      "name": "Bootstrap / reconcile this channel",
+      "status": "reconciled",
+      "passed": true
+    },
+    {
+      "name": "Opt in / Keep",
+      "status": "processed",
+      "passed": true
+    },
+    {
+      "name": "Send Off to olsols2",
+      "status": "accepted",
+      "passed": true
+    },
+    {
+      "name": "Verified fake raid preview before claims; API acceptance is not travel",
+      "passed": true
+    },
+    {
+      "name": "Two mocked consents, own controls, single mocked raid, claim and both overlays",
+      "passed": true
+    }
+  ],
+  "captures": [
+    "pilot-control-1591805230",
+    "pilot-control-1591806023",
+    "pilot-incoming-preview",
+    "pilot-overlay-1591805230",
+    "pilot-overlay-1591806023"
+  ],
+  "failure": null
+}

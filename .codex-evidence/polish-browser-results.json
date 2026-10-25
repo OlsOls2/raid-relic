@@ -1,0 +1,36 @@
+{
+  "simulator": true,
+  "passed": true,
+  "checks": [
+    {
+      "name": "Fresh unplaced memory/brand-new configured channel: truthful empty Atlas and waiting OBS, contrast/bounds",
+      "pass": true
+    },
+    {
+      "name": "Verified fake receipt only arrival, real two-chat kernel claim, reduced motion and reconnect seek unchanged receipt",
+      "pass": true
+    },
+    {
+      "name": "Visible named search anchor, POST name-as-text semantics,375px focus/bounds, empty/error privacy",
+      "pass": true
+    },
+    {
+      "name": "160×160 contrast/readable labels and persistent Simulator mode",
+      "pass": true
+    }
+  ],
+  "captures": [
+    "polish-simulator-atlas-empty-1920",
+    "polish-simulator-new-channel-1920",
+    "polish-simulator-new-channel-480",
+    "polish-simulator-new-channel-waiting-corner-160",
+    "polish-simulator-atlas-empty-375",
+    "polish-simulator-verified-arrival-1920",
+    "polish-simulator-claimed-1920",
+    "polish-simulator-atlas-populated-1920",
+    "polish-simulator-atlas-populated-viewport-1920x1080",
+    "polish-simulator-search-375",
+    "polish-simulator-corner-160"
+  ],
+  "failure": null
+}

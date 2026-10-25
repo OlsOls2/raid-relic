@@ -1,0 +1,26 @@
+{
+  "simulator": true,
+  "passed": true,
+  "checks": [
+    {
+      "name": "Two distinct deterministic templates, strict schema, no URL description or AI claim",
+      "pass": true
+    },
+    {
+      "name": "Actual JSON/SVG downloads,375px and clear/error states remain labelled",
+      "pass": true
+    }
+  ],
+  "downloadsVerified": [
+    "JSON",
+    "SVG"
+  ],
+  "captures": [
+    "forge-before",
+    "forge-crystal-after",
+    "forge-mobile-after",
+    "forge-error-after"
+  ],
+  "downloadsRetainedBecauseBrowserCloseFailed": false,
+  "failure": null
+}
