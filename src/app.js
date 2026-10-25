@@ -1,3 +1,4 @@
+import { recapSVG } from './recap.js';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { createMemoryState } from './state.js';
@@ -12,6 +13,8 @@ const assets = new Map([
   ['/', ['atlas.html', 'text/html; charset=utf-8']],
   ['/atlas', ['atlas.html', 'text/html; charset=utf-8']],
   ['/atlas/', ['atlas.html', 'text/html; charset=utf-8']],
+  ['/recap.css', ['recap.css', 'text/css; charset=utf-8']],
+  ['/recap.js', ['recap.js', 'text/javascript; charset=utf-8']],
   ['/atlas.css', ['atlas.css', 'text/css; charset=utf-8']],
   ['/atlas.js', ['atlas.js', 'text/javascript; charset=utf-8']],
   ['/control.js', ['control.js', 'text/javascript; charset=utf-8']],
@@ -51,6 +54,18 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
     }
     if (method === 'GET' && path === '/health') {
       return result(200, JSON.stringify({ status: 'ok', releaseCommit: release, phase: raidPilot ? 'raid-pilot' : 'foundation', readiness: raidPilot ? 'owner-test-ready' : 'not-ready-for-raids', ...(raidPilot ? { liveValidated: false } : {}) }), 'application/json');
+    }
+    if ((path.startsWith('/recap') && !['/recap.js', '/recap.css'].includes(path)) || path.startsWith('/api/recap')) {
+      if (!['/recap', '/api/recap', '/api/recap.svg'].includes(path)) return result(400, 'Invalid recap path');
+      if (method !== 'GET') return result(405, 'Read only');
+      if (!Buffer.isBuffer(rawBody) || rawBody.length) return result(400, 'No request body');
+      if (path === '/recap') return result(200, await readFile(new URL('../public/recap.html', import.meta.url)), 'text/html; charset=utf-8');
+      try {
+        const projection = await state.getRecap(); const simulator = overlayFeed?.simulator === true;
+        const svg = recapSVG(projection, { simulator });
+        if (path.endsWith('.svg')) return { ...result(200, svg, 'image/svg+xml'), headers: { 'content-disposition': 'attachment; filename="raid-relic-recap.svg"', 'content-security-policy': "default-src 'none'; sandbox" } };
+        return result(200, JSON.stringify({ ...projection, svg, mode: simulator ? 'simulator' : 'live' }), 'application/json');
+      } catch { return result(503, 'Recap unavailable; previous snapshot must be cleared'); }
     }
     if (path.startsWith('/api/atlas/search')) {
       if (path !== '/api/atlas/search') return result(400, 'Invalid search path');

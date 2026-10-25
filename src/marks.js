@@ -18,13 +18,17 @@ export function normalizeMark(input) {
 }
 
 // Original numeric geometry only. Input text never appears in SVG markup.
-export function runeSvg(input) {
+export function runeGeometry(input) {
   const normalized = normalizeMark(input);
   if (!normalized) throw new Error('Invalid mark');
   const digest = hash(`raid-relic-rune-v1:${normalized}`);
-  const points = Array.from({ length: 8 }, (_, i) => `${16 + parseInt(digest.slice(i * 2, i * 2 + 2), 16) % 5 * 16},${16 + parseInt(digest.slice(16 + i * 2, 18 + i * 2), 16) % 5 * 16}`);
+  const points = Array.from({ length: 8 }, (_, i) => [16 + parseInt(digest.slice(i * 2, i * 2 + 2), 16) % 5 * 16, 16 + parseInt(digest.slice(16 + i * 2, 18 + i * 2), 16) % 5 * 16]);
   const color = ['#e6bb70', '#9e87ed', '#70c9bd', '#dd93b3'][parseInt(digest[32], 16) % 4];
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><path d="M48 6 90 48 48 90 6 48Z" fill="none" stroke="${color}" stroke-width="3"/><polyline points="${points.join(' ')}" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  return { points, color };
+}
+export function runeSvg(input) {
+  const { points, color } = runeGeometry(input);
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><path d="M48 6 90 48 48 90 6 48Z" fill="none" stroke="${color}" stroke-width="3"/><polyline points="${points.map(point => point.join(',')).join(' ')}" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 }
 
 export function parseMarkCommand(text) {

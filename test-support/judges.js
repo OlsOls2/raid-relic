@@ -6,7 +6,7 @@ import { attachOverlaySockets } from '../src/overlay-sockets.js';
 export const JUDGES_ORIGIN = 'http://127.0.0.1:5191';
 const ids = [HOME, OTHER];
 const actions = ['setup', 'mark', 'send', 'raid', 'offer', 'accept', 'forget', 'expire', 'reset'];
-const assets = new Set(['/atlas.css', '/atlas.js', '/overlay.css', '/overlay.js', '/overlay-client.js', '/overlay-audio.js', '/arrival.js', '/crystal.svg', '/relic.svg']);
+const assets = new Set(['/recap.js', '/recap.css','/atlas.css', '/atlas.js', '/overlay.css', '/overlay.js', '/overlay-client.js', '/overlay-audio.js', '/arrival.js', '/crystal.svg', '/relic.svg']);
 const json = (status, value) => ({ status, type: 'application/json', body: JSON.stringify({ ...value, mode: 'simulator' }) });
 const html = body => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SIMULATOR · Raid Relic judges</title><link rel="stylesheet" href="/judges/style.css"></head><body><header class="sim-label">SIMULATOR · LOCAL MEMORY ONLY · NO REAL TWITCH</header>${body}</body></html>`;
 export async function createJudges({ intent = false, env = process.env } = {}) {
@@ -93,7 +93,7 @@ export async function createJudges({ intent = false, env = process.env } = {}) {
         if (path === '/judges' && method === 'GET') return { status: 200, type: 'text/html; charset=utf-8', body: await readFile(new URL('./judges/index.html', import.meta.url), 'utf8') };
         if (['/judges/app.js', '/judges/style.css'].includes(path) && method === 'GET') return { status: 200, type: path.endsWith('.js') ? 'text/javascript' : 'text/css', body: await readFile(new URL(`./judges/${path.endsWith('.js') ? 'app.js' : 'style.css'}`, import.meta.url), 'utf8') };
         if (/^\/control\/(1591805230|1591806023)$/.test(path) && method === 'GET') return { status: 200, type: 'text/html; charset=utf-8', body: html('<main><h1>Simulated Keeper control</h1><p>No real consent or online assertion. Fixed mock actors only; no browser tokens or actual OAuth.</p><a href="/judges">Open simulator step controls and observed eligible picker</a></main>') };
-        const readable = assets.has(path) || ['/', '/atlas', '/atlas/', '/api/atlas'].includes(path) || /^\/stops\/[a-f0-9]{64}$/.test(path)
+        const readable = assets.has(path) || ['/', '/atlas', '/atlas/', '/api/atlas', '/recap', '/api/recap', '/api/recap.svg'].includes(path) || /^\/stops\/[a-f0-9]{64}$/.test(path)
           || /^\/api\/atlas\/stops\/[a-f0-9]{64}(?:\?.*)?$/.test(path) || /^\/api\/atlas\?.*$/.test(path)
           || /^\/(?:api\/)?overlay\/(?:1591805230|1591806023)(?:\?.*)?$/.test(path) || path === '/api/atlas/search';
         if (!readable) return fail(404, 'Only local simulator pages are available');
@@ -104,15 +104,15 @@ export async function createJudges({ intent = false, env = process.env } = {}) {
         if (path === '/atlas.js') return { ...response, body: response.body.toString().replace(/\b[Cc]hannel (?=\$\{)/g, 'Simulated channel ').replace('Owner-test raid pilot.', 'SIMULATOR · not live.') };
         return response;
       } catch { return fail(400, 'Simulated step unavailable; follow the console order or reset local memory'); }
-    }).then(response => ({ ...response, headers: { 'x-raid-relic-mode': 'simulator', 'cache-control': 'no-store' } }));
+    }).then(response => ({ ...response, headers: { ...response.headers, 'x-raid-relic-mode': 'simulator', 'cache-control': 'no-store' } }));
   }
   async function handler(req, res) {
     const headers = { 'x-raid-relic-mode': 'simulator', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer',
-      'content-security-policy': "default-src 'self'; connect-src 'self' ws://127.0.0.1:5191; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; form-action 'self'; base-uri 'none'" };
+      'content-security-policy': "default-src 'self'; connect-src 'self' ws://127.0.0.1:5191; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; form-action 'self'; base-uri 'none'" };
     try {
       let size = 0; const chunks = []; for await (const chunk of req.iterator({ destroyOnReturn: false })) { size += chunk.length; if (size > 1024) break; chunks.push(chunk); }
       const response = await dispatch({ method: req.method, path: req.url, headers: req.headers, rawBody: size > 1024 ? Buffer.alloc(1025) : Buffer.concat(chunks) });
-      res.writeHead(response.status, { ...headers, 'content-type': response.type, 'content-length': Buffer.byteLength(response.body) }); res.end(response.body); if (size > 1024) req.resume();
+      res.writeHead(response.status, { ...headers, ...response.headers, 'content-type': response.type, 'content-length': Buffer.byteLength(response.body) }); res.end(response.body); if (size > 1024) req.resume();
     } catch { const error = req.url?.startsWith('/api/') ? json(500, { error: 'Simulator unavailable' }) : { type: 'text/html; charset=utf-8', body: html('<h1>SIMULATOR error · local only</h1>') }; res.writeHead(500, { ...headers, 'content-type': error.type }); res.end(error.body); }
   }
   return { dispatch, handler, server, async listen() { await new Promise((resolve, reject) => { server.once('error', reject); server.listen(5191, '127.0.0.1', resolve); }); },

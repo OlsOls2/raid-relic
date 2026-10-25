@@ -1,3 +1,4 @@
+import { recapProjection } from './recap.js';
 import { chronicleMutation } from './chronicle.js';
 import { hash as observationHash } from './crypto.js';
 import { atlasPage, atlasSearch, handoffView, withCarriedMarks, withIncomingPreview, keeperCandidates } from './public-view.js';
@@ -177,6 +178,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
       });
     },
     async chronicleStep(input) { return db.runTransaction(async tx => { const r = ref('lineage', 'single'); const change = chronicleMutation((await tx.get(r)).data(), input); if (change.next) tx.set(r, change.next); return change.result; }); },
+    async getRecap() { return recapProjection((await ref('lineage', 'single').get()).data()); },
     async searchPublicMarks(options) { return atlasSearch((await ref('lineage', 'single').get()).data(), options); },
     async getAtlasPage(options) { return atlasPage((await ref('lineage', 'single').get()).data(), options); },
     async getPublicPresentation(host, now) {

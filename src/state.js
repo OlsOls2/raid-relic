@@ -1,3 +1,4 @@
+import { recapProjection } from './recap.js';
 import { chronicleMutation } from './chronicle.js';
 import { hash as observationHash } from './crypto.js';
 import { atlasPage, atlasSearch, handoffView, withCarriedMarks, withIncomingPreview, keeperCandidates } from './public-view.js';
@@ -93,6 +94,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
       const checked = reduceClaims(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), lineage, null, now); registry = checked.registry; lineage = checked.lineage;
     },
     chronicleStep(input) { const change = chronicleMutation(lineage, input); if (change.next) lineage = change.next; return change.result; },
+    getRecap() { return recapProjection(lineage); },
     searchPublicMarks(options) { return atlasSearch(lineage, options); },
     getAtlasPage(options) { return atlasPage(lineage, options); },
     getPublicPresentation(host, now) { return { rings: lineage.stops.length, handoff: handoffView(registry, host, now) }; },
