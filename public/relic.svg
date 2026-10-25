@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-labelledby="title desc">
+  <title id="title">Raid Relic compass</title>
+  <desc id="desc">An original gold compass surrounding a violet traveling crystal.</desc>
+  <g fill="none" stroke="#e6bb70" stroke-width="3">
+    <circle cx="120" cy="120" r="86"/>
+    <path d="M120 16v30m0 148v30M16 120h30m148 0h30M58 58l20 20m84 84 20 20M58 182l20-20m84-84 20-20"/>
+    <path d="m120 49 48 71-48 71-48-71Z"/>
+  </g>
+  <path fill="#9e87ed" d="m120 69 31 51-31 51-31-51Z"/>
+  <path fill="#ddd2ff" d="m120 69 0 51-31 0Z"/>
+  <path fill="#624aab" d="m120 120 31 0-31 51Z"/>
+</svg>
