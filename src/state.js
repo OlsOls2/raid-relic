@@ -1,5 +1,5 @@
 import { hash as observationHash } from './crypto.js';
-import { atlasPage, handoffView, withCarriedMarks, withIncomingPreview } from './public-view.js';
+import { atlasPage, handoffView, withCarriedMarks, withIncomingPreview, keeperCandidates } from './public-view.js';
 import { reduceClaims, emptyLineage, publicJourney } from './claims.js';
 import { sendState } from './send-state.js';
 import { lifecycleConfig, reduceLifecycle, emptyRegistry } from './lifecycle.js';
@@ -82,6 +82,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
       const next = sendState(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), config, op, now);
       registry = next.registry; return next.result;
     },
+    getKeeperCandidates(host) { return keeperCandidates(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), config, host); },
     getKeeperRegistry() { return structuredClone(registry); },
     getStreamStatus(host) { return structuredClone(channels.get(host)); },
     setChannelPolicy(host, policy, now = Date.now()) {

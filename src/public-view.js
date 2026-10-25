@@ -44,3 +44,12 @@ export function withIncomingPreview(view, registry, host, channels, docs, now) {
     .map(({ id, text }) => ({ id, runeSvg: runeSvg(text) }));
   return { ...view, marks };
 }
+
+// Store-owned, consistent snapshot; never a provider lookup or live authority.
+export function keeperCandidates(registry, channels, docs, config, host) {
+  if (!config?.channels.includes(host)) return [];
+  return config.channels.filter(id => eligible(registry ?? {}, channels, docs, host, id)).map(id => ({
+    id, login: Object.entries(config.logins).find(([, value]) => value === id)?.[0] ?? id,
+    observedOnline: true, optedIn: true, eligible: true,
+  }));
+}

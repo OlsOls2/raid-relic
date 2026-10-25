@@ -2,6 +2,14 @@
 
 A raid-only traveling community relic, authored by Codex in the original thread recorded in [CODEX_SESSION.md](CODEX_SESSION.md). All future code and documentation work must resume that thread. No subagents or other threads are used. MIT licensed; see [LICENSE](LICENSE).
 
+## Owner freeze and Should #1 branch review
+
+**Owner directive supersedes every earlier redeploy authorization:** live source `fd05a5ee67f841b1ac92ebb221581db227d2353f` / revision `raid-relic-00003-kwp` must stay frozen for the actual owner test. No builds, deploys, cloud operations, live Twitch/OpenAI calls or credential reads are authorized for this work. Only `feature/raid-relic-shoulds` and Should #1 are in scope; no commit/push until parent review.
+
+Should #1 adds a labelled, manually refreshed **observed eligible Keeper target** selector to private controls. It uses the existing two-account allowlist and a consistent persisted lifecycle/policy snapshot, with no provider polling or background networking. Only observed-online/opted-in/unpaused/unbanned eligible targets other than self appear; source holder/policy eligibility is also required. Empty state explains setup/refresh. A single candidate retains the existing named Send Off button and one confirmation. Canonical action/CSRF JSON and scoped actor, Origin and session checks are unchanged. Server reservation and dispatch revalidation prevent stale selection from forcing an invalid raid. Candidate fields contain only public ID/login and safe eligibility flags.
+
+**Scopes are exactly unchanged:** Keeper `channel:bot channel:manage:raids`; bot `user:read:chat user:write:chat user:bot`. No OAuth onboarding expansion, arbitrary target, other Should feature or live deployment is included. [Branch-local judges quickstart](docs/JUDGES_QUICKSTART.md) describes QA and frozen live instructions. Latest sandbox:223 tests/218pass/five EPERM skips/zero failures, preserving216 baseline tests; release inventory42 files. Prior host/browser results below concern the frozen baseline, not a new branch browser pass.
+
 ## Current deployed owner-test pilot
 
 Parent verified source **`fd05a5ee67f841b1ac92ebb221581db227d2353f`**, revision **`raid-relic-00003-kwp`**,100% traffic at [Raid Relic](https://raid-relic-760724762396.us-central1.run.app/). Image `sha256:235f0751476eb087dc914ba29b2af6d76cd687de208eb181e5ca1b2938c6e304`; build `69655ba0-1a89-433b-a1f8-99c499a0ab42`. Pilot gate and both Keeper IDs are enabled; other environment/secret references/resources preserved, effective min0 and service/revision max1. Runtime remains **fd05**, not the later docs commit. Prior74f metadata is historical; rollback after future pilot writes needs compatibility review.

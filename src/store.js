@@ -1,5 +1,5 @@
 import { hash as observationHash } from './crypto.js';
-import { atlasPage, handoffView, withCarriedMarks, withIncomingPreview } from './public-view.js';
+import { atlasPage, handoffView, withCarriedMarks, withIncomingPreview, keeperCandidates } from './public-view.js';
 import { reduceClaims, publicJourney } from './claims.js';
 import { sendState } from './send-state.js';
 import { lifecycleConfig, reduceLifecycle } from './lifecycle.js';
@@ -148,6 +148,14 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         }
         const next = sendState(registry, channels, marks, config, op, now);
         tx.set(ref('keeperRegistry', 'single'), next.registry); return next.result;
+      });
+    },
+    async getKeeperCandidates(host) {
+      if (!config?.channels.includes(host)) return [];
+      return db.runTransaction(async tx => {
+        const registry = (await tx.get(ref('keeperRegistry', 'single'))).data(); const channels = {}, docs = {};
+        for (const id of config.channels) { channels[id] = (await tx.get(ref('streamChannels', id))).data(); docs[id] = (await tx.get(ref('markChannels', id))).data(); }
+        return keeperCandidates(registry, channels, docs, config, host);
       });
     },
     async getKeeperRegistry() { return (await ref('keeperRegistry', 'single').get()).data() ?? { holderId: null, originated: false }; },

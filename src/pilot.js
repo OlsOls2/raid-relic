@@ -67,7 +67,7 @@ export function createPilot({ state, store, oauth, subscriptions, sends, now = D
     async status(id) {
       if (!ids.includes(id)) throw new Error('Unconfigured Keeper');
       const channel = await state.getStreamStatus(id); const registry = await state.getKeeperRegistry();
-      return { mode: simulator ? 'simulator' : 'live', account: KEEPERS[id], online: channel?.online ?? false, optedIn: channel?.optedIn ?? false, paused: channel?.paused ?? false,
+      return { candidates: await state.getKeeperCandidates(id), candidatesObservedAt: now(), mode: simulator ? 'simulator' : 'live', account: KEEPERS[id], online: channel?.online ?? false, optedIn: channel?.optedIn ?? false, paused: channel?.paused ?? false,
         bothReadiness: Object.fromEntries(await Promise.all(ids.map(async keeper => [KEEPERS[keeper], (await store.getJob(keeper))?.ready === true]))),
         ownerStep: 'Wait for both readiness flags true; Bootstrap / reconcile pending channels after callback verification. Reconnect missing grants.',
         holder: registry.holderId, subscriptions: await store.getJob(id), intent: registry.send?.sourceId === id ? registry.send.status : null,
