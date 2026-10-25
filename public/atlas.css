@@ -5,3 +5,11 @@
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 /* Keep title word boundaries independent of surrounding wrapping tracks. */
 h1{overflow-wrap:normal;word-break:normal;hyphens:none}
+
+/* Local hero only: no overlay stylesheet or global canvas reset. */
+.atlas-relic{position:relative;width:min(100%,320px);aspect-ratio:1;justify-self:center;min-width:0;isolation:isolate}
+.atlas-relic>img{position:absolute;inset:12%;width:76%;height:76%;object-fit:contain}
+.atlas-relic>canvas.relic3d{position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(0 0 10px #a4c6ff35)}
+.atlas-relic.webgl-relic>img{visibility:hidden}
+@media(max-width:680px){.atlas-relic{width:150px;max-width:100%}}
+@media(max-width:480px){.atlas-relic{width:160px;justify-self:center}}

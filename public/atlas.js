@@ -1,4 +1,6 @@
+import { createAtlasHero, atlasRings } from './atlas-hero.js';
 const $ = id => document.getElementById(id);
+const hero = createAtlasHero({ archive: $('atlas-relic') });
 const stopId = /^\/stops\/([a-f0-9]{64})$/.exec(location.pathname)?.[1];
 let offset = 0; let next = null; let generation = 0; let controller;
 const node = (tag, text, className) => { const n = document.createElement(tag); if (text !== undefined) n.textContent = text; if (className) n.className = className; return n; };
@@ -10,7 +12,7 @@ function chronicleCaption(value) {
     || [...value.line].length > 160 || /[\p{Cc}\p{Cf}]/u.test(value.line)) return fallback;
   return `Fiction · ${value.source}: ${value.line}`;
 }
-function clear() { $('status').classList.remove('empty-state'); $('journey').replaceChildren(); $('marks').replaceChildren(); $('rings').textContent = 'No current state'; $('next').hidden = true; }
+function clear() { hero.clear(); $('status').classList.remove('empty-state'); $('journey').replaceChildren(); $('marks').replaceChildren(); $('rings').textContent = 'No current state'; $('next').hidden = true; }
 async function load() {
   const current = ++generation; controller?.abort(); controller = new AbortController(); const activeController = controller;
   // Clear immediately: no cache or old page may retain purged public content.
@@ -19,6 +21,8 @@ async function load() {
   try {
     const response = await fetch(`/api/atlas${stopId ? `/stops/${stopId}` : ''}?offset=${offset}&limit=${stopId ? 20 : 8}`, { cache: 'no-store', signal: activeController.signal });
     if (!response.ok) throw new Error('Unavailable'); const data = await response.json(); if (current !== generation) return;
+    if (atlasRings(data.rings) === null) throw Error('Invalid rings');
+    hero.update(data.rings);
     $('simulator').hidden = data.mode !== 'simulator';
     if (data.pilotEnabled) document.querySelector('.note').textContent = 'Owner-test raid pilot. Live validation remains pending. Only verified raid notifications and completed two-chat claims create this journey. Read only.'; $('rings').textContent = `${data.rings} completed growth rings`;
     $('status').textContent = data.total ? `Showing ${offset + 1}–${Math.min(offset + (stopId ? data.marks.length : data.stops.length), data.total)} of ${data.total}` : stopId ? 'No approved marks retained at this stop.' : 'No completed hops yet. The relic has no recorded journey. Refresh after a completed two-chat claim.';

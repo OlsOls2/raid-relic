@@ -89,13 +89,25 @@ export async function createRelic3D({ signal, archive, reducedMotion, corner = f
     const mesh = crystalMesh(design), geometry = new T.BufferGeometry(); geometry.setAttribute('position', new T.Float32BufferAttribute(mesh.positions, 3)); geometry.setAttribute('color', new T.Float32BufferAttribute(mesh.colors, 3)); geometry.computeVertexNormals();
     const material = new T.ShaderMaterial({ vertexColors: true, transparent: true, side: T.DoubleSide,
       vertexShader: 'varying vec3 tint; varying vec3 norm; varying vec3 eye; void main(){ tint=color; vec4 p=modelViewMatrix*vec4(position,1.0); norm=normalize(normalMatrix*normal); eye=normalize(-p.xyz); gl_Position=projectionMatrix*p; }',
-      fragmentShader: 'varying vec3 tint; varying vec3 norm; varying vec3 eye; void main(){ float f=pow(1.0-abs(dot(normalize(norm),normalize(eye))),2.0); vec3 moon=mix(vec3(.70,.63,.84),vec3(.86,.90,.94),f); float shine=pow(max(0.0,dot(reflect(-normalize(eye),normalize(norm)),normalize(vec3(-.5,.8,1.0)))),12.0); vec3 metal=tint*(.65+.35*abs(norm.y)) + moon*(f*.9+shine*.65); gl_FragColor=vec4(metal,.98); }' });
+      fragmentShader: 'varying vec3 tint; varying vec3 norm; varying vec3 eye; void main(){ float f=pow(1.0-abs(dot(normalize(norm),normalize(eye))),2.0); vec3 moon=mix(vec3(.70,.63,.84),vec3(.86,.90,.94),f); float shine=pow(max(0.0,dot(reflect(-normalize(eye),normalize(norm)),normalize(vec3(-.5,.8,1.0)))),12.0); vec3 metal=tint*(.65+.35*abs(norm.y)) + moon*(f*1.25+shine*.85); gl_FragColor=vec4(metal,.98); }' });
     group.add(new T.Mesh(geometry, material)); resources.add(geometry); resources.add(material);
     // A translucent, additive expanded faceted shell: no opaque quad/postprocess.
     const haloMaterial = new T.ShaderMaterial({ transparent: true, depthWrite: false, side: T.BackSide, blending: T.AdditiveBlending,
-      vertexShader: 'varying vec3 n; varying vec3 e; void main(){ vec4 p=modelViewMatrix*vec4(position*1.09,1.0); n=normalize(normalMatrix*normal); e=normalize(-p.xyz); gl_Position=projectionMatrix*p; }',
-      fragmentShader: 'varying vec3 n; varying vec3 e; void main(){ float rim=pow(1.0-abs(dot(normalize(n),normalize(e))),2.0); gl_FragColor=vec4(vec3(.58,.70,1.0),rim*.20); }' });
+      vertexShader: 'varying vec3 n; varying vec3 e; void main(){ vec4 p=modelViewMatrix*vec4(position*1.14,1.0); n=normalize(normalMatrix*normal); e=normalize(-p.xyz); gl_Position=projectionMatrix*p; }',
+      fragmentShader: 'varying vec3 n; varying vec3 e; void main(){ float rim=pow(1.0-abs(dot(normalize(n),normalize(e))),2.0); gl_FragColor=vec4(vec3(.58,.70,1.0),rim*.42); }' });
     group.add(new T.Mesh(geometry, haloMaterial)); resources.add(haloMaterial);
+    // Procedural soft aura, not postprocessed bloom. Two triangles, no asset fetch.
+    const auraTile = doc?.createElement?.('canvas'); const auraContext = auraTile?.getContext?.('2d');
+    if (T.CanvasTexture && auraContext?.createRadialGradient) {
+      auraTile.width = auraTile.height = 128;
+      const glow = auraContext.createRadialGradient(64, 64, 10, 64, 64, 64);
+      glow.addColorStop(0, 'rgba(199,237,250,0.20)'); glow.addColorStop(.4, 'rgba(148,134,183,0.12)'); glow.addColorStop(1, 'rgba(148,134,183,0)');
+      auraContext.fillStyle = glow; auraContext.fillRect(0, 0, 128, 128);
+      const texture = new T.CanvasTexture(auraTile);
+      const auraMaterial = new T.SpriteMaterial({ map: texture, transparent: true, depthWrite: false, blending: T.AdditiveBlending });
+      const aura = new T.Sprite(auraMaterial); aura.scale.set(3.5, 3.5, 1); aura.position.z = -.5; scene.add(aura);
+      resources.add(texture); resources.add(auraMaterial);
+    }
     canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); canvas.dataset.contextStatus = 'lost'; lost = true; stop(); fallback(); diagnostic('lost'); });
     doc?.addEventListener?.('visibilitychange', resume); reducedMotion?.addEventListener?.('change', resume); resume();
   } catch { dispose(); return { update() {}, wake() {}, dispose() {}, available: false }; }
@@ -119,6 +131,7 @@ export async function createRelic3D({ signal, archive, reducedMotion, corner = f
           const band = new T.Mesh(geometry, material); band.rotation.x = orbit ? .7 + i * .04 : 0; band.rotation.y = orbit ? .25 : 0; band.ringIndex = i; bands.push(band); scene.add(band);
         }
       }
+      if (canvas) canvas.dataset.bands = String(bands.length);
       let spriteFailures = 0;
       if (canvas) canvas.dataset.spriteFailures = '0';
       for (const [index, mark] of (snapshot.marks ?? []).slice(0, 160).entries()) {
