@@ -13,6 +13,11 @@ try {
   await f.control(HOME, `send:${OTHER}`); f.advance(); await f.raid(HOME, OTHER, 3); f.advance(180000);
   stage = 'browser-launch'; const { chromium } = await import('playwright'); browser = await chromium.launch({ executablePath: '/snap/bin/chromium', chromiumSandbox: true, headless: true });
   const context = await browser.newContext({ ignoreHTTPSErrors: true });
+  // Legacy SVG-fallback contract; default real WebGL is exercised independently.
+  await context.addInitScript(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function(type, ...args) { return /^webgl/.test(type) ? null : original.call(this, type, ...args); };
+  });
   await context.route('**/*', r => new URL(r.request().url()).origin === origin ? r.continue() : r.abort());
   await context.addCookies(Object.entries(f.cookies).map(([, cookie]) => { const i = cookie.indexOf('='); return { name: cookie.slice(0, i), value: cookie.slice(i + 1), url: origin, secure: true, httpOnly: true, sameSite: 'Lax' }; }));
   stage = 'control-load'; const page = await context.newPage();

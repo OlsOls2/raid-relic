@@ -16,6 +16,11 @@ try {
   browser = await chromium.launch({ executablePath: '/snap/bin/chromium', chromiumSandbox: true, headless: true,
     args: ['--disable-background-networking'] });
   const context = await browser.newContext({ viewport: { width: 1200, height: 900 }, reducedMotion: 'reduce', serviceWorkers: 'block' });
+  // Legacy SVG-fallback contract; default real WebGL is exercised independently.
+  await context.addInitScript(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function(type, ...args) { return /^webgl/.test(type) ? null : original.call(this, type, ...args); };
+  });
   await context.route('**/*', route => {
     const url = new URL(route.request().url());
     return url.origin === 'http://127.0.0.1:5191' ? route.continue() : route.abort();

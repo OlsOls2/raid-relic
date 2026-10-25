@@ -11,6 +11,13 @@ export async function releaseFiles(root, { runtime = false } = {}) {
     if (!(await lstat(resolve(root, dir))).isDirectory()) throw new Error('Release directory rejected');
     for (const name of await readdir(resolve(root, dir))) {
       const path = `${dir}/${name}`;
+      if (path === 'public/vendor') {
+        if (!(await lstat(resolve(root, path))).isDirectory()) throw new Error('Vendor directory rejected');
+        const allowed = ['LICENSE-three.txt', 'three.core.js', 'three.module.js'];
+        const actual = (await readdir(resolve(root, path))).sort();
+        if (JSON.stringify(actual) !== JSON.stringify(allowed)) throw new Error('Unexpected vendor inventory');
+        files.push(...allowed.map(file => `${path}/${file}`)); continue;
+      }
       if (!/^[a-z][a-z0-9-]*\.(?:js|html|css|svg)$/.test(name)) throw new Error(`Unexpected release filename: ${path}`);
       files.push(path);
     }

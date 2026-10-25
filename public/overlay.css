@@ -51,3 +51,13 @@ body:not(.corner) #handoff:empty{display:none}
 .corner.voting .compact-state{top:104px;bottom:auto;font-size:8px;line-height:10px}
 .corner.voting #compact-handoff{display:none}
 @media(prefers-reduced-motion:reduce){#claim-arcs{transition:none}}
+
+/* The canvas replaces only the archive artwork, never its meter or labels. */
+.relic3d{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.relic3d[hidden]{display:none}
+.webgl-relic>.crystal,.webgl-relic>.growth-rings,.webgl-relic>.runes{visibility:hidden}
+.webgl-relic>#claim-arcs{z-index:1}
+.archive[data-phase=streak]>.relic3d{transform:translateX(calc((1 - var(--arrival))* -100%));opacity:var(--arrival)}
+.archive[data-phase=impact]>.relic3d{transform:scale(calc(1 + (1 - var(--arrival))*.15))}
+@media(prefers-reduced-motion:reduce){.relic3d{display:none}.webgl-relic>.crystal,.webgl-relic>.growth-rings,.webgl-relic>.runes{visibility:visible}}
+.archive.resonating>.relic3d{filter:drop-shadow(0 0 10px #b7a2df88)}

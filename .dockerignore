@@ -12,3 +12,8 @@
 !public/*.css
 !public/*.js
 !public/*.svg
+
+!public/vendor/
+!public/vendor/three.module.js
+!public/vendor/three.core.js
+!public/vendor/LICENSE-three.txt

@@ -15,6 +15,11 @@ try {
   f.streams.get(HOME).viewer_count = 2; await f.control(HOME, `send:${OTHER}`);
   stage = 'browser'; const { chromium } = await import('playwright'); browser = await chromium.launch({ executablePath: '/snap/bin/chromium', chromiumSandbox: true, headless: true });
   const context = await browser.newContext({ ignoreHTTPSErrors: true, viewport: { width: 1280, height: 800 } });
+  // Legacy SVG-fallback contract; default real WebGL is exercised independently.
+  await context.addInitScript(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function(type, ...args) { return /^webgl/.test(type) ? null : original.call(this, type, ...args); };
+  });
   context.on('page', page => page.on('pageerror', error => {
     if (pageErrors.length < 8) pageErrors.push(['TypeError', 'ReferenceError', 'SyntaxError', 'RangeError', 'Error'].includes(error?.name) ? error.name : 'OtherError');
   }));

@@ -6,6 +6,11 @@ try {
   await judges.listen(); const { chromium } = await import('playwright');
   browser = await chromium.launch({ executablePath: '/snap/bin/chromium', chromiumSandbox: true, headless: true, args: ['--disable-background-networking'] });
   const context = await browser.newContext({ viewport: { width: 1000, height: 850 }, serviceWorkers: 'block' });
+  // Legacy SVG-fallback contract; default real WebGL is exercised independently.
+  await context.addInitScript(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function(type, ...args) { return /^webgl/.test(type) ? null : original.call(this, type, ...args); };
+  });
   await context.route('**/*', route => new URL(route.request().url()).origin === JUDGES_ORIGIN ? route.continue() : route.abort());
   await context.routeWebSocket('**/*', route => new URL(route.url()).origin === JUDGES_ORIGIN.replace('http', 'ws') ? route.connectToServer() : route.close());
   const page = await context.newPage(); await page.goto(`${JUDGES_ORIGIN}/judges`); await page.locator('#result').filter({ hasText: 'local state refreshed' }).waitFor();

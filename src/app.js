@@ -15,6 +15,10 @@ import { parseLifecycle } from './lifecycle.js';
 export const MAX_BODY_BYTES = 65536;
 export const REPLAY_WINDOW_MS = 10 * 60 * 1000;
 const assets = new Map([
+  ['/relic3d.js', ['relic3d.js', 'text/javascript; charset=utf-8']],
+  ['/vendor/three.module.js', ['vendor/three.module.js', 'text/javascript; charset=utf-8']],
+  ['/vendor/three.core.js', ['vendor/three.core.js', 'text/javascript; charset=utf-8']],
+  ['/vendor/LICENSE-three.txt', ['vendor/LICENSE-three.txt', 'text/plain; charset=utf-8']],
   ['/claim-meter.js', ['claim-meter.js', 'text/javascript; charset=utf-8']],
   ['/my-marks.js', ['my-marks.js', 'text/javascript; charset=utf-8']],
   ['/', ['atlas.html', 'text/html; charset=utf-8']],

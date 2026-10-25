@@ -1,3 +1,4 @@
+import { createRelic3D, ringSummary } from './relic3d.js';
 import { meterProgress } from './claim-meter.js';
 import { createOverlayAudio, createCueTracker } from './overlay-audio.js';
 import { arrivalPhase } from './arrival.js';
@@ -20,15 +21,19 @@ soundButton.onclick = async event => {
 addEventListener('pagehide', () => { audio.teardown(); cueFor(null); soundButton.setAttribute('aria-pressed', 'false'); soundButton.textContent = 'Sound'; soundButton.setAttribute('aria-label', 'Enable optional overlay sounds'); });
 let current = null; let receivedAt = 0; let receiptServerTime = 0;
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
+let relic3d, relic3dClosed = false; const relic3dAbort = new AbortController();
+createRelic3D({ signal: relic3dAbort.signal, archive: document.querySelector('.archive'), reducedMotion: motion, corner: document.body.classList.contains('corner') }).then(view => { if (relic3dClosed) { view?.dispose(); return; } relic3d = view; view?.update(current); });
+addEventListener('pagehide', () => { relic3dClosed = true; relic3dAbort.abort(); relic3d?.dispose(); });
 function render(snapshot) {
   const cue = cueFor(snapshot); if (!snapshot || !['ready', 'incoming', 'waiting'].includes(snapshot.status) || (snapshot.status === 'waiting' && !snapshot.handoff?.completed)) audio.silence();
   if (cue) audio.cue(cue);
   document.body.dataset.state = snapshot?.status ?? 'connecting';
   document.querySelector('#waiting-note').hidden = snapshot?.status !== 'waiting';
+  relic3d?.update(snapshot);
   current = snapshot; receivedAt = performance.now(); receiptServerTime = snapshot?.serverNow ?? Date.now();
   document.querySelector('#rings').replaceChildren();
-  document.querySelector('#lineage').textContent = snapshot ? `${snapshot.lineageRings} completed growth rings` : 'No current lineage state';
-  for (let i = 0; i < (snapshot?.lineageRings ?? 0); i++) { const ring = document.createElement('span'); ring.style.inset = `${4 + i * 1.8}%`; document.querySelector('#rings').append(ring); }
+  document.querySelector('#lineage').textContent = snapshot ? ringSummary(snapshot.lineageRings).text : 'No current lineage state';
+  for (let i = 0; i < Math.min(16, snapshot?.lineageRings ?? 0); i++) { const ring = document.createElement('span'); ring.style.inset = `${4 + i * 1.8}%`; document.querySelector('#rings').append(ring); }
   runes.replaceChildren();
   document.querySelector('#charge').style.width = '0%';
   if (!snapshot) { count.textContent = 'No current state'; document.querySelector('#compact-count').textContent = 'No current state'; return; }
@@ -55,7 +60,11 @@ if (channel) connectOverlay({ url: `${location.protocol === 'https:' ? 'wss' : '
     if (value !== 'connected') state.textContent = { connecting: 'Connecting to relic state…', reconnecting: 'Connection lost; reconnecting…', stale: 'State stale; reconnecting…' }[value];
   } });
 
+let lastReduced = motion.matches, lastHidden = document.hidden;
 function frame() {
+  if (motion.matches !== lastReduced || document.hidden !== lastHidden) {
+    lastReduced = motion.matches; lastHidden = document.hidden; relic3d?.wake();
+  }
   const echoOn = resonanceActive(current?.resonance, receiptServerTime + performance.now() - receivedAt);
   document.querySelector('.archive').classList.toggle('resonating', echoOn);
   const note = echoOn ? 'Decorative Shared-chat echo of an approved rune; not proof of raid membership' : '';
