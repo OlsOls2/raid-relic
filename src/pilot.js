@@ -15,9 +15,9 @@ export function createPilot({ replies, forge, chronicle, state, store, oauth, su
     return state.accept({ id: `owner:${randomBytes(24).toString('hex')}`, now: time, sentAt: time, expiresAt: time + 600000,
       chat: { broadcasterId: id, chatterId: id, markAction: action } });
   }
-  async function blocked(id, reason) {
+  async function blocked(id, reason, diagnostic) {
     try { await logger(JSON.stringify({ severity: 'WARNING', event: 'raid_relic_send_blocked', keeperId: id, reason })); } catch {}
-    return { status: 'blocked', reason, message: 'Send Off blocked: ' + reason + '. Refresh both channel statuses; do not retry accepted/unknown dispatches.' };
+    return { status: 'blocked', reason, ...(diagnostic ? { diagnostic } : {}), message: (diagnostic?.nextStep ? diagnostic.nextStep + ' ' : '') + 'Send Off blocked: ' + reason + '. Refresh both channel statuses; do not retry accepted/unknown dispatches.' };
   }
   async function readiness(id) {
     const other = ids.find(candidate => candidate !== id);
@@ -70,6 +70,10 @@ export function createPilot({ replies, forge, chronicle, state, store, oauth, su
   return {
     forgeEnabled: forge?.enabled === true,
     async forgeDesign(id, description, acknowledge) { if (!ids.includes(id) || !forge) throw Error('Unavailable'); return forge.write(id, description, acknowledge); },
+    async expireHandoff(id, intentId, hopId) {
+      if (!ids.includes(id) || !/^[a-f0-9]{64}$/.test(intentId ?? '') || !/^[a-f0-9]{64}$/.test(hopId ?? '')) return { status: 'blocked', reason: 'handoff-expiry-proof' };
+      return state.sendOffStep({ type: 'expire-handoff', source: id, actor: id, id: intentId, hopId }, now());
+    },
     actions, authorizeSend: readiness,
     async cancelQueued(id, intentId, generation) {
       if (!ids.includes(id) || !/^[a-f0-9]{64}$/.test(intentId ?? '') || !/^[a-f0-9]{64}$/.test(generation ?? '')) throw Error('Invalid intent confirmation');
@@ -97,7 +101,7 @@ export function createPilot({ replies, forge, chronicle, state, store, oauth, su
             intentId = reserved.intentId;
           }
           const outcome = await sends[id].processPending(intentId);
-          if (outcome.status !== 'accepted') return blocked(id, outcome.status === 'unknown' ? 'dispatch-unknown' : outcome.status === 'rejected-preflight' ? 'preflight-rejected' : outcome.status === 'rejected' ? 'dispatch-rejected' : 'worker-reconcile-only');
+          if (outcome.status !== 'accepted') return blocked(id, outcome.status === 'unknown' ? 'dispatch-unknown' : outcome.status === 'rejected-preflight' ? 'preflight-rejected' : outcome.status === 'rejected' ? 'dispatch-rejected' : 'worker-reconcile-only', outcome.diagnostic);
           return outcome;
         } catch { return blocked(id, 'request-outcome-unavailable'); }
       }
@@ -112,6 +116,9 @@ export function createPilot({ replies, forge, chronicle, state, store, oauth, su
         ownerStep: 'Wait for both readiness flags true; Bootstrap / reconcile pending channels after callback verification. Reconnect missing grants.',
         recovery: registry.send?.sourceId === id ? { intentId: registry.send.id, generation: registry.send.generation ?? null, status: registry.send.status, dispatchMarked: Object.hasOwn(registry.send, 'dispatchAt'), claimed: Object.hasOwn(registry.send, 'owner') || Object.hasOwn(registry.send, 'leaseUntil'), canCancel: registry.holderId === id && typeof registry.send.generation === 'string' && registry.send.status === 'queued' && !Object.hasOwn(registry.send, 'dispatchAt') && !Object.hasOwn(registry.send, 'owner') && !Object.hasOwn(registry.send, 'leaseUntil'), instruction: 'Never clear or retry accepted/unknown/claimed/processing outcomes. Operator read-only reconciliation only.' } : null,
         eligibility: await eligibility(id),
+        claimProgress: registry.pendingHop && [registry.pendingHop.from, registry.pendingHop.to].includes(id) ? { threshold: registry.pendingHop.threshold, offers: registry.pendingHop.offers?.length ?? null, accepts: registry.pendingHop.accepts?.length ?? null, endsAt: registry.pendingHop.endsAt, finalized: registry.pendingHop.finalized === true, cancelled: registry.pendingHop.cancelled === true } : null,
+        expiryRecovery: registry.send?.sourceId === id && registry.holderId === id && registry.send.status === 'confirmed' && registry.pendingHop && !registry.pendingHop.finalized ? { intentId: registry.send.id, hopId: registry.pendingHop.eventId, endsAt: registry.pendingHop.endsAt, canExpire: now() >= registry.pendingHop.endsAt } : null,
+        dispatchDiagnostic: registry.send?.sourceId === id ? registry.send.diagnostic ?? null : null,
         holder: registry.holderId, subscriptions: await store.getJob(id), intent: registry.send?.sourceId === id ? registry.send.status : null,
         handoff: handoffView(registry, id, now()) };
     },

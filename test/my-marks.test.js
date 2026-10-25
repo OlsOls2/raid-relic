@@ -16,12 +16,12 @@ for (const kind of ['memory', 'firestore']) {
   test(`${kind}: signed mymarks opt-in is deduped/rate-bounded, automatic exact-request reply runs once`, async () => {
     const f = await setup(kind); const calls = f.calls.length;
     await Promise.all(Array.from({ length: 8 }, () => f.chat(HOME, '811', '!relic mymarks')));
-    assert.equal(f.calls.slice(calls).filter(c => c.url.endsWith('/chat/messages')).length, 1); const row = await f.row(); assert.ok(row); assert.ok(!Buffer.from(row.token, 'base64url').includes(Buffer.from('"u":"811"')));
+    assert.equal(f.calls.slice(calls).filter(c => c.url.endsWith('/chat/messages') && JSON.parse(c.body).message.includes('PUBLIC CHAT')).length, 1); const row = await f.row(); assert.ok(row); assert.ok(!Buffer.from(row.token, 'base64url').includes(Buffer.from('"u":"811"')));
     const record = await f.runtime.state.getPrivateMarks(HOME, { broadcasterId: HOME, chatterId: HOME }); assert.equal(record.shares.length, 1);
     const page = JSON.parse((await f.page(row.token)).body); assert.equal(page.total, 1); assert.equal(page.matches[0].text, 'moon');
     for (const forbidden of ['userId', 'actor', 'nonce', 'private', 'capability']) assert.ok(!JSON.stringify(page).includes(forbidden));
     const responses = await Promise.all([f.control(HOME, 'mark-links'), f.control(HOME, 'mark-links')]); assert.ok(responses.every(r => r.status === 200));
-    const replies = f.calls.filter(c => c.url.endsWith('/chat/messages')); assert.equal(replies.length, 1);
+    const replies = f.calls.filter(c => c.url.endsWith('/chat/messages') && JSON.parse(c.body).message.includes('PUBLIC CHAT')); assert.equal(replies.length, 1);
     const message = JSON.parse(replies[0].body).message; assert.ok(message.includes('PUBLIC CHAT')); assert.ok(message.includes('/my-marks#')); assert.ok(message.length <= 500);
     assert.equal(replies[0].headers.Authorization, `Bearer access-${BOT}`);
     await f.chat(HOME, '811', '!relic forgetme'); assert.equal((await f.page(row.token)).status, 403);
@@ -59,7 +59,7 @@ test('Firestore share reservation rollback and reply crash stay at most once', a
   assert.equal(row.status, 'sent');
   // Crash at/after marked dispatch boundary: no automatic second send.
   assert.deepEqual(await f.runtime.replies.processPending(HOME), { status: 'idle' });
-  assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages')).length, 1);
+  assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages') && JSON.parse(c.body).message.includes('PUBLIC CHAT')).length, 1);
 });
 
 test('shared-history HTTP boundary is no-store/no-referrer, rejects invalid paging and clears revoked capability', async () => {
@@ -87,18 +87,18 @@ for (const kind of ['memory', 'firestore']) {
     const event = { broadcaster_user_id: HOME, chatter_user_id: '811', chatter_user_login: 'viewer811', message_id: 'stable-original', message: { text: '!relic mymarks', fragments: [] } };
     const send = () => f.signed('channel.chat.message', event, HOME, { broadcaster_user_id: HOME, user_id: BOT });
     await Promise.all(Array.from({ length: 8 }, send));
-    assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages')).length, 1);
+    assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages') && JSON.parse(c.body).message.includes('PUBLIC CHAT')).length, 1);
     let doc = await f.runtime.state.getPrivateMarks(HOME, { broadcasterId: HOME, chatterId: HOME });
     assert.equal(doc.shares.find(s => s.actor === '812').status, 'queued');
     assert.equal(doc.shares.find(s => s.actor === '811').status, 'sent');
     await f.chat(HOME, '811', '!relic mymarks'); //rate rejection cannot flush812
-    assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages')).length, 1);
+    assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages') && JSON.parse(c.body).message.includes('PUBLIC CHAT')).length, 1);
     // Fresh privacy recheck before HTTP, even if the queued row was claimed.
     const get = f.runtime.state.getOwnMarks;
     f.runtime.state.getOwnMarks = async () => { throw Error('synthetic revoked'); };
     await replies.processPending(HOME);
     f.runtime.state.getOwnMarks = get;
-    assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages')).length, 1);
+    assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages') && JSON.parse(c.body).message.includes('PUBLIC CHAT')).length, 1);
     f.advance(60001);
     // Ambiguous bot call and finalize failure never expose details or retry.
     const step = f.runtime.state.shareReplyStep;
@@ -108,7 +108,7 @@ for (const kind of ['memory', 'firestore']) {
     await replies.processPending(HOME);
     doc = await f.runtime.state.getPrivateMarks(HOME, { broadcasterId: HOME, chatterId: HOME });
     assert.equal(doc.shares.find(s => s.actor === '813').status, 'dispatching');
-    assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages')).length, 2);
+    assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages') && JSON.parse(c.body).message.includes('PUBLIC CHAT')).length, 2);
   });
 }
 
@@ -150,7 +150,7 @@ for (const kind of ['memory', 'firestore']) test(`${kind}: signed self-login joi
   const reused = doc.shares.find(s => s.actor === '999'); assert.equal(JSON.parse((await page(reused.token)).body).total, 0);
   await command('811', 'renamed', '!relic forgetme'); assert.equal((await page(renamed.token)).status, 403);
   assert.equal(JSON.parse((await page(reused.token)).body).total, 0);
-  assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages')).length, 3);
+  assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages') && JSON.parse(c.body).message.includes('PUBLIC CHAT')).length, 3);
 });
 
 for (const kind of ['memory', 'firestore']) test(`${kind}: named share is immediately revoked by known block without association resurrection`, async () => {
@@ -171,7 +171,7 @@ for (const kind of ['memory', 'firestore']) {
     await command('old_name', 'stable-original'); f.advance(60001);
     await command('new_name', 'new-command'); const current = await f.row();
     f.advance(60001); await Promise.all([command('old_name', 'stable-original'), command('old_name', 'stable-original')]);
-    assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages')).length, 2);
+    assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages') && JSON.parse(c.body).message.includes('PUBLIC CHAT')).length, 2);
     assert.equal((await f.row()).login, 'new_name'); assert.equal((await f.page(current.token)).status, 200);
     const doc = await f.runtime.state.getPrivateMarks(HOME, { broadcasterId: HOME, chatterId: HOME });
     assert.equal(doc.shareReceipts.length, 2);
@@ -189,7 +189,7 @@ for (const kind of ['memory', 'firestore']) {
     }
     if (revoke === 'lifecycle') await f.signed('stream.offline', { broadcaster_user_id: HOME }, HOME);
     f.advance(60001); await send();
-    assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages')).length, 1);
+    assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages') && JSON.parse(c.body).message.includes('PUBLIC CHAT')).length, 1);
     const doc = await f.runtime.state.getPrivateMarks(HOME, { broadcasterId: HOME, chatterId: HOME });
     assert.equal(doc.shares?.length ?? 0, 0); assert.equal(doc.shareReceipts.length, 1);
     assert.ok(!JSON.stringify(doc.shareReceipts).includes('old_name'));
@@ -201,7 +201,7 @@ for (const kind of ['memory', 'firestore']) {
     await send(); const process = f.runtime.replies.processPending;
     f.runtime.replies.processPending = async () => ({ status: 'idle' }); await f.chat(HOME, '812', '!relic mymarks'); f.runtime.replies.processPending = process;
     f.advance(60001); await send();
-    assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages')).length, 1);
+    assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages') && JSON.parse(c.body).message.includes('PUBLIC CHAT')).length, 1);
     const doc = await f.runtime.state.getPrivateMarks(HOME, { broadcasterId: HOME, chatterId: HOME });
     assert.equal(doc.shares.find(s => s.actor === '812').status, 'queued');
     assert.equal(doc.shareReceipts.length, 3);

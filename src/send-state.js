@@ -1,7 +1,9 @@
+import { validRaidDiagnostic } from './raid-diagnostic.js';
 import { hash } from './crypto.js';
 
 export const SEND_LIMITS = Object.freeze({ leaseMs: 30000, queueMs: 120000, confirmationMs: 600000, ritualMs: 90000 });
-const busy = intent => intent && !['rejected'].includes(intent.status);
+export const claimThreshold = viewers => viewers <= 2 ? 1 : Math.min(10, Math.ceil(Math.sqrt(Math.max(1, viewers))));
+const busy = intent => intent && !['rejected', 'expired-handoff'].includes(intent.status);
 export function eligible(registry, channels, marks, source, target, retired = false) {
   const ready = id => (channels[id]?.online || (retired && id === source)) && channels[id]?.optedIn
     && marks[id]?.context?.optedIn === true && marks[id].context.keeperId === id && !marks[id].paused
@@ -35,6 +37,26 @@ export function sendState(previous, channels, marks, config, op, now) {
       intent.status = 'rejected'; result = { status: 'cancelled-undispatched' };
     }
   }
+  if (op.type === 'expire-handoff') {
+    const hop = registry.pendingHop;
+    const source = channels[op.source];
+    const streamMatches = source?.online ? source.streamId === hop?.sourceStreamId : source?.retiredStream?.streamId === hop?.sourceStreamId;
+    const provenClosed = source?.closedIds?.includes(hop?.sourceStreamId) === true;
+    if (config.channels.includes(op.source) && op.actor === op.source && registry.holderId === op.source
+      && intent?.status === 'confirmed' && intent.id === op.id && intent.sourceId === op.source
+      && hop?.eventId === op.hopId && hop.from === op.source && hop.to === intent.targetId && !hop.finalized
+      && hop.sourceStreamId === intent.sourceStreamId && hop.targetStreamId === intent.targetStreamId
+      && Number.isFinite(hop.raidSentAt) && hop.raidSentAt >= (intent.dispatchAt ?? intent.createdAt)
+      && Number.isFinite(hop.endsAt) && now >= hop.endsAt && (streamMatches || provenClosed)) {
+      hop.cancelled = true; hop.expired = true; delete hop.offers; delete hop.accepts;
+      intent.status = 'expired-handoff'; intent.retiredAt = now; intent.confirmedEventId = hop.eventId; intent.confirmedRaidSentAt = hop.raidSentAt;
+      registry.raidWatermark = Math.max(registry.raidWatermark ?? -1, now);
+      registry.sendWatermark = Math.max(registry.sendWatermark ?? -1, now);
+      result = { status: 'expired-handoff' };
+    } else if (intent?.status === 'expired-handoff' && intent.id === op.id && registry.holderId === op.source
+      && intent.sourceId === op.source && op.actor === op.source && hop?.eventId === op.hopId && hop.expired && !hop.finalized) result = { status: 'expired-handoff' };
+    else result = { status: 'blocked', reason: 'handoff-expiry-proof' };
+  }
   if (op.type === 'claim' && intent?.sourceId === op.source && (!op.expectedId || intent.id === op.expectedId)) {
     if (intent.status === 'dispatching' && intent.leaseUntil <= now) intent.status = 'unknown';
     if (['queued', 'preflight'].includes(intent.status) && (intent.status === 'queued' || intent.leaseUntil <= now)) {
@@ -49,7 +71,10 @@ export function sendState(previous, channels, marks, config, op, now) {
     else { intent.status = 'dispatching'; intent.dispatchAt = now; result = structuredClone(intent); }
   }
   if (op.type === 'finish' && owns && !['confirmed', 'rejected'].includes(intent.status)) {
-    if (intent.status === 'dispatching') intent.status = ['accepted', 'rejected', 'unknown'].includes(op.status) ? op.status : 'unknown';
+    if (intent.status === 'dispatching') {
+      intent.status = ['accepted', 'rejected', 'unknown'].includes(op.status) ? op.status : 'unknown';
+      if (validRaidDiagnostic(op.diagnostic, intent)) intent.diagnostic = op.diagnostic;
+    }
     else if (intent.status === 'preflight' && intent.leaseUntil > now && op.status === 'rejected') intent.status = 'rejected';
   }
   if (op.type === 'raid' && Number.isInteger(op.raid?.viewers) && op.raid.viewers >= 0 && op.raid.viewers <= 1000000) {
@@ -70,7 +95,7 @@ export function sendState(previous, channels, marks, config, op, now) {
       registry.raidWatermark = sentAt;
       registry.pendingHop = { eventId: hash(id), from: source, to: target, phase: 'pending-handoff', origin: correlated ? 'planned' : 'manual',
         sourceStreamId: sourceStreamId, targetStreamId: channels[target].streamId, retiredSource: Boolean(retired),
-        raidSentAt: sentAt, raidSize: raid.viewers, threshold: Math.min(10, Math.ceil(Math.sqrt(Math.max(1, raid.viewers)))), offers: [], accepts: [],
+        raidSentAt: sentAt, raidSize: raid.viewers, threshold: claimThreshold(raid.viewers), thresholdPolicy: 'small-raid-v2', offers: [], accepts: [],
         startedAt: now, snatchedUntil: now + 1500, endsAt: now + SEND_LIMITS.ritualMs };
       if (correlated) intent.status = 'confirmed';
       ritual = { eventId: id, incomingBroadcasterId: source, hostBroadcasterId: target, startedAt: now, endsAt: now + SEND_LIMITS.ritualMs };

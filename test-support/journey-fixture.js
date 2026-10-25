@@ -14,7 +14,7 @@ export async function createJourneyFixture({ seed = true, firestoreClient } = {}
   const app = createApp({ secret: 'synthetic-journey-test-secret', state, overlayFeed: feed, chatContext: { streamerId: source, keeperIds: [source, target], botId: bot } });
   let seq = 0;
   const event = async (data, time = Date.now()) => state.accept({ id: `sim-journey-${++seq}`, now: time, sentAt: time, expiresAt: time + 600000, ...data });
-  const chat = (host, user, action, time) => event({ chat: { broadcasterId: host, chatterId: user, markAction: action } }, time);
+  const chat = (host, user, action, time) => event({ chat: { broadcasterId: host, chatterId: user, messageId: `sim-chat-${++seq}`, markAction: action } }, time);
   if (seed) {
     const time = Date.now() - 3000;
     for (const [host, id] of [[source, '9001'], [target, '9002']]) {

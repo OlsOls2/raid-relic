@@ -12,7 +12,7 @@ export function publicJourney(lineage) {
 }
 // All inputs are store-owned snapshots. No effects; caller commits every result together.
 export function reduceClaims(registry, channels, marks, previous, chat, now, sentAt = now) {
-  registry = structuredClone(registry); marks = structuredClone(marks); const lineage = structuredClone(previous ?? emptyLineage());
+  registry = structuredClone(registry); marks = structuredClone(marks); const lineage = structuredClone(previous ?? emptyLineage()); let acknowledgement = null;
   // References are private and scoped to source channel/stream/mark/user. Purge
   // permanently when approval/content is removed; never regenerate archived entries.
   for (const stop of lineage.stops) stop.marks = stop.marks.filter(item => {
@@ -53,7 +53,10 @@ export function reduceClaims(registry, channels, marks, previous, chat, now, sen
       const other = side === 'offers' ? 'accepts' : 'offers';
       if (chat.broadcasterId === (side === 'offers' ? hop.from : hop.to)
         && !hop[other].includes(chat.chatterId) && !hop[side].includes(chat.chatterId)
-        && hop[side].length < hop.threshold) hop[side].push(chat.chatterId);
+        && hop[side].length < hop.threshold) {
+        hop[side].push(chat.chatterId);
+        acknowledgement = `${side === 'offers' ? 'Offers' : 'Accepts'} ${hop[side].length}/${hop.threshold}. Both chats required within the app-local 90s window.`;
+      }
       if (hop.offers.length === hop.threshold && hop.accepts.length === hop.threshold) {
         const doc = marks[hop.from]; const session = doc.sessions.find(s => s.streamId === hop.sourceStreamId);
         const approved = (session?.marks ?? []).filter(m => m.status === 'approved' && !doc.blocked.includes(m.userId)
@@ -65,6 +68,7 @@ export function reduceClaims(registry, channels, marks, previous, chat, now, sen
             streamId: hop.sourceStreamId, claimedAt: now, raidSize: hop.raidSize, ringIndex: lineage.stops.length + 1,
             marks: approved.map(({ id, userId, text }) => ({ id, userId, text })) });
           if (Buffer.byteLength(JSON.stringify(lineage)) > LINEAGE_LIMITS.bytes) throw new Error('Lineage capacity reached');
+          acknowledgement = 'Claim complete: both chats reached the threshold. Relic transferred; one growth ring recorded.';
           delete registry.echo; registry.holderId = hop.to; registry.carriedClosures = 0; delete registry.send; hop.finalized = true;
           marks[hop.from].context.holdsRelic = false; marks[hop.to].context.holdsRelic = true;
         }
@@ -73,5 +77,5 @@ export function reduceClaims(registry, channels, marks, previous, chat, now, sen
     }
   }
   if (Buffer.byteLength(JSON.stringify(registry)) > 4096) throw new Error('Relic registry capacity reached');
-  return { registry, marks, lineage };
+  return { registry, marks, lineage, acknowledgement, ackDeadline: registry.pendingHop?.endsAt };
 }
