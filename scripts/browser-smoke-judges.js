@@ -33,7 +33,7 @@ try {
   await press('raid'); const target = page.frameLocator('iframe[title="SIMULATOR host overlay"]');
   await target.locator('#compact-status').filter({ hasText: 'Incoming' }).waitFor();
   await target.locator('#claim-meter').waitFor({ state: 'visible' });
-  await target.locator('#claim-label').filter({ hasText: 'Verified raid · claim' }).waitFor();
+  await target.locator('#claim-label').filter({ hasText: 'The raid arrived · claim the relic' }).waitFor();
   const incoming = await page.evaluate(async () => (await fetch('/api/overlay/1591806023')).json());
   if (incoming.status !== 'incoming' || !incoming.handoff || incoming.handoff.completed || incoming.claimMeter.awaitingRaid) throw Error('Verified incoming proof missing');
   await target.locator('#compact-count').filter({ hasText: 'Charge 1/160 · Rings 0' }).waitFor();
