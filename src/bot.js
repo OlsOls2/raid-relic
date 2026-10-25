@@ -42,13 +42,13 @@ export function createBot({ oauth, clientId, clientSecret, streamerId, botId, ca
     try { return await transport(url, options); } catch { throw new Error('Bot request failed'); }
   }
   const headers = token => ({ Authorization: `Bearer ${token}`, 'Client-Id': clientId, 'content-type': 'application/json' });
-  async function sendChat(message) {
+  async function sendChat(message, { retryUnauthorized = true } = {}) {
     if (typeof message !== 'string' || !message.trim() || [...message].length > 500) throw new Error('Invalid chat message');
     for (let attempt = 0; attempt < 2; attempt++) {
       const token = await oauth.accessToken('bot', { refresh: attempt === 1 });
       const response = await call('https://api.twitch.tv/helix/chat/messages', { method: 'POST', headers: headers(token),
         body: JSON.stringify({ broadcaster_id: streamerId, sender_id: botId, message }) });
-      if (response.status === 401 && attempt === 0) continue;
+      if (response.status === 401 && attempt === 0 && retryUnauthorized) continue;
       const sent = response.data?.data?.[0];
       if (response.status !== 200 || sent?.is_sent !== true || typeof sent.message_id !== 'string') throw new Error('Chat message not sent');
       return { messageId: sent.message_id };

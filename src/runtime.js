@@ -72,7 +72,7 @@ export async function createRuntime(env, { firestoreClient, transport, chronicle
     pilot = createPilot({ replies, forge, chronicle, state, store, oauth, subscriptions: subscriptionManagers, sends, now, simulator, clientId: env.TWITCH_CLIENT_ID, transport });
     oauth.control.bindPilot(pilot);
   }
-  return { ...createApp({ shares, banAuthorized: async host => { const proof = (await store.getJob(host))?.banCapability; return proof?.scope === 'channel:moderate' && proof.expiresAt > now(); }, secret: env.TWITCH_EVENTSUB_SECRET, state, oauth, overlayFeed, overlayFeeds, raidPilot, now, releaseCommit: releaseCommit ?? undefined,
+  return { ...createApp({ shares, replies, banAuthorized: async host => { const proof = (await store.getJob(host))?.banCapability; return proof?.scope === 'channel:moderate' && proof.expiresAt > now(); }, secret: env.TWITCH_EVENTSUB_SECRET, state, oauth, overlayFeed, overlayFeeds, raidPilot, now, releaseCommit: releaseCommit ?? undefined,
     chatContext: oauth ? { streamerId: env.TWITCH_STREAMER_ID, botId: env.TWITCH_BOT_ID, keeperIds } : undefined }), oauth, bot, store, subscriptions, sendOff, overlayFeed, overlayFeeds, pilot, shares, replies, subscriptionManagers, sends,
     overlayOrigins: production ? [env.OVERLAY_ORIGIN].filter(Boolean) : ['http://localhost:5191', 'http://127.0.0.1:5191'] };
 }

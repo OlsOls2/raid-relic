@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';
-import { createMarkShares, ownHistory } from '../src/my-marks.js';
+import { createMarkShares, createShareReplies, ownHistory } from '../src/my-marks.js';
 import { readFile } from 'node:fs/promises';
 async function setup(kind) {
   const f = await pilotFixture(kind); for (const id of [BOT, HOME, OTHER]) await f.login(id);
@@ -13,10 +13,10 @@ async function setup(kind) {
   return f;
 }
 for (const kind of ['memory', 'firestore']) {
-  test(`${kind}: signed mymarks opt-in is deduped/rate-bounded, no webhook HTTP; explicit own request replies once`, async () => {
+  test(`${kind}: signed mymarks opt-in is deduped/rate-bounded, automatic exact-request reply runs once`, async () => {
     const f = await setup(kind); const calls = f.calls.length;
     await Promise.all(Array.from({ length: 8 }, () => f.chat(HOME, '811', '!relic mymarks')));
-    assert.equal(f.calls.length, calls); const row = await f.row(); assert.ok(row); assert.ok(!Buffer.from(row.token, 'base64url').includes(Buffer.from('"u":"811"')));
+    assert.equal(f.calls.slice(calls).filter(c => c.url.endsWith('/chat/messages')).length, 1); const row = await f.row(); assert.ok(row); assert.ok(!Buffer.from(row.token, 'base64url').includes(Buffer.from('"u":"811"')));
     const record = await f.runtime.state.getPrivateMarks(HOME, { broadcasterId: HOME, chatterId: HOME }); assert.equal(record.shares.length, 1);
     const page = JSON.parse((await f.page(row.token)).body); assert.equal(page.total, 1); assert.equal(page.matches[0].text, 'moon');
     for (const forbidden of ['userId', 'actor', 'nonce', 'private', 'capability']) assert.ok(!JSON.stringify(page).includes(forbidden));
@@ -56,10 +56,10 @@ test('Firestore share reservation rollback and reply crash stay at most once', a
   const f = await setup('firestore'); f.db.failCommit = true;
   await assert.rejects(f.chat(HOME, '811', '!relic mymarks')); f.db.failCommit = false; assert.equal(await f.row(), undefined);
   await f.chat(HOME, '811', '!relic mymarks'); const row = await f.row();
-  const claim = await f.runtime.state.shareReplyStep(HOME, { type: 'claim' }, f.now()); assert.equal(claim.nonce, row.nonce);
+  assert.equal(row.status, 'sent');
   // Crash at/after marked dispatch boundary: no automatic second send.
   assert.deepEqual(await f.runtime.replies.processPending(HOME), { status: 'idle' });
-  assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages')).length, 0);
+  assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages')).length, 1);
 });
 
 test('shared-history HTTP boundary is no-store/no-referrer, rejects invalid paging and clears revoked capability', async () => {
@@ -75,4 +75,50 @@ test('shared-history HTTP boundary is no-store/no-referrer, rejects invalid pagi
   await f.chat(HOME, '811', '!relic forgetme'); const gone = await http(); assert.equal(gone.code, 403); assert.equal(gone.headers['cache-control'], 'no-store'); assert.ok(!gone.body.includes('moon'));
   const shares = createMarkShares({ key: Buffer.alloc(32, 3).toString('base64'), channels: [HOME], origin: 'https://test.example', now: () => 101 });
   assert.equal(shares.open(shares.issue(HOME, '811', 100).token).expiresAt, 600100); //receipt-based issue survives processing milliseconds
+});
+
+for (const kind of ['memory', 'firestore']) {
+  test(`${kind}: exact message hash isolates queued viewers, retries and ambiguous reply dispatch`, async () => {
+    const f = await setup(kind), replies = f.runtime.replies, original = replies.processPending;
+    // Durable queue exists, but simulate a request ending before the exact claim.
+    replies.processPending = async () => ({ status: 'idle' });
+    await f.chat(HOME, '812', '!relic mymarks');
+    replies.processPending = original;
+    const event = { broadcaster_user_id: HOME, chatter_user_id: '811', message_id: 'stable-original', message: { text: '!relic mymarks', fragments: [] } };
+    const send = () => f.signed('channel.chat.message', event, HOME, { broadcaster_user_id: HOME, user_id: BOT });
+    await Promise.all(Array.from({ length: 8 }, send));
+    assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages')).length, 1);
+    let doc = await f.runtime.state.getPrivateMarks(HOME, { broadcasterId: HOME, chatterId: HOME });
+    assert.equal(doc.shares.find(s => s.actor === '812').status, 'queued');
+    assert.equal(doc.shares.find(s => s.actor === '811').status, 'sent');
+    await f.chat(HOME, '811', '!relic mymarks'); //rate rejection cannot flush812
+    assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages')).length, 1);
+    // Fresh privacy recheck before HTTP, even if the queued row was claimed.
+    const get = f.runtime.state.getOwnMarks;
+    f.runtime.state.getOwnMarks = async () => { throw Error('synthetic revoked'); };
+    await replies.processPending(HOME);
+    f.runtime.state.getOwnMarks = get;
+    assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages')).length, 1);
+    f.advance(60001);
+    // Ambiguous bot call and finalize failure never expose details or retry.
+    const step = f.runtime.state.shareReplyStep;
+    f.runtime.state.shareReplyStep = async (...args) => { if (args[1].type === 'finish') throw Error('synthetic commit failure'); return step(...args); };
+    await f.chat(HOME, '813', '!relic mymarks');
+    f.runtime.state.shareReplyStep = step;
+    await replies.processPending(HOME);
+    doc = await f.runtime.state.getPrivateMarks(HOME, { broadcasterId: HOME, chatterId: HOME });
+    assert.equal(doc.shares.find(s => s.actor === '813').status, 'dispatching');
+    assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages')).length, 2);
+  });
+}
+
+for (const kind of ['memory', 'firestore']) test(`${kind}: failed chat POST is marked unknown and never retried`, async () => {
+  const f = await setup(kind); f.runtime.replies.processPending = async () => ({ status: 'idle' });
+  await f.chat(HOME, '811', '!relic mymarks'); const row = await f.row(); let posts = 0;
+  const service = createShareReplies({ state: f.runtime.state, shares: f.runtime.shares, now: f.now,
+    bots: { [HOME]: { async sendChat(_message, options) { assert.equal(options.retryUnauthorized, false); posts++; throw Error('synthetic timeout'); } } } });
+  assert.deepEqual(await service.processPending(HOME, row.requestHash), { status: 'unknown' });
+  assert.deepEqual(await service.processPending(HOME, row.requestHash), { status: 'idle' });
+  assert.deepEqual(await service.processPending(HOME, '0'.repeat(64)), { status: 'idle' });
+  assert.equal(posts, 1); assert.equal((await f.row()).status, 'unknown');
 });

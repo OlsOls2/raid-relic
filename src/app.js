@@ -1,3 +1,4 @@
+import { shareRequestHash } from './my-marks.js';
 import { parseBan } from './bans.js';
 import { matchesSubscriptionCondition } from './subscriptions.js';
 import { strictJSON, templateDesign, forgeResult } from './forge.js';
@@ -39,7 +40,7 @@ const assets = new Map([
 const header = (headers, name) => typeof headers[name] === 'string' ? headers[name] : '';
 const result = (status, body = '', type = 'text/plain; charset=utf-8') => ({ status, body, type });
 
-export function createApp({ secret, state = createMemoryState(), now = Date.now, oauth, chatContext, overlayFeed, overlayFeeds, raidPilot = false, releaseCommit, shares, banAuthorized, publicBudget = { burst: 60, perSecond: 1 } } = {}) {
+export function createApp({ secret, state = createMemoryState(), now = Date.now, oauth, chatContext, overlayFeed, overlayFeeds, raidPilot = false, releaseCommit, shares, replies, banAuthorized, publicBudget = { burst: 60, perSecond: 1 } } = {}) {
   const keepers = chatContext?.keeperIds ?? (chatContext ? [chatContext.streamerId] : []);
   if (!Array.isArray(keepers) || keepers.length > 4 || (chatContext && !keepers.length)
     || !keepers.every(id => typeof id === 'string' && /^\d{1,32}$/.test(id))
@@ -212,6 +213,10 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
     const share = chat?.markAction?.type === 'mymarks' && shares && !chat.isBot && !chat.copied ? shares.issue(chat.broadcasterId, chat.chatterId, receivedAt) : undefined;
     const accepted = await state.accept({ share, id, now: receivedAt, sentAt, expiresAt: sentAt + REPLAY_WINDOW_MS, raid, chat, lifecycle });
     if (accepted === 'full') return result(503, 'Event capacity reached');
+    // Exact proven request only; duplicates can recover an unclaimed row, never another viewer's.
+    if (share && replies) {
+      try { await replies.processPending(chat.broadcasterId, shareRequestHash(chat)); } catch { /* No sensitive diagnostics or post-response worker. */ }
+    }
     return result(204);
   }
 

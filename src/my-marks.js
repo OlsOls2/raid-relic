@@ -1,6 +1,7 @@
 import { createHmac, randomBytes } from 'node:crypto';
 import { createTokenCipher, hash } from './crypto.js';
 import { runeSvg } from './marks.js';
+export const shareRequestHash = chat => hash(JSON.stringify(['my-marks-request-v1', chat.broadcasterId, chat.chatterId, chat.messageId]));
 export const SHARE_TTL = 600000;
 export function createMarkShares({ key, channels, origin, now = Date.now }) {
   const secret = Buffer.from(key ?? '', 'base64'); if (secret.length !== 32 || !channels?.length || new URL(origin).origin !== origin) throw Error('Share configuration required');
@@ -43,10 +44,10 @@ export function reserveShare(doc, lineage, chat, share, now) {
   doc.shares = (doc.shares ?? []).filter(s => s.expiresAt > now);
   if (!share || share.host !== chat.broadcasterId || share.actor !== chat.chatterId || share.expiresAt <= now || share.expiresAt > now + SHARE_TTL || chat.isBot
     || !doc.context?.optedIn || doc.paused || doc.blocked.includes(chat.chatterId) || doc.context.blockedUserIds.includes(chat.chatterId)
-    || doc.shares.length >= 8 || doc.shareRates.length >= 128 || doc.shareRates.some(s => s.key === rateKey)) return doc;
+    || doc.shares.some(s => s.requestHash === shareRequestHash(chat)) || doc.shares.length >= 8 || doc.shareRates.length >= 128 || doc.shareRates.some(s => s.key === rateKey)) return doc;
   const count = ownHistory(approvedArchive(doc, lineage), share.host, share.actor).total;
   doc.shareRates.push({ key: rateKey, at: now });
-  doc.shares.push({ actor: share.actor, nonce: share.nonce, token: share.token, expiresAt: share.expiresAt, at: now, status: 'queued', count });
+  doc.shares.push({ requestHash: shareRequestHash(chat), actor: share.actor, nonce: share.nonce, token: share.token, expiresAt: share.expiresAt, at: now, status: 'queued', count });
   if (Buffer.byteLength(JSON.stringify(doc)) > 131072) throw Error('Mark storage capacity reached');
   return doc;
 }
@@ -60,24 +61,24 @@ export function shareStep(previous, op, now) {
   const doc = structuredClone(previous); const row = (doc?.shares ?? []).find(s => s.nonce === op.nonce && s.expiresAt > now);
   let result = null;
   if (op.type === 'claim') {
-    const next = (doc?.shares ?? []).find(s => s.status === 'queued' && s.expiresAt > now);
+    const next = (doc?.shares ?? []).find(s => s.status === 'queued' && s.expiresAt > now && (op.requestHash === undefined || s.requestHash === op.requestHash));
     if (next) { next.status = 'dispatching'; result = structuredClone(next); }
   } else if (op.type === 'finish' && row?.status === 'dispatching') row.status = op.sent ? 'sent' : 'unknown';
   if (doc && Buffer.byteLength(JSON.stringify(doc)) > 131072) throw Error('Mark storage capacity reached');
   return { doc, result };
 }
 export function createShareReplies({ state, shares, bots, now = Date.now }) {
-  return { async processPending(host) {
+  return { async processPending(host, requestHash) {
     if (!bots[host]) throw Error('Unconfigured reply channel');
-    const row = await state.shareReplyStep(host, { type: 'claim' }, now());
+    const row = await state.shareReplyStep(host, { type: 'claim', ...(requestHash === undefined ? {} : { requestHash }) }, now());
     if (!row) return { status: 'idle' };
     let sent = false;
     try {
       const page = await state.getOwnMarks(shares.open(row.token), now(), 0, 1);
-      await bots[host].sendChat(`${page.total} retained approved mark entries. You opted to share this history in PUBLIC CHAT; anyone can open (10min): ${shares.link(row.token)}`);
+      await bots[host].sendChat(`${page.total} retained approved mark entries. You opted to share this history in PUBLIC CHAT; anyone can open (10min): ${shares.link(row.token)}`, { retryUnauthorized: false });
       sent = true;
     } catch { /* Revoked/expired or ambiguous chat: never automatically retry. */ }
-    await state.shareReplyStep(host, { type: 'finish', nonce: row.nonce, sent }, now());
+    try { await state.shareReplyStep(host, { type: 'finish', nonce: row.nonce, sent }, now()); } catch { /* Durable dispatching boundary remains non-retryable. */ }
     return { status: sent ? 'sent' : 'unknown' };
   } };
 }

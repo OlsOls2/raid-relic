@@ -64,3 +64,11 @@ test('signed chat EventSub is deduplicated and stores bounded receipt, never cre
   const forged = { ...request, headers: { ...request.headers, 'twitch-eventsub-message-signature': 'sha256=' + '0'.repeat(64) } };
   assert.equal((await instance.dispatch(forged)).status, 403);
 });
+
+test('at-most-once reply mode never retries a chat POST on401', async () => {
+  let posts = 0;
+  const bot = createBot({ ...config, oauth: { accessToken: async () => 'synthetic-token' },
+    transport: async () => { posts++; return { status: 401, data: {} }; } });
+  await assert.rejects(bot.sendChat('public history notice', { retryUnauthorized: false }), /Chat message not sent/);
+  assert.equal(posts, 1);
+});
