@@ -18,7 +18,7 @@ export function createOverlayFeed(store, channel, { simulator = false } = {}) {
     }
   }
   const wrapped = Object.create(store);
-  for (const name of ['accept', 'setKeeperContext', 'controlMarks']) {
+  for (const name of ['accept', 'setKeeperContext', 'controlMarks', 'setChannelPolicy']) {
     wrapped[name] = (...args) => enqueue(async () => {
       const result = await store[name](...args);
       revision++;

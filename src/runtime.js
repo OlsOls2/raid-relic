@@ -5,22 +5,24 @@ import { createOAuth } from './oauth.js';
 import { createBot } from './bot.js';
 import { createOverlayFeed } from './overlay-feed.js';
 import { validateReleaseCommit } from './release.js';
+import { createSubscriptionManager } from './subscriptions.js';
 
 export const PROJECT_ID = 'raid-relic-hackathon';
 export async function createRuntime(env, { firestoreClient, transport, loadSDK = () => import('@google-cloud/firestore') } = {}) {
   const production = env.NODE_ENV === 'production';
   const releaseCommit = validateReleaseCommit(env.RELEASE_COMMIT, { required: production });
   let state; let store;
+  const lifecycle = env.OAUTH_ENABLED === 'true' ? { channels: [env.TWITCH_STREAMER_ID] } : undefined;
   if (env.STATE_STORE === 'firestore') {
     if (env.GOOGLE_CLOUD_PROJECT !== PROJECT_ID || env.FIRESTORE_EMULATOR_HOST) throw new Error('Firestore project configuration rejected');
     const db = firestoreClient ?? new (await loadSDK()).Firestore({ projectId: PROJECT_ID });
-    state = store = createFirestoreStore(db);
+    state = store = createFirestoreStore(db, { lifecycle });
   } else {
     if (production || env.STATE_STORE !== 'memory') throw new Error('Select STATE_STORE explicitly; production requires Firestore');
-    state = createMemoryState(); store = createMemoryAuthStore();
+    state = createMemoryState({ lifecycle }); store = createMemoryAuthStore();
   }
   if (!env.TWITCH_EVENTSUB_SECRET || env.TWITCH_EVENTSUB_SECRET.length < 10 || env.TWITCH_EVENTSUB_SECRET.length > 100) throw new Error('Webhook secret required');
-  let oauth; let bot;
+  let oauth; let bot; let subscriptions;
   if (env.OAUTH_ENABLED === 'true') {
     oauth = createOAuth({ clientId: env.TWITCH_CLIENT_ID, clientSecret: env.TWITCH_CLIENT_SECRET, redirectUri: env.OAUTH_REDIRECT_URI,
       redirectAllowlist: (env.OAUTH_REDIRECT_ALLOWLIST ?? '').split(','), streamerId: env.TWITCH_STREAMER_ID, botId: env.TWITCH_BOT_ID,
@@ -28,6 +30,8 @@ export async function createRuntime(env, { firestoreClient, transport, loadSDK =
     bot = createBot({ oauth, clientId: env.TWITCH_CLIENT_ID, clientSecret: env.TWITCH_CLIENT_SECRET, streamerId: env.TWITCH_STREAMER_ID,
       botId: env.TWITCH_BOT_ID, callbackUrl: env.EVENTSUB_CALLBACK_URL, webhookSecret: env.TWITCH_EVENTSUB_SECRET, transport });
     if (production) bot.chatSubscription();
+    subscriptions = createSubscriptionManager({ oauth, bot, clientId: env.TWITCH_CLIENT_ID, clientSecret: env.TWITCH_CLIENT_SECRET,
+      streamerId: env.TWITCH_STREAMER_ID, transport });
   } else if (production || env.OAUTH_ENABLED !== 'false') throw new Error('Select OAUTH_ENABLED explicitly; production requires OAuth configuration');
   let overlayFeed;
   if (env.TWITCH_STREAMER_ID) {
@@ -35,6 +39,6 @@ export async function createRuntime(env, { firestoreClient, transport, loadSDK =
     overlayFeed = createOverlayFeed(state, env.TWITCH_STREAMER_ID); state = overlayFeed.store;
   }
   return { ...createApp({ secret: env.TWITCH_EVENTSUB_SECRET, state, oauth, overlayFeed, releaseCommit: releaseCommit ?? undefined,
-    chatContext: oauth ? { streamerId: env.TWITCH_STREAMER_ID, botId: env.TWITCH_BOT_ID } : undefined }), oauth, bot, store, overlayFeed,
+    chatContext: oauth ? { streamerId: env.TWITCH_STREAMER_ID, botId: env.TWITCH_BOT_ID } : undefined }), oauth, bot, store, subscriptions, overlayFeed,
     overlayOrigins: production ? [env.OVERLAY_ORIGIN].filter(Boolean) : ['http://localhost:5191', 'http://127.0.0.1:5191'] };
 }

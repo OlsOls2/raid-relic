@@ -4,6 +4,7 @@ import { createMemoryState } from './state.js';
 import { parseChat } from './bot.js';
 import { createMarkService } from './marks.js';
 import { validateReleaseCommit } from './release.js';
+import { parseLifecycle } from './lifecycle.js';
 
 export const MAX_BODY_BYTES = 65536;
 export const REPLAY_WINDOW_MS = 10 * 60 * 1000;
@@ -68,9 +69,12 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
     if (type !== 'notification' && type !== 'revocation') return result(400, 'Unsupported message type');
     const subscription = payload.subscription;
     if (!subscription || typeof subscription.type !== 'string') return result(400, 'Missing subscription');
-    let raid; let chat;
+    let raid; let chat; let lifecycle;
     if (type === 'notification') {
-      if (subscription.type === 'channel.chat.message') {
+      if (['stream.online', 'stream.offline'].includes(subscription.type)) {
+        if (!chatContext || !state.lifecycleEnabled) return result(503, 'Lifecycle not configured');
+        try { lifecycle = parseLifecycle(payload, chatContext.streamerId, sentAt); } catch { return result(400, 'Invalid lifecycle'); }
+      } else if (subscription.type === 'channel.chat.message') {
         if (!chatContext) return result(503, 'Chat not configured');
         try { chat = parseChat(payload, { ...chatContext, includeMarkCommands: true }); } catch { return result(400, 'Invalid chat'); }
       } else {
@@ -78,9 +82,10 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
         raid = payload.event;
         if (!raid || !['from_broadcaster_user_id', 'to_broadcaster_user_id'].every(key => typeof raid[key] === 'string' && /^\d+$/.test(raid[key]))
           || !Number.isInteger(raid.viewers) || raid.viewers < 0) return result(400, 'Invalid raid');
+        if (chatContext && (subscription.condition?.to_broadcaster_user_id !== chatContext.streamerId || raid.to_broadcaster_user_id !== chatContext.streamerId)) return result(400, 'Invalid raid condition');
       }
     }
-    const accepted = await state.accept({ id, now: receivedAt, expiresAt: sentAt + REPLAY_WINDOW_MS, raid, chat });
+    const accepted = await state.accept({ id, now: receivedAt, sentAt, expiresAt: sentAt + REPLAY_WINDOW_MS, raid, chat, lifecycle });
     if (accepted === 'full') return result(503, 'Event capacity reached');
     return result(204);
   }

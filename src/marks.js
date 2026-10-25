@@ -35,6 +35,7 @@ export function parseMarkCommand(text) {
   if (text === '!relic pause') return { type: 'pause', paused: true };
   if (text === '!relic resume') return { type: 'pause', paused: false };
   if (text === '!relic opt-out') return { type: 'opt-out' };
+  if (text === '!relic keep' || text === '!relic opt-in') return { type: 'keep' };
   const approve = /^!relic approve (m[1-9]\d{0,8})$/.exec(text);
   if (approve) return { type: 'approve', markId: approve[1] };
   const block = /^!relic block (\d{1,32})$/.exec(text);
@@ -46,6 +47,7 @@ export function isModerator(actor, host) {
 }
 export const isChatIdentity = (actor, host) => userId(host) && actor?.broadcasterId === host && userId(actor.chatterId);
 const empty = () => ({ context: null, paused: false, blocked: [], sessions: [], cooldowns: [], serial: 0 });
+export const emptyMarkDocument = empty;
 function bounded(doc) {
   if (Buffer.byteLength(JSON.stringify(doc)) > MARK_LIMITS.bytes) throw new Error('Mark storage capacity reached');
   return doc;

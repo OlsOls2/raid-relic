@@ -1,18 +1,25 @@
+import { lifecycleConfig, reduceLifecycle, emptyRegistry } from './lifecycle.js';
 import { setMarkContext, reduceMark, publicMarks, publicOverlayState, privateMarks, isModerator, isChatIdentity } from './marks.js';
 
 // Synchronous mutations are atomic within a single process; tests/dev only.
-export function createMemoryState({ maxEvents = 10000 } = {}) {
+export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
+  const config = lifecycleConfig(lifecycle);
+  let registry = emptyRegistry(); const channels = new Map();
   const seen = new Map();
   const rituals = new Map();
   const chatReceipts = new Map();
   const markDocs = new Map();
   return {
-    accept({ id, expiresAt, now, raid, chat }) {
+    lifecycleEnabled: Boolean(config),
+    accept({ id, expiresAt, now, raid, chat, lifecycle: event, sentAt = now }) {
       for (const [key, expiry] of seen) if (expiry < now) seen.delete(key);
       for (const [key, ritual] of rituals) if (ritual.endsAt <= now) rituals.delete(key);
       if (seen.has(id)) return 'duplicate';
       if (seen.size >= maxEvents) return 'full';
-      const markDoc = chat?.markAction ? reduceMark(markDocs.get(chat.broadcasterId), chat.broadcasterId, chat, chat.markAction, now) : null;
+      const host = event?.host ?? chat?.broadcasterId;
+      if (config && host && !config.channels.includes(host)) throw new Error('Unconfigured lifecycle channel');
+      const transition = config && host ? reduceLifecycle({ registry, channel: channels.get(host), marks: markDocs.get(host), host, event, chat, now, sentAt }) : null;
+      const markDoc = transition ? transition.marks : chat?.markAction ? reduceMark(markDocs.get(chat.broadcasterId), chat.broadcasterId, chat, chat.markAction, now) : null;
       // No await between check and insertion: atomic within this process.
       seen.set(id, expiresAt);
       if (raid) rituals.set(raid.to_broadcaster_user_id, {
@@ -22,7 +29,8 @@ export function createMemoryState({ maxEvents = 10000 } = {}) {
         startedAt: now,
         endsAt: now + 90000,
       });
-      if (markDoc) markDocs.set(chat.broadcasterId, markDoc);
+      if (transition) { registry = transition.registry; channels.set(host, transition.channel); }
+      if (markDoc) markDocs.set(host, markDoc);
       if (chat?.markAction?.type === 'forgetme' && chatReceipts.get(chat.broadcasterId)?.chatterId === chat.chatterId) chatReceipts.delete(chat.broadcasterId);
       if (chat && !chat.markAction) chatReceipts.set(chat.broadcasterId, { broadcasterId: chat.broadcasterId, chatterId: chat.chatterId, messageId: chat.messageId, receivedAt: now });
       return 'accepted';
@@ -32,13 +40,23 @@ export function createMemoryState({ maxEvents = 10000 } = {}) {
       return ritual ? { ...ritual } : undefined;
     },
     getChatReceipt(hostId) { return structuredClone(chatReceipts.get(hostId)); },
-    setKeeperContext(host, context) { markDocs.set(host, setMarkContext(markDocs.get(host), host, context)); },
+    setKeeperContext(host, context) { if (config) throw new Error('Use signed lifecycle; raw context injection disabled'); markDocs.set(host, setMarkContext(markDocs.get(host), host, context)); },
     controlMarks(host, actor, action, now) {
       if (!isChatIdentity(actor, host)) throw new Error('Authenticated chat identity required');
       if (action.type !== 'forgetme' && !isModerator(actor, host)) throw new Error('Moderator identity required');
-      const doc = reduceMark(markDocs.get(host), host, actor, action, now);
+      if (config && !config.channels.includes(host)) throw new Error('Unconfigured lifecycle channel');
+      const transition = config ? reduceLifecycle({ registry, channel: channels.get(host), marks: markDocs.get(host), host, chat: { ...actor, markAction: action }, now, sentAt: now }) : null;
+      const doc = transition ? transition.marks : reduceMark(markDocs.get(host), host, actor, action, now);
+      if (transition) { registry = transition.registry; channels.set(host, transition.channel); }
       markDocs.set(host, doc);
       if (action.type === 'forgetme' && chatReceipts.get(host)?.chatterId === actor.chatterId) chatReceipts.delete(host);
+    },
+    getKeeperRegistry() { return structuredClone(registry); },
+    getStreamStatus(host) { return structuredClone(channels.get(host)); },
+    setChannelPolicy(host, policy, now = Date.now()) {
+      if (!config?.channels.includes(host)) throw new Error('Unconfigured lifecycle channel');
+      const next = reduceLifecycle({ registry, channel: channels.get(host), marks: markDocs.get(host), host, policy, now, sentAt: now });
+      registry = next.registry; channels.set(host, next.channel); markDocs.set(host, next.marks);
     },
     getPublicMarks(host) { return publicMarks(markDocs.get(host), host); },
     getOverlayState(host) { return publicOverlayState(markDocs.get(host), host); },

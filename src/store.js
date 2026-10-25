@@ -1,3 +1,4 @@
+import { lifecycleConfig, reduceLifecycle } from './lifecycle.js';
 import { hash } from './crypto.js';
 import { setMarkContext, reduceMark, publicMarks, publicOverlayState, privateMarks, isModerator, isChatIdentity } from './marks.js';
 
@@ -36,20 +37,29 @@ export function createMemoryAuthStore() {
   };
 }
 
-export function createFirestoreStore(db) {
+export function createFirestoreStore(db, { lifecycle } = {}) {
+  const config = lifecycleConfig(lifecycle);
   const ref = (collection, key) => db.collection(collection).doc(hash(key));
   return {
-    async accept({ id, expiresAt, now, raid, chat }) {
+    lifecycleEnabled: Boolean(config),
+    async accept({ id, expiresAt, now, raid, chat, lifecycle: event, sentAt = now }) {
       return db.runTransaction(async tx => {
         const eventRef = ref('events', id);
         const existing = await tx.get(eventRef);
         if (existing.exists && existing.data().expiresAt >= now) return 'duplicate';
-        const markRef = chat?.markAction ? ref('markChannels', chat.broadcasterId) : null;
+        const host = event?.host ?? chat?.broadcasterId;
+        if (config && host && !config.channels.includes(host)) throw new Error('Unconfigured lifecycle channel');
+        const managed = config && host;
+        const registry = managed ? (await tx.get(ref('keeperRegistry', 'single'))).data() : null;
+        const channel = managed ? (await tx.get(ref('streamChannels', host))).data() : null;
+        const markRef = managed || chat?.markAction ? ref('markChannels', host) : null;
         const markDoc = markRef ? (await tx.get(markRef)).data() : null;
         const receiptRef = chat?.markAction?.type === 'forgetme' ? ref('chatReceipts', chat.broadcasterId) : null;
         const receipt = receiptRef ? (await tx.get(receiptRef)).data() : null;
-        const next = markRef ? reduceMark(markDoc, chat.broadcasterId, chat, chat.markAction, now) : null;
+        const transition = managed ? reduceLifecycle({ registry, channel, marks: markDoc, host, event, chat, now, sentAt }) : null;
+        const next = transition ? transition.marks : markRef ? reduceMark(markDoc, chat.broadcasterId, chat, chat.markAction, now) : null;
         tx.set(eventRef, { expiresAt });
+        if (transition) { tx.set(ref('keeperRegistry', 'single'), transition.registry); tx.set(ref('streamChannels', host), transition.channel); }
         if (raid) tx.set(ref('rituals', raid.to_broadcaster_user_id), ritualFor(id, now, raid));
         // Store only bounded metadata, never raw chat text or proof of membership.
         if (next) tx.set(markRef, next);
@@ -60,6 +70,7 @@ export function createFirestoreStore(db) {
     },
     async getRitual(hostId) { return (await ref('rituals', hostId).get()).data(); },
     async setKeeperContext(host, context) {
+      if (config) throw new Error('Use signed lifecycle; raw context injection disabled');
       await db.runTransaction(async tx => {
         const doc = ref('markChannels', host); const previous = (await tx.get(doc)).data();
         tx.set(doc, setMarkContext(previous, host, context));
@@ -72,8 +83,28 @@ export function createFirestoreStore(db) {
         const doc = ref('markChannels', host); const previous = (await tx.get(doc)).data();
         const receiptRef = ref('chatReceipts', host);
         const receipt = action.type === 'forgetme' ? (await tx.get(receiptRef)).data() : null;
-        tx.set(doc, reduceMark(previous, host, actor, action, now));
+        let next;
+        if (config) {
+          if (!config.channels.includes(host)) throw new Error('Unconfigured lifecycle channel');
+          const registry = (await tx.get(ref('keeperRegistry', 'single'))).data();
+          const channel = (await tx.get(ref('streamChannels', host))).data();
+          const transition = reduceLifecycle({ registry, channel, marks: previous, host, chat: { ...actor, markAction: action }, now, sentAt: now });
+          tx.set(ref('keeperRegistry', 'single'), transition.registry); tx.set(ref('streamChannels', host), transition.channel); next = transition.marks;
+        } else next = reduceMark(previous, host, actor, action, now);
+        tx.set(doc, next);
         if (receipt && receipt.chatterId === actor?.chatterId) tx.delete(receiptRef);
+      });
+    },
+    async getKeeperRegistry() { return (await ref('keeperRegistry', 'single').get()).data() ?? { holderId: null, originated: false }; },
+    async getStreamStatus(host) { return (await ref('streamChannels', host).get()).data(); },
+    async setChannelPolicy(host, policy, now = Date.now()) {
+      if (!config?.channels.includes(host)) throw new Error('Unconfigured lifecycle channel');
+      await db.runTransaction(async tx => {
+        const registry = (await tx.get(ref('keeperRegistry', 'single'))).data();
+        const channel = (await tx.get(ref('streamChannels', host))).data();
+        const marks = (await tx.get(ref('markChannels', host))).data();
+        const next = reduceLifecycle({ registry, channel, marks, host, policy, now, sentAt: now });
+        tx.set(ref('keeperRegistry', 'single'), next.registry); tx.set(ref('streamChannels', host), next.channel); tx.set(ref('markChannels', host), next.marks);
       });
     },
     async getPublicMarks(host) { return publicMarks((await ref('markChannels', host).get()).data(), host); },
