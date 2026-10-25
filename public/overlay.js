@@ -1,3 +1,4 @@
+import { createCinemaTracker, wordBatch, runePose } from './cinematic.js';
 import { createRelic3D, ringSummary } from './relic3d.js';
 import { meterProgress } from './claim-meter.js';
 import { createOverlayAudio, createCueTracker } from './overlay-audio.js';
@@ -11,6 +12,17 @@ const count = document.querySelector('#count');
 document.body.classList.toggle('corner', new URLSearchParams(location.search).get('corner') === '1');
 const audio = createOverlayAudio({ optedIn: new URLSearchParams(location.search).get('sound') === '1' });
 const cueFor = createCueTracker();
+const cinema = createCinemaTracker();
+const archiveNode = document.querySelector('.archive');
+const effect = name => { const node = document.createElement('div'); node.className = `p3-${name}`; node.hidden = true; node.setAttribute('aria-hidden', 'true'); archiveNode.append(node); return node; };
+const effects = Object.fromEntries(['comet', 'flash', 'shock', 'release', 'fusion'].map(name => [name, effect(name)]));
+const ns = 'http://www.w3.org/2000/svg';
+const fusionSVG = document.createElementNS(ns, 'svg'); fusionSVG.setAttribute('viewBox', '0 0 120 120');
+const fusionArcs = ['offer', 'accept', 'ring'].map(name => { const c = document.createElementNS(ns, 'circle'); c.setAttribute('cx','60'); c.setAttribute('cy','60'); c.setAttribute('r','59'); c.classList.add(`p3-fuse-${name}`); fusionSVG.append(c); return c; });
+effects.fusion.append(fusionSVG);
+const words = Array.from({ length: 8 }, () => { const word = document.createElement('span'); word.className = 'p3-word'; word.hidden = true; archiveNode.append(word); return word; });
+function clearCinema() { for (const node of [...Object.values(effects), ...words]) { node.hidden = true; if (node.classList.contains('p3-word')) node.textContent = ''; } archiveNode.dataset.charge = 'false'; archiveNode.style.setProperty('--charge-level', '0'); archiveNode.style.setProperty('--charge-alpha', '0'); archiveNode.dataset.fusionPending = 'false'; archiveNode.style.setProperty('--p3-shake', '0px'); }
+
 const soundButton = document.querySelector('#sound-toggle');
 soundButton.hidden = new URLSearchParams(location.search).get('sound') !== '1';
 soundButton.onclick = async event => {
@@ -23,10 +35,11 @@ let current = null; let receivedAt = 0; let receiptServerTime = 0;
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
 let relic3d, relic3dClosed = false; const relic3dAbort = new AbortController();
 createRelic3D({ signal: relic3dAbort.signal, archive: document.querySelector('.archive'), reducedMotion: motion, corner: document.body.classList.contains('corner') }).then(view => { if (relic3dClosed) { view?.dispose(); return; } relic3d = view; view?.update(current); });
-addEventListener('pagehide', () => { relic3dClosed = true; relic3dAbort.abort(); relic3d?.dispose(); });
+addEventListener('pagehide', () => { clearCinema(); relic3dClosed = true; relic3dAbort.abort(); relic3d?.dispose(); });
 function render(snapshot) {
   const cue = cueFor(snapshot); if (!snapshot || !['ready', 'incoming', 'waiting'].includes(snapshot.status) || (snapshot.status === 'waiting' && !snapshot.handoff?.completed)) audio.silence();
-  if (cue) audio.cue(cue);
+  cinema.observe(snapshot); clearCinema(); archiveNode.dataset.fusionPending = String(cinema.pending(snapshot, snapshot?.serverNow ?? 0, motion.matches)); archiveNode.style.setProperty('--p3-fusion', '0');
+  if (cue && !(cue === 'claim' && snapshot?.handoff?.completedAt !== undefined) && !motion.matches && !document.hidden) audio.cue(cue);
   document.body.dataset.state = snapshot?.status ?? 'connecting';
   document.querySelector('#waiting-note').hidden = snapshot?.status !== 'waiting';
   relic3d?.update(snapshot);
@@ -80,6 +93,44 @@ function frame() {
     document.querySelector('#accept-arc').style.strokeDashoffset = String(307.876 * (1 - progress.accepts));
     document.querySelector('#claim-label').textContent = `${meter.awaitingRaid ? 'Awaiting verified raid · provisional' : 'Verified raid · claim'} · ${progress.seconds}s · Offer ${meter.offers}/${meter.threshold} · Accept ${meter.accepts}/${meter.threshold}`;
   } else document.querySelector('#claim-label').textContent = '';
+  const cinematic = cinema.frame(current, time, { reduced: motion.matches, hidden: document.hidden });
+  const chargeLevel = document.hidden ? 0 : cinematic.chargeLevel;
+  archiveNode.dataset.charge = String(cinematic.charge && !motion.matches && !document.hidden);
+  archiveNode.style.setProperty('--charge-level', String(chargeLevel));
+  archiveNode.style.setProperty('--charge-blur', `${4 + chargeLevel * 12}px`);
+  archiveNode.style.setProperty('--charge-alpha', String(.08 + chargeLevel * .42));
+  archiveNode.style.setProperty('--p3-shake', `${cinematic.shake}px`);
+  for (const [name, value] of Object.entries({ comet: cinematic.comet, flash: cinematic.flash || null, shock: cinematic.shock, release: cinematic.release, fusion: cinematic.fusion })) {
+    const node = effects[name]; node.hidden = value === null || document.hidden; node.style.setProperty('--p3-progress', String(value ?? 0));
+    if (name === 'flash') node.style.opacity = String(value ?? 0);
+  }
+  archiveNode.dataset.fusionPending = String(cinematic.fusionPending);
+  archiveNode.style.setProperty('--p3-fusion', String(cinematic.fusion ?? (cinematic.fusionPending ? 0 : 1)));
+  const fuse = cinematic.fusion ?? 0;
+  fusionArcs[0].style.transform = `translateX(${-(1-fuse)*18}px)`; fusionArcs[1].style.transform = `translateX(${(1-fuse)*18}px)`;
+  fusionArcs[0].style.opacity = fusionArcs[1].style.opacity = String(1-fuse); fusionArcs[2].style.opacity = String(fuse);
+  const ringInset = archiveNode.classList.contains('webgl-relic') ? relic3d?.ringInset?.() : null;
+  effects.fusion.style.inset = `${ringInset ?? (4 + Math.max(0, Math.min(16, current?.lineageRings ?? 0) - 1) * 1.8)}%`;
+  const batch = wordBatch(current?.marks ?? [], cinematic, motion.matches);
+  for (let i = 0; i < words.length; i++) {
+    const item = batch[i], node = words[i]; node.hidden = !item || document.hidden;
+    if (!item) { node.textContent = ''; continue; }
+    if (node.textContent !== item.mark.flightText) node.textContent = item.mark.flightText;
+    const pose = runePose(item.index, current.marks.length, motion.matches ? 0 : performance.now(), cinematic.unfurl ?? 1);
+    node.dataset.orbitIndex = String(item.index);
+    node.style.left = `${pose.x}%`; node.style.top = `${pose.y}%`;
+    // Place a readable caption immediately below its real projected glyph.
+    const bounds = archiveNode.getBoundingClientRect(), label = node.getBoundingClientRect();
+    const x = Math.max(label.width / 2 + 3, Math.min(bounds.width - label.width / 2 - 3, pose.x / 100 * bounds.width));
+    const y = Math.max(3, Math.min(bounds.height - label.height - 3, pose.y / 100 * bounds.height + (document.body.classList.contains('corner') ? 5 : 14)));
+    node.style.left = `${x}px`; node.style.top = `${y}px`;
+    node.style.opacity = String((item.mark.faded ? .28 : 1) * (motion.matches ? 1 : Math.min(1, item.progress * 6) * Math.min(1, (1 - item.progress) * 5)));
+  }
+  if (!archiveNode.classList.contains('webgl-relic')) {
+    for (let i = 0; i < runes.children.length; i++) { const pose = runePose(i, current?.marks.length ?? 0, motion.matches ? 0 : performance.now(), cinematic.unfurl ?? 1); const glyph = runes.children[i]; glyph.hidden = cinematic.unfurl !== null && pose.flight <= 0; glyph.style.left = `${pose.x}%`; glyph.style.top = `${pose.y}%`; }
+  }
+  if (cinematic.send) audio.cue('send');
+  if (cinematic.chord) audio.cue('claim');
   const arrival = arrivalPhase(current?.handoff, time, motion.matches);
   const archive = document.querySelector('.archive'); archive.dataset.phase = arrival.phase;
   archive.style.setProperty('--arrival', arrival.progress);

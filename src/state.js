@@ -142,7 +142,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
     getRecap() { return recapProjection(lineage); },
     searchPublicMarks(options) { return atlasSearch(lineage, options); },
     getAtlasPage(options) { return atlasPage(lineage, options); },
-    getPublicPresentation(host, now) { return { rings: lineage.stops.length, handoff: handoffView(registry, host, now), claimMeter: claimMeterView(registry, host, now), ...(echoView(registry, host, now) ? { resonance: echoView(registry, host, now) } : {}) }; },
+    getPublicPresentation(host, now) { return { rings: lineage.stops.length, handoff: handoffView(registry, host, now, lineage), claimMeter: claimMeterView(registry, host, now), ...(echoView(registry, host, now) ? { resonance: echoView(registry, host, now) } : {}) }; },
     getPublicJourney() { return publicJourney(lineage); },
     getPublicMarks(host) { return publicMarks(markDocs.get(host), host); },
     getOverlayState(host, now = Date.now()) { return withIncomingPreview(withCarriedMarks(publicOverlayState(markDocs.get(host), host), lineage, registry, host), registry, host, Object.fromEntries(channels), Object.fromEntries(markDocs), now); },

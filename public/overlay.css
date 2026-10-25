@@ -61,3 +61,26 @@ body:not(.corner) #handoff:empty{display:none}
 .archive[data-phase=impact]>.relic3d{transform:scale(calc(1 + (1 - var(--arrival))*.15))}
 @media(prefers-reduced-motion:reduce){.relic3d{display:none}.webgl-relic>.crystal,.webgl-relic>.growth-rings,.webgl-relic>.runes{visibility:visible}}
 .archive.resonating>.relic3d{filter:drop-shadow(0 0 10px #b7a2df88)}
+/* P3: one archive-confined receipt-time sequence, never a viewport flash. */
+.archive{overflow:clip;transform:translateX(var(--p3-shake,0px))}
+.p3-comet,.p3-flash,.p3-shock,.p3-release,.p3-fusion{position:absolute;pointer-events:none;z-index:3}
+.p3-comet[hidden],.p3-flash[hidden],.p3-shock[hidden],.p3-release[hidden],.p3-fusion[hidden],.p3-word[hidden]{display:none}
+.p3-comet{width:58%;height:3px;left:0;top:48%;background:linear-gradient(90deg,transparent,#9486b777,#c7edfa);border-radius:100%;transform:translateX(calc(var(--p3-progress)*70%)) rotate(-18deg);box-shadow:0 0 9px #c7edfaaa}
+.p3-flash{inset:12%;background:radial-gradient(ellipse,#fff,transparent 68%);border-radius:50%;opacity:0}
+.p3-shock,.p3-release,.p3-fusion{inset:20%;border:2px solid #dce4ed;border-radius:50%;transform:scale(calc(.35 + var(--p3-progress)*1.3));opacity:calc(1 - var(--p3-progress))}
+.p3-release{border-color:#c7edfa}.p3-fusion{border-color:#e6bb70;border-width:3px;transform:rotate(calc(var(--p3-progress)*80deg)) scale(calc(.55 + var(--p3-progress)*.45))}
+.p3-word{position:absolute;z-index:4;transform:translate(-50%,-50%);font:13px/1.3 Georgia,serif;color:#eef9ff;background:#101d30d9;padding:2px 4px;max-width:40%;overflow-wrap:anywhere;pointer-events:none;text-shadow:0 0 5px #9486b7}
+.corner .p3-word{font:8px/1.1 system-ui;padding:1px 2px;max-width:42%}.corner .p3-comet{height:2px}.corner .p3-fusion{border-width:1px}
+.archive[data-charge=true]>.crystal{filter:drop-shadow(0 0 var(--charge-blur,4px) rgb(199 237 250 / var(--charge-alpha,.08))) drop-shadow(0 0 5px rgb(148 134 183 / var(--charge-alpha,.08)))}
+.archive[data-charge=true]>.relic3d{filter:drop-shadow(0 0 var(--charge-blur,4px) rgb(199 237 250 / var(--charge-alpha,.08)))}
+@media(prefers-reduced-motion:reduce){.archive{transform:none}.p3-comet,.p3-flash,.p3-shock,.p3-release,.p3-fusion{display:none!important}}
+/* Two quorum arcs converge into the one actually committed newest band. */
+.p3-fusion{border:0}.p3-fusion svg{width:100%;height:100%;overflow:visible}
+.p3-fusion circle{fill:none;stroke-width:3;transform-origin:60px 60px}
+.p3-fuse-offer{stroke:#e6bb70;stroke-dasharray:185.354 370.708;stroke-dashoffset:0}
+.p3-fuse-accept{stroke:#b4a0d5;stroke-dasharray:185.354 370.708;stroke-dashoffset:-185.354}
+.p3-fuse-ring{stroke:#e6bb70}
+.p3-word{transform:translate(-50%,0)}
+.archive[data-fusion-pending=true]>.growth-rings span:last-child{opacity:var(--p3-fusion,0);transform:scale(calc(.7 + .3*var(--p3-fusion,0)))}
+.archive[data-phase=unfurl] .runes{transform:none;opacity:1}
+.rune[hidden]{display:none}

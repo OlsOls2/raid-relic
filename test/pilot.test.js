@@ -173,10 +173,10 @@ for (const kind of ['memory', 'firestore']) {
       await f.control(HOME, `send:${OTHER}`); assert.equal((await f.runtime.overlayFeeds[OTHER].snapshot()).marks.length, 0);
       f.advance(); await f.raid(); assert.equal(host.status, 'incoming'); assert.equal(host.marks.length, 1);
       assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, HOME);
-      assert.ok(!JSON.stringify(host).includes('moon')); assert.ok(!JSON.stringify(host).includes('userId'));
+      assert.equal(host.marks[0].flightText, 'moon'); assert.deepEqual(Object.keys(host.marks[0]).sort(), ['flightText', 'id', 'runeSvg']); assert.ok(!JSON.stringify(host).includes('userId')); assert.ok(!JSON.stringify(host).includes('pending'));
       const text = action === 'forgetme' ? '!relic forgetme' : action === 'block' ? '!relic block 811' : `!relic ${action}`;
       await f.chat(HOME, action === 'forgetme' ? '811' : HOME, text);
-      assert.equal(host.marks.length, 0, action); assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, HOME);
+      assert.equal(host.marks.length, 0, action); assert.ok(!JSON.stringify(host).includes('moon'), action); assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, HOME);
     }
   });
 }

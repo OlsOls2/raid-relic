@@ -250,7 +250,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
       return db.runTransaction(async tx => {
         const registry = (await tx.get(ref('keeperRegistry', 'single'))).data();
         const lineage = (await tx.get(ref('lineage', 'single'))).data();
-        return { rings: lineage?.stops?.length ?? 0, handoff: handoffView(registry, host, now), claimMeter: claimMeterView(registry, host, now), ...(echoView(registry, host, now) ? { resonance: echoView(registry, host, now) } : {}) };
+        return { rings: lineage?.stops?.length ?? 0, handoff: handoffView(registry, host, now, lineage), claimMeter: claimMeterView(registry, host, now), ...(echoView(registry, host, now) ? { resonance: echoView(registry, host, now) } : {}) };
       });
     },
     async getPublicJourney() { return publicJourney((await ref('lineage', 'single').get()).data()); },

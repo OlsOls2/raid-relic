@@ -1,3 +1,4 @@
+import { runePose } from './cinematic.js';
 // Original procedural renderer. The reviewed local Three.js vendor is optional;
 // failed imports, reduced motion and context loss retain the original SVG.
 export const DEFAULT_DESIGN = Object.freeze({ version: 1, shape: 'crystal', facets: 6, aspect: 1, palette: ['#101d30', '#dce4ed', '#9486b7', '#c7edfa'] });
@@ -30,7 +31,7 @@ export async function createRelic3D({ signal, archive, reducedMotion, corner = f
   load = () => import('/vendor/three.module.js'), document: doc = globalThis.document, window: win = globalThis.window } = {}) {
   let renderer, scene, camera, group, canvas, disposed = false, lost = false, frame = null, last = -Infinity, snapshot = null, revision = 0, visualSignature = null, resumeCalls = 0;
   const resources = new Set(), sprites = [], bands = [];
-  const remove = items => { for (const item of items.splice(0)) { group.remove(item); item.geometry?.dispose(); item.material?.map?.dispose(); item.material?.dispose(); } };
+  const remove = items => { for (const item of items.splice(0)) { group.remove(item); scene?.remove?.(item); item.geometry?.dispose(); item.material?.map?.dispose(); item.material?.dispose(); } };
   const diagnostic = reason => {
     if (!canvas) return;
     Object.assign(canvas.dataset, { snapshotPresent: String(Boolean(snapshot)), disposed: String(disposed), lost: String(lost),
@@ -50,7 +51,20 @@ export async function createRelic3D({ signal, archive, reducedMotion, corner = f
     if (time - last >= frameInterval(arriving, corner) - .1) {
       last = time; group.rotation.y = time * .00018; group.rotation.z = Math.sin(time * .00013) * .06;
       for (let i = 0; i < bands.length; i++) bands[i].rotation.z = time * .0001 * (i % 2 ? 1 : -1);
-      for (let i = 0; i < sprites.length; i++) { const a = time * .00016 + sprites[i].orbitIndex * 2.399963; sprites[i].position.set(Math.cos(a) * 1.35, Math.sin(a) * 1.35, .5); }
+      const unfurl = phase === 'unfurl' ? Number.parseFloat(archive.style?.getPropertyValue('--arrival') ?? '1') : 1;
+      for (const sprite of sprites) {
+        const pose = runePose(sprite.orbitIndex, snapshot.marks?.length ?? 0, time, unfurl);
+        sprite.visible = !['streak', 'impact'].includes(phase) && (phase !== 'unfurl' || pose.flight > 0);
+        const span = 2 * (6 - .5) * Math.tan(Math.PI / 10); // camera36deg, sprite plane z=.5
+        sprite.position.set((pose.x - 50) / 100 * span, (50 - pose.y) / 100 * span, .5);
+      }
+      const fusionWait = archive.dataset.fusionPending === 'true';
+      const fusionProgress = Number(archive.style?.getPropertyValue('--p3-fusion') ?? '1');
+      for (const band of bands) {
+        const newest = band.ringIndex === ringSummary(snapshot.lineageRings).visible - 1;
+        band.visible = !newest || !fusionWait || fusionProgress > 0;
+        if (band.scale?.setScalar) band.scale.setScalar(newest && fusionWait ? .7 + .3 * fusionProgress : 1);
+      }
       const box = archive.getBoundingClientRect(); const size = Math.max(1, Math.min(480, Math.round(box.width)));
       if (canvas.width !== size) renderer.setSize(size, size, false);
       try { renderer.render(scene, camera); if (lost) { fallback(); diagnostic('lost'); return; } canvas.dataset.triangles = String(renderer.info?.render?.triangles ?? 0); canvas.dataset.sprites = String(sprites.length); canvas.dataset.fps = String(arriving && !corner ? 60 : 30); canvas.dataset.fadedSprites = String(sprites.filter(s => s.material.opacity === .28).length); canvas.dataset.frames = String(Number(canvas.dataset.frames ?? 0) + 1); canvas.hidden = false; archive.classList.add('webgl-relic'); if (canvas.hasAttribute?.('data-pixel-probe')) canvas.dispatchEvent(new Event('relic3d-frame')); } catch (error) { canvas.dataset.renderError = ['TypeError','RangeError','Error'].includes(error?.name) ? error.name : 'OtherError'; lost = true; fallback(); diagnostic('lost'); return; }
@@ -102,7 +116,7 @@ export async function createRelic3D({ signal, archive, reducedMotion, corner = f
         for (const orbit of [false, true]) {
           const geometry = new T.TorusGeometry(1.05 + i * .018, orbit ? .008 : .013, corner ? 3 : 8, corner ? 16 : 24);
           const material = new T.MeshBasicMaterial({ color: '#d5aa62', transparent: true, opacity: orbit ? .45 : .7 });
-          const band = new T.Mesh(geometry, material); band.rotation.x = orbit ? .7 + i * .04 : 0; band.rotation.y = orbit ? .25 : 0; bands.push(band); group.add(band);
+          const band = new T.Mesh(geometry, material); band.rotation.x = orbit ? .7 + i * .04 : 0; band.rotation.y = orbit ? .25 : 0; band.ringIndex = i; bands.push(band); scene.add(band);
         }
       }
       let spriteFailures = 0;
@@ -120,11 +134,12 @@ export async function createRelic3D({ signal, archive, reducedMotion, corner = f
           } else texture = new T.Texture(image);
           if (T.SRGBColorSpace) texture.colorSpace = T.SRGBColorSpace; texture.needsUpdate = true;
           const material = new T.SpriteMaterial({ map: texture, transparent: true, opacity: mark.faded === true ? .28 : 1, depthWrite: false, depthTest: false });
-          const sprite = new T.Sprite(material); sprite.orbitIndex = index; sprite.renderOrder = 10; sprite.scale.set(corner ? .65 : .48, corner ? .65 : .48, 1); sprites.push(sprite); sprites.sort((a, b) => a.orbitIndex - b.orbitIndex); group.add(sprite);
+          const sprite = new T.Sprite(material); sprite.orbitIndex = index; sprite.renderOrder = 10; sprite.scale.set(corner ? .65 : .48, corner ? .65 : .48, 1); sprites.push(sprite); sprites.sort((a, b) => a.orbitIndex - b.orbitIndex); scene.add(sprite);
         }; image.onerror = () => { if (!disposed && ownRevision === revision && !lost) canvas.dataset.spriteFailures = String(++spriteFailures); }; image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(mark.runeSvg)}`;
       }
       resume();
     },
+    ringInset() { const rings = ringSummary(snapshot?.lineageRings).visible; return 50 - (1.05 + Math.max(0, rings - 1) * .018) / (12 * Math.tan(Math.PI / 10)) * 100; },
     wake: resume,
     dispose
   };

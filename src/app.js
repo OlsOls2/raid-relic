@@ -15,6 +15,7 @@ import { parseLifecycle } from './lifecycle.js';
 export const MAX_BODY_BYTES = 65536;
 export const REPLAY_WINDOW_MS = 10 * 60 * 1000;
 const assets = new Map([
+  ['/cinematic.js', ['cinematic.js', 'text/javascript; charset=utf-8']],
   ['/relic3d.js', ['relic3d.js', 'text/javascript; charset=utf-8']],
   ['/vendor/three.module.js', ['vendor/three.module.js', 'text/javascript; charset=utf-8']],
   ['/vendor/three.core.js', ['vendor/three.core.js', 'text/javascript; charset=utf-8']],

@@ -1,3 +1,4 @@
+import { validFlightText } from '../public/cinematic.js';
 import { validClaimMeter } from '../public/claim-meter.js';
 // One mutation queue for every configured feed. Never wrap a wrapped store.
 export function createOverlayHub(store, channels, { simulator = false, now = Date.now } = {}) {
@@ -13,9 +14,10 @@ export function createOverlayHub(store, channels, { simulator = false, now = Dat
       const echo = journey.resonance;
       if (echo && (!Number.isFinite(echo.receivedAt) || !Number.isFinite(echo.expiresAt) || echo.expiresAt - echo.receivedAt !== 1200 || !/^[a-f0-9]{64}$/.test(echo.id))) throw new Error('Invalid decorative cue');
       const resonance = echo ? { receivedAt: echo.receivedAt, expiresAt: echo.expiresAt, id: echo.id } : null;
-      const marks = state.marks.map(({ id, runeSvg, faded }) => {
+      const marks = state.marks.map(({ id, runeSvg, faded, flightText }) => {
         if (faded !== undefined && typeof faded !== 'boolean') throw new Error('Invalid faded flag');
-        return { id, runeSvg, ...(faded === true ? { faded: true } : {}) };
+        if (flightText !== undefined && !validFlightText(flightText)) throw Error('Invalid approved caption');
+        return { id, runeSvg, ...(flightText === undefined ? {} : { flightText }), ...(faded === true ? { faded: true } : {}) };
       });
       if (journey.claimMeter != null && !validClaimMeter(journey.claimMeter)) throw Error('Invalid claim meter');
       const incoming = journey.handoff?.role === 'host' && !journey.handoff.completed;

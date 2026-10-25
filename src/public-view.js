@@ -16,10 +16,11 @@ export function atlasPage(lineage, { stopId, offset = 0, limit = 8 } = {}) {
   return { rings: stops.length, offset, total: stops.length, nextOffset: offset + limit < stops.length ? offset + limit : null,
     stops: stops.slice(offset, offset + limit).map(stopSummary) };
 }
-export function handoffView(registry, channel, now) {
+export function handoffView(registry, channel, now, lineage) {
   const hop = registry?.pendingHop;
   if (!hop || (hop.policy === 'preclaim-v1' && !hop.verified) || hop.cancelled || now >= hop.endsAt || ![hop.from, hop.to].includes(channel)) return null;
-  return { role: hop.to === channel ? 'host' : 'source', startedAt: hop.startedAt, endsAt: hop.endsAt,
+  const stop = hop.finalized && lineage?.stops?.find(s => s.eventId === hop.eventId && s.from === hop.from && s.to === hop.to);
+  return { ...(stop && Number.isFinite(stop.claimedAt) ? { completedAt: stop.claimedAt } : {}), role: hop.to === channel ? 'host' : 'source', startedAt: hop.startedAt, endsAt: hop.endsAt,
     ...(hop.policy === 'preclaim-v1' ? { clockPolicy: hop.policy, claimStartedAt: hop.claimStartedAt } : {}),
     threshold: hop.threshold, offers: Math.min(hop.threshold, hop.offers?.length ?? hop.threshold), accepts: Math.min(hop.threshold, hop.accepts?.length ?? hop.threshold),
     completed: hop.finalized === true };
@@ -28,7 +29,7 @@ export function handoffView(registry, channel, now) {
 export function withCarriedMarks(view, lineage, registry, host) {
   if (registry?.holderId !== host || !['ready', 'paused'].includes(view.status)) return view;
   const last = lineage?.stops?.at(-1);
-  const carried = last?.to === host ? last.marks.map(({ id, text }) => ({ id, runeSvg: runeSvg(text), ...(registry.carriedClosures === 3 ? { faded: true } : {}) })) : [];
+  const carried = last?.to === host ? last.marks.map(({ id, text }) => ({ id, runeSvg: runeSvg(text), flightText: text, ...(registry.carriedClosures === 3 ? { faded: true } : {}) })) : [];
   return { ...view, marks: [...carried, ...view.marks].slice(-160) };
 }
 
@@ -43,7 +44,7 @@ export function withIncomingPreview(view, registry, host, channels, docs, now) {
   const session = doc.sessions.find(item => item.streamId === hop.sourceStreamId);
   const marks = (session?.marks ?? []).filter(mark => mark.status === 'approved' && !doc.blocked.includes(mark.userId)
     && !source.blockedUserIds.includes(mark.userId) && !doc.context.blockedUserIds.includes(mark.userId)).slice(-160)
-    .map(({ id, text }) => ({ id, runeSvg: runeSvg(text) }));
+    .map(({ id, text }) => ({ id, runeSvg: runeSvg(text), flightText: text }));
   return { ...view, marks };
 }
 
