@@ -1,3 +1,26 @@
+# Current branch: all five Shoulds, local only
+
+**Owner freeze overrides all historical build/deploy authorizations below.** Live `raid-relic-00003-kwp` / source `fd05a5ee67f841b1ac92ebb221581db227d2353f` is untouched. None of the five Shoulds is deployed. Parent verified Should #4 host254/254 plus Atlas/audio/pilot browser PASS and pushed `86c28e6`.
+
+Should #5 adds the explicit local-only judges launcher. Obtain an authorised clone of `https://github.com/OlsOls2/raid-relic.git` on `feature/raid-relic-shoulds`, or use the provided reviewer archive; GitHub read access may be needed. The app simulation itself needs no Twitch, cloud or OpenAI credentials:
+
+```sh
+# Node22+, on feature/raid-relic-shoulds; no Twitch/cloud/OpenAI credentials needed
+npm ci --ignore-scripts --no-audit --no-fund
+npm run judges
+# Open http://127.0.0.1:5191/judges ; Ctrl-C to stop
+```
+
+Follow [the judges quickstart](docs/JUDGES_QUICKSTART.md) for exact setup/mark/picker/mock API acceptance/separate verified receipt/two-chat claim/Atlas search/template/privacy/reset steps. All pages (including loading/errors and160px overlays), tabs and headers are labelled SIMULATOR; API objects say `mode: simulator`. There is no real login, consent, chat, online assertion, raid, AI call or cloud data. The fixture uses synthetic actors and signed messages through the actual engine. Its private wrapper is not real owner authentication: it calls existing internally mocked owner controls, exposes no tokens/sessions, requires exact loopback Host/Origin and bounded allowlisted JSON, and denies external redirects/OAuth entry points.
+
+The launcher binds only registered127.0.0.1:5191, requires explicit CLI simulator intent, rejects production/K_SERVICE and ignores ambient provider/store configuration. It always builds fresh memory and mocked transports; no actual fetch/default credentials/cloud SDK can be selected through env. Reset replaces only local memory, closes old WS fanout and reloads embedded previews. Judges files live only in scripts/test-support/tests and are excluded from production uploads/images/inventory; `npm start` and runtime source remain unchanged. No production seed, route, query activation or background work was added. If the port is occupied there is no random fallback or interference with other projects.
+
+Chronicle remains OFF (`CHRONICLE_ENABLED=false`, `CHRONICLE_ALLOW_PAID=false`), no key provisioned; only labelled handwritten fiction is shown. Paid generation would still require separate prior owner approval, both explicit gates and a key binding; even a small model can incur charges. Audio stays muted by default; optional `?corner=1&sound=1` still needs a local Sound gesture/OBS permission, with no autoplay bypass or listening proof. OAuth scopes are unchanged: Keeper `channel:bot channel:manage:raids`; bot `user:read:chat user:write:chat user:bot`. No provider/cloud/build/deploy calls or commits are authorized in this run. Parent now verifies **261/261 host tests PASS, zero skips**, **all three sandboxed browser workflows PASS** (judges: three checks and six labelled screenshots; pilot: eight checks; current Atlas/search/Chronicle/audio checks), **audit zero vulnerabilities**, **44 release files** and **diff check PASS**. Parent reviewed desktop/mobile/stop judges captures: persistent clear Simulator labels, no real raid or AI claims. In full-page captures the sticky banner appears at the viewport scroll position; the initial DOM banner is present. These are local mocked browser proofs, not physical listening, actual Twitch/OBS, AI or cloud validation. The earlier sandbox result—261 total/256 pass/five EPERM skips—remains historical and is resolved by the host run. Codex did not run the new browser workflows or inspect live state.
+
+---
+
+Earlier milestone notes below retain historical pending/failure statements and limited scopes. The current branch evidence above supersedes their QA status; none authorizes changes to frozen live source fd05.
+
 # Raid Relic
 
 A raid-only traveling community relic, authored by Codex in the original thread recorded in [CODEX_SESSION.md](CODEX_SESSION.md). All future code and documentation work must resume that thread. No subagents or other threads are used. MIT licensed; see [LICENSE](LICENSE).

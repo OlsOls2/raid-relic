@@ -1,57 +1,65 @@
-# Shoulds branch: observed Keeper targets and shared-text search
+# Judges Simulator — five Shoulds, local branch only
 
-**Live deployment is frozen by the owner.** Do not build, deploy, change cloud configuration, contact live Twitch/OpenAI, read credentials or initiate owner live actions for this branch review. The live owner-test deployment remains source `fd05a5ee67f841b1ac92ebb221581db227d2353f`, revision `raid-relic-00003-kwp`. Earlier redeploy authorizations are superseded. Should#2 is **not deployed**; Should#1 was reviewed/pushed on this branch, also not deployed. Work stays in the original Codex thread; only Should#1 and the separately authorized Should#2 are included; no Should#3.
+**LIVE IS FROZEN.** Revision `raid-relic-00003-kwp`, source `fd05a5ee67f841b1ac92ebb221581db227d2353f`, remains the owner's actual-test deployment. None of these five Shoulds is deployed. Do not build, deploy, change cloud state, read credentials or initiate real Twitch/AI actions for this review. [LIVE_TEST.md](LIVE_TEST.md) remains the separate frozen owner workflow, not this simulator.
 
-## Start with local branch QA
+## Fresh clone and start
+
+Use Node.js **22+** and the reviewed `feature/raid-relic-shoulds` branch. Use the authorised clone URL below, or the provided reviewer archive; GitHub read access may be needed. The app simulation itself needs no Twitch, cloud or OpenAI credentials, `.env`, paid key or actual consent. With an archive, unpack it and enter its repository directory instead of running git clone.
 
 ```sh
-git switch feature/raid-relic-shoulds
+git clone --branch feature/raid-relic-shoulds https://github.com/OlsOls2/raid-relic.git raid-relic
+cd raid-relic
+node --version
+npm ci --ignore-scripts --no-audit --no-fund
+npm run judges
+```
+
+Open **http://127.0.0.1:5191/judges** exactly (not `localhost`). The explicit command runs `node scripts/judges.js --simulator` and binds only registered loopback **127.0.0.1:5191**, with no alternative port. If occupied, stop this attempt and resolve the port owner; do not terminate other projects. Production `NODE_ENV` or any `K_SERVICE` setting rejects startup. Ambient store/provider configuration is not passed into the fixture. It uses only fresh memory, synthetic OAuth/account grants, mocked Twitch HTTP and a disabled Chronicle transport; it never loads default credentials or the Firestore SDK. Real `npm start` is unchanged.
+
+Every page, loading/error view, tab and response header says **SIMULATOR**, including 160px overlays. API objects have `mode: simulator`. Actual numerical account IDs are engine constants, presented as Simulated identities; they do not assert actual consent, online status or raids. Links stay local. OAuth start/callback and external redirects are denied. Production has no simulator route, query activation, seed or admin endpoint; judge scripts/assets/tests are excluded from release.
+
+## Click order
+
+1. **Simulate three consents, setup & Keep**: mock bot and both mock Keepers, sequential reconciliation (five enabled subscriptions each), already-live stream observations and explicit opt-in. No browser login occurs.
+2. **Add approved source mark “moon”**: actual mark/approval kernel via synthetic signed chat. Inspect **Observed eligible simulated Keeper**: it lists the other opted-in observed-online mock Keeper, not continuous provider authority or an arbitrary destination.
+3. **Simulate Send Off API acceptance**: mock Start Raid runs through the authenticated internal owner-control helper. The relic stays source, zero rings and no arrival. API acceptance is not travel.
+4. **Simulate verified raid receipt**: synthetic HMAC EventSub opens the host's incoming approved-rune preview and the app-local 90-second claim window. Only this separate receipt starts presentation; it is never called Twitch synchronized.
+5. **Source !offer**, then **Host !accept**: independent buttons invoke two different nonbot actors in their respective authenticated mock chats. For the tiny simulated raid, T=1 on each side. One side alone cannot transfer; both commit ownership, an Atlas stop and exactly one ring. Chat location is not proof of actual raid membership.
+6. Open **Simulated Atlas**. Search **moon** using the approved-text input (Enter works), follow its stop link, and inspect the rune and **Fiction · template** line. This searches shared public approved text, not verified personal ownership or viewer/account associations. Query is transient POST body data, never the URL/history. Clear before screenshots if desired. Chronicle generation remains **OFF**, no key, not real AI; even a small model could incur costs if separately approved/enabled later.
+7. **Forget source mark** demonstrates fresh search results and the active host overlay losing the retained content. Refresh a separate Atlas/stop tab manually: it is a snapshot, not a remote-erasure push to old browser pages or screenshots. The completed ring/stop remains. Minimal existing quota/cooldown records are not refunded; no Twitch-wide erasure is claimed.
+8. **Reset only local memory** starts fresh isolated memory and reconnects/reloads the two preview frames. Separate tabs need manual reload. For an alternate expiry demo, reset/repeat through the receipt, then **Advance synthetic clock 90s** before host acceptance; claims can no longer complete. The synthetic clock also advances with local elapsed time, without provider polling.
+
+The source is **Simulated raidrelichq (1591805230)**, host **Simulated olsols2 (1591806023)**, bot **Simulated raidrelicbot (1591804828)**. These are fixed allowlisted engine actors, not real authenticated accounts. The wrapper's POST actions accept one allowlisted action only, exact local Origin and JSON up to1024 bytes, with no arbitrary URL, target, actor or configuration input. No secrets, tokens, CSRF values or private participant associations are returned to the judges console.
+
+## Overlay and optional sound
+
+Local source: http://127.0.0.1:5191/overlay/1591805230?corner=1
+
+Local host: http://127.0.0.1:5191/overlay/1591806023?corner=1
+
+Optional sound: http://127.0.0.1:5191/overlay/1591806023?corner=1&sound=1
+
+Sound is muted by default: no AudioContext/oscillators without opt-in and a local **Sound** button gesture (OBS Browser Source → Interact if used). Browser permission and OBS audio routing still apply; no autoplay bypass. `sound=0` is silent, and corner/sound order is independent. Initial/reconnect snapshots do not replay cues. All views remain explicitly simulated, including sound demonstrations. Context-count/mock tests are not physical listening or live OBS proof.
+
+## QA and cleanup
+
+```sh
 npm test
 node --test --test-isolation=none
 npm run release:files
 git diff --check
 ```
 
-Current sandbox result: **231 total,226 pass,zero failures,five EPERM loopback skips**. All223 pre-search tests are retained. Parent verified Should#1 with223/223 plus pilot browser PASS and pushedb0027e0; these facts do not prove the new search browser gate. The host216/216 and prior mocked-browser passes concern the frozen baseline, not new branch visual proof. No build/deploy is part of these commands. Parent reviews before any commit/push; Codex has not committed or pushed.
+Stop the judges launcher with **Ctrl-C** before running any browser script. Optional parent-host scripts each own5191 and must run **sequentially**:
 
-Optional parent-host **local mocked** browser QA on registered5191: `node scripts/browser-smoke-pilot.js` and `node scripts/browser-smoke.js` (sequentially). They do not connect to Twitch; keep Simulator labels visible, Chromium sandbox enabled, and stop only their own fixture server. The extended search browser check is pending parent host QA; no new search/browser/OBS screenshot proof is claimed.
+```sh
+node scripts/browser-smoke-judges.js
+node scripts/browser-smoke.js
+node scripts/browser-smoke-pilot.js
+```
 
-## What to review
+The judges browser smoke uses sandboxed Chromium, blocked nonlocal HTTP/WebSockets and the in-memory fixture; finally closes browser/server/sockets and saves available labelled captures/results under ignored `artifacts/judges-*`. It covers receipt/claim, search/template, erasure/reset and375px layout. No new dependency is required for core tests; optional browser QA requires the already installed Playwright and `/snap/bin/chromium`. Parent has now run it successfully: six labelled screenshots exist and desktop/mobile/stop captures were reviewed. Simulator labels remain clear and persistent; the sticky header appears at the viewport scroll position in full-page captures, with the initial DOM banner present. No real raid or AI claim was found. The CLI also closes its own HTTP/WS resources on Ctrl-C/SIGTERM. Closing idle OBS/browser sources contains local usage.
 
-The authenticated private control page now has a labelled **Observed eligible raid target** selector. The list comes from one consistent stored lifecycle/mark-policy snapshot, not Get Streams or provider polling. It excludes the viewer's own channel and any target that is offline, not opted in, paused, banned or blocked/ineligible. Source ownership/current eligibility is also required. The same two curated accounts remain: home `raidrelichq`1591805230 and `olsols2`1591806023; bot1591804828. No scopes, grant onboarding or arbitrary targets were added.
+Parent verified Should #4 **254/254**, Atlas/audio/pilot browser PASS, pushed `86c28e6`; Should #3 **244/244 + Atlas PASS**, `483b898`; Should #2 **231/231 + Atlas PASS**, `b3e7f57` + `b5a135f`; Should #1 **223/223 + pilot PASS**, `b0027e0`. These are historical local-mock branch proofs. Current Should #5 evidence is recorded below; neither set is real Twitch/OBS/AI validation. OAuth scopes stay exactly Keeper `channel:bot channel:manage:raids`, bot `user:read:chat user:write:chat user:bot`. No claim that all Musts or live validation are complete.
 
-**Refresh status** manually reads a fresh snapshot. “Observed online” is not continuous live authority. An empty list gives setup/refresh guidance; it is not proof that no other Twitch stream exists. With one candidate the button still reads **Send Off to olsols2** (or **Send Off to raidrelichq**), preserving the existing browser gate. Selection produces only the canonical `send:<allowlistedID>` action; request JSON remains exactly action+CSRF, with actor derived from the scoped session. There is one explicit named-target confirmation and no automatic action on selection/refresh.
-
-Server reservation and final dispatch still recheck current ownership, stream, consent and policies. Tests cover both holder directions, offline/unopted/paused/banned/blocked/self exclusions, cross-account session rejection, and stale selection before reservation/during preflight. A stale UI cannot force an ineligible raid. Candidate output contains only public channel ID/login and safe eligibility booleans, no token, stream ID, pending mark/chat data or participant IDs. No background networking was introduced.
-
-## Should #2: Where has my mark been?
-
-Run the local mocked Atlas browser script above, or open its labelled Simulator Atlas on5191. In **Approved mark text (one word or emoji)** enter a shared approved word such as the fixture's synthetic moon mark; click **Search approved text** or press Enter. Matching completed stop links and approved rune/text are shown in pages≤20. Follow a stop link to existing detail navigation; **Clear search** removes the input/results. The script checks Unicode normalization, POST-only search without URL changes and375px results. Clear the synthetic query before capturing screenshots; do not collect real user queries.
-
-This is shared-text discovery, **not verified personal ownership or a viewer/account association lookup**. Exact mark NFKC/case normalization and one-word/emoji bounds apply; substring matching is literal, not regex. Pending text and content erased by forget/block/veto/opt-out never appear in a fresh search. No-result/invalid/unavailable states clear old matches; manual requests read fresh data, without a query cache or polling. Browsers can retain displayed results until a clear/refresh/navigation; there is no claim of remote screenshot erasure.
-
-The dedicated read-only POST endpoint accepts query/offset/limit in a≤1024-byte JSON body, never in URL/history/logs. It rate-limits before a single bounded lineage-document read. General Atlas POST stays405; malformed arguments fail400. Public result fields are only stop/channel/time/ring/approved-text/rune fields; no actor IDs, private association or OAuth data. Scopes are unchanged: Keepers channel:bot + channel:manage:raids; bot user:read:chat + user:write:chat + user:bot. No new authorization or provider traffic.
-
-## Frozen live owner instructions
-
-The existing [owner-test guide](LIVE_TEST.md) and [deployed release handoff](DEPLOYMENT.md) describe revision00003/sourcefd05. They are not permission to redeploy this branch or perform live actions during local review. The owner may carry out the separately authorized actual test against that frozen deployment; this new selector will not appear there. Actual live verification remains unproven by local mocked tests. No claim that all Musts/Shoulds are complete.
-
-## Local branch Should #3: Chronicle fiction, off by default
-
-Start with the branch's local tests and labelled Simulator, not the frozen live owner-test service. Atlas and completed stop pages now present a short **Fiction · template** line even offline from providers. It is a handwritten metaphor; it does not identify whose mark travelled. Existing shared-text search and stop navigation are preserved.
-
-The authenticated recipient control offers **Write Chronicle for latest received stop**. With the default `CHRONICLE_ENABLED=false`, `CHRONICLE_ALLOW_PAID=false` and no key, it explains that templates are used and makes no provider calls. The owner intends to leave it off. Do not provision a key or enable it as part of this review. Paid mode would need separate prior owner approval, both gates and a secret reference; even `gpt-4.1-mini` can incur charges. One persisted attempt per stop, output moderation, strict bounds and fallback are mock-tested only. No query/mark/identity data goes to the model. Should #3 has not been deployed; live owner instructions still refer to frozen revision `00003-kwp` / source `fd05`.
-
-Parent verified Should #2: host 231/231 tests and Atlas browser PASS, pushed `b3e7f57` + `b5a135f`. New Chronicle visual/provider proof is not claimed. No Should #4/#5 is included.
-
-Latest review: parent host **243/243 PASS**; the Chronicle Atlas browser run failed on a missing optional caption field. That compatibility bug is corrected with bounded optional caption rendering and fallback; the exact literal-XSS mark assertion remains, with extra caption tests. **Parent browser rerun pending**. Earlier Should #2 Atlas PASS is historical, not proof of this correction.
-
-## Local branch Should #4: optional original oscillator cues
-
-Parent verified Should #3 host244/244 and Atlas browser PASS, pushed `483b898`. Should #4 is unpublished local branch work; frozen LIVE `00003-kwp`/`fd05` has none of these new sound controls. No Should #5 is included.
-
-For a local configured channel, the ordinary overlay URL or `?sound=0` is silent and creates no AudioContext. Use `http://127.0.0.1:5191/overlay/1591805230?sound=1` or `http://127.0.0.1:5191/overlay/1591806023?corner=1&sound=1` only with the appropriate local fixture; combined query order does not matter. Existing Simulator labels remain visible. Click **Sound** (in OBS use Browser Source → Interact) to arm/resume; **Mute** stops audio. Browser autoplay permission and OBS source/audio routing are still required, so without a gesture it may stay quiet. No autoplay bypass, samples or network audio are used. Close sources when idle.
-
-Only new verified receipt transitions produce distinct gentle source/host cues, and a genuine subsequent two-chat completion can cue the claim. API acceptance, ordinary chat/counts, initial/reconnect snapshots and stale/expired/cancelled/policy-blocked receipts stay quiet. Missed cues are never queued for a later gesture. Reduced motion and the 20-second visual seek timeline are independent. App-local 90s timing is not Twitch synchronized.
-
-Local Should #4:253 tests/248pass/five sandbox EPERM skips,0fail;20 test files,44 release files/diff pass. Extended host browser checks await parent rerun. Fake audio tests and context-count checks do not prove physical audibility or live OBS/Twitch behavior. OAuth scopes remain exactly unchanged.
+Latest **parent-verified Should #5 QA**: **261/261 host tests PASS, zero skips**; all254 baseline tests retained. **All three sandboxed Chromium workflows PASS**: judges three checks with six labelled screenshots, pilot eight checks, and current Atlas/search/Chronicle/audio checks. Parent also verifies **audit zero vulnerabilities,44 release files and diff check PASS**. Earlier Codex sandbox261/256pass/five EPERM skips is historical, superseded for host validation. Codex has not rerun the browsers in this docs-only update. No actual providers, credentials, keys, costs, cloud operations or deployments were used; live00003/sourcefd05 remains frozen. All five Shoulds remain branch-only, not live; parent will review and commit the entire Should #5 increment separately.
