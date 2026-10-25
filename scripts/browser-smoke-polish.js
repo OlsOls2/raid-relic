@@ -1,16 +1,49 @@
+import { captureTiles, RASTER_LIMIT } from '../test-support/capture-tiles.js';
 // Optional host-only visual gate. Fixed registered5191, fresh memory, mocked
 // provider transports and synthetic signed events; never cloud/live state.
 import { mkdir, writeFile } from 'node:fs/promises';
 import { createJudges, JUDGES_ORIGIN } from '../test-support/judges.js';
 const judges = await createJudges({ intent: true }); let browser, failure;
-const captures = new Map(), checks = [], pages = [];
+const captures = new Map(), checks = [], pages = [], captureCoverage = [];
+let stage='startup', captureDiagnostic=null, crashed=false, disconnected=false, closing=false;
+const classifyFailure = error => {
+  const text=String(error?.message??'');
+  const signal=/\b(SIGXFSZ|SIGKILL|SIGSEGV|SIGABRT|SIGBUS)\b/.exec(text)?.[1]??null;
+  const code=/(?:exitCode|exit code)[=: ]+(-?\d{1,3})/i.exec(text)?.[1];
+  return { category: signal==='SIGXFSZ'?'file-size-limit':/ENOMEM|out of memory/i.test(text)?'memory-limit':/Target.*closed|browser has been closed/i.test(text)?'target-closed':'assertion-or-browser', signal, exitCode:code===undefined?null:Number(code) };
+};
 const capture = async (page, name, fullPage = true) => {
-  // Focus assertions happen before capture. Reset the scroll offset so a sticky
-  // Simulator header sits at the document top in full-page evidence.
+  if(!/^polish-simulator-[a-z0-9-]+$/.test(name))throw Error('Unknown capture name');
+  stage='capture-measure';
   await page.evaluate(() => scrollTo({ top: 0, left: 0, behavior: 'instant' }));
   await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
-  if (!fullPage && !await page.evaluate(() => innerWidth === 1920 && innerHeight === 1080)) throw Error('Expected exact1920×1080 Atlas viewport');
-  captures.set(name, await page.screenshot({ fullPage }));
+  const dimensions=await page.evaluate(()=>({width:innerWidth,height:innerHeight,documentHeight:Math.max(document.documentElement.scrollHeight,document.body.scrollHeight),documentWidth:Math.max(innerWidth,document.documentElement.scrollWidth)}));
+  captureDiagnostic={captureName:name,viewportWidth:dimensions.width,viewportHeight:dimensions.height,documentHeight:dimensions.documentHeight,computedRawBytes:dimensions.documentWidth*dimensions.documentHeight*4};
+  if (!fullPage && !(dimensions.width===1920&&dimensions.height===1080)) throw Error('Expected exact1920×1080 Atlas viewport');
+  // Only when the measured full raster exceeds the existing file-size bound:
+  // preserve all content in overlapping viewport rasters, never raise the cap.
+  if(fullPage&&captureDiagnostic.computedRawBytes>=RASTER_LIMIT){
+    const ranges=captureTiles(dimensions.width,dimensions.height,dimensions.documentHeight);
+    const saved=[];
+    for(let i=0;i<ranges.length;i++){
+      stage='capture-tile';const range=ranges[i];
+      await page.evaluate(y=>scrollTo({top:y,left:0,behavior:'instant'}),range.start);
+      await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+      const actual=await page.evaluate(()=>{
+        const label=[...document.querySelectorAll('body>header')].find(n=>n.textContent.includes('SIMULATOR'))??document.querySelector('#simulator');
+        const r=label?.getBoundingClientRect();
+        return {start:scrollY,documentHeight:Math.max(document.documentElement.scrollHeight,document.body.scrollHeight),labelVisible:Boolean(r&&r.top>=0&&r.bottom<=innerHeight&&r.height>0&&getComputedStyle(label).visibility!=='hidden'&&getComputedStyle(label).display!=='none'),labelHeight:r?.height??0};
+      });
+      if(Math.abs(actual.start-range.start)>.5||actual.documentHeight!==dimensions.documentHeight||!actual.labelVisible||actual.labelHeight>64)throw Error('Tile coverage or Simulator label changed');
+      const tileName=`${name}-tile${i+1}`;captures.set(tileName,await page.screenshot({fullPage:false}));saved.push({name:tileName,start:range.start,end:range.end});
+    }
+    captureCoverage.push({captureName:name,mode:'viewport-tiles',computedRawBytes:captureDiagnostic.computedRawBytes,documentHeight:dimensions.documentHeight,viewportWidth:dimensions.width,viewportHeight:dimensions.height,ranges:saved});
+    await page.evaluate(()=>scrollTo({top:0,left:0,behavior:'instant'}));
+  }else{
+    stage=fullPage?'capture-full':'capture-viewport';captures.set(name,await page.screenshot({fullPage}));
+    captureCoverage.push({captureName:name,mode:fullPage?'full-page':'exact-viewport',computedRawBytes:captureDiagnostic.computedRawBytes,documentHeight:dimensions.documentHeight,viewportWidth:dimensions.width,viewportHeight:dimensions.height,ranges:[{name,start:0,end:fullPage?dimensions.documentHeight:dimensions.height}]});
+  }
+  stage='functional-assertions';
 };
 async function fits(page, selector, name) {
   const result = await page.evaluate(selector => {
@@ -39,6 +72,7 @@ async function contrast(page, selectors) {
 try {
   await judges.listen(); const { chromium } = await import('playwright');
   browser = await chromium.launch({ executablePath: '/snap/bin/chromium', chromiumSandbox: true, headless: true, args: ['--disable-background-networking'] });
+  browser.on('disconnected',()=>{if(!closing)disconnected=true;});
   const context = await browser.newContext({ viewport: { width: 1920, height: 1080 }, reducedMotion: 'reduce', serviceWorkers: 'block' });
   // Legacy SVG-fallback contract; default real WebGL is exercised independently.
   await context.addInitScript(() => {
@@ -47,7 +81,7 @@ try {
   });
   await context.route('**/*', route => new URL(route.request().url()).origin === JUDGES_ORIGIN ? route.continue() : route.abort());
   await context.routeWebSocket('**/*', route => new URL(route.url()).origin === JUDGES_ORIGIN.replace('http', 'ws') ? route.connectToServer() : route.close());
-  const errors = []; const page = async () => { const p = await context.newPage(); pages.push(p); p.on('pageerror', () => errors.push('Local page error')); return p; };
+  const errors = []; const page = async () => { const p = await context.newPage(); pages.push(p); p.on('crash',()=>{crashed=true;}); p.on('pageerror', () => errors.push('Local page error')); return p; };
   const atlas = await page(); await atlas.goto(`${JUDGES_ORIGIN}/atlas/`);
   await atlas.locator('#status').filter({ hasText: 'No completed hops yet' }).waitFor();
   if (await atlas.locator('.stop').count()) throw Error('Fresh memory has fake stops');
@@ -129,10 +163,11 @@ try {
 } catch (error) { failure = error; }
 finally {
   // Save any successfully captured bytes even if a later assertion fails.
+  closing=true;
   try { await browser?.close(); } catch (error) { failure ??= error; }
   try { await judges.close(); } catch (error) { failure ??= error; }
   await mkdir('artifacts', { recursive: true });
   for (const [name, bytes] of captures) await writeFile(`artifacts/${name}.png`, bytes);
-  await writeFile('artifacts/polish-browser-results.json', JSON.stringify({ simulator: true, passed: !failure, checks, captures: [...captures.keys()], failure: failure ? String(failure.message).slice(0, 200) : null }, null, 2));
+  await writeFile('artifacts/polish-browser-results.json', JSON.stringify({ simulator: true, passed: !failure, checks, captures: [...captures.keys()], stage, captureDiagnostic, crashed, disconnected, captureCoverage, failureCategory: failure ? classifyFailure(failure).category : null, failure: failure ? classifyFailure(failure) : null }, null, 2));
 }
 if (failure) { console.error('Local polish browser gate failed; see bounded Simulator artifact results.'); process.exitCode = 1; }
