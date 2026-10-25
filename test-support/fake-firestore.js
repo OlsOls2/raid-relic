@@ -8,7 +8,7 @@ export function fakeFirestore() {
     docs, reads: [], writes: [], failCommit: false, retry: false,
     collection(name) { return { doc(id) {
       const key = `${name}/${id}`;
-      return { key, async get() { return snapshot(docs.get(key)); },
+      return { key, async get() { db.reads.push(key); return snapshot(docs.get(key)); },
         async create(value) { return db.runTransaction(async tx => {
           const ref = { key }; if ((await tx.get(ref)).exists) throw new Error('Already exists'); tx.set(ref, value);
         }); } };
