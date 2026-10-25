@@ -1,5 +1,5 @@
 // One-process ordered commit/read/publish queue. Cross-instance fanout is absent.
-export function createOverlayFeed(store, channel, { simulator = false } = {}) {
+export function createOverlayFeed(store, channel, { simulator = false, now = Date.now } = {}) {
   if (!/^\d{1,32}$/.test(channel ?? '')) throw new Error('Configured overlay channel required');
   let queue = Promise.resolve(); let revision = 0;
   const listeners = new Set();
@@ -10,10 +10,12 @@ export function createOverlayFeed(store, channel, { simulator = false } = {}) {
     try {
       const state = await store.getOverlayState(channel);
       if (!['ready', 'waiting', 'paused'].includes(state.status) || !Array.isArray(state.marks) || state.marks.length > 160) throw new Error('Invalid public state');
-      const journey = store.getPublicJourney ? await store.getPublicJourney() : { rings: 0 };
+      const serverNow = now();
+      const journey = store.getPublicPresentation ? await store.getPublicPresentation(channel, serverNow)
+        : { rings: 0, handoff: null };
       const marks = state.marks.map(({ id, runeSvg }) => ({ id, runeSvg }));
       return { type: 'snapshot', revision, mode: simulator ? 'simulator' : 'live', status: state.status, marks,
-        approvedCount: marks.length, lineageRings: journey.rings };
+        approvedCount: marks.length, lineageRings: journey.rings, handoff: journey.handoff, serverNow };
     } catch {
       return { type: 'snapshot', revision, mode: simulator ? 'simulator' : 'live', status: 'unavailable', marks: [], approvedCount: 0, lineageRings: 0 };
     }
@@ -28,5 +30,5 @@ export function createOverlayFeed(store, channel, { simulator = false } = {}) {
       return result;
     });
   }
-  return { store: wrapped, channel, snapshot: () => enqueue(read), subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); } };
+  return { store: wrapped, channel, simulator, snapshot: () => enqueue(read), subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); } };
 }

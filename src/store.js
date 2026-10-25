@@ -1,3 +1,4 @@
+import { atlasPage, handoffView } from './public-view.js';
 import { reduceClaims, publicJourney } from './claims.js';
 import { sendState } from './send-state.js';
 import { lifecycleConfig, reduceLifecycle } from './lifecycle.js';
@@ -147,6 +148,14 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         const checked = reduceClaims(next.registry, channelMap, markMap, history, null, now);
         tx.set(ref('lineage', 'single'), checked.lineage);
         tx.set(ref('keeperRegistry', 'single'), checked.registry); tx.set(ref('streamChannels', host), next.channel); tx.set(ref('markChannels', host), next.marks);
+      });
+    },
+    async getAtlasPage(options) { return atlasPage((await ref('lineage', 'single').get()).data(), options); },
+    async getPublicPresentation(host, now) {
+      return db.runTransaction(async tx => {
+        const registry = (await tx.get(ref('keeperRegistry', 'single'))).data();
+        const lineage = (await tx.get(ref('lineage', 'single'))).data();
+        return { rings: lineage?.stops?.length ?? 0, handoff: handoffView(registry, host, now) };
       });
     },
     async getPublicJourney() { return publicJourney((await ref('lineage', 'single').get()).data()); },

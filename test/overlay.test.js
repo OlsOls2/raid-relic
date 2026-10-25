@@ -41,8 +41,14 @@ test('public HTTP and real WebSocket deliver safe initial state, signed-event up
     'twitch-eventsub-message-timestamp': timestamp, 'twitch-eventsub-message-type': 'notification', 'twitch-eventsub-message-signature': `sha256=${signature}` } });
   assert.equal(response.status, 204); assert.equal((await next()).marks.length, 0);
   await f.app.marks.approve('111', f.admin, 'm1'); const approved = await next(); assert.equal(approved.marks.length, 1);
+  const beforeRead = Date.now();
   const snapshot = await (await fetch(`${origin}/api/overlay/111`)).json();
-  assert.deepEqual(snapshot, approved);
+  const afterRead = Date.now();
+  const { serverNow: pushedAt, ...pushedState } = approved;
+  const { serverNow: readAt, ...readState } = snapshot;
+  assert.deepEqual(readState, pushedState); // All committed fields, including revision/privacy.
+  assert.ok(Number.isFinite(pushedAt) && Number.isFinite(readAt));
+  assert.ok(readAt >= pushedAt && readAt >= beforeRead && readAt <= afterRead);
   const serialized = JSON.stringify(snapshot);
   for (const forbidden of ['orchid', '987654321', 'private-message-id', 'userId', 'spent', 'token', 'cooldown']) assert.ok(!serialized.includes(forbidden));
   await f.app.marks.forgetMe('111', { broadcasterId: '111', chatterId: '987654321' });
@@ -130,4 +136,14 @@ test('browser connection state ignores older snapshots, clears on loss, reconnec
   sockets[1].onmessage({ data: JSON.stringify(value(0)) }); assert.equal(views.at(-1).revision, 0);
   [...timers.values()].find(timer => timer.delay === 35000).fn(); assert.ok(statuses.includes('stale')); assert.equal(views.at(-1), null);
   stop(); assert.ok(statuses.includes('reconnecting'));
+});
+
+test('fresh server clock changes across reads while committed snapshot revision/state stays stable', async () => {
+  let time = 1000;
+  const feed = createOverlayFeed(createMemoryState(), '111', { now: () => time });
+  const first = await feed.snapshot(); time += 3; const second = await feed.snapshot();
+  const { serverNow: firstTime, ...firstState } = first;
+  const { serverNow: secondTime, ...secondState } = second;
+  assert.deepEqual(firstState, secondState);
+  assert.equal(firstTime, 1000); assert.equal(secondTime, 1003);
 });

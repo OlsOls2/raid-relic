@@ -10,6 +10,11 @@ export const MAX_BODY_BYTES = 65536;
 export const REPLAY_WINDOW_MS = 10 * 60 * 1000;
 const assets = new Map([
   ['/', ['atlas.html', 'text/html; charset=utf-8']],
+  ['/atlas', ['atlas.html', 'text/html; charset=utf-8']],
+  ['/atlas/', ['atlas.html', 'text/html; charset=utf-8']],
+  ['/atlas.css', ['atlas.css', 'text/css; charset=utf-8']],
+  ['/atlas.js', ['atlas.js', 'text/javascript; charset=utf-8']],
+  ['/arrival.js', ['arrival.js', 'text/javascript; charset=utf-8']],
   ['/overlay', ['overlay.html', 'text/html; charset=utf-8']],
   ['/relic.svg', ['relic.svg', 'image/svg+xml']],
   ['/style.css', ['style.css', 'text/css; charset=utf-8']],
@@ -21,14 +26,18 @@ const assets = new Map([
 const header = (headers, name) => typeof headers[name] === 'string' ? headers[name] : '';
 const result = (status, body = '', type = 'text/plain; charset=utf-8') => ({ status, body, type });
 
-export function createApp({ secret, state = createMemoryState(), now = Date.now, oauth, chatContext, overlayFeed, releaseCommit } = {}) {
+export function createApp({ secret, state = createMemoryState(), now = Date.now, oauth, chatContext, overlayFeed, releaseCommit, publicBudget = { burst: 60, perSecond: 1 } } = {}) {
   const keepers = chatContext?.keeperIds ?? (chatContext ? [chatContext.streamerId] : []);
   if (!Array.isArray(keepers) || keepers.length > 4 || (chatContext && !keepers.length)
     || !keepers.every(id => typeof id === 'string' && /^\d{1,32}$/.test(id))
     || (chatContext && !keepers.includes(chatContext.streamerId))) throw new Error('Configured Keeper allowlist required');
+  let credits = publicBudget.burst; let budgetAt = now();
+  const spend = () => { const time = now(); credits = Math.min(publicBudget.burst, credits + Math.max(0, time - budgetAt) / 1000 * publicBudget.perSecond); budgetAt = time;
+    if (credits < 1) return false; credits--; return true; };
   const release = validateReleaseCommit(releaseCommit);
   // Pure request boundary for tests: rawBody is never reserialized before HMAC.
   async function dispatch({ method, path, headers = {}, rawBody = Buffer.alloc(0) }) {
+    if ((path.startsWith('/api/') || path.split('?')[0] === '/auth/callback' || path.startsWith('/oauth/')) && !spend()) return result(429, 'Public request budget reached; retry later');
     if (path.startsWith('/oauth/') || (oauth && path.split('?')[0] === oauth.callbackPath)) {
       if (!oauth) return result(503, 'OAuth not configured');
       return oauth.route({ method, path, headers });
@@ -36,7 +45,29 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
     if (method === 'GET' && path === '/health') {
       return result(200, JSON.stringify({ status: 'ok', releaseCommit: release, phase: 'foundation', readiness: 'not-ready-for-raids' }), 'application/json');
     }
-    if (method === 'GET' && path === '/api/journey' && state.getPublicJourney) return result(200, JSON.stringify(await state.getPublicJourney()), 'application/json');
+    if (path.startsWith('/api/atlas')) {
+      if (method !== 'GET') return result(405, 'Read only');
+      const match = /^\/api\/atlas(?:\/stops\/([a-f0-9]{64}))?(?:\?([^#]*))?$/.exec(path);
+      if (!match) return result(400, 'Invalid Atlas path');
+      const params = new URLSearchParams(match[2] ?? '');
+      if ([...params.keys()].some(key => !['offset', 'limit'].includes(key)) || [...params.keys()].some(key => params.getAll(key).length !== 1)) return result(400, 'Invalid paging');
+      const number = (key, fallback, max) => { const v = params.get(key); if (v === null) return fallback; return /^(0|[1-9]\d{0,2})$/.test(v) && Number(v) <= max ? Number(v) : NaN; };
+      const offset = number('offset', 0, match[1] ? 160 : 16); const limit = number('limit', match[1] ? 20 : 8, match[1] ? 20 : 8);
+      if (!Number.isInteger(offset) || !Number.isInteger(limit) || limit < 1) return result(400, 'Invalid paging');
+      try {
+        const page = await state.getAtlasPage({ stopId: match[1], offset, limit });
+        return page ? result(200, JSON.stringify({ ...page, mode: overlayFeed?.simulator ? 'simulator' : 'live' }), 'application/json') : result(404, 'Stop not found');
+      } catch { return result(503, 'Atlas unavailable; clear previous data and refresh later'); }
+    }
+    if (/^\/stops\/[a-f0-9]{64}$/.test(path)) {
+      if (method !== 'GET') return result(405, 'Read only');
+      return result(200, await readFile(new URL('../public/atlas.html', import.meta.url)), 'text/html; charset=utf-8');
+    }
+    if (path === '/api/journey') {
+      if (method !== 'GET') return result(404, 'Read only');
+      try { return result(200, JSON.stringify(await state.getAtlasPage({ offset: 0, limit: 8 })), 'application/json'); }
+      catch { return result(503, 'Atlas unavailable'); }
+    }
     if (method === 'GET' && overlayFeed && path === `/api/overlay/${overlayFeed.channel}`) {
       return result(200, JSON.stringify(await overlayFeed.snapshot()), 'application/json');
     }
@@ -135,5 +166,5 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
       else res.destroy();
     }
   }
-  return { dispatch, handler, state, marks: createMarkService(state, { now }) };
+  return { dispatch, handler, state, allowPublicRead: spend, marks: createMarkService(state, { now }) };
 }

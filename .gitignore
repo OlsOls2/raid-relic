@@ -26,3 +26,6 @@ rollout-*.jsonl
 coverage/
 *.log
 .DS_Store
+
+# Local browser QA captures (not release payload).
+/artifacts/

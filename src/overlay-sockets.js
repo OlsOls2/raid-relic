@@ -1,12 +1,13 @@
 import { WebSocketServer, WebSocket } from 'ws';
 
-export function attachOverlaySockets(server, feed, { origins, maxClients = 16, heartbeatMs = 15000 } = {}) {
+export function attachOverlaySockets(server, feed, { origins, maxClients = 16, heartbeatMs = 15000, allowRead = () => true } = {}) {
   if (!Array.isArray(origins) || !origins.length || origins.some(origin => new URL(origin).origin !== origin)) throw new Error('Exact overlay origins required');
   const wss = new WebSocketServer({ noServer: true, maxPayload: 1024, perMessageDeflate: false });
   const upgrade = (req, socket, head) => {
     if (req.url !== `/ws/${feed.channel}` || !origins.includes(req.headers.origin) || req.headers['sec-websocket-protocol'] || wss.clients.size >= maxClients) {
       socket.end('HTTP/1.1 403 Forbidden\r\nConnection: close\r\nContent-Length: 0\r\n\r\n'); return;
     }
+    if (!allowRead()) { socket.end('HTTP/1.1 429 Too Many Requests\r\nConnection: close\r\nContent-Length: 0\r\n\r\n'); return; }
     wss.handleUpgrade(req, socket, head, ws => wss.emit('connection', ws));
   };
   server.on('upgrade', upgrade);

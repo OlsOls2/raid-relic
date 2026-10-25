@@ -20,7 +20,7 @@ export async function createOverlayFixture({ seed = false, socketOptions = {} } 
     }
   }
   const server = createServer(app.handler);
-  const sockets = attachOverlaySockets(server, feed, { origins: ['http://127.0.0.1:5191', 'http://localhost:5191'], ...socketOptions });
+  const sockets = attachOverlaySockets(server, feed, { origins: ['http://127.0.0.1:5191', 'http://localhost:5191'], allowRead: app.allowPublicRead, ...socketOptions });
   return { app, memory, feed, admin, server, sockets,
     async listen() { await new Promise((resolve, reject) => { server.once('error', reject); server.listen(5191, '127.0.0.1', resolve); }); },
     async close() { sockets.close(); server.closeAllConnections(); if (server.listening) await new Promise(resolve => server.close(resolve)); },

@@ -1,7 +1,13 @@
+function validHandoff(h) {
+  return ['source', 'host'].includes(h.role) && Number.isFinite(h.startedAt) && Number.isFinite(h.endsAt)
+    && h.endsAt - h.startedAt === 90000 && Number.isInteger(h.threshold) && h.threshold >= 1 && h.threshold <= 10
+    && [h.offers, h.accepts].every(v => Number.isInteger(v) && v >= 0 && v <= h.threshold) && typeof h.completed === 'boolean';
+}
 export function validSnapshot(value) {
   return value?.type === 'snapshot' && Number.isSafeInteger(value.revision) && value.revision >= 0
     && ['live', 'simulator'].includes(value.mode) && ['ready', 'waiting', 'paused', 'unavailable'].includes(value.status)
-    && value.lineageRings === 0 && Array.isArray(value.marks) && value.marks.length <= 160
+    && Number.isInteger(value.lineageRings) && value.lineageRings >= 0 && value.lineageRings <= 16
+    && (value.handoff === undefined || value.handoff === null || (Number.isFinite(value.serverNow) && validHandoff(value.handoff))) && Array.isArray(value.marks) && value.marks.length <= 160
     && value.approvedCount === value.marks.length && value.marks.every(mark => typeof mark.id === 'string'
       && /^m[1-9]\d{0,8}$/.test(mark.id) && typeof mark.runeSvg === 'string' && mark.runeSvg.length < 1024);
 }

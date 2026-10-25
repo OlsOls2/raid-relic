@@ -1,16 +1,25 @@
+import { arrivalPhase } from './arrival.js';
 import { connectOverlay } from './overlay-client.js';
 const channel = /^\/overlay\/(\d{1,32})$/.exec(location.pathname)?.[1];
 const runes = document.querySelector('#runes');
 const state = document.querySelector('#status');
 const count = document.querySelector('#count');
 document.body.classList.toggle('corner', new URLSearchParams(location.search).get('corner') === '1');
+let current = null; let receivedAt = 0; let receiptServerTime = 0;
+const motion = matchMedia('(prefers-reduced-motion: reduce)');
 function render(snapshot) {
+  current = snapshot; receivedAt = performance.now(); receiptServerTime = snapshot?.serverNow ?? Date.now();
+  document.querySelector('#rings').replaceChildren();
+  document.querySelector('#lineage').textContent = snapshot ? `${snapshot.lineageRings} completed growth rings` : 'No current lineage state';
+  for (let i = 0; i < (snapshot?.lineageRings ?? 0); i++) { const ring = document.createElement('span'); ring.style.inset = `${4 + i * 1.8}%`; document.querySelector('#rings').append(ring); }
   runes.replaceChildren();
   document.querySelector('#charge').style.width = '0%';
-  if (!snapshot) { count.textContent = 'No current state'; return; }
+  if (!snapshot) { count.textContent = 'No current state'; document.querySelector('#compact-count').textContent = 'No current state'; return; }
   document.querySelector('#simulator').hidden = snapshot.mode !== 'simulator';
   const messages = { ready: 'Relic connected', paused: 'Marks paused by Keeper', waiting: 'Waiting for trusted Keeper and stream state', unavailable: 'State unavailable; runes hidden' };
   state.textContent = messages[snapshot.status];
+  document.querySelector('#compact-status').textContent = { ready: 'Relic connected', paused: 'Marks paused', waiting: 'Waiting for Keeper', unavailable: 'State unavailable' }[snapshot.status];
+  document.querySelector('#compact-count').textContent = `Charge ${snapshot.approvedCount}/160 · Rings ${snapshot.lineageRings}`;
   count.textContent = `${snapshot.approvedCount} approved marks · charge ${snapshot.approvedCount}/160`;
   document.querySelector('#charge').style.width = `${snapshot.approvedCount / 160 * 100}%`;
   snapshot.marks.forEach((mark, index) => {
@@ -24,5 +33,20 @@ function render(snapshot) {
 if (channel) connectOverlay({ url: `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/${channel}`, render,
   status(value) {
     document.body.classList.toggle('disconnected', value !== 'connected');
+    if (value !== 'connected') document.querySelector('#compact-status').textContent = value === 'stale' ? 'State stale' : 'Reconnecting…';
     if (value !== 'connected') state.textContent = { connecting: 'Connecting to relic state…', reconnecting: 'Connection lost; reconnecting…', stale: 'State stale; reconnecting…' }[value];
   } });
+
+function frame() {
+  const time = receiptServerTime + performance.now() - receivedAt;
+  const arrival = arrivalPhase(current?.handoff, time, motion.matches);
+  const archive = document.querySelector('.archive'); archive.dataset.phase = arrival.phase;
+  archive.style.setProperty('--arrival', arrival.progress);
+  const hop = current?.handoff;
+  document.querySelector('#handoff').textContent = hop && time < hop.endsAt
+    ? hop.completed ? 'Two-chat claim complete' : `App-local ritual · ${Math.max(0, Math.ceil((hop.endsAt - time) / 1000))}s · offer ${hop.offers}/${hop.threshold} · accept ${hop.accepts}/${hop.threshold}` : '';
+  document.querySelector('#compact-handoff').textContent = hop && time < hop.endsAt
+    ? hop.completed ? 'Two-chat claim complete' : `Local ${Math.max(0, Math.ceil((hop.endsAt - time) / 1000))}s · O${hop.offers}/${hop.threshold} A${hop.accepts}/${hop.threshold}` : '';
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
