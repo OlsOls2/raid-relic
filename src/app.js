@@ -15,6 +15,8 @@ import { parseLifecycle } from './lifecycle.js';
 export const MAX_BODY_BYTES = 65536;
 export const REPLAY_WINDOW_MS = 10 * 60 * 1000;
 const assets = new Map([
+  ['/journey-map.js', ['journey-map.js', 'text/javascript; charset=utf-8']],
+  ['/journey-map.css', ['journey-map.css', 'text/css; charset=utf-8']],
   ['/scoreboard.js', ['scoreboard.js', 'text/javascript; charset=utf-8']],
   ['/fonts.css', ['fonts.css', 'text/css; charset=utf-8']],
   ['/fonts/Cinzel.ttf', ['fonts/Cinzel.ttf', 'font/ttf']],
@@ -78,6 +80,20 @@ export function createApp({ scoreAcks, claimAcks, secret, state = createMemorySt
     }
     if (method === 'GET' && path === '/health') {
       return result(200, JSON.stringify({ status: 'ok', ...(previewReadOnly ? { preview: 'P5 READ-ONLY PREVIEW; live Twitch chat commands not enabled on canonical yet' } : {}), releaseCommit: release, phase: raidPilot ? 'raid-pilot' : 'foundation', readiness: raidPilot ? 'owner-test-ready' : 'not-ready-for-raids', ...(raidPilot ? { liveValidated: false } : {}) }), 'application/json');
+    }
+    if (path.startsWith('/api/journey-map')) {
+      if (path !== '/api/journey-map' || rawBody.length) return result(400, 'Invalid journey request');
+      if (method !== 'GET') return result(405, 'Read only');
+      try { const body = JSON.stringify({...await state.getJourneyMap(now()),mode:overlayFeed?.simulator ? 'simulator' : 'live'});
+        if (Buffer.byteLength(body)>32768) throw Error();
+        return {...result(200,body,'application/json'),headers:{'cache-control':'no-store'}};
+      } catch { return result(503,'Journey unavailable; clear previous data'); }
+    }
+    if (/^\/atlas(?:\/embed)?(?:\/)?(?:\?.*)?$/.test(path)) {
+      if (method !== 'GET') return result(405,'Read only');
+      const embed=path.split('?')[0].replace(/\/$/,'')==='/atlas/embed', params=new URLSearchParams(path.split('?')[1] ?? '');
+      if ([...params].some(([k,v])=>params.getAll(k).length!==1 || (k==='t' ? !/^[a-f0-9]{64}$/.test(v) : !(embed && k==='play' && v==='1')))) return result(400,'Invalid journey selection');
+      return {...result(200,await readFile(new URL(embed?'../public/journey-embed.html':'../public/atlas.html',import.meta.url)),'text/html; charset=utf-8'),headers:{'cache-control':'no-store'}};
     }
     if (path.startsWith('/api/scores')) {
       if (path !== '/api/scores' || rawBody.length) return result(400, 'Invalid score request');

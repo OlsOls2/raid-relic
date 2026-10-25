@@ -1,3 +1,4 @@
+import { journeyMap } from './journey-map.js';
 import { reduceScores, retainedScores, scoreboard, scoreMessage, isScoreCommand, scoreAckDocument, scoreAckMutation } from './scoreboard.js';
 import { updatePresence, presenceKey, revokePresenceActor } from './presence.js';
 import { reserveShare, sharePage, shareStep } from './my-marks.js';
@@ -281,6 +282,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
     },
     async getRecap() { return recapProjection((await ref('lineage', 'single').get()).data()); },
     async searchPublicMarks(options) { return atlasSearch((await ref('lineage', 'single').get()).data(), options); },
+    async getJourneyMap(now) { return journeyMap((await ref('lineage', 'single').get()).data(), config, now); },
     async getAtlasPage(options) { return atlasPage((await ref('lineage', 'single').get()).data(), options); },
     async getPublicPresentation(host, now) {
       return db.runTransaction(async tx => {

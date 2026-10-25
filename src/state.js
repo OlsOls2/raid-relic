@@ -1,3 +1,4 @@
+import { journeyMap } from './journey-map.js';
 import { reduceScores, retainedScores, scoreboard, scoreMessage, isScoreCommand, scoreAckDocument, scoreAckMutation } from './scoreboard.js';
 import { updatePresence, presenceKey, revokePresenceActor } from './presence.js';
 import { reserveShare, sharePage, shareStep } from './my-marks.js';
@@ -162,6 +163,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
     },
     getRecap() { return recapProjection(lineage); },
     searchPublicMarks(options) { return atlasSearch(lineage, options); },
+    getJourneyMap(now) { return journeyMap(lineage, config, now); },
     getAtlasPage(options) { return atlasPage(lineage, options); },
     getPublicPresentation(host, now) { return { rings: lineage.stops.length, ...(movedToView(registry, lineage, host, channels.get(host)) ? { movedToLogin: movedToView(registry, lineage, host, channels.get(host)) } : {}), handoff: handoffView(registry, host, now, lineage), claimMeter: claimMeterView(registry, host, now), ...(echoView(registry, host, now) ? { resonance: echoView(registry, host, now) } : {}) }; },
     getPublicJourney() { return publicJourney(lineage); },
