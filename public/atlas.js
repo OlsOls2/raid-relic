@@ -10,7 +10,7 @@ function chronicleCaption(value) {
     || [...value.line].length > 160 || /[\p{Cc}\p{Cf}]/u.test(value.line)) return fallback;
   return `Fiction · ${value.source}: ${value.line}`;
 }
-function clear() { $('journey').replaceChildren(); $('marks').replaceChildren(); $('rings').textContent = 'No current state'; $('next').hidden = true; }
+function clear() { $('status').classList.remove('empty-state'); $('journey').replaceChildren(); $('marks').replaceChildren(); $('rings').textContent = 'No current state'; $('next').hidden = true; }
 async function load() {
   const current = ++generation; controller?.abort(); controller = new AbortController(); const activeController = controller;
   // Clear immediately: no cache or old page may retain purged public content.
@@ -30,6 +30,7 @@ async function load() {
       const item = node('li', undefined, 'stop'); const link = node('a', 'Open this stop'); link.href = `/stops/${stop.stopId}`;
       item.append(node('h2', `Ring ${stop.ringIndex}`), node('p', chronicleCaption(stop.chronicle)), node('p', `Channel ${stop.from} to ${stop.to}`), node('p', new Date(stop.claimedAt).toLocaleString()), node('p', `${stop.approvedCount} approved marks retained`), link); $('journey').append(item);
     }
+    $('status').classList.toggle('empty-state', data.total === 0);
     next = data.nextOffset; $('next').hidden = next === null;
   } catch { if (current !== generation) return; clear(); $('status').textContent = 'Archive unavailable. Previous content hidden. Refresh to try again.'; }
   finally { clearTimeout(timer); if (current === generation) $('refresh').disabled = false; }

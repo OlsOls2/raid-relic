@@ -18,3 +18,21 @@
 .archive.resonating .crystal { filter:drop-shadow(0 0 15px #b7a2df); outline:1px solid #b7a2df88; outline-offset:5px; }
 .echo-note { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
 @media(prefers-reduced-motion:reduce){.archive.resonating .crystal{filter:none;outline:2px solid #b7a2df;}}
+
+/* Transparent OBS composition: one centred archive, quiet readable labels. */
+body:not(.corner){min-height:100svh;display:grid;place-items:center}
+.relic-overlay{padding:16px 16px 20px}
+body:not(.corner) .archive{width:min(100%,360px);margin:0 auto}
+body:not(.corner) .crystal{width:42%}
+body:not(.corner) h1{font-size:26px;line-height:1.2;letter-spacing:.035em;margin:8px 0 10px}
+body:not(.corner) #status{color:#e3e8ef;background:#101d30f2;border-left:2px solid #b7a2df;padding:7px 10px;max-width:37ch;line-height:1.5}
+body:not(.corner) #count{color:#e3e8ef;font-size:12px;background:#101d30f2;padding:3px 6px;width:fit-content}
+body:not(.corner) .lineage{color:#c1ccda;background:#101d30f2;padding:2px 6px;width:fit-content}
+body:not(.corner) #handoff{color:#e3e8ef;background:#101d30f2;width:fit-content;padding:2px 6px}
+body:not(.corner) #handoff:empty{display:none}
+#waiting-note{color:#c1ccda;background:#101d30f2;padding:6px 10px;font-size:11px;line-height:1.5;max-width:42ch}
+.corner{display:block;min-height:0;width:160px;height:160px}
+.corner .compact-state{color:#e3e8ef;background:#101d30f2;padding:1px 0;font-size:9px;line-height:12px}
+.corner #waiting-note{position:absolute;width:1px;height:1px;padding:0;margin:0;clip-path:inset(50%);overflow:hidden;white-space:nowrap}
+#sound-toggle:focus-visible{outline:2px solid #f0c581;outline-offset:2px}
+@media(min-width:681px) and (min-height:800px){body:not(.corner) .archive{width:min(100%,440px)}}

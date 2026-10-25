@@ -22,6 +22,8 @@ const motion = matchMedia('(prefers-reduced-motion: reduce)');
 function render(snapshot) {
   const cue = cueFor(snapshot); if (!snapshot || !['ready', 'incoming', 'waiting'].includes(snapshot.status) || (snapshot.status === 'waiting' && !snapshot.handoff?.completed)) audio.silence();
   if (cue) audio.cue(cue);
+  document.body.dataset.state = snapshot?.status ?? 'connecting';
+  document.querySelector('#waiting-note').hidden = snapshot?.status !== 'waiting';
   current = snapshot; receivedAt = performance.now(); receiptServerTime = snapshot?.serverNow ?? Date.now();
   document.querySelector('#rings').replaceChildren();
   document.querySelector('#lineage').textContent = snapshot ? `${snapshot.lineageRings} completed growth rings` : 'No current lineage state';
@@ -30,7 +32,7 @@ function render(snapshot) {
   document.querySelector('#charge').style.width = '0%';
   if (!snapshot) { count.textContent = 'No current state'; document.querySelector('#compact-count').textContent = 'No current state'; return; }
   document.querySelector('#simulator').hidden = snapshot.mode !== 'simulator';
-  const messages = { incoming: 'Incoming relic · awaiting two-chat claim', ready: 'Relic connected', paused: 'Marks paused by Keeper', waiting: 'Waiting for trusted Keeper and stream state', unavailable: 'State unavailable; runes hidden' };
+  const messages = { incoming: 'Incoming relic · awaiting two-chat claim', ready: 'Relic connected', paused: 'Marks paused by Keeper', waiting: 'Waiting for an active Keeper holding the relic', unavailable: 'State unavailable; runes hidden' };
   state.textContent = messages[snapshot.status];
   document.querySelector('#compact-status').textContent = { incoming: 'Incoming · claim pending', ready: 'Relic connected', paused: 'Marks paused', waiting: 'Waiting for Keeper', unavailable: 'State unavailable' }[snapshot.status];
   document.querySelector('#compact-count').textContent = `Charge ${snapshot.approvedCount}/160 · Rings ${snapshot.lineageRings}`;

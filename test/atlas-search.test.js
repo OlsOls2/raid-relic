@@ -84,12 +84,12 @@ test('Atlas search heading has a discoverable named anchor and honest name-as-te
 });
 test('all16 stops ×160 approved name-text entries page completely without an identity lookup', () => {
   const stops = Array.from({ length: 16 }, (_, n) => ({ stopId: (n + 1).toString(16).padStart(64, '0'), from: '1', to: '2', ringIndex: n + 1, claimedAt: n,
-    marks: Array.from({ length: 160 }, (_, i) => ({ id: `m${i + 1}`, userId: 'PRIVATE_ASSOCIATION', text: 'alex' })) }));
+    marks: Array.from({ length: 160 }, (_, i) => ({ id: `m${i + 1}`, userId: 'PRIVATE_ASSOCIATION', text: `alex${String.fromCharCode(97 + Math.floor(i / 26))}${String.fromCharCode(97 + i % 26)}` })) }));
   let offset = 0; const seen = new Set();
   do {
     const page = atlasSearch({ stops }, { query: 'alex', offset, limit: 20 });
     assert.equal(page.total, 2560); assert.equal(page.matches.length, 20);
-    for (const match of page.matches) { seen.add(`${match.stopId}:${match.runeSvg}:${seen.size}`); assert.equal(match.text, 'alex'); assert.ok(!JSON.stringify(match).includes('PRIVATE_ASSOCIATION')); }
+    for (const match of page.matches) { seen.add(`${match.stopId}:${match.text}`); assert.ok(match.text.startsWith('alex')); assert.ok(!JSON.stringify(match).includes('PRIVATE_ASSOCIATION')); }
     offset = page.nextOffset;
   } while (offset !== null);
   assert.equal(seen.size, 2560);
