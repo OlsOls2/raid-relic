@@ -3,19 +3,25 @@ import { createMemoryState } from './state.js';
 import { createMemoryAuthStore, createFirestoreStore } from './store.js';
 import { createOAuth } from './oauth.js';
 import { createBot } from './bot.js';
-import { createOverlayFeed } from './overlay-feed.js';
+import { createPilot, KEEPERS } from './pilot.js';
+import { createOverlayHub } from './overlay-feed.js';
 import { validateReleaseCommit } from './release.js';
 import { createSubscriptionManager } from './subscriptions.js';
 import { createSendOff } from './send-off.js';
 
 export const PROJECT_ID = 'raid-relic-hackathon';
-export async function createRuntime(env, { firestoreClient, transport, loadSDK = () => import('@google-cloud/firestore') } = {}) {
+export async function createRuntime(env, { firestoreClient, transport, now = Date.now, simulator = false, loadSDK = () => import('@google-cloud/firestore') } = {}) {
   const production = env.NODE_ENV === 'production';
+  if (production && simulator) throw new Error('Simulator forbidden in production');
   const releaseCommit = validateReleaseCommit(env.RELEASE_COMMIT, { required: production });
+  const raidPilot = env.RAID_PILOT_ENABLED === 'true';
+  if (env.RAID_PILOT_ENABLED && !['true', 'false'].includes(env.RAID_PILOT_ENABLED)) throw new Error('Explicit pilot gate required');
   let state; let store;
   const keeperIds = env.KEEPER_CHANNEL_IDS ? env.KEEPER_CHANNEL_IDS.split(',') : [env.TWITCH_STREAMER_ID];
   if (env.KEEPER_CHANNEL_IDS && (!keeperIds.every(id => ['1591805230', '1591806023'].includes(id)) || env.TWITCH_STREAMER_ID !== '1591805230' || env.TWITCH_BOT_ID !== '1591804828')) throw new Error('Keeper allowlist rejected');
-  const lifecycle = env.OAUTH_ENABLED === 'true' ? { channels: keeperIds } : undefined;
+  if (raidPilot && (env.OAUTH_ENABLED !== 'true' || keeperIds.length !== 2 || !Object.keys(KEEPERS).every(id => keeperIds.includes(id)))) throw new Error('Pilot needs both configured Keepers and OAuth controls');
+  if (raidPilot && (new URL(env.OAUTH_REDIRECT_URI).pathname !== '/auth/callback' || new URL(env.EVENTSUB_CALLBACK_URL).origin !== new URL(env.OAUTH_REDIRECT_URI).origin)) throw new Error('Pilot callback configuration mismatch');
+  const lifecycle = env.OAUTH_ENABLED === 'true' ? { channels: keeperIds, ...(raidPilot ? { logins: Object.fromEntries(Object.entries(KEEPERS).map(([id, login]) => [login, id])) } : {}) } : undefined;
   if (env.STATE_STORE === 'firestore') {
     if (env.GOOGLE_CLOUD_PROJECT !== PROJECT_ID || env.FIRESTORE_EMULATOR_HOST) throw new Error('Firestore project configuration rejected');
     const db = firestoreClient ?? new (await loadSDK()).Firestore({ projectId: PROJECT_ID });
@@ -29,20 +35,33 @@ export async function createRuntime(env, { firestoreClient, transport, loadSDK =
   if (env.OAUTH_ENABLED === 'true') {
     oauth = createOAuth({ clientId: env.TWITCH_CLIENT_ID, clientSecret: env.TWITCH_CLIENT_SECRET, redirectUri: env.OAUTH_REDIRECT_URI,
       redirectAllowlist: (env.OAUTH_REDIRECT_ALLOWLIST ?? '').split(','), streamerId: env.TWITCH_STREAMER_ID, botId: env.TWITCH_BOT_ID,
-      encryptionKey: env.TOKEN_ENCRYPTION_KEY, keeperIds, store, transport, production });
+      encryptionKey: env.TOKEN_ENCRYPTION_KEY, keeperIds, store, transport, production, now });
     bot = createBot({ oauth, clientId: env.TWITCH_CLIENT_ID, clientSecret: env.TWITCH_CLIENT_SECRET, streamerId: env.TWITCH_STREAMER_ID,
       botId: env.TWITCH_BOT_ID, callbackUrl: env.EVENTSUB_CALLBACK_URL, webhookSecret: env.TWITCH_EVENTSUB_SECRET, transport });
     if (production) bot.chatSubscription();
     subscriptions = createSubscriptionManager({ oauth, bot, clientId: env.TWITCH_CLIENT_ID, clientSecret: env.TWITCH_CLIENT_SECRET,
       streamerId: env.TWITCH_STREAMER_ID, transport });
   } else if (production || env.OAUTH_ENABLED !== 'false') throw new Error('Select OAUTH_ENABLED explicitly; production requires OAuth configuration');
-  let overlayFeed;
+  let overlayFeed; let overlayFeeds;
   if (env.TWITCH_STREAMER_ID) {
     if (production && (!env.OVERLAY_ORIGIN || new URL(env.OVERLAY_ORIGIN).origin !== env.OVERLAY_ORIGIN || !env.OVERLAY_ORIGIN.startsWith('https://'))) throw new Error('Exact HTTPS overlay origin required');
-    overlayFeed = createOverlayFeed(state, env.TWITCH_STREAMER_ID); state = overlayFeed.store;
+    const hub = createOverlayHub(state, raidPilot ? keeperIds : [env.TWITCH_STREAMER_ID], { now, simulator });
+    overlayFeeds = hub.feeds; overlayFeed = overlayFeeds[env.TWITCH_STREAMER_ID]; state = hub.store;
   }
-  const sendOff = oauth ? createSendOff({ state, oauth, clientId: env.TWITCH_CLIENT_ID, streamerId: env.TWITCH_STREAMER_ID, transport }) : undefined;
-  return { ...createApp({ secret: env.TWITCH_EVENTSUB_SECRET, state, oauth, overlayFeed, releaseCommit: releaseCommit ?? undefined,
-    chatContext: oauth ? { streamerId: env.TWITCH_STREAMER_ID, botId: env.TWITCH_BOT_ID, keeperIds } : undefined }), oauth, bot, store, subscriptions, sendOff, overlayFeed,
+  const sendOff = oauth ? createSendOff({ state, oauth, clientId: env.TWITCH_CLIENT_ID, streamerId: env.TWITCH_STREAMER_ID, transport, now }) : undefined;
+  let pilot; const sends = {}; const subscriptionManagers = {};
+  if (raidPilot) {
+    for (const id of keeperIds) {
+      const scoped = { accessToken: (role, options) => role === 'streamer' ? oauth.accessTokenForKeeper(id, options) : oauth.accessToken(role, options) };
+      const channelBot = createBot({ oauth: scoped, clientId: env.TWITCH_CLIENT_ID, clientSecret: env.TWITCH_CLIENT_SECRET, streamerId: id, botId: env.TWITCH_BOT_ID,
+        callbackUrl: env.EVENTSUB_CALLBACK_URL, webhookSecret: env.TWITCH_EVENTSUB_SECRET, transport });
+      subscriptionManagers[id] = createSubscriptionManager({ oauth: scoped, bot: channelBot, clientId: env.TWITCH_CLIENT_ID, clientSecret: env.TWITCH_CLIENT_SECRET, streamerId: id, transport });
+      sends[id] = createSendOff({ state, oauth: scoped, clientId: env.TWITCH_CLIENT_ID, streamerId: id, transport, now, authorize: source => pilot.authorizeSend(source) });
+    }
+    pilot = createPilot({ state, store, oauth, subscriptions: subscriptionManagers, sends, now, simulator, clientId: env.TWITCH_CLIENT_ID, transport });
+    oauth.control.bindPilot(pilot);
+  }
+  return { ...createApp({ secret: env.TWITCH_EVENTSUB_SECRET, state, oauth, overlayFeed, overlayFeeds, raidPilot, now, releaseCommit: releaseCommit ?? undefined,
+    chatContext: oauth ? { streamerId: env.TWITCH_STREAMER_ID, botId: env.TWITCH_BOT_ID, keeperIds } : undefined }), oauth, bot, store, subscriptions, sendOff, overlayFeed, overlayFeeds, pilot, subscriptionManagers, sends,
     overlayOrigins: production ? [env.OVERLAY_ORIGIN].filter(Boolean) : ['http://localhost:5191', 'http://127.0.0.1:5191'] };
 }

@@ -16,9 +16,9 @@ function render(snapshot) {
   document.querySelector('#charge').style.width = '0%';
   if (!snapshot) { count.textContent = 'No current state'; document.querySelector('#compact-count').textContent = 'No current state'; return; }
   document.querySelector('#simulator').hidden = snapshot.mode !== 'simulator';
-  const messages = { ready: 'Relic connected', paused: 'Marks paused by Keeper', waiting: 'Waiting for trusted Keeper and stream state', unavailable: 'State unavailable; runes hidden' };
+  const messages = { incoming: 'Incoming relic · awaiting two-chat claim', ready: 'Relic connected', paused: 'Marks paused by Keeper', waiting: 'Waiting for trusted Keeper and stream state', unavailable: 'State unavailable; runes hidden' };
   state.textContent = messages[snapshot.status];
-  document.querySelector('#compact-status').textContent = { ready: 'Relic connected', paused: 'Marks paused', waiting: 'Waiting for Keeper', unavailable: 'State unavailable' }[snapshot.status];
+  document.querySelector('#compact-status').textContent = { incoming: 'Incoming · claim pending', ready: 'Relic connected', paused: 'Marks paused', waiting: 'Waiting for Keeper', unavailable: 'State unavailable' }[snapshot.status];
   document.querySelector('#compact-count').textContent = `Charge ${snapshot.approvedCount}/160 · Rings ${snapshot.lineageRings}`;
   count.textContent = `${snapshot.approvedCount} approved marks · charge ${snapshot.approvedCount}/160`;
   document.querySelector('#charge').style.width = `${snapshot.approvedCount / 160 * 100}%`;

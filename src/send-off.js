@@ -1,7 +1,7 @@
 import { randomBytes } from 'node:crypto';
 import { httpTransport } from './oauth.js';
 
-export function createSendOff({ state, oauth, clientId, streamerId, transport = httpTransport, now = Date.now }) {
+export function createSendOff({ state, oauth, clientId, streamerId, transport = httpTransport, now = Date.now, authorize }) {
   async function processPending() {
     const owner = randomBytes(24).toString('hex');
     const intent = await state.sendOffStep({ type: 'claim', source: streamerId, owner }, now());
@@ -9,6 +9,7 @@ export function createSendOff({ state, oauth, clientId, streamerId, transport = 
     const finish = status => state.sendOffStep({ type: 'finish', id: intent.id, owner, status }, now());
     let token; let refreshed = false;
     try {
+      await authorize?.(intent.sourceId, intent.targetId);
       token = await oauth.accessToken('streamer');
       async function get(url) {
         let response = await transport(url, { headers: { Authorization: `Bearer ${token}`, 'Client-Id': clientId } });
@@ -26,6 +27,7 @@ export function createSendOff({ state, oauth, clientId, streamerId, transport = 
         if (!streams.some(item => item.user_id === id && item.id === stream && item.type === 'live')) throw new Error('Not live');
       }
     } catch { await finish('rejected'); return { status: 'rejected-preflight' }; }
+    try { if (authorize) { await authorize(intent.sourceId, intent.targetId); token = await oauth.accessToken('streamer'); } } catch { await finish('rejected'); return { status: 'rejected-preflight' }; }
     const dispatched = await state.sendOffStep({ type: 'dispatch', id: intent.id, owner }, now());
     if (!dispatched) return { status: 'rejected-or-lease-lost' };
     // Irreversible dispatch boundary is persisted BEFORE HTTP. Never retry this

@@ -1,4 +1,5 @@
-import { atlasPage, handoffView } from './public-view.js';
+import { hash as observationHash } from './crypto.js';
+import { atlasPage, handoffView, withCarriedMarks, withIncomingPreview } from './public-view.js';
 import { reduceClaims, emptyLineage, publicJourney } from './claims.js';
 import { sendState } from './send-state.js';
 import { lifecycleConfig, reduceLifecycle, emptyRegistry } from './lifecycle.js';
@@ -15,13 +16,22 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
   const markDocs = new Map();
   return {
     lifecycleEnabled: Boolean(config),
-    accept({ id, expiresAt, now, raid, chat, lifecycle: event, sentAt = now }) {
+    accept({ id, expiresAt, now, raid, chat, lifecycle: providedEvent, observation, sentAt = now }) {
       for (const [key, expiry] of seen) if (expiry < now) seen.delete(key);
       for (const [key, ritual] of rituals) if (ritual.endsAt <= now) rituals.delete(key);
       if (seen.has(id)) return 'duplicate';
       if (seen.size >= maxEvents) return 'full';
+      const event = observation?.event ?? providedEvent;
       const host = event?.host ?? chat?.broadcasterId;
       if (config && host && !config.channels.includes(host)) throw new Error('Unconfigured lifecycle channel');
+      if (config && chat && !chat.markAction && !raid && !event && !observation) {
+        if (!isChatIdentity(chat, host)) throw new Error('Authenticated chat identity required');
+        seen.set(id, expiresAt); chatReceipts.set(host, { broadcasterId: host, chatterId: chat.chatterId, messageId: chat.messageId, receivedAt: now }); return 'accepted';
+      }
+      if (observation) {
+        if (!config || observationHash(JSON.stringify(channels.get(host) ?? null)) !== observation.baseline) return 'superseded';
+        if (event.type === 'online' && channels.get(host)?.closedIds.includes(event.streamId)) return 'closed';
+      }
       const transition = config && host ? reduceLifecycle({ registry, channel: channels.get(host), marks: markDocs.get(host), host, event, chat, now, sentAt }) : null;
       const markDoc = transition ? transition.marks : chat?.markAction ? reduceMark(markDocs.get(chat.broadcasterId), chat.broadcasterId, chat, chat.markAction, now) : null;
       let claiming; let sending;
@@ -84,7 +94,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
     getPublicPresentation(host, now) { return { rings: lineage.stops.length, handoff: handoffView(registry, host, now) }; },
     getPublicJourney() { return publicJourney(lineage); },
     getPublicMarks(host) { return publicMarks(markDocs.get(host), host); },
-    getOverlayState(host) { return publicOverlayState(markDocs.get(host), host); },
+    getOverlayState(host, now = Date.now()) { return withIncomingPreview(withCarriedMarks(publicOverlayState(markDocs.get(host), host), lineage, registry, host), registry, host, Object.fromEntries(channels), Object.fromEntries(markDocs), now); },
     getPrivateMarks(host, actor) { return privateMarks(markDocs.get(host), host, actor); },
   };
 }

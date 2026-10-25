@@ -5,7 +5,7 @@ function validHandoff(h) {
 }
 export function validSnapshot(value) {
   return value?.type === 'snapshot' && Number.isSafeInteger(value.revision) && value.revision >= 0
-    && ['live', 'simulator'].includes(value.mode) && ['ready', 'waiting', 'paused', 'unavailable'].includes(value.status)
+    && ['live', 'simulator'].includes(value.mode) && ['ready', 'waiting', 'paused', 'incoming', 'unavailable'].includes(value.status)
     && Number.isInteger(value.lineageRings) && value.lineageRings >= 0 && value.lineageRings <= 16
     && (value.handoff === undefined || value.handoff === null || (Number.isFinite(value.serverNow) && validHandoff(value.handoff))) && Array.isArray(value.marks) && value.marks.length <= 160
     && value.approvedCount === value.marks.length && value.marks.every(mark => typeof mark.id === 'string'

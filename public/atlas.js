@@ -11,7 +11,8 @@ async function load() {
   try {
     const response = await fetch(`/api/atlas${stopId ? `/stops/${stopId}` : ''}?offset=${offset}&limit=${stopId ? 20 : 8}`, { cache: 'no-store', signal: activeController.signal });
     if (!response.ok) throw new Error('Unavailable'); const data = await response.json(); if (current !== generation) return;
-    $('simulator').hidden = data.mode !== 'simulator'; $('rings').textContent = `${data.rings} completed growth rings`;
+    $('simulator').hidden = data.mode !== 'simulator';
+    if (data.pilotEnabled) document.querySelector('.note').textContent = 'Owner-test raid pilot. Live validation remains pending. Only verified raid notifications and completed two-chat claims create this journey. Read only.'; $('rings').textContent = `${data.rings} completed growth rings`;
     $('status').textContent = data.total ? `Showing ${offset + 1}–${Math.min(offset + (stopId ? data.marks.length : data.stops.length), data.total)} of ${data.total}` : stopId ? 'No approved marks retained at this stop.' : 'No completed hops yet. The relic has no recorded journey. Refresh after a completed two-chat claim.';
     if (stopId) {
       $('title').textContent = `Stop ${data.stop.ringIndex}`; $('description').textContent = `Channel ${data.stop.from} to channel ${data.stop.to}. Claimed ${new Date(data.stop.claimedAt).toLocaleString()}. ${data.stop.raidSize} reported raid viewers.`;

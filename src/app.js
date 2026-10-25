@@ -14,6 +14,8 @@ const assets = new Map([
   ['/atlas/', ['atlas.html', 'text/html; charset=utf-8']],
   ['/atlas.css', ['atlas.css', 'text/css; charset=utf-8']],
   ['/atlas.js', ['atlas.js', 'text/javascript; charset=utf-8']],
+  ['/control.js', ['control.js', 'text/javascript; charset=utf-8']],
+  ['/control.css', ['control.css', 'text/css; charset=utf-8']],
   ['/arrival.js', ['arrival.js', 'text/javascript; charset=utf-8']],
   ['/overlay', ['overlay.html', 'text/html; charset=utf-8']],
   ['/relic.svg', ['relic.svg', 'image/svg+xml']],
@@ -26,7 +28,7 @@ const assets = new Map([
 const header = (headers, name) => typeof headers[name] === 'string' ? headers[name] : '';
 const result = (status, body = '', type = 'text/plain; charset=utf-8') => ({ status, body, type });
 
-export function createApp({ secret, state = createMemoryState(), now = Date.now, oauth, chatContext, overlayFeed, releaseCommit, publicBudget = { burst: 60, perSecond: 1 } } = {}) {
+export function createApp({ secret, state = createMemoryState(), now = Date.now, oauth, chatContext, overlayFeed, overlayFeeds, raidPilot = false, releaseCommit, publicBudget = { burst: 60, perSecond: 1 } } = {}) {
   const keepers = chatContext?.keeperIds ?? (chatContext ? [chatContext.streamerId] : []);
   if (!Array.isArray(keepers) || keepers.length > 4 || (chatContext && !keepers.length)
     || !keepers.every(id => typeof id === 'string' && /^\d{1,32}$/.test(id))
@@ -47,7 +49,7 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
       return oauth.route({ method, path, headers });
     }
     if (method === 'GET' && path === '/health') {
-      return result(200, JSON.stringify({ status: 'ok', releaseCommit: release, phase: 'foundation', readiness: 'not-ready-for-raids' }), 'application/json');
+      return result(200, JSON.stringify({ status: 'ok', releaseCommit: release, phase: raidPilot ? 'raid-pilot' : 'foundation', readiness: raidPilot ? 'owner-test-ready' : 'not-ready-for-raids', ...(raidPilot ? { liveValidated: false } : {}) }), 'application/json');
     }
     if (path.startsWith('/api/atlas')) {
       if (method !== 'GET') return result(405, 'Read only');
@@ -60,7 +62,7 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
       if (!Number.isInteger(offset) || !Number.isInteger(limit) || limit < 1) return result(400, 'Invalid paging');
       try {
         const page = await state.getAtlasPage({ stopId: match[1], offset, limit });
-        return page ? result(200, JSON.stringify({ ...page, mode: overlayFeed?.simulator ? 'simulator' : 'live' }), 'application/json') : result(404, 'Stop not found');
+        return page ? result(200, JSON.stringify({ ...page, pilotEnabled: raidPilot, mode: overlayFeed?.simulator ? 'simulator' : 'live' }), 'application/json') : result(404, 'Stop not found');
       } catch { return result(503, 'Atlas unavailable; clear previous data and refresh later'); }
     }
     if (/^\/stops\/[a-f0-9]{64}$/.test(path)) {
@@ -72,6 +74,10 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
       try { return result(200, JSON.stringify(await state.getAtlasPage({ offset: 0, limit: 8 })), 'application/json'); }
       catch { return result(503, 'Atlas unavailable'); }
     }
+    const feedPath = /^(?:\/api)?\/overlay\/(\d{1,32})(?:\?corner=1)?$/.exec(path);
+    const selected = feedPath ? (overlayFeeds ?? (overlayFeed ? { [overlayFeed.channel]: overlayFeed } : {}))[feedPath[1]] : null;
+    if (method === 'GET' && selected && path === `/api/overlay/${selected.channel}`) return result(200, JSON.stringify(await selected.snapshot()), 'application/json');
+    if (method === 'GET' && selected && (path === `/overlay/${selected.channel}` || path === `/overlay/${selected.channel}?corner=1`)) return result(200, await readFile(new URL('../public/overlay-live.html', import.meta.url)), 'text/html; charset=utf-8');
     if (method === 'GET' && overlayFeed && path === `/api/overlay/${overlayFeed.channel}`) {
       return result(200, JSON.stringify(await overlayFeed.snapshot()), 'application/json');
     }

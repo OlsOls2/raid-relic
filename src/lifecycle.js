@@ -59,7 +59,7 @@ export function reduceLifecycle({ registry, channel, marks, host, event, chat, p
     && !channel.closedIds.includes(event.streamId) && event.streamId !== channel.streamId
     && (!channel.online || event.startedAt > channel.startedAt)) {
     if (channel.online) closeStream(channel, marks);
-    channel.online = true; channel.streamId = event.streamId; channel.startedAt = event.startedAt; channel.lifecycleAt = event.sentAt;
+    channel.online = true; channel.streamId = event.streamId; channel.startedAt = event.startedAt; channel.lifecycleAt = event.sentAt; channel.lifecycleSource = event.provenance ?? 'eventsub';
   }
   if (event?.type === 'offline' && event.sentAt >= channel.lifecycleAt) {
     // Retain only the last authoritative stream closure. Repeated offline
@@ -69,7 +69,7 @@ export function reduceLifecycle({ registry, channel, marks, host, event, chat, p
     };
     closeStream(channel, marks);
     channel.closedThrough = Math.max(channel.closedThrough, event.sentAt);
-    channel.lifecycleAt = event.sentAt; channel.online = false; channel.streamId = null; channel.startedAt = null;
+    channel.lifecycleAt = event.sentAt; channel.lifecycleSource = event.provenance ?? 'eventsub'; channel.online = false; channel.streamId = null; channel.startedAt = null;
   }
   const action = chat?.markAction;
   const owner = chat?.broadcasterId === host && chat.chatterId === host;

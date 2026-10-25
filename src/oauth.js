@@ -71,7 +71,7 @@ export function createOAuth({ clientId, clientSecret, redirectUri, redirectAllow
     });
   }
   async function route({ path, method, headers }) {
-    const response = (status, body, extra = {}) => ({ status, body, type: 'text/plain; charset=utf-8', headers: { 'referrer-policy': 'no-referrer', ...extra } });
+    const response = (status, body, extra = {}) => ({ status, body, type: 'text/plain; charset=utf-8', headers: { 'referrer-policy': 'no-referrer', 'content-security-policy': "frame-ancestors 'none'; base-uri 'none'", 'x-frame-options': 'DENY', ...extra } });
     try {
       const url = new URL(path, redirect.origin);
       const keeperMatch = /^\/oauth\/keeper\/(\d{1,32})\/start$/.exec(url.pathname);

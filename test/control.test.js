@@ -98,3 +98,20 @@ for (const kind of ['memory', 'firestore']) {
     assert.equal((await f.request(`/control/${home}?returnTo=https://evil.example`)).status, 404);
   });
 }
+
+for (const kind of ['memory', 'firestore']) {
+  test(`${kind}: OAuth redirects/callbacks and private control responses deny framing and referrers`, async () => {
+    const f = fixture(kind); const flow = await f.start(`/oauth/keeper/${home}/start`);
+    const connected = await f.finish(flow); assert.equal(connected.status, 200);
+    const cookie = connected.headers['set-cookie'][1].split(';')[0];
+    const responses = [connected, await f.request(`/oauth/keeper/${home}/start`), await f.request(`/control/${home}`, { cookie }),
+      await f.request(`/control/${home}/status`, { cookie }), await f.request(`/control/${home}`),
+      await f.request(`/control/${home}`, {}, 'POST', { action: 'logout', csrf: 'forged' })];
+    const denied = await f.start(`/oauth/keeper/${second}/start`); responses.push(await f.finish(denied, 'error=access_denied'));
+    for (const r of responses) {
+      assert.equal(r.headers['content-security-policy'], "frame-ancestors 'none'; base-uri 'none'");
+      assert.equal(r.headers['x-frame-options'], 'DENY'); assert.equal(r.headers['referrer-policy'], 'no-referrer');
+    }
+    assert.equal(responses[1].status, 302); assert.equal(new URL(responses[1].headers.location).origin, 'https://id.twitch.tv');
+  });
+}

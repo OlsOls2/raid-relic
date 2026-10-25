@@ -1,7 +1,9 @@
+import { readFile } from 'node:fs/promises';
 import { randomBytes } from 'node:crypto';
 import { hash } from './crypto.js';
 
 export function createControl({ store, keeperIds, origin, secure, now = Date.now }) {
+  let pilot;
   const name = id => `${secure ? '__Host-' : ''}rr_control_${id}`;
   const cookie = (id, value, age) => `${name(id)}=${value}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${age}${secure ? '; Secure' : ''}`;
   const csrf = secret => hash(`control-csrf:${secret}`);
@@ -16,14 +18,18 @@ export function createControl({ store, keeperIds, origin, secure, now = Date.now
   async function authorizePost({ keeperId, headers = {}, rawBody }, allowedActions = []) {
     if (headers.origin !== origin || headers['content-type'] !== 'application/json' || !Buffer.isBuffer(rawBody) || rawBody.length > 1024) return null;
     const record = await session(keeperId, headers); if (!record) return null;
-    let body; try { body = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(rawBody)); } catch { return null; }
+    let body; try { const text = new TextDecoder('utf-8', { fatal: true }).decode(rawBody);
+      if ((text.match(/"(?:action|csrf)"\s*:/g) ?? []).length !== 2) return null;
+      body = JSON.parse(text);
+    } catch { return null; }
     if (!body || Object.keys(body).sort().join(',') !== 'action,csrf' || !allowedActions.includes(body.action)
       || typeof body.csrf !== 'string' || hash(body.csrf) !== record.csrfHash) return null;
     return { keeperId, action: body.action, sessionHash: hash(record.secret) };
   }
   const reply = (status, body, type = 'text/plain; charset=utf-8', extra = {}) => ({ status, body, type,
-    headers: { 'cache-control': 'no-store', 'referrer-policy': 'no-referrer', ...extra } });
+    headers: { 'cache-control': 'no-store', 'referrer-policy': 'no-referrer', 'content-security-policy': "frame-ancestors 'none'; base-uri 'none'", 'x-frame-options': 'DENY', ...extra } });
   return {
+    bindPilot(service) { if (pilot) throw new Error('Control already bound'); pilot = service; },
     async issue(id) {
       if (!keeperIds.includes(id)) throw new Error('Control authorization failed');
       const secret = randomBytes(32).toString('base64url');
@@ -36,14 +42,20 @@ export function createControl({ store, keeperIds, origin, secure, now = Date.now
       const id = match[1];
       try {
         if (method === 'POST' && !match[2]) {
-          const auth = await authorizePost({ keeperId: id, headers, rawBody }, ['logout']);
-          if (!auth || !await store.revokeControlSession(id, auth.sessionHash, now())) return reply(403, 'Control authorization required');
+          const auth = await authorizePost({ keeperId: id, headers, rawBody }, ['logout', ...(pilot?.actions(id) ?? [])]);
+          if (!auth) return reply(403, 'Control authorization required');
+          if (auth.action !== 'logout') {
+            const result = await pilot.execute(id, auth.action);
+            return reply(result.status === 'failed' ? 502 : result.status === 'busy' ? 409 : 200, JSON.stringify(result), 'application/json');
+          }
+          if (!await store.revokeControlSession(id, auth.sessionHash, now())) return reply(403, 'Control authorization required');
           return reply(200, 'Control session ended; Twitch authorization unchanged', undefined, { 'set-cookie': cookie(id, '', 0) });
         }
         if (method !== 'GET') return reply(405, 'Method not allowed');
         const record = await session(id, headers);
         if (!record) return reply(401, `<p>Keeper authorization required.</p><a href="/oauth/keeper/${id}/start">Connect this Keeper</a>`, 'text/html; charset=utf-8');
-        if (match[2]) return reply(200, JSON.stringify({ keeperId: id, expiresAt: record.expiresAt, csrf: csrf(record.secret), actions: ['logout'] }), 'application/json');
+        if (match[2]) return reply(200, JSON.stringify({ keeperId: id, expiresAt: record.expiresAt, csrf: csrf(record.secret), actions: ['logout', ...(pilot?.actions(id) ?? [])], ...(pilot ? { pilot: await pilot.status(id) } : {}) }), 'application/json');
+        if (pilot) return reply(200, await readFile(new URL('../public/control.html', import.meta.url)), 'text/html; charset=utf-8');
         return reply(200, `<h1>Keeper control</h1><p>Authenticated Keeper ${id}.</p><p>Worker and subscription bootstrap actions are not available yet.</p><a href="/control/${id}/status">Private session status</a>`, 'text/html; charset=utf-8');
       } catch { return reply(403, 'Control authorization required'); }
     },

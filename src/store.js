@@ -1,4 +1,5 @@
-import { atlasPage, handoffView } from './public-view.js';
+import { hash as observationHash } from './crypto.js';
+import { atlasPage, handoffView, withCarriedMarks, withIncomingPreview } from './public-view.js';
 import { reduceClaims, publicJourney } from './claims.js';
 import { sendState } from './send-state.js';
 import { lifecycleConfig, reduceLifecycle } from './lifecycle.js';
@@ -14,6 +15,10 @@ export function ritualFor(id, now, raid) {
 export function createMemoryAuthStore() {
   const records = new Map();
   return {
+    async acquireJob(id, owner, now) { const previous = records.get(`job:${id}`); if (previous?.expiresAt > now) return false;
+      records.set(`job:${id}`, { owner, expiresAt: now + 300000, status: 'running' }); return true; },
+    async finishJob(id, owner, result) { const job = records.get(`job:${id}`); if (job?.owner === owner) records.set(`job:${id}`, { expiresAt: 0, result }); },
+    async getJob(id) { return structuredClone(records.get(`job:${id}`)?.result ?? null); },
     async createControlSession(id, record) { records.set(`control:${id}`, structuredClone(record)); },
     async getControlSession(id, sessionHash, now) { const r = records.get(`control:${id}`); return r?.sessionHash === sessionHash && r.expiresAt > now ? structuredClone(r) : null; },
     async revokeControlSession(id, sessionHash, now) { const r = records.get(`control:${id}`); if (r?.sessionHash !== sessionHash || r.expiresAt <= now) return false; records.delete(`control:${id}`); return true; },
@@ -48,13 +53,18 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
   const ref = (collection, key) => db.collection(collection).doc(hash(key));
   return {
     lifecycleEnabled: Boolean(config),
-    async accept({ id, expiresAt, now, raid, chat, lifecycle: event, sentAt = now }) {
+    async accept({ id, expiresAt, now, raid, chat, lifecycle: providedEvent, observation, sentAt = now }) {
       return db.runTransaction(async tx => {
         const eventRef = ref('events', id);
         const existing = await tx.get(eventRef);
         if (existing.exists && existing.data().expiresAt >= now) return 'duplicate';
+        const event = observation?.event ?? providedEvent;
         const host = event?.host ?? chat?.broadcasterId;
         if (config && host && !config.channels.includes(host)) throw new Error('Unconfigured lifecycle channel');
+        if (config && chat && !chat.markAction && !raid && !event && !observation) {
+          if (!isChatIdentity(chat, host)) throw new Error('Authenticated chat identity required');
+          tx.set(eventRef, { expiresAt }); tx.set(ref('chatReceipts', host), { messageId: chat.messageId, chatterId: chat.chatterId, receivedAt: now }); return 'accepted';
+        }
         const managed = config && (host || raid);
         const registry = managed ? (await tx.get(ref('keeperRegistry', 'single'))).data() : null;
         const channelMap = {}; const markMap = {};
@@ -64,6 +74,10 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         }
         const lineage = managed ? (await tx.get(ref('lineage', 'single'))).data() : null;
         const channel = channelMap[host];
+        if (observation) {
+          if (!managed || observationHash(JSON.stringify(channel ?? null)) !== observation.baseline) return 'superseded';
+          if (event.type === 'online' && channel?.closedIds.includes(event.streamId)) return 'closed';
+        }
         const markRef = host && (managed || chat?.markAction) ? ref('markChannels', host) : null;
         const markDoc = managed ? markMap[host] : markRef ? (await tx.get(markRef)).data() : null;
         const receiptRef = chat?.markAction?.type === 'forgetme' ? ref('chatReceipts', chat.broadcasterId) : null;
@@ -163,11 +177,34 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
     },
     async getPublicJourney() { return publicJourney((await ref('lineage', 'single').get()).data()); },
     async getPublicMarks(host) { return publicMarks((await ref('markChannels', host).get()).data(), host); },
-    async getOverlayState(host) { return publicOverlayState((await ref('markChannels', host).get()).data(), host); },
+    async getOverlayState(host, now = Date.now()) {
+      return db.runTransaction(async tx => {
+        const doc = (await tx.get(ref('markChannels', host))).data();
+        const registry = (await tx.get(ref('keeperRegistry', 'single'))).data();
+        const lineage = (await tx.get(ref('lineage', 'single'))).data();
+        const channels = {}, docs = { [host]: doc };
+        if (registry?.pendingHop?.to === host && !registry.pendingHop.finalized && !registry.pendingHop.cancelled && now < registry.pendingHop.endsAt) {
+          for (const id of [registry.pendingHop.from, host]) {
+            channels[id] = (await tx.get(ref('streamChannels', id))).data();
+            if (id !== host) docs[id] = (await tx.get(ref('markChannels', id))).data();
+          }
+        }
+        return withIncomingPreview(withCarriedMarks(publicOverlayState(doc, host), lineage, registry, host), registry, host, channels, docs, now);
+      });
+    },
     async getPrivateMarks(host, actor) {
       if (!isModerator(actor, host)) throw new Error('Moderator identity required');
       return privateMarks((await ref('markChannels', host).get()).data(), host, actor);
     },
+    async acquireJob(id, owner, now) {
+      return db.runTransaction(async tx => { const doc = ref('bootstrapJobs', id); const job = (await tx.get(doc)).data();
+        if (job?.expiresAt > now) return false; tx.set(doc, { owner, expiresAt: now + 300000, status: 'running' }); return true; });
+    },
+    async finishJob(id, owner, result) {
+      await db.runTransaction(async tx => { const doc = ref('bootstrapJobs', id); const job = (await tx.get(doc)).data();
+        if (job?.owner === owner) tx.set(doc, { expiresAt: 0, result }); });
+    },
+    async getJob(id) { return (await ref('bootstrapJobs', id).get()).data()?.result ?? null; },
     async createControlSession(id, record) {
       await db.runTransaction(async tx => { const doc = ref('controlSessions', id); await tx.get(doc); tx.set(doc, record); });
     },

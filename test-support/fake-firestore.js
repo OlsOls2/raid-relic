@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 export function fakeFirestore() {
   const docs = new Map(); let queue = Promise.resolve();
   const db = {
-    docs, failCommit: false, retry: false,
+    docs, reads: [], writes: [], failCommit: false, retry: false,
     collection(name) { return { doc(id) {
       const key = `${name}/${id}`;
       return { key, async get() { return snapshot(docs.get(key)); },
@@ -18,9 +18,9 @@ export function fakeFirestore() {
         const attempt = async () => {
           const staged = new Map(); let writing = false;
           const tx = {
-            async get(ref) { assert.equal(writing, false, 'All transaction reads precede writes'); return snapshot(docs.get(ref.key)); },
-            set(ref, value) { writing = true; staged.set(ref.key, structuredClone(value)); },
-            delete(ref) { writing = true; staged.set(ref.key, undefined); },
+            async get(ref) { db.reads.push(ref.key); assert.equal(writing, false, 'All transaction reads precede writes'); return snapshot(docs.get(ref.key)); },
+            set(ref, value) { db.writes.push(ref.key); writing = true; staged.set(ref.key, structuredClone(value)); },
+            delete(ref) { db.writes.push(ref.key); writing = true; staged.set(ref.key, undefined); },
           };
           return { result: await operation(tx), staged };
         };

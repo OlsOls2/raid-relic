@@ -1,0 +1,77 @@
+import { randomBytes } from 'node:crypto';
+import { hash } from './crypto.js';
+import { parseLifecycle } from './lifecycle.js';
+import { handoffView } from './public-view.js';
+import { httpTransport } from './oauth.js';
+
+export const KEEPERS = Object.freeze({ '1591805230': 'raidrelichq', '1591806023': 'olsols2' });
+export function createPilot({ state, store, oauth, subscriptions, sends, now = Date.now, simulator = false, clientId, transport = httpTransport }) {
+  const ids = Object.keys(KEEPERS);
+  const actions = id => ['bootstrap', 'keep', 'pause', 'resume', 'opt-out', 'process', `send:${ids.find(other => other !== id)}`];
+  async function mutate(id, action) {
+    const time = now();
+    return state.accept({ id: `owner:${randomBytes(24).toString('hex')}`, now: time, sentAt: time, expiresAt: time + 600000,
+      chat: { broadcasterId: id, chatterId: id, markAction: action } });
+  }
+  async function readiness(id) {
+    const other = ids.find(candidate => candidate !== id);
+    if ((await store.getJob(id))?.ready !== true || (await store.getJob(other))?.ready !== true)
+      throw new Error('Both channels need five enabled subscriptions; Bootstrap / reconcile each channel again after callbacks verify');
+    try { await oauth.accessTokenForKeeper(id); await oauth.accessTokenForKeeper(other); await oauth.accessToken('bot'); }
+    catch { throw new Error('Both Keeper grants and bot grant required; reconnect the affected account and reconcile'); }
+  }
+  async function bootstrap(id) {
+    const owner = randomBytes(24).toString('hex');
+    if (!await store.acquireJob(id, owner, now())) return { status: 'busy' };
+    // Capture both baseline and observation start before ANY network effects.
+    const started = now(); const baseline = hash(JSON.stringify(await state.getStreamStatus(id) ?? null));
+    let result;
+    try {
+      const reconciled = await subscriptions[id].reconcile({ readiness: true });
+      const token = await oauth.accessTokenForKeeper(id);
+      const response = await transport(`https://api.twitch.tv/helix/streams?user_id=${id}`, { headers: { Authorization: `Bearer ${token}`, 'Client-Id': clientId } });
+      if (response.status !== 200 || !Array.isArray(response.data?.data) || response.data.data.length > 1) throw new Error('Stream observation failed');
+      const stream = response.data.data[0]; let event;
+      if (!stream) event = { host: id, type: 'offline', sentAt: started };
+      else {
+        if (stream.user_id !== id) throw new Error('Stream account mismatch');
+        event = parseLifecycle({ subscription: { type: 'stream.online', version: '1', condition: { broadcaster_user_id: id } },
+          event: { broadcaster_user_id: id, id: stream.id, type: stream.type, started_at: stream.started_at } }, id, started);
+      }
+      event.provenance = 'helix-observation';
+      const observation = await state.accept({ id: `observation:${owner}`, now: now(), sentAt: started, expiresAt: now() + 600000, observation: { baseline, event } });
+      result = { status: 'reconciled', subscriptions: reconciled.results, conditions: reconciled.conditions, ready: reconciled.ready, observation };
+    } catch { result = { status: 'failed', ready: false, message: 'Bootstrap failed; review grants and retry explicitly' }; }
+    await store.finishJob(id, owner, result); return result;
+  }
+  return {
+    actions, authorizeSend: readiness,
+    async execute(id, action) {
+      if (!ids.includes(id) || !actions(id).includes(action)) throw new Error('Action unavailable');
+      if (action === 'bootstrap') return bootstrap(id);
+      if (action === 'process') {
+        const intent = (await state.getKeeperRegistry()).send;
+        if (intent?.sourceId === id && ['queued', 'preflight'].includes(intent.status)) { try { await readiness(id); } catch (error) { return { status: 'blocked', message: error.message }; } }
+        return sends[id].processPending();
+      }
+      if (action.startsWith('send:')) {
+        const target = action.slice(5);
+        try { await readiness(id); } catch (error) { return { status: 'blocked', message: error.message }; }
+        await mutate(id, { type: 'send', login: KEEPERS[target] });
+        // The HTTP request awaits the worker; never detached/post-response CPU.
+        return sends[id].processPending();
+      }
+      await mutate(id, action === 'pause' || action === 'resume' ? { type: 'pause', paused: action === 'pause' } : { type: action });
+      return { status: 'processed', action };
+    },
+    async status(id) {
+      if (!ids.includes(id)) throw new Error('Unconfigured Keeper');
+      const channel = await state.getStreamStatus(id); const registry = await state.getKeeperRegistry();
+      return { mode: simulator ? 'simulator' : 'live', account: KEEPERS[id], online: channel?.online ?? false, optedIn: channel?.optedIn ?? false, paused: channel?.paused ?? false,
+        bothReadiness: Object.fromEntries(await Promise.all(ids.map(async keeper => [KEEPERS[keeper], (await store.getJob(keeper))?.ready === true]))),
+        ownerStep: 'Wait for both readiness flags true; Bootstrap / reconcile pending channels after callback verification. Reconnect missing grants.',
+        holder: registry.holderId, subscriptions: await store.getJob(id), intent: registry.send?.sourceId === id ? registry.send.status : null,
+        handoff: handoffView(registry, id, now()) };
+    },
+  };
+}
