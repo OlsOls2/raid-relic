@@ -1,3 +1,4 @@
+import { echoCandidate, reduceEcho, echoView } from './resonance.js';
 import { forgeMutation } from './forge.js';
 import { recapProjection } from './recap.js';
 import { chronicleMutation } from './chronicle.js';
@@ -64,7 +65,10 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         const event = observation?.event ?? providedEvent;
         const host = event?.host ?? chat?.broadcasterId;
         if (config && host && !config.channels.includes(host)) throw new Error('Unconfigured lifecycle channel');
-        if (config && chat && !chat.markAction && !raid && !event && !observation) {
+        if (chat?.copied && !echoCandidate(chat, config, now, sentAt)) {
+          tx.set(eventRef, { expiresAt }); return 'accepted';
+        }
+        if (config && chat && !chat.copied && !chat.markAction && !raid && !event && !observation) {
           if (!isChatIdentity(chat, host)) throw new Error('Authenticated chat identity required');
           tx.set(eventRef, { expiresAt }); tx.set(ref('chatReceipts', host), { messageId: chat.messageId, chatterId: chat.chatterId, receivedAt: now }); return 'accepted';
         }
@@ -76,6 +80,11 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
           markMap[channelId] = (await tx.get(ref('markChannels', channelId))).data();
         }
         const lineage = managed ? (await tx.get(ref('lineage', 'single'))).data() : null;
+        if (chat?.copied) {
+          const next = reduceEcho(registry, channelMap, markMap, lineage, chat, now);
+          tx.set(eventRef, { expiresAt }); if (next) tx.set(ref('keeperRegistry', 'single'), next);
+          return next ? 'resonance' : 'accepted';
+        }
         const channel = channelMap[host];
         if (observation) {
           if (!managed || observationHash(JSON.stringify(channel ?? null)) !== observation.baseline) return 'superseded';
@@ -187,7 +196,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
       return db.runTransaction(async tx => {
         const registry = (await tx.get(ref('keeperRegistry', 'single'))).data();
         const lineage = (await tx.get(ref('lineage', 'single'))).data();
-        return { rings: lineage?.stops?.length ?? 0, handoff: handoffView(registry, host, now) };
+        return { rings: lineage?.stops?.length ?? 0, handoff: handoffView(registry, host, now), ...(echoView(registry, host, now) ? { resonance: echoView(registry, host, now) } : {}) };
       });
     },
     async getPublicJourney() { return publicJourney((await ref('lineage', 'single').get()).data()); },

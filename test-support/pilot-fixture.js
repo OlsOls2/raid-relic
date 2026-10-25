@@ -56,8 +56,8 @@ export async function pilotFixture(kind = 'memory', { chronicleEnv = {}, chronic
     const csrf = status.status === 200 ? JSON.parse(status.body).csrf : 'expired';
     return request(`/control/${id}`, 'POST', { cookie: cookies[id], origin, 'content-type': 'application/json', ...overrides }, Buffer.from(JSON.stringify({ action, csrf })));
   }
-  function signed(type, event, host, condition) {
-    const id = `pilot-event-${++seq}`, timestamp = new Date(time).toISOString();
+  function signed(type, event, host, condition, options = {}) {
+    const id = `pilot-event-${++seq}`, timestamp = new Date(options.sentAt ?? time).toISOString();
     const rawBody = Buffer.from(JSON.stringify({ subscription: { type, version: '1', condition: condition ?? { broadcaster_user_id: host } }, event }));
     return request('/eventsub', 'POST', { 'twitch-eventsub-message-id': id, 'twitch-eventsub-message-timestamp': timestamp,
       'twitch-eventsub-message-type': 'notification', 'twitch-eventsub-message-signature': `sha256=${createHmac('sha256', secret).update(id).update(timestamp).update(rawBody).digest('hex')}` }, rawBody);

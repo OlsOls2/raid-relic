@@ -65,7 +65,7 @@ export function reduceClaims(registry, channels, marks, previous, chat, now, sen
             streamId: hop.sourceStreamId, claimedAt: now, raidSize: hop.raidSize, ringIndex: lineage.stops.length + 1,
             marks: approved.map(({ id, userId, text }) => ({ id, userId, text })) });
           if (Buffer.byteLength(JSON.stringify(lineage)) > LINEAGE_LIMITS.bytes) throw new Error('Lineage capacity reached');
-          registry.holderId = hop.to; registry.carriedClosures = 0; delete registry.send; hop.finalized = true;
+          delete registry.echo; registry.holderId = hop.to; registry.carriedClosures = 0; delete registry.send; hop.finalized = true;
           marks[hop.from].context.holdsRelic = false; marks[hop.to].context.holdsRelic = true;
         }
         delete hop.offers; delete hop.accepts;

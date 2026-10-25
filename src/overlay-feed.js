@@ -9,13 +9,16 @@ export function createOverlayHub(store, channels, { simulator = false, now = Dat
       const state = await store.getOverlayState(channel, now());
       if (!['ready', 'waiting', 'paused'].includes(state.status) || !Array.isArray(state.marks) || state.marks.length > 160) throw new Error('Invalid public state');
       const serverNow = now(); const journey = store.getPublicPresentation ? await store.getPublicPresentation(channel, serverNow) : { rings: 0, handoff: null };
+      const echo = journey.resonance;
+      if (echo && (!Number.isFinite(echo.receivedAt) || !Number.isFinite(echo.expiresAt) || echo.expiresAt - echo.receivedAt !== 1200 || !/^[a-f0-9]{64}$/.test(echo.id))) throw new Error('Invalid decorative cue');
+      const resonance = echo ? { receivedAt: echo.receivedAt, expiresAt: echo.expiresAt, id: echo.id } : null;
       const marks = state.marks.map(({ id, runeSvg, faded }) => {
         if (faded !== undefined && typeof faded !== 'boolean') throw new Error('Invalid faded flag');
         return { id, runeSvg, ...(faded === true ? { faded: true } : {}) };
       });
       const incoming = journey.handoff?.role === 'host' && !journey.handoff.completed;
       return { type: 'snapshot', revision, mode: simulator ? 'simulator' : 'live', status: incoming && state.status !== 'paused' ? 'incoming' : state.status,
-        marks, approvedCount: marks.length, lineageRings: journey.rings, handoff: journey.handoff, serverNow };
+        marks, approvedCount: marks.length, lineageRings: journey.rings, handoff: journey.handoff, ...(resonance ? { resonance } : {}), serverNow };
     } catch { return { type: 'snapshot', revision, mode: simulator ? 'simulator' : 'live', status: 'unavailable', marks: [], approvedCount: 0, lineageRings: 0 }; }
   }
   const wrapped = Object.create(store);
@@ -26,7 +29,7 @@ export function createOverlayHub(store, channels, { simulator = false, now = Dat
       if (name === 'accept') {
         const input = args[0];
         const quiet = input.chat && !input.chat.markAction && !input.raid && !input.lifecycle && !input.observation;
-        if (quiet || result !== 'accepted') return result;
+        if ((quiet && result !== 'resonance') || !['accepted', 'resonance'].includes(result)) return result;
       }
       revision++;
       for (const channel of channels) { const snapshot = await read(channel); for (const listener of listeners.get(channel)) { try { listener(snapshot); } catch { /* Client cannot fail commit. */ } } }

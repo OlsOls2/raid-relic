@@ -1,3 +1,4 @@
+import { echoCandidate, reduceEcho, echoView } from './resonance.js';
 import { forgeMutation } from './forge.js';
 import { recapProjection } from './recap.js';
 import { chronicleMutation } from './chronicle.js';
@@ -27,9 +28,16 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
       const event = observation?.event ?? providedEvent;
       const host = event?.host ?? chat?.broadcasterId;
       if (config && host && !config.channels.includes(host)) throw new Error('Unconfigured lifecycle channel');
-      if (config && chat && !chat.markAction && !raid && !event && !observation) {
+      if (chat?.copied && !echoCandidate(chat, config, now, sentAt)) {
+        seen.set(id, expiresAt); return 'accepted';
+      }
+      if (config && chat && !chat.copied && !chat.markAction && !raid && !event && !observation) {
         if (!isChatIdentity(chat, host)) throw new Error('Authenticated chat identity required');
         seen.set(id, expiresAt); chatReceipts.set(host, { broadcasterId: host, chatterId: chat.chatterId, messageId: chat.messageId, receivedAt: now }); return 'accepted';
+      }
+      if (chat?.copied) {
+        const next = reduceEcho(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), lineage, chat, now);
+        seen.set(id, expiresAt); if (next) registry = next; return next ? 'resonance' : 'accepted';
       }
       if (observation) {
         if (!config || observationHash(JSON.stringify(channels.get(host) ?? null)) !== observation.baseline) return 'superseded';
@@ -99,7 +107,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
     getRecap() { return recapProjection(lineage); },
     searchPublicMarks(options) { return atlasSearch(lineage, options); },
     getAtlasPage(options) { return atlasPage(lineage, options); },
-    getPublicPresentation(host, now) { return { rings: lineage.stops.length, handoff: handoffView(registry, host, now) }; },
+    getPublicPresentation(host, now) { return { rings: lineage.stops.length, handoff: handoffView(registry, host, now), ...(echoView(registry, host, now) ? { resonance: echoView(registry, host, now) } : {}) }; },
     getPublicJourney() { return publicJourney(lineage); },
     getPublicMarks(host) { return publicMarks(markDocs.get(host), host); },
     getOverlayState(host, now = Date.now()) { return withIncomingPreview(withCarriedMarks(publicOverlayState(markDocs.get(host), host), lineage, registry, host), registry, host, Object.fromEntries(channels), Object.fromEntries(markDocs), now); },

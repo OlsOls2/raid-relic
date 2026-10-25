@@ -48,6 +48,7 @@ function sync(registry, channel, marks, host) {
 // Called inside one store transaction, including event dedupe. No external effects.
 export function reduceLifecycle({ registry, channel, marks, host, event, chat, policy, now, sentAt }) {
   registry = structuredClone(registry ?? emptyRegistry());
+  if (event || chat?.markAction || policy) delete registry.echo;
   channel = structuredClone(channel ?? emptyChannel());
   marks = structuredClone(marks ?? emptyMarkDocument());
   const countHolderClosure = () => {

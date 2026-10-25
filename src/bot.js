@@ -1,5 +1,6 @@
 import { httpTransport } from './oauth.js';
-import { parseMarkCommand } from './marks.js';
+import { hash } from './crypto.js';
+import { normalizeMark, parseMarkCommand } from './marks.js';
 
 export function parseChat(payload, { streamerId, botId, includeMarkCommands = false }) {
   const event = payload.event; const condition = payload.subscription?.condition;
@@ -11,6 +12,19 @@ export function parseChat(payload, { streamerId, botId, includeMarkCommands = fa
     || !event.message.fragments.every(fragment => fragment && ['text', 'emote', 'cheermote', 'mention'].includes(fragment.type) && typeof fragment.text === 'string')) throw new Error('Invalid chat payload');
   const chat = { broadcasterId: streamerId, chatterId: event.chatter_user_id, messageId: event.message_id };
   if (event.chatter_user_id === botId) chat.isBot = true;
+  const origin = event.source_broadcaster_user_id, sourceMessage = event.source_message_id;
+  if (origin != null || sourceMessage != null) {
+    if (typeof origin !== 'string' || !/^\d{1,32}$/.test(origin) || typeof sourceMessage !== 'string'
+      || !/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(sourceMessage)) throw new Error('Invalid copied chat metadata');
+    if (origin !== streamerId) {
+      // Never interpret copied text/badges as local commands or local role proof.
+      chat.copied = { origin, key: hash(`${origin}:${sourceMessage.toLowerCase()}`) };
+      const text = normalizeMark(event.message.text);
+      if (text && !chat.isBot) chat.echoText = text;
+      return chat;
+    }
+  }
+
   if (includeMarkCommands) {
     const action = parseMarkCommand(event.message.text);
     if (action) {

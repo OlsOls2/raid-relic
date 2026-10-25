@@ -6,7 +6,7 @@ let browser, failure; const captures = new Map(), checks = [];
 try {
   await judges.listen(); const { chromium } = await import('playwright');
   browser = await chromium.launch({ executablePath: '/snap/bin/chromium', chromiumSandbox: true, headless: true, args: ['--disable-background-networking'] });
-  const context = await browser.newContext({ viewport: { width: 700, height: 700 }, serviceWorkers: 'block' });
+  const context = await browser.newContext({ viewport: { width: 700, height: 700 }, reducedMotion: 'reduce', serviceWorkers: 'block' });
   await context.route('**/*', route => new URL(route.request().url()).origin === JUDGES_ORIGIN ? route.continue() : route.abort());
   await context.routeWebSocket('**/*', route => new URL(route.url()).origin === JUDGES_ORIGIN.replace('http', 'ws') ? route.connectToServer() : route.close());
   const consolePage = await context.newPage(); await consolePage.goto(`${JUDGES_ORIGIN}/judges`);
@@ -20,7 +20,11 @@ try {
   for (const action of ['setup', 'mark', 'send', 'raid', 'offer', 'accept']) await step(action);
   const overlay = await context.newPage(); await overlay.goto(`${JUDGES_ORIGIN}/overlay/1591806023`);
   await overlay.locator('.rune').waitFor();
-  const capture = async name => captures.set(name, await overlay.screenshot({ fullPage: true }));
+  const capture = async name => {
+    const rune = overlay.locator('.rune').first(); await rune.waitFor({ state: 'visible' });
+    if (!await rune.evaluate(node => { const r = node.getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.left >= 0 && r.top >= 0 && r.right <= innerWidth && r.bottom <= innerHeight && Number(getComputedStyle(node).opacity) > 0; })) throw Error('Rune outside capture viewport');
+    captures.set(name, await overlay.screenshot({ fullPage: true }));
+  };
   if (await overlay.locator('.rune.faded').count()) throw Error('Fresh carry incorrectly faded');
   await capture('fade-simulator-before');
   await step('closure'); await step('closure');

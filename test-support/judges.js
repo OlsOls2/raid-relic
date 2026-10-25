@@ -5,7 +5,7 @@ import { pilotFixture, HOME, OTHER, BOT } from './pilot-fixture.js';
 import { attachOverlaySockets } from '../src/overlay-sockets.js';
 export const JUDGES_ORIGIN = 'http://127.0.0.1:5191';
 const ids = [HOME, OTHER];
-const actions = ['setup', 'mark', 'send', 'raid', 'offer', 'accept', 'forget', 'expire', 'closure', 'reset'];
+const actions = ['setup', 'mark', 'send', 'raid', 'offer', 'accept', 'forget', 'expire', 'closure', 'echo', 'copycommand', 'reset'];
 const assets = new Set(['/forge.js', '/forge.css','/recap.js', '/recap.css','/atlas.css', '/atlas.js', '/overlay.css', '/overlay.js', '/overlay-client.js', '/overlay-audio.js', '/arrival.js', '/crystal.svg', '/relic.svg']);
 const json = (status, value) => ({ status, type: 'application/json', body: JSON.stringify({ ...value, mode: 'simulator' }) });
 const html = body => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SIMULATOR · Raid Relic judges</title><link rel="stylesheet" href="/judges/style.css"></head><body><header class="sim-label">SIMULATOR · LOCAL MEMORY ONLY · NO REAL TWITCH</header>${body}</body></html>`;
@@ -43,6 +43,19 @@ export async function createJudges({ intent = false, env = process.env } = {}) {
       flags.setup = true; return;
     }
     if (!flags.setup) throw Error('Run simulated setup first');
+    if (action === 'echo' || action === 'copycommand') {
+      const registry = await fixture.runtime.state.getKeeperRegistry();
+      const view = await fixture.runtime.state.getOverlayState(OTHER, fixture.now());
+      if (!flags.accept || !registry.pendingHop?.finalized || registry.holderId !== OTHER || !view.marks.length || view.status !== 'ready') throw Error('Complete an approved simulated carry first');
+      flags.echoes = (flags.echoes ?? 0) + 1;
+      if (flags.echoes > 8) throw Error('Reset to repeat the bounded demo');
+      fixture.advance(10001);
+      await fixture.signed('channel.chat.message', { broadcaster_user_id: OTHER, chatter_user_id: OTHER, message_id: `simulated-copy-${flags.echoes}`,
+        source_broadcaster_user_id: HOME, source_message_id: `00000000-0000-4000-8000-${String(flags.echoes).padStart(12, '0')}`,
+        badges: [{ set_id: 'moderator', id: '1' }], source_badges: [{ set_id: 'moderator', id: '1' }],
+        message: { text: action === 'echo' ? 'moon' : '!relic pause', fragments: [] } }, OTHER, { broadcaster_user_id: OTHER, user_id: BOT });
+      return;
+    }
     if (action === 'closure') {
       if (!flags.accept || !(await fixture.runtime.state.getKeeperRegistry()).pendingHop?.finalized) throw Error('Complete the simulated two-chat carry first');
       flags.closures = (flags.closures ?? 0) + 1;

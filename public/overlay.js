@@ -1,7 +1,8 @@
 import { createOverlayAudio, createCueTracker } from './overlay-audio.js';
 import { arrivalPhase } from './arrival.js';
-import { connectOverlay } from './overlay-client.js';
+import { connectOverlay, resonanceActive } from './overlay-client.js';
 const channel = /^\/overlay\/(\d{1,32})$/.exec(location.pathname)?.[1];
+const echoNote = document.createElement('span'); echoNote.className = 'echo-note'; echoNote.setAttribute('role', 'status'); document.querySelector('.archive').append(echoNote);
 const runes = document.querySelector('#runes');
 const state = document.querySelector('#status');
 const count = document.querySelector('#count');
@@ -52,6 +53,10 @@ if (channel) connectOverlay({ url: `${location.protocol === 'https:' ? 'wss' : '
   } });
 
 function frame() {
+  const echoOn = resonanceActive(current?.resonance, receiptServerTime + performance.now() - receivedAt);
+  document.querySelector('.archive').classList.toggle('resonating', echoOn);
+  const note = echoOn ? 'Decorative Shared-chat echo of an approved rune; not proof of raid membership' : '';
+  if (echoNote.textContent !== note) echoNote.textContent = note;
   const time = receiptServerTime + performance.now() - receivedAt;
   if (current?.handoff && time >= current.handoff.endsAt) audio.silence();
   const arrival = arrivalPhase(current?.handoff, time, motion.matches);
