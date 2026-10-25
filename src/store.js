@@ -1,5 +1,5 @@
 import { hash } from './crypto.js';
-import { setMarkContext, reduceMark, publicMarks, privateMarks, isModerator, isChatIdentity } from './marks.js';
+import { setMarkContext, reduceMark, publicMarks, publicOverlayState, privateMarks, isModerator, isChatIdentity } from './marks.js';
 
 export function ritualFor(id, now, raid) {
   return { eventId: id, incomingBroadcasterId: raid.from_broadcaster_user_id,
@@ -77,6 +77,7 @@ export function createFirestoreStore(db) {
       });
     },
     async getPublicMarks(host) { return publicMarks((await ref('markChannels', host).get()).data(), host); },
+    async getOverlayState(host) { return publicOverlayState((await ref('markChannels', host).get()).data(), host); },
     async getPrivateMarks(host, actor) {
       if (!isModerator(actor, host)) throw new Error('Moderator identity required');
       return privateMarks((await ref('markChannels', host).get()).data(), host, actor);

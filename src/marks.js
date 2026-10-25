@@ -129,6 +129,9 @@ export function publicMarks(doc, host) {
   return { marks: (session?.marks ?? []).filter(mark => mark.status === 'approved' && !doc.blocked.includes(mark.userId) && !doc.context.blockedUserIds.includes(mark.userId))
     .map(mark => ({ id: mark.id, runeSvg: runeSvg(mark.text) })) };
 }
+export function publicOverlayState(doc, host) {
+  return { status: !doc || !active(doc, host) ? 'waiting' : doc.paused ? 'paused' : 'ready', ...publicMarks(doc, host) };
+}
 export function privateMarks(doc, host, actor) {
   if (!isModerator(actor, host)) throw new Error('Moderator identity required');
   return structuredClone(doc ?? empty());

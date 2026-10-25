@@ -79,11 +79,11 @@ test('OAuth callback and encrypted tokens persist across instances using Firesto
 const env = { NODE_ENV: 'production', STATE_STORE: 'firestore', GOOGLE_CLOUD_PROJECT: PROJECT_ID, TWITCH_EVENTSUB_SECRET: 'synthetic-webhook-secret',
   OAUTH_ENABLED: 'true', TWITCH_CLIENT_ID: 'client', TWITCH_CLIENT_SECRET: 'synthetic-client-secret', TWITCH_STREAMER_ID: '111', TWITCH_BOT_ID: '222',
   OAUTH_REDIRECT_URI: 'https://example.test/oauth/callback', OAUTH_REDIRECT_ALLOWLIST: 'https://example.test/oauth/callback',
-  TOKEN_ENCRYPTION_KEY: Buffer.alloc(32, 3).toString('base64'), EVENTSUB_CALLBACK_URL: 'https://example.test/eventsub' };
+  TOKEN_ENCRYPTION_KEY: Buffer.alloc(32, 3).toString('base64'), EVENTSUB_CALLBACK_URL: 'https://example.test/eventsub', OVERLAY_ORIGIN: 'https://example.test' };
 test('runtime explicitly selects Firestore for only the approved project; never falls back in production', async () => {
   const instance = await createRuntime(env, { firestoreClient: fakeFirestore() }); assert.ok(instance.oauth && instance.bot);
   for (const change of [{ STATE_STORE: 'memory' }, { STATE_STORE: '' }, { GOOGLE_CLOUD_PROJECT: 'another-project' },
-    { FIRESTORE_EMULATOR_HOST: 'localhost:8080' }, { TWITCH_CLIENT_SECRET: '' }, { TOKEN_ENCRYPTION_KEY: '' }, { TWITCH_EVENTSUB_SECRET: '' }, { OAUTH_ENABLED: 'false' }, { EVENTSUB_CALLBACK_URL: '' }]) {
+    { FIRESTORE_EMULATOR_HOST: 'localhost:8080' }, { TWITCH_CLIENT_SECRET: '' }, { TOKEN_ENCRYPTION_KEY: '' }, { TWITCH_EVENTSUB_SECRET: '' }, { OAUTH_ENABLED: 'false' }, { EVENTSUB_CALLBACK_URL: '' }, { OVERLAY_ORIGIN: '' }]) {
     await assert.rejects(createRuntime({ ...env, ...change }, { firestoreClient: fakeFirestore() }));
   }
 });

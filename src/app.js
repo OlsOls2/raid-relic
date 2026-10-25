@@ -11,11 +11,15 @@ const assets = new Map([
   ['/overlay', ['overlay.html', 'text/html; charset=utf-8']],
   ['/relic.svg', ['relic.svg', 'image/svg+xml']],
   ['/style.css', ['style.css', 'text/css; charset=utf-8']],
+  ['/overlay.css', ['overlay.css', 'text/css; charset=utf-8']],
+  ['/overlay.js', ['overlay.js', 'text/javascript; charset=utf-8']],
+  ['/overlay-client.js', ['overlay-client.js', 'text/javascript; charset=utf-8']],
+  ['/crystal.svg', ['crystal.svg', 'image/svg+xml']],
 ]);
 const header = (headers, name) => typeof headers[name] === 'string' ? headers[name] : '';
 const result = (status, body = '', type = 'text/plain; charset=utf-8') => ({ status, body, type });
 
-export function createApp({ secret, state = createMemoryState(), now = Date.now, oauth, chatContext } = {}) {
+export function createApp({ secret, state = createMemoryState(), now = Date.now, oauth, chatContext, overlayFeed } = {}) {
   // Pure request boundary for tests: rawBody is never reserialized before HMAC.
   async function dispatch({ method, path, headers = {}, rawBody = Buffer.alloc(0) }) {
     if (path.startsWith('/oauth/')) {
@@ -24,6 +28,12 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
     }
     if (method === 'GET' && path === '/health') {
       return result(200, JSON.stringify({ status: 'ok' }), 'application/json');
+    }
+    if (method === 'GET' && overlayFeed && path === `/api/overlay/${overlayFeed.channel}`) {
+      return result(200, JSON.stringify(await overlayFeed.snapshot()), 'application/json');
+    }
+    if (method === 'GET' && overlayFeed && (path === `/overlay/${overlayFeed.channel}` || path === `/overlay/${overlayFeed.channel}?corner=1`)) {
+      return result(200, await readFile(new URL('../public/overlay-live.html', import.meta.url)), 'text/html; charset=utf-8');
     }
     if (method === 'GET' && assets.has(path)) {
       const [file, type] = assets.get(path);

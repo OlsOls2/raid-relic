@@ -1,4 +1,4 @@
-import { setMarkContext, reduceMark, publicMarks, privateMarks, isModerator, isChatIdentity } from './marks.js';
+import { setMarkContext, reduceMark, publicMarks, publicOverlayState, privateMarks, isModerator, isChatIdentity } from './marks.js';
 
 // Synchronous mutations are atomic within a single process; tests/dev only.
 export function createMemoryState({ maxEvents = 10000 } = {}) {
@@ -41,6 +41,7 @@ export function createMemoryState({ maxEvents = 10000 } = {}) {
       if (action.type === 'forgetme' && chatReceipts.get(host)?.chatterId === actor.chatterId) chatReceipts.delete(host);
     },
     getPublicMarks(host) { return publicMarks(markDocs.get(host), host); },
+    getOverlayState(host) { return publicOverlayState(markDocs.get(host), host); },
     getPrivateMarks(host, actor) { return privateMarks(markDocs.get(host), host, actor); },
   };
 }

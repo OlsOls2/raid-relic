@@ -4,7 +4,7 @@ A raid-only traveling community relic, authored by Codex in the original thread 
 
 ## Local setup and tests
 
-Use Node.js 22+. Tests use Node built-ins, synthetic secrets, mock HTTP, simulated request streams, and a transactional Firestore fake. They need no credentials, installed SDK, listening sockets, or network access:
+Use Node.js 22+. Tests use Node built-ins, synthetic secrets, mock HTTP, simulated request streams, and a transactional Firestore fake. They need no credentials or cloud/Twitch network access. The four local WebSocket tests attempt the authorized fixed loopback port 5191 and clean up their ephemeral server:
 
 ```sh
 npm test
@@ -13,9 +13,14 @@ node test/oauth.test.js
 node test/bot.test.js
 node test/firestore.test.js
 node test/marks.test.js
+node test/overlay.test.js
 ```
 
-All **84 named tests pass** on Node 24.22.1: all 49 pre-marks tests retained, plus 35 marks/rune tests covering both adapters and the quota/forget corrections. In this environment `npm test` reports five passing test files; direct invocations expose individual node:test results. This is local verification only. The installed Firestore SDK import was verified separately without constructing a client. Actual database/emulator integration remains **UNTESTED**. No browser, OBS, login, live chat/raid, or deployment validation has occurred.
+**Parent-verified host results: 92 tests, 92 pass, 0 fail, 0 skip**, including all four real loopback WebSocket integration/resource tests. The parent also reports **npm audit: 0 vulnerabilities**. These are host results reported by the parent, separate from this thread's sandbox execution.
+
+**Sandbox results: 92 tests, 88 pass, 0 fail, 4 explicitly skip** on Node 24.22.1. All 84 earlier tests and four new socket-free tests pass. The sandbox denies `listen 127.0.0.1:5191` with `EPERM`; tests skip only that exact permission error, not port conflicts or other failures. `npm test` summarizes six passing files here; `node --test --test-isolation=none` exposes named results/skips. The host run resolves the socket-validation blocker; the sandbox restriction remains environment-specific.
+
+The parent launched the labelled local simulator on registered port 5191 and stopped it; host loopback tests also ran and stopped their ephemeral servers. Host Chromium launched successfully with its sandbox enabled, but saving a screenshot under the workspace failed with **Permission denied (13)**. No screenshot was saved and no visual/OBS QA proof is claimed. The earlier Chromium launch failure (`sandbox_host_linux.cc:41` / `Operation not permitted`) applies to Codex's sandbox, not the host. The installed Firestore SDK import was verified separately without constructing a client. Actual database/emulator integration remains **UNTESTED**. No live login, chat/raid, database, or deployment validation has occurred.
 
 The dependency `@google-cloud/firestore` is declared in package.json and loaded only when explicitly selecting Firestore. The parent reports successful host installation with scripts disabled and a host audit showing **0 vulnerabilities**; this audit result is operator-reported, not rerun here. This thread generated `package-lock.json` using `npm install --package-lock-only --ignore-scripts --offline --no-audit --no-fund` with empty user/global npm configs, then successfully imported the actual installed SDK. No client was constructed and no credentials or database were accessed. SDK import success is not database/emulator integration validation. Tests continue to use the injected fake.
 
@@ -23,7 +28,7 @@ For a later authorized local preview:
 
 1. Copy `.env.example` to ignored `.env`; supply a random webhook secret. Leave `STATE_STORE=memory`, `NODE_ENV=development`, and `OAUTH_ENABLED=false` for the static preview. No OAuth or cloud credentials are needed for this mode.
 2. Run tests. Then, only when server startup is authorized, run `node --env-file=.env src/server.js`. Default `PORT` is **5191**. `npm start` uses exported variables; it does not load `.env` automatically.
-3. The static Atlas is `/`, the static overlay is `/overlay`, and health is `GET /health`. Stop the preview when finished. This increment did not start a server.
+3. The static Atlas is `/`, the static overlay is `/overlay`, and health is `GET /health`. Stop the preview when finished. The parent ran and stopped the local simulator and ephemeral loopback tests; no persistent server is left running.
 
 The original compass/crystal SVG lives in `public/relic.svg`. Both views remain explicitly static; they show no fabricated ownership, route, chat activity, or live countdown.
 
@@ -64,7 +69,7 @@ Raid notifications create a **local 90-second ritual starting at verified receip
 
 ## Must milestone: marks backend and original runes
 
-This increment adds the backend engine/store integration only. The Atlas and overlay remain static. There are no public mark mutation, moderation, pending-text, or projection HTTP endpoints. All service methods are internal trusted interfaces; do not expose them to request-supplied actor objects.
+The marks milestone added the backend engine/store integration. The next overlay increment adds a read-only public snapshot and WebSocket below; there are still no public mark mutation, moderation or pending-text endpoints. All service methods are internal trusted interfaces; do not expose them to request-supplied actor objects.
 
 **Fail-closed context:** `app.marks.setKeeperContext(hostId, { streamId, keeperId, optedIn, holdsRelic, blockedUserIds })` requires an explicit authoritative session ID, numeric Keeper ID, boolean consent/ownership, and a bounded configured blocked-user list. Acceptance requires that the Keeper ID equals the signed chat broadcaster, consent is true and the Keeper holds the relic. Only a trusted lifecycle/ownership integration may call this method. Tests inject synthetic trusted contexts; live stream lifecycle and ownership/opt-in synchronization are **not wired yet**. Runtime startup supplies no context, so real marks remain disabled. No ID is inferred from dates, raid events, names or viewer text. Updating the same active stream ID preserves viewer quotas. Selecting a new authoritative stream closes the previous session and removes its viewer quota identifiers; closed stream IDs cannot be reactivated to obtain fresh budgets. Cooldowns survive that transition until their original 30-second expiry.
 
@@ -94,6 +99,29 @@ Minimal private anti-abuse identifiers remain: the caller's existing `{ userId, 
 
 Tests cover normalization, unsafe inputs, original rune determinism, missing/mismatched context, cooldown boundaries, independent per-viewer five-mark limits, concurrent mixed viewers and duplicate deliveries, session reuse/reset, moderator authorization, privacy projection, pause/blocks/opt-out, content-only self-forget without global holds or quota refunds, command idempotency, bounded documents, and Firestore commit rollback/retry. Firestore tests still use the staged transactional fake; real database/emulator integration remains untested.
 
+## OBS idle overlay and public push
+
+Use `/overlay/<configured-numeric-channel>` for the transparent OBS source; e.g. the local simulator uses `/overlay/111`. Add `?corner=1` for a 160px composition. Only `TWITCH_STREAMER_ID` is served; unknown channels/paths return 404. `/` remains the static Atlas and `/overlay` remains the honest legacy skeleton. No fake arrivals, travel history or ritual countdown was added.
+
+The overlay has an original faceted silver/violet crystal with a slow turn, quiet concentric **guide tracks**, and an orbit of approved original rune images. Guide tracks are not lineage growth: the UI explicitly reports **0 growth rings; lineage not implemented**. Charge is the current approved mark count out of the bounded 160-mark capacity, not inferred travel or a claim of earned lineage. Slate blue, moon silver, amber and muted violet use system serif/sans typography, no downloaded fonts/assets. Reduced-motion preference stops the turn and charge transitions. The transparent canvas and corner layout still await actual visual/browser/OBS QA: host Chromium launched, but screenshot saving failed with Permission denied (13), leaving no saved visual proof.
+
+`GET /api/overlay/<channel>` returns a no-store public snapshot. `ws(s)://<same-origin>/ws/<channel>` sends an initial snapshot, then genuine server-pushed snapshots after committed store events/moderation/context changes. Public fields are limited to type, process-local revision, live/simulator mode, ready/waiting/paused/unavailable status, approved rune IDs/SVG, approved count, and zero lineage rings. Neither pending text/runes, raw user IDs, private quotas/cooldowns, OAuth state nor tokens are projected. Rune SVG is generated numeric geometry and displayed as image data URLs, never inserted as raw HTML. Missing trusted stream/Keeper context yields waiting/empty state; this lifecycle is still not wired and is never invented.
+
+The feed serializes in-process commits, reads and publications; connection subscription is installed before its initial read, and both server/client reject older snapshot revisions. Revisions reset on process restart and each fresh connection resets its comparator. Forget/veto/block/opt-out removal is queued to connected clients immediately after commit; actual network delivery still has latency. On connection loss/staleness the UI hides runes/charge, retries with bounded exponential backoff, and obtains a fresh initial snapshot. No database polling loop runs: reads occur on subscriptions, explicit snapshot requests and commits. Heartbeats do not read Firestore. Database failures publish unavailable/empty state without exception details.
+
+Read-only WebSockets accept only the exact configured channel upgrade path, no query/subprotocol, and an exact allowed Origin. Production requires `OVERLAY_ORIGIN=https://<owned-host>` with no path/trailing slash. Local permitted origins are `http://localhost:5191` and `http://127.0.0.1:5191`; an absent/foreign Origin is rejected. Limits are 16 clients, 1 KiB incoming messages, 128 KiB outgoing snapshot and 256 KiB buffered-output cutoff; compression is disabled. Any incoming application message closes with policy violation. Every 15 seconds, ping/pong disconnects clients missing a pong on the next interval; browser heartbeat messages drive a 35-second stale watchdog. The parent verified all four real loopback WebSocket tests, including resource controls, on the host; those tests remain EPERM-skipped only in this sandbox. Origins are a browser isolation boundary, not authentication; the projection is intentionally public and read-only.
+
+**Single-instance production limitation:** fanout is in-process only. The intended Cloud Run design is **min instances 0, max instances 1**, with one active serving process/revision. There is no deployment/IAM change in this increment. Cross-instance, overlapping rollout revision, or external database-writer notifications are not implemented; those require a shared event transport/listener before scaling. Use `runtime.marks` and the wrapped `runtime.state` for notified mutations, not raw adapter writes. Firestore persistence alone does not deliver notifications to other processes. WebSockets are long-lived requests: open connections keep a Cloud Run instance active/billable and configured request timeouts cause reconnects; min=0 does not mean an open OBS source is free or scaled down. See [official Cloud Run WebSocket guidance](https://docs.cloud.google.com/run/docs/triggering/websockets). No guaranteed free-tier or zero-cost claim is made.
+
+### Local simulator and verification checklist
+
+The canonical workspace `config/dev-ports.json` was merged with Raid Relic on **5191**, preserving other project entries, before any listen attempt. No random fallback is used. `ws` is pinned to the installed **8.22.0**. Offline npm initially returned `ENOTCACHED` for ws metadata; the installed `node_modules/.package-lock.json` entry (resolved URL/integrity) was copied into the project lock, then `npm install --package-lock-only --ignore-scripts --offline --no-audit --no-fund` completed with empty npm user/global configs. The parent subsequently verified npm audit reports 0 vulnerabilities; no audit/network request was rerun from this sandbox.
+
+1. Run `npm test` and `node --test --test-isolation=none`; inspect named skips, not just the file summary. On a host allowing loopback listen, the four real WebSocket tests run at fixed `127.0.0.1:5191` and close their servers/sockets. Do not run another service on 5191 concurrently.
+2. For an authorized manual local test only, run `node scripts/simulate-overlay.js`, then visit `http://127.0.0.1:5191/overlay/111` and its `?corner=1` variant. The launcher binds loopback only, uses explicit synthetic stream/users/marks, and shows **Local simulator · test data**. It refuses production and is never imported by the production server. No fixture mutation endpoint exists. Stop with Ctrl-C.
+3. Verify transparent composition, reduced motion, 160px mode, no-state, disconnect/reconnect, and approved-rune removal before claiming browser/OBS readiness. The parent verified host Chromium launch with sandboxing enabled, but screenshot saving under the workspace failed with Permission denied (13); no saved screenshot or visual proof exists. Codex sandbox Chromium launch and loopback listen remain restricted. The parent ran and stopped the labelled simulator and loopback test servers on 5191; none was left running.
+4. For non-simulator runtime, configure the channel and exact production origin (plus existing required OAuth/Firestore config). Do not seed or fabricate stream state: until trusted lifecycle integration provides it, the overlay must show waiting. Do not deploy or perform live integration checks in this run.
+
 ## Store and architecture
 
 The target remains **Cloud Run scale-to-zero + Firestore**, not Cloudflare. Memory state/auth stores are explicit tests/development choices. `NODE_ENV=production` requires `STATE_STORE=firestore`, `GOOGLE_CLOUD_PROJECT=raid-relic-hackathon`, and complete OAuth/webhook settings. Unknown stores/projects or emulator configuration are rejected; SDK or store failures never silently fall back to memory. SDK construction passes the exact project ID. No cloud credentials are provisioned or read by this run. A future authorized cloud runtime would need its operator-managed identity and Firestore access.
@@ -102,7 +130,7 @@ The store interface supports atomic event acceptance, ritual reads, create/consu
 
 OAuth expiry and event replay expiry are checked in application transactions; physical document cleanup/TTL policies are not configured. Firestore currently retains expired records until an operator adds retention cleanup. Latest chat metadata is bounded per configured host. Memory OAuth state has a capacity limit and lazy expiration; memory resets lose state, grants and rituals. Firestore key paths hash external IDs to prevent path injection. OAuth tokens are application-encrypted, while state hashes, role metadata and account/chat IDs are not secret ciphertext.
 
-Deadlines are persisted timestamps, with no background ritual timer. Evaluate deadlines on requests after scale-to-zero. No overlay state transport or application login sessions exist. Validation occurs for every token use; idle hourly validation scheduling and revocation lifecycle remain pending before deployment. Cold starts/delivery latency cannot provide Twitch synchronization.
+Deadlines are persisted timestamps, with no background ritual timer. Evaluate deadlines on requests after scale-to-zero. The read-only overlay transport above is implemented; application login sessions do not exist. Validation occurs for every token use; idle hourly validation scheduling and revocation lifecycle remain pending before deployment. Cold starts/delivery latency cannot provide Twitch synchronization.
 
 ## Operator-verified cloud setup
 
@@ -129,7 +157,7 @@ Public documentation was accessible; no authenticated Twitch APIs were called:
 - [Managing EventSub subscriptions](https://dev.twitch.tv/docs/eventsub/manage-subscriptions/): webhook creation uses an app access token. Chat payload uses the broadcaster ID and bot user ID conditions.
 - [Firestore SDK reference](https://docs.cloud.google.com/nodejs/docs/reference/firestore/latest/firestore/firestore): adapter targets `@google-cloud/firestore` transactions. Actual SDK import succeeds locally; database/emulator integration remains untested.
 
-Pending before live use: real Firestore/emulator adapter integration tests; owner correction of callback registration and final HTTPS redirect validation; actual account grants; callback reachability and webhook delivery; raid subscription permission/condition verification; retention cleanup, request rate limits and log redaction; disconnect/token-key rotation procedures; hourly idle validation if sessions are maintained; subscription reconciliation/revocation lifecycle; implementation and mock validation of committed Raid Send Off; user/claim authorization and incoming-raider proof; browser/OBS/accessibility checks; cloud security/cost review and deployment. No browser/live validation is claimed.
+Pending before live use: real Firestore/emulator adapter integration tests; owner correction of callback registration and final HTTPS redirect validation; actual account grants; callback reachability and webhook delivery; raid subscription permission/condition verification; retention cleanup, request rate limits and log redaction; disconnect/token-key rotation procedures; hourly idle validation if sessions are maintained; subscription reconciliation/revocation lifecycle; implementation and mock validation of committed Raid Send Off; user/claim authorization and incoming-raider proof; saved browser screenshots and actual visual/OBS/accessibility QA; cloud security/cost review and deployment. No browser/live validation is claimed.
 
 ## How we used Codex
 
