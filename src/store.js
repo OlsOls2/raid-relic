@@ -6,7 +6,7 @@ import { recapProjection } from './recap.js';
 import { chronicleMutation } from './chronicle.js';
 import { ackDocument, ackSeen, ackStep, completionAck } from './claim-ack.js';
 import { hash as observationHash } from './crypto.js';
-import { atlasPage, atlasSearch, claimMeterView, handoffView, withCarriedMarks, withIncomingPreview, keeperCandidates } from './public-view.js';
+import { atlasPage, atlasSearch, movedToView, claimMeterView, handoffView, withCarriedMarks, withIncomingPreview, keeperCandidates } from './public-view.js';
 import { reduceClaims, publicJourney } from './claims.js';
 import { sendState } from './send-state.js';
 import { lifecycleConfig, reduceLifecycle } from './lifecycle.js';
@@ -28,6 +28,11 @@ export function createMemoryAuthStore() {
     async getJob(id) { return structuredClone(records.get(`job:${id}`)?.result ?? null); },
     async createControlSession(id, record) { records.set(`control:${id}`, structuredClone(record)); },
     async getControlSession(id, sessionHash, now) { const r = records.get(`control:${id}`); return r?.sessionHash === sessionHash && r.expiresAt > now ? structuredClone(r) : null; },
+    async renewControlSession(id, sessionHash, expectedExpiry, now, { signal } = {}) {
+      const r = records.get(`control:${id}`);
+      if (signal?.aborted || r?.keeperId !== id || r.role !== 'keeper' || r.sessionHash !== sessionHash || r.expiresAt !== expectedExpiry || r.expiresAt <= now) return null;
+      const next = { ...r, renewedAt: now, expiresAt: now + 43200000 }; records.set(`control:${id}`, next); return structuredClone(next);
+    },
     async revokeControlSession(id, sessionHash, now) { const r = records.get(`control:${id}`); if (r?.sessionHash !== sessionHash || r.expiresAt <= now) return false; records.delete(`control:${id}`); return true; },
     async createState(id, record, now) {
       for (const [key, value] of records) if (!key.includes(':') && value.expiresAt <= now) records.delete(key);
@@ -250,7 +255,8 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
       return db.runTransaction(async tx => {
         const registry = (await tx.get(ref('keeperRegistry', 'single'))).data();
         const lineage = (await tx.get(ref('lineage', 'single'))).data();
-        return { rings: lineage?.stops?.length ?? 0, handoff: handoffView(registry, host, now, lineage), claimMeter: claimMeterView(registry, host, now), ...(echoView(registry, host, now) ? { resonance: echoView(registry, host, now) } : {}) };
+        const channel = (await tx.get(ref('streamChannels', host))).data();
+        return { rings: lineage?.stops?.length ?? 0, ...(movedToView(registry, lineage, host, channel) ? { movedToLogin: movedToView(registry, lineage, host, channel) } : {}), handoff: handoffView(registry, host, now, lineage), claimMeter: claimMeterView(registry, host, now), ...(echoView(registry, host, now) ? { resonance: echoView(registry, host, now) } : {}) };
       });
     },
     async getPublicJourney() { return publicJourney((await ref('lineage', 'single').get()).data()); },
@@ -288,6 +294,13 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
     },
     async getControlSession(id, sessionHash, now) {
       return db.runTransaction(async tx => { const r = (await tx.get(ref('controlSessions', id))).data(); return r?.sessionHash === sessionHash && r.expiresAt > now ? r : null; });
+    },
+    async renewControlSession(id, sessionHash, expectedExpiry, now, { signal } = {}) {
+      return db.runTransaction(async tx => {
+        const doc = ref('controlSessions', id); const r = (await tx.get(doc)).data();
+        if (signal?.aborted || r?.keeperId !== id || r.role !== 'keeper' || r.sessionHash !== sessionHash || r.expiresAt !== expectedExpiry || r.expiresAt <= now) return null;
+        const next = { ...r, renewedAt: now, expiresAt: now + 43200000 }; tx.set(doc, next); return next;
+      });
     },
     async revokeControlSession(id, sessionHash, now) {
       return db.runTransaction(async tx => { const doc = ref('controlSessions', id); const r = (await tx.get(doc)).data();

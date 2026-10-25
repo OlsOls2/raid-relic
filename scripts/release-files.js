@@ -11,6 +11,12 @@ export async function releaseFiles(root, { runtime = false } = {}) {
     if (!(await lstat(resolve(root, dir))).isDirectory()) throw new Error('Release directory rejected');
     for (const name of await readdir(resolve(root, dir))) {
       const path = `${dir}/${name}`;
+      if (path === 'public/fonts') {
+        if (!(await lstat(resolve(root, path))).isDirectory()) throw Error('Font directory rejected');
+        const allowed = ['Cinzel.ttf','OFL-Cinzel.txt'];
+        if (JSON.stringify((await readdir(resolve(root,path))).sort()) !== JSON.stringify(allowed)) throw Error('Unexpected font inventory');
+        files.push(...allowed.map(file=>`${path}/${file}`)); continue;
+      }
       if (path === 'public/vendor') {
         if (!(await lstat(resolve(root, path))).isDirectory()) throw new Error('Vendor directory rejected');
         const allowed = ['LICENSE-three.txt', 'three.core.js', 'three.module.js'];

@@ -1,0 +1,5 @@
+/* Cinzel, Google Fonts pinned 3dd78844021e948ceb633d1dcee3f7885561b5d9; SIL OFL 1.1. */
+@font-face{font-family:Cinzel;src:url('/fonts/Cinzel.ttf') format('truetype');font-weight:400 900;font-style:normal;font-display:swap}
+h1,h2,.brand{font-family:Cinzel,Georgia,serif}
+
+.corner #compact-count{font-family:Cinzel,Georgia,serif;font-size:9px}

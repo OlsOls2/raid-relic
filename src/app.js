@@ -15,6 +15,10 @@ import { parseLifecycle } from './lifecycle.js';
 export const MAX_BODY_BYTES = 65536;
 export const REPLAY_WINDOW_MS = 10 * 60 * 1000;
 const assets = new Map([
+  ['/fonts.css', ['fonts.css', 'text/css; charset=utf-8']],
+  ['/fonts/Cinzel.ttf', ['fonts/Cinzel.ttf', 'font/ttf']],
+  ['/fonts/OFL-Cinzel.txt', ['fonts/OFL-Cinzel.txt', 'text/plain; charset=utf-8']],
+  ['/control-view.js', ['control-view.js', 'text/javascript; charset=utf-8']],
   ['/control-read.js', ['control-read.js', 'text/javascript; charset=utf-8']],
   ['/cinematic.js', ['cinematic.js', 'text/javascript; charset=utf-8']],
   ['/relic3d.js', ['relic3d.js', 'text/javascript; charset=utf-8']],

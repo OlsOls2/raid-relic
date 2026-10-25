@@ -56,7 +56,7 @@ export function reduceClaims(registry, channels, marks, previous, chat, now, sen
         && hop[side].length < (hop.policy === 'preclaim-v1' ? 10 : hop.threshold)) {
         hop[side].push(chat.chatterId);
         if (side === 'offers' && chat.broadcasterId === hop.to) { hop.movedOffers ??= []; hop.movedOffers.push(chat.chatterId); }
-        acknowledgement = `${hop.policy === 'preclaim-v1' && !hop.verified ? 'Provisional ' : ''}${side === 'offers' ? 'Offers' : 'Accepts'} ${hop[side].length}/${hop.threshold}. Both chats required within the app-local claim window; verified raid required.`;
+        acknowledgement = `${side === 'offers' ? 'Offers' : 'Accepts'} ${hop[side].length}/${hop.threshold}. ${hop.policy === 'preclaim-v1' && !hop.verified ? 'The relic stirs… waiting for Twitch to confirm the raid. Both chats must bind it.' : 'Bound by two chats: keep offering and accepting before the ritual ends.'}`;
       }
     }
       if (valid && (hop.policy !== 'preclaim-v1' || hop.verified === true) && hop.offers.length >= hop.threshold && hop.accepts.length >= hop.threshold) {

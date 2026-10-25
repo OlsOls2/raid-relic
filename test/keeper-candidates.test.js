@@ -48,7 +48,7 @@ for (const kind of ['memory', 'firestore']) {
 }
 test('control target selection is labelled, manual, canonical and keeps the named one-target button', async () => {
   const html = await readFile('public/control.html', 'utf8'), js = await readFile('public/control.js', 'utf8');
-  assert.match(html, /label for="raid-target"/); assert.match(html, /Observed online Keeper snapshot/); assert.match(html, /id="target-empty"/);
+  assert.match(html, /label for="raid-target"/); assert.match(html, /Send Off requests a real Twitch raid to this observed Keeper\. The relic moves only after Twitch confirms the raid and both chats bind it; sending rechecks eligibility\./); assert.match(html, /id="target-empty"/);
   assert.ok(js.includes('Send Off to ${names[target.value]}')); assert.ok(js.includes('run(`send:${target.value}`)'));
   assert.ok(js.includes('JSON.stringify({ action, csrf })')); assert.ok(!js.includes('setInterval'));
 });

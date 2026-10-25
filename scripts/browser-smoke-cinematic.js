@@ -55,7 +55,7 @@ try {
   await capture(gl, 'p3-simulator-streak');
   stage = 'impact'; f.advance(3200); await f.chat(HOME, HOME, '!offer');
   await gl.waitForFunction(() => document.querySelector('.archive').dataset.phase === 'impact');
-  const safeFlash = await gl.locator('.p3-flash').evaluate(n => Number(getComputedStyle(n).opacity) <= .3); if (!safeFlash) throw Error('flash bound');
+  const safeFlash = await gl.locator('.p3-flash').evaluate(n => Number(getComputedStyle(n).opacity) <= .45); if (!safeFlash) throw Error('flash bound');
   await capture(gl, 'p3-simulator-impact');
   stage = 'words'; f.advance(2200); await f.chat(HOME, '812', '!mark sun');
   await gl.waitForFunction(() => document.querySelector('.archive').dataset.phase === 'unfurl' && [...document.querySelectorAll('.p3-word:not([hidden])')].some(n => n.textContent === 'moon'));

@@ -20,7 +20,8 @@ export function handoffView(registry, channel, now, lineage) {
   const hop = registry?.pendingHop;
   if (!hop || (hop.policy === 'preclaim-v1' && !hop.verified) || hop.cancelled || now >= hop.endsAt || ![hop.from, hop.to].includes(channel)) return null;
   const stop = hop.finalized && lineage?.stops?.find(s => s.eventId === hop.eventId && s.from === hop.from && s.to === hop.to);
-  return { ...(stop && Number.isFinite(stop.claimedAt) ? { completedAt: stop.claimedAt } : {}), role: hop.to === channel ? 'host' : 'source', startedAt: hop.startedAt, endsAt: hop.endsAt,
+  const sourceLogin = { '1591805230': 'raidrelichq', '1591806023': 'olsols2' }[hop.from];
+  return { ...(sourceLogin ? { sourceLogin } : {}), ...(stop && Number.isFinite(stop.claimedAt) ? { completedAt: stop.claimedAt } : {}), role: hop.to === channel ? 'host' : 'source', startedAt: hop.startedAt, endsAt: hop.endsAt,
     ...(hop.policy === 'preclaim-v1' ? { clockPolicy: hop.policy, claimStartedAt: hop.claimStartedAt } : {}),
     threshold: hop.threshold, offers: Math.min(hop.threshold, hop.offers?.length ?? hop.threshold), accepts: Math.min(hop.threshold, hop.accepts?.length ?? hop.threshold),
     completed: hop.finalized === true };
@@ -73,4 +74,11 @@ export function claimMeterView(registry, host, now) {
   const hop = registry?.pendingHop;
   if (!hop || ![hop.from, hop.to].includes(host) || hop.cancelled || hop.finalized || now >= hop.endsAt) return null;
   return { startedAt: hop.claimStartedAt ?? hop.startedAt, endsAt: hop.endsAt, offers: Math.min(10, hop.offers?.length ?? 0), accepts: Math.min(10, hop.accepts?.length ?? 0), threshold: hop.threshold, provisional: hop.policy === 'preclaim-v1' && !hop.verified, awaitingRaid: hop.policy === 'preclaim-v1' && !hop.verified };
+}
+
+// Current holder identity is public channel identity, never a viewer lookup.
+export function movedToView(registry, lineage, host, channel) {
+  const stop = lineage?.stops?.at(-1);
+  return channel?.optedIn === true && !channel.paused && !channel.banned && stop?.from === host && stop.to === registry?.holderId && stop.to !== host
+    ? ({ '1591805230': 'raidrelichq', '1591806023': 'olsols2' }[stop.to]) : undefined;
 }

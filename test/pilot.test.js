@@ -67,7 +67,7 @@ for (const kind of ['memory', 'firestore']) {
     f.timeout(); await f.control(HOME, `send:${OTHER}`); await f.control(HOME, 'process');
     assert.equal((await f.runtime.state.getKeeperRegistry()).send.status, 'unknown');
     assert.equal(f.calls.filter(c => c.url.includes('/raids')).length, 1);
-    f.advance(3600001); assert.equal((await f.control(HOME, 'bootstrap')).status, 403);
+    f.advance(43200001); assert.equal((await f.control(HOME, 'bootstrap')).status, 403);
   });
   test(`${kind}: empty stream observation is offline; inconsistent GetStreams account rejected`, async () => {
     const f = await pilotFixture(kind); for (const id of [BOT, HOME, OTHER]) await f.login(id);

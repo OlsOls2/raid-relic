@@ -138,7 +138,13 @@ try {
   await forge.close(); await page.bringToFront();
   stage = 'reduced-corner'; await page.emulateMedia({ reducedMotion: 'reduce' }); await page.setViewportSize({ width: 160, height: 160 });
   await page.goto(`${JUDGES_ORIGIN}/overlay/1591805230?corner=1`);
-  await page.locator('#compact-status').filter({ hasText: 'Waiting' }).waitFor(); await page.locator('.crystal').waitFor({ state: 'visible' });
+  await page.locator('#compact-status').filter({ hasText: 'Moved to @olsols2' }).waitFor();
+  if (!await page.evaluate(async () => {
+    const view = await (await fetch('/api/overlay/1591805230')).json();
+    const state = await (await fetch('/api/judges/status')).json();
+    return view.status === 'waiting' && view.movedToLogin === 'olsols2' && view.lineageRings === 1
+      && state.holder === 'Simulated 1591806023' && state.rings === 1;
+  })) throw Error('Completed source destination/holder/ring proof'); await page.locator('.crystal').waitFor({ state: 'visible' });
   if (await page.locator('canvas.relic3d').count() || await page.evaluate(() => document.documentElement.scrollHeight > 160)) throw Error('reduced corner fallback');
   checks.push({ name: 'SIMULATOR reduced-motion160px corner uses original SVG without WebGL canvas', passed: true });
   stage = 'no-webgl'; await page.emulateMedia({ reducedMotion: 'no-preference' });
@@ -146,7 +152,13 @@ try {
     const original = HTMLCanvasElement.prototype.getContext;
     HTMLCanvasElement.prototype.getContext = function(type, ...args) { return /^webgl/.test(type) ? null : original.call(this, type, ...args); };
   });
-  await page.reload(); await page.locator('#compact-status').filter({ hasText: 'Waiting' }).waitFor();
+  await page.reload(); await page.locator('#compact-status').filter({ hasText: 'Moved to @olsols2' }).waitFor();
+  if (!await page.evaluate(async () => {
+    const view = await (await fetch('/api/overlay/1591805230')).json();
+    const state = await (await fetch('/api/judges/status')).json();
+    return view.status === 'waiting' && view.movedToLogin === 'olsols2' && view.lineageRings === 1
+      && state.holder === 'Simulated 1591806023' && state.rings === 1;
+  })) throw Error('Completed source destination/holder/ring proof');
   await page.locator('.crystal').waitFor({ state: 'visible' });
   if (await page.locator('.webgl-relic').count()) throw Error('no-webgl fallback');
   checks.push({ name: 'SIMULATOR unavailable WebGL retains SVG/status without blocking state', passed: true }); stage = 'complete';

@@ -21,9 +21,9 @@ export function cinematicPhase(snapshot, now, { reduced = false, fresh = false }
   const fusion = !reduced && fresh && fusionAt !== null && now >= fusionAt && now < fusionAt + 2000 ? (now - fusionAt) / 2000 : null;
   return { elapsed, host: Boolean(host), ...sourceCharge(snapshot, now, reduced),
     comet: !reduced && host && elapsed < 3000 ? elapsed / 3000 : null,
-    flash: !reduced && fresh && host && elapsed >= 3000 && elapsed < 3150 ? .3 * (1 - (elapsed - 3000) / 150) : 0,
-    shock: !reduced && host && elapsed >= 3000 && elapsed < 3600 ? (elapsed - 3000) / 600 : null,
-    shake: !reduced && fresh && host && elapsed >= 3000 && elapsed < 3150 ? 2.5 * Math.sin((elapsed - 3000) * .15) * (1 - (elapsed - 3000) / 150) : 0,
+    flash: !reduced && fresh && host && elapsed >= 3000 && elapsed < 3700 ? .45 * Math.sin(Math.PI * (elapsed - 3000) / 700) : 0,
+    shock: !reduced && fresh && host && elapsed >= 3000 && elapsed < 4400 ? (elapsed - 3000) / 1400 : null,
+    shake: !reduced && fresh && host && elapsed >= 3000 && elapsed < 3300 ? 3 * Math.sin((elapsed - 3000) * .025) * (1 - (elapsed - 3000) / 300) : 0,
     release: !reduced && fresh && active && hop.role === 'source' && elapsed < 600 ? elapsed / 600 : null,
     unfurl: !reduced && host && elapsed >= 5000 && elapsed < 20000 ? (elapsed - 5000) / 15000 : null,
     fusion, fusionAt };
@@ -77,4 +77,18 @@ export function runePose(index, count, time, unfurl = 1) {
   const angle = time * .00016 + index * 2.399963;
   const radius = Math.min(42, 30 + index % 3 * 5 + (1 - flight) * 12);
   return { x: 50 + Math.cos(angle) * radius, y: 50 + Math.sin(angle) * radius, flight };
+}
+
+// Fixed local decorative geometry; never marks, viewer content or archive data.
+export const validSourceLogin = value => ['raidrelichq', 'olsols2'].includes(value);
+export function ambientSigils(snapshot, phase, reduced = false) {
+  return !reduced && phase.host && phase.unfurl !== null && snapshot?.marks?.length === 0
+    && validSourceLogin(snapshot.handoff?.sourceLogin) ? 6 : 0;
+}
+export function decorativePoints(index) {
+  const n = 3 + index % 6;
+  return Array.from({ length: n * 2 }, (_, i) => {
+    const a = i * Math.PI / n - Math.PI / 2, r = i % 2 ? 9 : 23;
+    return `${(32 + Math.cos(a) * r).toFixed(2)},${(32 + Math.sin(a) * r).toFixed(2)}`;
+  }).join(' ');
 }

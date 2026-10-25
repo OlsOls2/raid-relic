@@ -56,14 +56,14 @@ for (const kind of ['memory', 'firestore']) {
     const f = fixture(kind); const first = await f.login(home); const next = await f.login(second);
     const cookie = `${first.cookie}; ${next.cookie}`;
     for (const id of [home, second]) assert.equal((await f.request(`/control/${id}/status`, { cookie })).status, 200);
-    assert.match(first.result.headers['set-cookie'][1], /HttpOnly; SameSite=Lax; Max-Age=3600; Secure/);
+    assert.match(first.result.headers['set-cookie'][1], /HttpOnly; SameSite=Lax; Max-Age=43200; Secure/);
     const secret = first.cookie.split('=')[1]; const stored = await f.store.getControlSession(home, hash(secret), 1000);
     assert.equal(stored.role, 'keeper'); assert.ok(!JSON.stringify(stored).includes(secret));
     if (f.db) { const contents = JSON.stringify([...f.db.docs]); assert.ok(!contents.includes(secret)); assert.ok(!contents.includes('access-')); assert.ok(!contents.includes('refresh-')); }
     const renewed = await f.login(home); assert.notEqual(renewed.cookie, first.cookie);
     assert.equal((await f.request(`/control/${home}`, { cookie: first.cookie })).status, 401);
     assert.equal((await f.request(`/control/${second}`, { cookie: next.cookie })).status, 200);
-    f.advance(3600001); assert.equal((await f.request(`/control/${home}`, { cookie: renewed.cookie })).status, 401);
+    f.advance(43200001); assert.equal((await f.request(`/control/${home}`, { cookie: renewed.cookie })).status, 401);
   });
   test(`${kind}: POST helper rejects CSRF/origin/role/cookie/body/action attacks; logout is session-only`, async () => {
     const f = fixture(kind); const a = await f.login(home); const b = await f.login(second);

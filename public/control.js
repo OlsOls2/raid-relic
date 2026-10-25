@@ -1,3 +1,4 @@
+import { actionMessage } from './control-view.js';
 import { boundedResponse } from './control-read.js';
 const forgeLink = document.getElementById('forge-owner-link');
 if (forgeLink) forgeLink.href = `${location.pathname}/forge`;
@@ -6,13 +7,14 @@ const id = /^\/control\/(\d+)$/.exec(location.pathname)?.[1];
 if (id) { document.getElementById('reconnect').href = `/oauth/keeper/${id}/start`; document.getElementById('own-overlay').href = `/overlay/${id}`; document.getElementById('own-overlay-sound').href = `/overlay/${id}?sound=1`; }
 const names = { '1591805230': 'raidrelichq', '1591806023': 'olsols2' };
 let recovery = null;
+let simulated = false;
 let csrf; let busy = false; let candidates = []; let readGeneration = 0, readController;
 const target = document.getElementById('raid-target');
 const empty = document.getElementById('target-empty');
 const labels = { 'mark-links': 'Send queued public mark-history link', chronicle: 'Write Chronicle for latest received stop', bootstrap: 'Bootstrap / reconcile this channel', keep: 'Opt in / Keep', pause: 'Pause', resume: 'Resume', 'opt-out': 'Opt out', process: 'Process queued own send' };
 const status = document.getElementById('result');
 function disable(value) { busy = value; document.querySelectorAll('button').forEach(b => { b.disabled = value || !csrf; }); document.getElementById('refresh').disabled = value; document.getElementById('expire-handoff').disabled = value || !expiryRecovery?.canExpire; target.disabled = value || !csrf || !candidates.length; document.getElementById('cancel-queued').disabled = value || !recovery?.canCancel; }
-function invalidate() { csrf = null; candidates = []; recovery = expiryRecovery = null; for (const group of ['setup', 'keeper', 'raid']) document.getElementById(group).replaceChildren(); disable(busy); }
+function invalidate() { for (const key of ['bot','subscriptions','live']) { const light=document.getElementById(`light-${key}`); light.dataset.state='unknown'; light.textContent = `${{bot:'Bot',subscriptions:'Subscriptions',live:'Stream'}[key]}: not yet checked`; } document.getElementById('keeper-summary').textContent='Read status before taking action.'; csrf = null; candidates = []; recovery = expiryRecovery = null; for (const group of ['setup', 'keeper', 'raid']) document.getElementById(group).replaceChildren(); disable(busy); }
 async function refresh({ preserveResult = false } = {}) {
   const generation = ++readGeneration; readController?.abort(); const request = new AbortController(); readController = request; invalidate();
   if (!preserveResult) status.textContent = 'Reading your session…';
@@ -21,14 +23,18 @@ async function refresh({ preserveResult = false } = {}) {
   try {
     const response = await boundedResponse(`/control/${id}/status`, { cache: 'no-store', signal: request.signal }, { json: true });
     if (generation !== readGeneration || request.signal.aborted) return;
-    const value = response.value; if (!value || value.keeperId !== id || typeof value.csrf !== 'string' || !Array.isArray(value.actions) || !value.pilot) throw Error('Invalid status'); csrf = value.csrf; document.getElementById('simulator').hidden = value.pilot.mode !== 'simulator';
+    const value = response.value; if (!value || value.keeperId !== id || typeof value.csrf !== 'string' || !Array.isArray(value.actions) || !value.pilot) throw Error('Invalid status'); csrf = value.csrf; document.getElementById('simulator').hidden = value.pilot.mode !== 'simulator'; simulated = value.pilot.mode === 'simulator'; document.getElementById('ledger').hidden = !simulated;
+    const lights = { bot: value.pilot.botGrantStored === true, subscriptions: value.pilot.subscriptions?.ready === true, live: value.pilot.online === true };
+    for (const [key, ready] of Object.entries(lights)) { const light = document.getElementById(`light-${key}`); light.dataset.state = ready ? 'ready' : key === 'live' ? 'offline' : 'unknown'; light.textContent = `${{bot:'Bot',subscriptions:'Subscriptions',live:'Stream'}[key]}: ${ready ? {bot:'saved grant connected (not a live check)',subscriptions:'all five enabled',live:'observed live'}[key] : {bot:'not connected',subscriptions:'not ready',live:'offline'}[key]}`; }
+    document.getElementById('keeper-summary').textContent = `Relic Keeper: @${names[value.pilot.holder] ?? 'unplaced'}. Your stream: ${value.pilot.online ? 'live' : 'offline'}. ${value.pilot.optedIn ? 'Opted in' : 'Not opted in'}. ${value.pilot.paused ? 'Paused.' : ''} ${Object.values(value.pilot.bothReadiness ?? {}).length === 2 && Object.values(value.pilot.bothReadiness).every(v=>v===true) ? 'Both channels are ready.' : 'Reconcile both channels until both are ready.'} ${value.pilot.claimProgress ? `Offer ${value.pilot.claimProgress.offers ?? 0}/${value.pilot.claimProgress.threshold} · Accept ${value.pilot.claimProgress.accepts ?? 0}/${value.pilot.claimProgress.threshold}${value.pilot.claimProgress.finalized ? ' · Bound by two chats' : ''}` : ''}`;
+    document.querySelector('label[for=intent-confirm]').textContent = simulated ? 'Exact queued intent ID from your private status' : 'Type CANCEL to confirm only this never-dispatched queue';
     recovery = value.pilot.recovery; document.getElementById('cancel-queued').disabled = !recovery?.canCancel;
-    document.getElementById('recovery-status').textContent = recovery ? JSON.stringify(recovery) : 'No own intent. No recovery mutation is needed.';
+    document.getElementById('recovery-status').textContent = recovery ? simulated ? JSON.stringify(recovery) : recovery.canCancel ? 'A never-dispatched request can be cancelled with confirmation below.' : 'An existing request needs review. Accepted, unknown or processing requests must never be repeated.' : 'No own intent. No recovery mutation is needed.';
     expiryRecovery = value.pilot.expiryRecovery;
     document.getElementById('expire-handoff').disabled = !expiryRecovery?.canExpire;
-    document.getElementById('expiry-state').textContent = expiryRecovery ? JSON.stringify(expiryRecovery) : 'No source-owned ended confirmed handoff.';
+    document.getElementById('expiry-state').textContent = expiryRecovery ? simulated ? JSON.stringify(expiryRecovery) : expiryRecovery.canExpire ? 'This ended ritual can be retired safely. The relic stays here.' : 'The current ritual has not ended.' : 'No source-owned ended confirmed handoff.';
     document.getElementById('account').textContent = `${names[id]} · Keeper control`;
-    for (const key of ['chronicle', 'account', 'online', 'optedIn', 'paused', 'holder', 'subscriptions', 'bothReadiness', 'eligibility', 'ownerStep', 'intent', 'dispatchDiagnostic', 'handoff', 'claimProgress']) {
+    if (simulated) for (const key of ['chronicle', 'account', 'online', 'optedIn', 'paused', 'holder', 'subscriptions', 'bothReadiness', 'eligibility', 'ownerStep', 'intent', 'dispatchDiagnostic', 'handoff', 'claimProgress']) {
       const dt = document.createElement('dt'); dt.textContent = key; const dd = document.createElement('dd'); dd.textContent = JSON.stringify(value.pilot[key], null, 2); document.getElementById('ledger').append(dt, dd);
     }
     for (const group of ['setup', 'keeper', 'raid']) document.getElementById(group).replaceChildren();
@@ -36,7 +42,7 @@ async function refresh({ preserveResult = false } = {}) {
     for (const candidate of candidates) { const option = document.createElement('option'); option.value = candidate.id; option.textContent = `${candidate.login} · observed online`; target.append(option); }
     target.disabled = busy || !candidates.length; empty.hidden = candidates.length > 0;
     if (candidates.length) {
-      const send = document.createElement('button'); const label = () => { send.textContent = `Send Off to ${names[target.value]}`; }; label();
+      const send = document.createElement('button'); const label = () => { send.className = 'send-off'; send.textContent = `Send Off to ${names[target.value]}`; }; label();
       target.onchange = label; send.onclick = () => run(`send:${target.value}`); document.getElementById('raid').append(send);
     }
     for (const action of value.actions.filter(a => a !== 'logout' && !a.startsWith('send:'))) {
@@ -57,7 +63,8 @@ async function run(action) {
   try {
     const response = await boundedResponse(`/control/${id}`, { method: 'POST', cache: 'no-store', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action, csrf }) });
     if (action === 'logout' && response.ok) { location.assign(`/control/${id}`); return; }
-    const text = response.text; status.textContent = response.ok ? text : `Action failed (${response.status}). Refresh and review setup before retrying.`;
+    let value; try { value = JSON.parse(response.text); } catch {}
+    status.textContent = simulated && response.ok ? response.text : actionMessage(value, names[target.value]);
     await refresh({ preserveResult: true });
   } catch { invalidate(); status.textContent = 'Request outcome unavailable. Refresh status; never blindly repeat a raid request.'; }
   finally { disable(false); }
@@ -69,16 +76,16 @@ addEventListener('pagehide', () => { readGeneration++; readController?.abort(); 
 
 document.getElementById('cancel-queued').onclick = async () => {
   const intentId = document.getElementById('intent-confirm').value;
-  if (busy || !recovery?.canCancel || intentId !== recovery.intentId || !confirm('Cancel only this exact unclaimed queued intent? This cannot cancel a dispatched Twitch raid.')) return;
+  if (busy || !recovery?.canCancel || (simulated ? intentId !== recovery.intentId : intentId !== 'CANCEL') || !confirm('Cancel only this exact unclaimed queued intent? This cannot cancel a dispatched Twitch raid.')) return;
   disable(true);
-  try { const result = await boundedResponse(`${location.pathname}/cancel-queued`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ csrf, intentId, generation: recovery.generation }) });
-    const body = JSON.parse(result.text); status.textContent = result.ok ? body.status : 'Recovery authorization failed'; await refresh({ preserveResult: true });
+  try { const result = await boundedResponse(`${location.pathname}/cancel-queued`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ csrf, intentId: recovery.intentId, generation: recovery.generation }) });
+    const body = JSON.parse(result.text); status.textContent = result.ok ? actionMessage(body) : 'Recovery authorization failed'; await refresh({ preserveResult: true });
   } catch { invalidate(); status.textContent = 'Recovery unavailable. Refresh and inspect; do not repeat dispatch.'; }
   finally { document.getElementById('intent-confirm').value = ''; disable(false); }
 };
 document.getElementById('expire-handoff').onclick = async () => {
   if (busy || !csrf || !expiryRecovery?.canExpire || !confirm('Expire only this ended app claim window? Holder stays unchanged; no Twitch raid is cancelled.')) return;
   const expected = expiryRecovery; disable(true);
-  try { const response = await boundedResponse(`/control/${id}/expire-handoff`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ csrf, intentId: expected.intentId, hopId: expected.hopId }) }); status.textContent = response.text; await refresh(); }
+  try { const response = await boundedResponse(`/control/${id}/expire-handoff`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ csrf, intentId: expected.intentId, hopId: expected.hopId }) }); let value; try { value = JSON.parse(response.text); } catch {} status.textContent = actionMessage(value); await refresh({ preserveResult: true }); }
   catch { invalidate(); status.textContent = 'Outcome unavailable. Refresh; do not blindly repeat Send Off.'; } finally { disable(false); document.getElementById('expire-handoff').disabled = !expiryRecovery?.canExpire; }
 };

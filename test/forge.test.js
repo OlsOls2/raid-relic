@@ -48,7 +48,7 @@ for (const kind of ['memory', 'firestore']) {
     assert.equal(model.input, 'violet crystal'); assert.equal(model.store, false); assert.ok(!JSON.stringify(calls).includes('moon')); assert.ok(!JSON.stringify(calls).includes(HOME));
     assert.ok(both.some(r => JSON.parse(r.body).source === 'model')); await owner(f, OTHER); assert.equal(calls.length, 3);
     await f.request('/forge'); await post(f.runtime, { description: 'crystal' }); await f.request('/api/atlas'); assert.equal(calls.length, 3);
-    f.advance(3600001); assert.equal((await owner(f, OTHER)).status, 403); assert.equal(calls.length, 3);
+    f.advance(43200001); assert.equal((await owner(f, OTHER)).status, 403); assert.equal(calls.length, 3);
   });
   test(`${kind}: off/no-key/no acknowledgement and missing stop use pure template without claims or network`, async () => {
     for (const env of [{}, { CHRONICLE_ENABLED: 'true' }, { ...enabled, CHRONICLE_ALLOW_PAID: 'false' }, { CHRONICLE_ENABLED: 'true', CHRONICLE_ALLOW_PAID: 'true' }]) {

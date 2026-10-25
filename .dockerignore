@@ -17,3 +17,7 @@
 !public/vendor/three.module.js
 !public/vendor/three.core.js
 !public/vendor/LICENSE-three.txt
+
+!public/fonts/
+!public/fonts/Cinzel.ttf
+!public/fonts/OFL-Cinzel.txt

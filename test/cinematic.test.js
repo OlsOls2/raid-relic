@@ -10,8 +10,8 @@ test('receipt phases: accepted-only never arrives; target bounded flash/shake; s
   assert.equal(cinematicPhase({ status: 'waiting', claimMeter: { awaitingRaid: true } }, 2000).comet, null);
   assert.equal(cinematicPhase({ status: 'ready', claimMeter: { startedAt: 1000, endsAt: 181000, awaitingRaid: true, provisional: true, offers: 0, accepts: 0, threshold: 1 } }, 2000).charge, true);
   for (const time of [999, 1000, 3999, 4000, 4075, 4150, 4600, 6000, 20999, 21000, 181000]) {
-    const p = cinematicPhase(view(), time, { fresh: true }); assert.ok(p.flash >= 0 && p.flash <= .3); assert.ok(Math.abs(p.shake) <= 2.5);
-    if (time < 4000 || time >= 4150) assert.equal(p.flash, 0);
+    const p = cinematicPhase(view(), time, { fresh: true }); assert.ok(p.flash >= 0 && p.flash <= .45); assert.ok(Math.abs(p.shake) <= 3);
+    if (time < 4000 || time >= 4700) assert.equal(p.flash, 0);
     const source = cinematicPhase(view({ ...hop, role: 'source' }), time, { fresh: true }); assert.equal(source.comet, null); assert.equal(source.unfurl, null); assert.equal(source.fusion, null);
     const reduced = cinematicPhase(view(), time, { reduced: true, fresh: true }); assert.equal(reduced.flash, 0); assert.equal(reduced.shake, 0); assert.equal(reduced.comet, null);
   }

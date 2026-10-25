@@ -20,9 +20,11 @@ export function createOverlayHub(store, channels, { simulator = false, now = Dat
         return { id, runeSvg, ...(flightText === undefined ? {} : { flightText }), ...(faded === true ? { faded: true } : {}) };
       });
       if (journey.claimMeter != null && !validClaimMeter(journey.claimMeter)) throw Error('Invalid claim meter');
+      if (journey.handoff?.sourceLogin !== undefined && !['raidrelichq', 'olsols2'].includes(journey.handoff.sourceLogin)) throw Error('Invalid source Keeper');
+      if (journey.movedToLogin !== undefined && !['raidrelichq', 'olsols2'].includes(journey.movedToLogin)) throw Error('Invalid holder');
       const incoming = journey.handoff?.role === 'host' && !journey.handoff.completed;
       return { type: 'snapshot', revision, mode: simulator ? 'simulator' : 'live', status: incoming && state.status !== 'paused' ? 'incoming' : state.status,
-        marks, approvedCount: marks.length, lineageRings: journey.rings, handoff: journey.handoff, claimMeter: journey.claimMeter ?? null, ...(resonance ? { resonance } : {}), serverNow };
+        ...(state.status === 'waiting' && journey.movedToLogin ? { movedToLogin: journey.movedToLogin } : {}), marks, approvedCount: marks.length, lineageRings: journey.rings, handoff: journey.handoff, claimMeter: journey.claimMeter ?? null, ...(resonance ? { resonance } : {}), serverNow };
     } catch { return { type: 'snapshot', revision, mode: simulator ? 'simulator' : 'live', status: 'unavailable', marks: [], approvedCount: 0, lineageRings: 0 }; }
   }
   const wrapped = Object.create(store);

@@ -63,6 +63,9 @@ export async function createRelic3D({ signal, archive, reducedMotion, corner = f
       for (const band of bands) {
         const newest = band.ringIndex === ringSummary(snapshot.lineageRings).visible - 1;
         band.visible = !newest || !fusionWait || fusionProgress > 0;
+        const flare = newest && fusionWait ? Math.sin(Math.PI * Math.max(0,Math.min(1,fusionProgress))) : 0;
+        band.material.color?.setRGB?.(.835 + flare*.165, .667 + flare*.25, .384 + flare*.40);
+
         if (band.scale?.setScalar) band.scale.setScalar(newest && fusionWait ? .7 + .3 * fusionProgress : 1);
       }
       const box = archive.getBoundingClientRect(); const size = Math.max(1, Math.min(480, Math.round(box.width)));

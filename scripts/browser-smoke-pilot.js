@@ -12,12 +12,20 @@ async function press(page, id, label, expected) {
   const ownPath = `/control/${id}`;
   const post = page.waitForResponse(r => new URL(r.url()).pathname === ownPath && r.request().method() === 'POST');
   const refreshed = page.waitForResponse(r => new URL(r.url()).pathname === `${ownPath}/status` && r.request().method() === 'GET').catch(() => null);
+  await page.evaluate(() => { window.__pilotPostProof = null; });
   await page.getByRole('button', { name: label, exact: true }).click();
-  const response = await post; const result = await response.json();
+  phase = `${label}: own-response`;
+  const response = await post;
+  await page.waitForFunction(() => Boolean(window.__pilotPostProof));
+  const result = await page.evaluate(() => window.__pilotPostProof);
+  if (result.http !== response.status()) throw Error('Response proof mismatch');
   lastPostStatus = { http: response.status(), status: ['accepted', 'processed', 'reconciled', 'blocked', 'busy', 'failed', 'unknown', 'rejected', 'rejected-preflight', 'idle-or-reconcile-only'].includes(result.status) ? result.status : 'unexpected' };
   if (response.status() !== 200 || result.status !== expected) throw new Error('Owner POST returned unexpected status');
+  phase = `${label}: status-refresh`;
   if (!(await refreshed)) throw new Error('Owner status refresh missing');
   await page.waitForFunction(() => !document.getElementById('refresh').disabled);
+  phase = `${label}: result-dom`;
+  await page.locator('#result').filter({ hasText: expected === 'processed' ? /processed|Keeper choice saved/i : expected === 'reconciled' ? /reconciled/i : /accepted/i }).waitFor();
   if (expected === 'reconciled' && result.ready !== true) throw new Error('Mocked subscriptions not enabled');
   checks.push({ name: label, status: result.status, passed: true });
 } const checks = [];
@@ -30,6 +38,19 @@ try {
   const { chromium } = await import('playwright');
   browser = await chromium.launch({ executablePath: '/snap/bin/chromium', chromiumSandbox: true, headless: true, args: ['--disable-background-networking'] });
   const context = await browser.newContext({ viewport: { width: 900, height: 850 }, ignoreHTTPSErrors: true, reducedMotion: 'reduce', serviceWorkers: 'block' });
+  // Record only closed properties from the SAME page POST response, before
+  // boundedResponse consumes its stream. No raw body, cookies or CSRF retained.
+  await context.addInitScript(() => {
+    const nativeFetch = window.fetch.bind(window);
+    window.fetch = async (...args) => {
+      const response = await nativeFetch(...args);
+      if (args[1]?.method === 'POST' && new URL(String(args[0]), location.href).pathname === location.pathname) {
+        window.__pilotPostProof = response.clone().json().then(value => ({ http: response.status,
+          status: ['accepted','processed','reconciled','blocked','busy','failed','unknown','rejected','rejected-preflight','idle-or-reconcile-only'].includes(value.status) ? value.status : 'unexpected', ready: value.ready === true }), () => ({ http: response.status, status: 'invalid-json', ready: false }));
+      }
+      return response;
+    };
+  });
   // Legacy SVG-fallback contract; default real WebGL is exercised independently.
   await context.addInitScript(() => {
     const original = HTMLCanvasElement.prototype.getContext;

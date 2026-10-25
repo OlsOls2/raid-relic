@@ -35,7 +35,7 @@ for (const kind of ['memory', 'firestore']) {
     const detail = JSON.parse((await f.request(`/api/atlas/stops/${id}`)).body);
     assert.deepEqual(detail.stop.chronicle, { line: generated, source: 'model', fiction: true });
     assert.ok(!JSON.stringify(detail).includes('claimId'));
-    f.advance(3600001); assert.equal((await f.control(OTHER, 'chronicle')).status, 403); assert.equal(calls.length, 2);
+    f.advance(43200001); assert.equal((await f.control(OTHER, 'chronicle')).status, 403); assert.equal(calls.length, 2);
   });
   test(`${kind}: default/off/no-key control makes zero model requests`, async () => {
     for (const env of [{}, { CHRONICLE_ENABLED: 'true' }, { CHRONICLE_ENABLED: 'true', CHRONICLE_ALLOW_PAID: 'true' }, { ...enabled, CHRONICLE_ALLOW_PAID: 'false' }]) {
