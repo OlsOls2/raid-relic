@@ -1,16 +1,16 @@
-# Owner checklist: pending Coulds tagged pilot
+# Owner checklist: deployed Coulds tagged preview
 
-**Not deployed yet.** Owner authorizes parent to merge reviewed Coulds candidate `52e1a04` into main/push, then build/deploy a NEW no-normal-traffic tag `coulds`. Expected origin: **https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app**. Do not treat these links as active or ready until parent supplies the actual merged release hash, revision/image and verifies them. Production stays `raid-relic-00003-kwp` / source `fd05a5ee67f841b1ac92ebb221581db227d2353f` at100% at https://raid-relic-760724762396.us-central1.run.app . Preserve Shoulds `raid-relic-00004-kul` / source0723 at0%; it does not contain Coulds features.
+**Parent verified deployed preview:** main/source **`15e427eca81bcbf7c78a78191d668ee7642e1b96`**, revision **`raid-relic-00005-rey`**, tag **`coulds`**,0% normal traffic at **https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app**. Build `0be349f9-6d62-4bdf-a785-c206bed1f044`, immutable image `sha256:53dc32c5ea650d0287e9d23f089c896e1e689d1cebeac6e63f0fb745bed570d8`. Production stays `raid-relic-00003-kwp` / source `fd05a5ee67f841b1ac92ebb221581db227d2353f` at100% at https://raid-relic-760724762396.us-central1.run.app . Shoulds `raid-relic-00004-kul` / source0723 remains0% and preserved; it does not contain Coulds features. This is an active parent-verified preview, **not actual live Twitch validation**.
 
-This is an **owner/operator-only manual checklist**, not permission for Codex to contact Twitch/cloud, read credentials, consent, bootstrap, send chat/raids or deploy. Parent baseline:312/312 host tests; seven sandboxed browser flows/33 checks; audit0/release55/diff pass. Those labelled Simulator results are not actual Twitch/Shared Chat/physical OBS/AI validation. No real live test is claimed. Keep `CHRONICLE_ENABLED=false` and `CHRONICLE_ALLOW_PAID=false`, min0/max1, existing secret references/resources; no new services. Parent changes origin settings only on the new reviewed revision, not existing revisions/traffic.
+This is an **owner/operator-only manual checklist**, not permission for Codex to contact Twitch/cloud, read credentials, consent, bootstrap, send chat/raids or deploy. Parent baseline:312/312 host tests; seven sandboxed browser flows/33 checks; audit0/release55/diff pass. Those labelled Simulator results are not actual Twitch/Shared Chat/physical OBS/AI validation. No real live test is claimed. Keep `CHRONICLE_ENABLED=false` and `CHRONICLE_ALLOW_PAID=false`, min0/max1, existing secret references/resources; no new services. Parent changed origin settings only on the new reviewed revision, not existing revisions/traffic.
 
 ## 1. Confirm release and one-origin test window
 
-Parent first verifies the new tag's health release hash against its actual reviewed merged source, asset parity, protected boundaries and initial read-only snapshots. Health `raid-pilot / owner-test-ready / liveValidated:false` is capability readiness, **not proof of subscriptions or live delivery**. Do not substitute the feature/docs commit hash for deployed identity.
+Parent verified cloud Ready, health matching source15e,22 distinct public assets byte-matched, protected private controls/owner Forge401, judges404, unsigned webhook403 before mutation, read-only Atlas/recap and recapSVG, and both actual cloud HTTP/WSS initial snapshots mode:live/status:waiting (sockets closed). A live pure template POST/api/forge returned source:template/applied:false without DB/provider work. Search strictness is established by the312 host tests, not a newly claimed live search request. Health `raid-pilot / owner-test-ready / liveValidated:false` is capability readiness, **not proof of subscriptions or live delivery**. Do not substitute the feature/docs commit hash for deployed identity.
 
 The tag shares the real `raid-relic-hackathon` default Firestore database, OAuth grants/state, control sessions, holder and lineage. It is **not isolated staging**. Cookies are host-specific, but reauthorization can rotate old controls through shared rows. Finish/close canonical and Shoulds tests, OBS sources and private controls first; coordinate everyone using these accounts. Use **one origin at a time** for consent/bootstrap/Send Off. Separate in-process WebSocket hubs do not fan out writes/deliveries across revisions.
 
-**Expected:** parent supplies a real Coulds revision/hash and exclusive test window; canonical100% and Shoulds0% remain unchanged. If this cannot be confirmed, stop before live setup.
+**Expected:** verify the agreed exclusive owner test window against the parent-recorded15e/00005-rey release; canonical100% and Shoulds0% remain unchanged. Health remains liveValidated:false. No actual OAuth consent/bootstrap/Twitch API/chat/raid/AI calls or fake seed were performed by parent or Codex; those owner steps remain untested. Stop if the exclusive window cannot be coordinated.
 
 ## 2. Register exactly one additional OAuth callback
 
@@ -88,7 +88,7 @@ Sound is muted by default, creates no AudioContext without opt-in. Optional full
 
 In the actual holder's **own original chat**, a consenting viewer sends `!mark moon`. It is **pending/private**, not automatically visible. Budget is five marks per viewer per actual stream, with30-second per-viewer cooldown; pending marks consume the same budget.
 
-There is no private pending-moderation UI. Only an authorized **GCP operator**, with owner permission, may perform a read-only own-channel pending lookup in Firebase console/project `raid-relic-hackathon`, database **`(default)`**. Derived from `src/runtime.js`, `src/store.js` and SHA256 in `src/crypto.js`: collection **`markChannels`**, document ID **SHA256 of the numeric channel ID string** (no namespace prefix):
+There is no private pending-moderation UI. Only an authorized **GCP operator**, with owner permission, may perform a read-only own-channel pending lookup in the [Google Cloud native Firestore console](https://console.cloud.google.com/firestore/databases?project=raid-relic-hackathon), project `raid-relic-hackathon`, database **`(default)`**, using existing project IAM read permission. No Firebase app registration or configured Firebase console is required or assumed. Derived from `src/runtime.js`, `src/store.js` and SHA256 in `src/crypto.js`: collection **`markChannels`**, document ID **SHA256 of the numeric channel ID string** (no namespace prefix):
 
 | Own channel | Exact document path |
 | --- | --- |
@@ -105,7 +105,7 @@ On the **actual source holder's** own control, refresh status, choose the other 
 
 **Expected before actual raid notification:** holder remains source; no earned ring/stop or fabricated arrival. Only a matching signed actual `channel.raid` delivered to the new tag starts target incoming presentation (3s streak/2s impact/15s unfurl; reduced motion settles) and the **app-local receipt-based90-second window**.
 
-During that window, distinct nonbot participants send **`!offer` in the source's original chat** and **`!accept` in the host/target's original chat**. Each side needs **`T=min(10,ceil(sqrt(max(1,viewers))))`**, derived from signed raid viewers. A user cannot count on both sides; bot excluded. Tiny T=1 can use the actual source and target broadcaster accounts, one in each chat. Larger raids require additional consenting real participants—no fake votes or forged events. Copied Shared Chat commands never count. Chat location is participation proof, **not actual incoming-raid membership**.
+During that window, distinct nonbot participants send **`!offer` in the source's original chat** and **`!accept` in the host/target's original chat**. Each side needs **`T=min(10,ceil(sqrt(max(1,viewers))))`**, derived from signed raid viewers. A user cannot count on both sides; bot excluded. Two actual nonbot source/target broadcaster accounts, one in each original chat, suffice **only for T=1 (actual signed viewers≤1)**. Larger raids require additional consenting real participants—no fake votes or forged events. Copied Shared Chat commands never count. Chat location is participation proof, **not actual incoming-raid membership**.
 
 **Expected:** aggregate counts advance only on the correct side. Source remains holder until **both thresholds**; then one atomic transfer, one ring and one stop, target becomes holder and source waits. Live target/current consent/policy/stream checks still apply. Source stream closure alone can be accepted only with the retained authoritative matching raid/stream proof; do not fabricate historical state.
 
@@ -121,7 +121,7 @@ If chat/native Send Off queued an intent, its source owner must explicitly click
 
 ## 10. Reverse hop, privacy and safe stop
 
-For a second hop, actual Other-holder owner selects home, submits its own Send Off, completes the real Twitch raid and repeats both chat claims with **roles reversed**. If home currently holds, reverse accordingly; never force ownership in the DB.
+For a second hop, actual Other-holder owner selects home, submits its own Send Off, completes the real Twitch raid and repeats both chat claims with **roles reversed**. After an actual raid, source and/or target may need to restart their real broadcasts before opposite-direction eligibility: both must actually be live for dispatch. Wait for authentic online delivery or use only owner-authorized sequential Bootstrap/backfill to observe the real stream; never force online state or invent/reuse stream IDs. If home currently holds, reverse accordingly; never force ownership in the DB.
 
 `!relic forgetme` in the participant's own original channel removes their retained application content/associations there, including archived entries, but retains existing minimal anti-abuse quota/cooldown identifiers until lifecycle/expiry; no quota refund or Twitch-wide erasure. **Expected:** fresh APIs/Atlas search and connected overlays lose removed runes/text; ring/stop remains. Old downloaded files/screenshots cannot be recalled. Opt out purges that channel's retained content, **not a global holder reset**. End control session is not Twitch disconnect. Local Simulator Reset affects only local memory.
 
@@ -129,10 +129,10 @@ There is **no live global reset endpoint**. Never delete collections, the defaul
 
 ## Safe operator diagnostics and routing rollback
 
-Parent records the actual Coulds revision after deployment; replace the placeholder below with that **verified revision name**, not the old revision or a guessed number. This read-only command is for the operator, never executed by Codex. It filters project/region/service/revision, excludes auth/OAuth URL paths and prints **only timestamp, severity, HTTP status and revision**, no request URL/query, body, headers, Authorization, token, code or CSRF:
+The parent-verified Coulds revision is **`raid-relic-00005-rey`**; the filter below watches only that revision, not canonical or Shoulds. This read-only command is for the operator, never executed by Codex. It filters project/region/service/revision, excludes auth/OAuth URL paths and prints **only timestamp, severity, HTTP status and revision**, no request URL/query, body, headers, Authorization, token, code or CSRF:
 
 ```sh
-gcloud logging read 'resource.type="cloud_run_revision" AND resource.labels.project_id="raid-relic-hackathon" AND resource.labels.location="us-central1" AND resource.labels.service_name="raid-relic" AND resource.labels.revision_name="REPLACE_WITH_PARENT_VERIFIED_COULDS_REVISION" AND NOT (httpRequest.requestUrl =~ "/(oauth|auth)(/|[?]|$)")' --project=raid-relic-hackathon --limit=50 --order=desc --format='table(timestamp,severity,httpRequest.status,resource.labels.revision_name)'
+gcloud logging read 'resource.type="cloud_run_revision" AND resource.labels.project_id="raid-relic-hackathon" AND resource.labels.location="us-central1" AND resource.labels.service_name="raid-relic" AND resource.labels.revision_name="raid-relic-00005-rey" AND NOT (httpRequest.requestUrl =~ "/(oauth|auth)(/|[?]|$)")' --project=raid-relic-hackathon --freshness=30m --limit=50 --order=desc --format='table(timestamp,severity,httpRequest.status,resource.labels.revision_name)'
 ```
 
 [Service revisions, us-central1](https://console.cloud.google.com/run/detail/us-central1/raid-relic/revisions?project=raid-relic-hackathon) · [Project logs explorer](https://console.cloud.google.com/logs/query?project=raid-relic-hackathon). No raw-log export or broad payload printing is needed.
@@ -148,3 +148,5 @@ Rollback of webhook routing is a **separate coordinated operator review**: stop 
 | Zero/one-sided claim participants | Verify correct original chat, distinct nonbot users and T/window; no copied commands/fake votes. No transfer without both sides. |
 | Forgotten archive content seems present | Fresh manual refresh/reconnect; inspect own-scope privacy path with operator; old downloads cannot be recalled, never restore deleted marks. |
 | Too many sockets / unexpected usage | Close unused OBS/tabs; global16-client limit and min0/max1 do not guarantee free usage. |
+
+Post-deploy docs/evidence commits do not change deployed `RELEASE_COMMIT=15e427eca81bcbf7c78a78191d668ee7642e1b96` and do not require or authorize another deployment. Parent will prove the55 release-file inventory unchanged separately. All three cloud revisions/source features are now frozen until owner test; only this docs handoff is authorized to Codex. Parent will refresh a scanned fixed evidence snapshot after run047; Codex does not read raw/auth files or export it.

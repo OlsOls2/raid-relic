@@ -1,14 +1,16 @@
-# Raid Relic — Coulds release preparation
+# Raid Relic — deployed Coulds preview
 
-Owner authorizes parent to merge reviewed Coulds candidate **52e1a04** into main/push and deploy a **NEW no-normal-traffic `coulds` tag**. Expected host **https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app** is **pending deployment**, not yet active/verified. Main's freeze is lifted for this reviewed merge/docs only. Preserve canonical00003/sourcefd05 at100% and Shoulds00004/source0723 at0%; Shoulds does not contain Coulds. Paid gates stayOFF, existing resources/secret references/min0max1 preserved. Codex authors docs only, with no cloud/provider/credential/live actions or commit.
+Parent fast-forward merged/pushed the reviewed Coulds plus046 docs into **main `15e427eca81bcbf7c78a78191d668ee7642e1b96`** and deployed **`raid-relic-00005-rey`**, tag `coulds`,0% normal traffic: **https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app**. Build `0be349f9-6d62-4bdf-a785-c206bed1f044`, image `sha256:53dc32c5ea650d0287e9d23f089c896e1e689d1cebeac6e63f0fb745bed570d8`. Canonical00003/sourcefd05 stays100%; Shoulds00004/source0723 stays0%. Paid gatesOFF, existing three secret references/SA/resources/concurrency/timeout/min0max1/CPU1/256Mi/startup boostoff preserved; no IAM/services/keys created. All three revisions/source features are frozen until owner test. Later docs/evidence commits do not change deployed15e or authorize another deploy.
 
-Parent baseline: **312/312 host tests; seven sandboxed browser workflows/33 checks PASS; audit0;55 release files; diff pass**. Local Simulator proof is not actual Twitch/Shared Chat/physical OBS/AI validation. Candidate includes recap, Forge, carried-rune fade and bounded decorative copied-word echo in the existing curated two-Keeper prototype; no all-Coulds/live-ready claim. [Preview safety and preserved release facts](docs/TAGGED_PREVIEW.md).
+Parent baseline: **312/312 host tests; seven sandboxed browser workflows/33 checks PASS; audit0;55 release files; diff pass**. Local Simulator proof is not actual Twitch/Shared Chat/physical OBS/AI validation. This deployed preview includes recap, Forge, carried-rune fade and bounded decorative copied-word echo in the existing curated two-Keeper prototype; no all-Coulds/live-ready claim. [Preview safety and preserved release facts](docs/TAGGED_PREVIEW.md).
 
-## Judges: two-minute preview once parent verifies the new tag
+## Judges: two-minute read-only Coulds preview
 
-1. Open expected [Coulds Atlas](https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app/atlas/): manual refresh shows **actual** completed stops/rings or honest0/empty history. Search matches approved shared text, not personal ownership. No fake journey is seeded.
+1. Open [Coulds Atlas](https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app/atlas/): manual refresh shows **actual** completed stops/rings or honest0/empty history. Search matches approved shared text, not personal ownership. No fake journey is seeded.
 2. Open [Forge templates](https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app/forge) for a deterministic design preview/JSON/SVG, never live customization; [recap](https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app/recap) downloads actual retained summary SVG/PNG. Chronicle is template fiction, not paid AI.
 3. Read-only overlays: [raidrelichq1591805230](https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app/overlay/1591805230) and [OlsOls2 1591806023](https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app/overlay/1591806023), optional `?corner=1` at160×160. Waiting is honest if no trusted active context; do not bootstrap or raid for a public demo. Close idle sockets.
+
+Parent verified Ready/health exact15e (`owner-test-ready`, `liveValidated:false`),22 public assets byte parity, private controls/owner Forge401, judges404, unsigned webhook403 before mutation, read-only Atlas/recap/SVG and both cloud HTTP/WSS snapshots mode:live/status:waiting (closed). Pure template Forge POST returned source:template/applied:false without DB/provider work. Search boundary proof is from host tests, not a newly claimed live search. No actual OAuth consent/bootstrap/Twitch API/chat/raid/AI calls or fake seed; canonical/Shoulds health unchanged.
 
 Actual owner setup/raids require the [detailed owner checklist and mandatory webhook-routing gate](docs/LIVE_TEST.md). OAuth redirect changes **do not retarget EventSub**;409 old-callback conflicts need independently reviewed operator migration, never broad deletion or split routing. Tags share real Firestore/auth/control rows and separate fanout; use one origin at a time.
 
@@ -23,9 +25,11 @@ Open **http://127.0.0.1:5191/judges**, the exact URL enforced by `scripts/judges
 
 ---
 
-## Historical increment notes — superseded by release preparation above
+## Historical increment notes — superseded by deployed-preview facts above
 
-### Historical Could #2 Relic Forge increment
+### Historical phase —2026-10-25 Forge implementation, before Coulds release preparation
+
+> Historical phase recorded2026-10-25, before completed Coulds release preparation. The branch, freeze, deployment and QA statements below describe that earlier phase; the verified15e/00005 facts at the top and [current owner checklist](docs/LIVE_TEST.md) supersede them.
 
 **Final Coulds local evidence (parent verified): 287/287 host tests PASS, zero skips; all five browser workflows PASS; npm audit zero vulnerabilities;54 release files and diff check PASS.** Recap `c63ec31` is pushed on the feature branch; Forge `523d772af6ba6f0460d7486d9f3434ea242fdcc3` is committed/pushed on `feature/raid-relic-coulds`. Coulds are not on main, Shoulds tag or live. At that earlier Forge-only cutoff, three-stream fade and shared-chat resonance were deferred; both bounded implementations now exist in the reviewed Coulds candidate; this does not complete all Coulds. Both paid flags remainfalse on preview, with no actual paid Chronicle/Forge calls. Main072317a, live00003 at100% and Shoulds00004 at0% remain frozen; no further cloud/provider/key actions by Codex or parent are authorized. Older pending QA notes below are historical and superseded by this parent proof.
 
@@ -43,11 +47,13 @@ Only the explicitly submitted normalized description, schema and fixed instructi
 
 The local judges wrapper adds Forge links, immediate Simulator labels and mode-stamped JSON/SVG exports; it cannot inherit paid provider configuration. Try “tall violet crystal with 8 facets” then “warm amber orb”. The new optional host gate `node scripts/browser-smoke-forge.js` tests deterministic templates,375px/error states and actual JSON/SVG downloads using a unique owned `~/Downloads/raid-relic-forge-*` directory, sandboxed Chromium, blocked nonlocal requests and exact cleanup after browser close. Parent now verifies all five sandboxed browser workflows PASS: Forge actual JSON/SVG downloads (2 checks), recap actual SVG/1200×630 PNG (3), judges (3), pilot (8), Atlas (13). Parent viewed actual Forge desktop/375px and recap PNG/mobile captures: unmistakable Simulator/template/no-live-apply labels and consistent canonical moon rune. This is local mock/browser/download proof, not physical listening, live AI or Twitch validation.
 
-OAuth scopes remain exactly Keeper `channel:bot channel:manage:raids`; bot `user:read:chat user:write:chat user:bot`. No dependencies, env gates, live/cloud/build/deploy/provider/credential actions or commits were added. Older Could #1/Shoulds notes below retain historical QA; current freezes and scope above supersede them.
+OAuth scopes remain exactly Keeper `channel:bot channel:manage:raids`; bot `user:read:chat user:write:chat user:bot`. During that historical Forge implementation step, no dependencies, env gates, live/cloud/build/deploy/provider/credential actions or commits were added; this does not describe the later parent merge/deployment recorded at the top. Older Could #1/Shoulds notes below retain historical QA; current freezes and scope above supersede them.
 
 ---
 
-# Current work: Could #1 journey recap (feature branch only)
+## Historical phase —2026-10-25 recap feature branch, before Coulds release preparation
+
+> Historical phase recorded2026-10-25, before completed Coulds release preparation. The branch, freeze, deployment and QA statements below describe that earlier phase; the verified15e/00005 facts at the top and [current owner checklist](docs/LIVE_TEST.md) supersede them.
 
 Work is only on `feature/raid-relic-coulds`; main and **both cloud revisions are frozen**. Parent merged the five Shoulds green261/261 into main `072317a2f127fc3a67137812ba9b762fe1f34ead` and completed a no-normal-traffic Shoulds tagged preview (`00004-kul`); canonical `00003-kwp` remains100%/sourcefd05. The tag shares live Firestore/auth/session rows and is **not isolated staging**. See [tagged preview facts and safeguards](docs/TAGGED_PREVIEW.md). The exception covered only that completed parent deployment, not new deployment authority. Could #1 is neither merged nor on either revision.
 
@@ -67,7 +73,9 @@ OAuth scopes remain Keeper `channel:bot channel:manage:raids`; bot `user:read:ch
 
 Statements below saying the five Shoulds were not deployed or authorizing older work are historical; the current tagged-preview/freeze facts above supersede them. They do not grant new cloud authorization.
 
-# Current branch: all five Shoulds, local only
+## Historical phase —2026-10-25 five Shoulds local branch, before Coulds release preparation
+
+> Historical phase recorded2026-10-25, before completed Coulds release preparation. The branch, freeze, deployment and QA statements below describe that earlier phase; the verified15e/00005 facts at the top and [current owner checklist](docs/LIVE_TEST.md) supersede them.
 
 **Owner freeze overrides all historical build/deploy authorizations below.** Live `raid-relic-00003-kwp` / source `fd05a5ee67f841b1ac92ebb221581db227d2353f` is untouched. None of the five Shoulds is deployed. Parent verified Should #4 host254/254 plus Atlas/audio/pilot browser PASS and pushed `86c28e6`.
 
@@ -112,7 +120,9 @@ Should #1 adds a labelled, manually refreshed **observed eligible Keeper target*
 
 **Scopes are exactly unchanged:** Keeper `channel:bot channel:manage:raids`; bot `user:read:chat user:write:chat user:bot`. No OAuth onboarding expansion, arbitrary target, other Should feature or live deployment is included. [Branch-local judges quickstart](docs/JUDGES_QUICKSTART.md) describes QA and frozen live instructions. Latest sandbox:223 tests/218pass/five EPERM skips/zero failures, preserving216 baseline tests; release inventory42 files. Prior host/browser results below concern the frozen baseline, not a new branch browser pass.
 
-## Current deployed owner-test pilot
+## Historical phase —2026-10-25 fd05 owner-test pilot handoff
+
+> Historical phase recorded2026-10-25, before completed Coulds release preparation. The branch, freeze, deployment and QA statements below describe that earlier phase; the verified15e/00005 facts at the top and [current owner checklist](docs/LIVE_TEST.md) supersede them.
 
 Parent verified source **`fd05a5ee67f841b1ac92ebb221581db227d2353f`**, revision **`raid-relic-00003-kwp`**,100% traffic at [Raid Relic](https://raid-relic-760724762396.us-central1.run.app/). Image `sha256:235f0751476eb087dc914ba29b2af6d76cd687de208eb181e5ca1b2938c6e304`; build `69655ba0-1a89-433b-a1f8-99c499a0ab42`. Pilot gate and both Keeper IDs are enabled; other environment/secret references/resources preserved, effective min0 and service/revision max1. Runtime remains **fd05**, not the later docs commit. Prior74f metadata is historical; rollback after future pilot writes needs compatibility review.
 
@@ -120,7 +130,9 @@ Parent verified health200/exact source with **raid-pilot / owner-test-ready / li
 
 Use [the current deployment handoff](docs/DEPLOYMENT.md) and [exact owner workflow](docs/LIVE_TEST.md): start both streams; three consents sequentially in correct accounts/profiles; controls in matching profiles; sequential bootstrap until five enabled subscriptions per channel; Keep both and Refresh source to verify home holder/both live/opted-in/ready. Both numeric OBS links and private controls are in the handoff. Only actual eligible raid EventSub starts arrival/app-local90s claims; only both distinct non-bot chat thresholds transfer/add stop/ring. No automatic worker. Unknown outcome: do not blindly repeat. Close OBS when idle to contain usage. Ready for owner live validation, **not already proven or all Musts complete**. Codex performed no deploy/cloud/live/credential operations in this docs-only turn.
 
-## Current local release gates: parent verified
+## Historical phase —2026-10-25 pilot216-test release gates
+
+> Historical phase recorded2026-10-25, before completed Coulds release preparation. The branch, freeze, deployment and QA statements below describe that earlier phase; the verified15e/00005 facts at the top and [current owner checklist](docs/LIVE_TEST.md) supersede them.
 
 Parent reports **216/216 host tests pass, zero skips**. Both sandboxed browser gates passed: local-HTTPS `browser-smoke-pilot.js` **eight checks** and Atlas/mobile `browser-smoke.js` **six checks**. Parent viewed the saved, explicitly labelled Simulator captures: correct account controls, incoming approved-rune preview with Rings0, claimed target Ring1 and waiting source. These are local mocked tests, **not actual Twitch or live OBS proof**. The parent subsequently deployed fd05 as recorded above; these local QA facts do not change its runtime identity.
 
@@ -529,7 +541,7 @@ Pending before raid readiness: comprehensive Firestore/emulator mark/quota/token
 
 ## How we used Codex
 
-Codex was the sole author of code, tests, docs and original procedural SVG, always in saved thread **01a1705c-a87d-7143-80f6-021e47b78ced**, with no forks or delegated agents. [Resume/session and cutoff rules](CODEX_SESSION.md) and [the offline evidence-export guide](docs/CODEX_EVIDENCE.md) describe the selected sanitized transcript. Parent committed/pushed evidence `b6ae4b9`:870 selected entries, cutoff2026-10-25T06:29:41.733Z, transcript SHA256 `58183847ddd17274efecac534fa78d7f086e7197740f21fe26268cad5a216dca`,43 curated CLI logs. Twenty credential-looking items were omitted/disclosed without assuming credential status; no strong keys were found by the scanner. Raw15.8MB backup remains LOCAL/ignored. The committed2.5MB transcript is selected, not raw/private complete. Parent will refresh a scanned fixed snapshot after run045 completes; future counts/cutoff/hash are unknown until generated, and the current committed manifest remains authoritative.
+Codex was the sole author of code, tests, docs and original procedural SVG, always in saved thread **01a1705c-a87d-7143-80f6-021e47b78ced**, with no forks or delegated agents. [Resume/session and cutoff rules](CODEX_SESSION.md) and [the offline evidence-export guide](docs/CODEX_EVIDENCE.md) describe the selected sanitized transcript. Parent committed/pushed evidence `b6ae4b9`:870 selected entries, cutoff2026-10-25T06:29:41.733Z, transcript SHA256 `58183847ddd17274efecac534fa78d7f086e7197740f21fe26268cad5a216dca`,43 curated CLI logs. Twenty credential-looking items were omitted/disclosed without assuming credential status; no strong keys were found by the scanner. Raw15.8MB backup remains LOCAL/ignored. The committed2.5MB transcript is selected, not raw/private complete. Parent will refresh a scanned fixed snapshot after run047 completes; future counts/cutoff/hash are unknown until generated, and the current committed manifest remains authoritative.
 
 The human owner/operator set product direction, fixed the initial sandbox blocker, supplied environment/dependencies without exposing secrets, reviewed bugs/screenshots, ran host QA and performed gated Git/cloud operations. Codex implemented the bounded changes and tests in response, without cloud/provider/live Twitch/Devpost actions or credential reads. Parent/operator facts are attributed; they are not state Codex independently inspected.
 
@@ -544,7 +556,7 @@ Git-confirmed examples of this review loop:
 
 Other concrete corrections included five marks **per viewer**, not globally; forgetting content without a channel-wide denial-of-service hold or quota refund; optional Chronicle captions that cannot hide an otherwise valid literal-XSS mark gallery; and retaining the original overlay unsupported-method404 boundary with a dispatch regression outside sandbox socket skips. All were driven by parent review and implemented/tested here; no false pass replaced a failed host gate.
 
-Latest parent-verified proof: **312/312 host tests, zero skips; seven sandboxed browser workflows/33 checks PASS; audit0;55 release files; diff pass**. Atlas13,pilot8,judges3,recap3,Forge2,fade2,resonance2 cover explicitly labelled local mocks. Parent viewed stable reduced-motion fade before/after3: same canonical moon rune dims, count stays1; the resonance outline leaves the rune DIM. Captures/result JSON are local Simulator artifacts, not live Shared Chat, physical OBS/audio, actual Twitch or AI proof. Evidence `b6ae4b9`, fade `d392a0c`, resonance `d8eecf4` were parent committed/pushed in that order. Recap/Forge/fade/decorative echo remain Coulds-branch-only within the curated two-Keeper prototype; no all-Coulds completion claim. Main0723/live00003fd05 at100%/Shoulds00004source0723 at0% remain frozen; paid gatesOFF, no new scope/subscription. After045, parent alone will refresh the scanned fixed evidence snapshot; current post042 manifest remains authoritative until that reviewed refresh.
+Latest parent-verified proof: **312/312 host tests, zero skips; seven sandboxed browser workflows/33 checks PASS; audit0;55 release files; diff pass**. Atlas13,pilot8,judges3,recap3,Forge2,fade2,resonance2 cover explicitly labelled local mocks. Parent viewed stable reduced-motion fade before/after3: same canonical moon rune dims, count stays1; the resonance outline leaves the rune DIM. Captures/result JSON are local Simulator artifacts, not live Shared Chat, physical OBS/audio, actual Twitch or AI proof. Evidence `b6ae4b9`, fade `d392a0c`, resonance `d8eecf4` were parent committed/pushed in that order. Recap/Forge/fade/decorative echo were merged to main15e and deployed only to Coulds00005 within the curated two-Keeper prototype; no all-Coulds completion claim. Current main/source15e and Coulds00005at0%, canonical00003fd05at100% and Shoulds00004source0723at0% remain frozen until owner test; paid gatesOFF, no new scope/subscription. After047, parent alone will refresh the scanned fixed evidence snapshot; current post042 manifest remains authoritative until that reviewed refresh.
 
 ### Should #3 — Chronicle (unpublished branch; off by default)
 

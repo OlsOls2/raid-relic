@@ -1,12 +1,16 @@
-# Tagged previews: Coulds preparation and preserved Shoulds release
+# Tagged previews: deployed Coulds and preserved older releases
 
-## Current authorization — pending new Coulds deployment
+## Current parent-verified Coulds release
 
-Owner authorizes **parent only** to merge reviewed `feature/raid-relic-coulds` candidate `52e1a04` into main/push and build/deploy a NEW no-normal-traffic tag **`coulds`**, expected https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app . Main's freeze is lifted only for this reviewed merge/docs; this is **not production traffic promotion**. New merged release hash/revision/image/build are not yet reported: do not claim this tag active or verified. Parent changes only the new revision's OAuth redirect/allowlist, EventSub callback and OVERLAY origin to the Coulds host, preserving existing resources/secret references, min0/max1 and both paid gatesfalse. No new services.
+Parent completed the authorized fast-forward merge/push into main **`15e427eca81bcbf7c78a78191d668ee7642e1b96`** and deployed **`raid-relic-00005-rey`**, tag **`coulds`**,0% normal traffic at https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app . Build **`0be349f9-6d62-4bdf-a785-c206bed1f044`**; immutable image **`sha256:53dc32c5ea650d0287e9d23f089c896e1e689d1cebeac6e63f0fb745bed570d8`**. This is not production promotion: canonical00003/sourcefd05 remains100%, Shoulds00004/source0723 remains0%, both preserved.
 
-Canonical `raid-relic-00003-kwp` / sourcefd05 remains100%; Shoulds `raid-relic-00004-kul` / source0723 remains0% and preserved. Codex is authorized for docs only here: no cloud/build/deploy, credentials/provider calls, actual consent/bootstrap/chat/raid/public actions or commits; same original thread/no delegation. Parent supplies deployment proof separately. No raw evidence backup read/export by Codex; parent refreshes a scanned fixed snapshot after this run.
+Only the new revision's OAuth URI/exact allowlist `/auth/callback`, EventSub `/eventsub`, OVERLAY origin and RELEASE_COMMIT changed to Coulds/15e. `CHRONICLE_ENABLED=false`, `CHRONICLE_ALLOW_PAID=false`; all other env, three secret references, SA/resources/concurrency/timeout/min0max1/CPU1/256Mi/startup boostoff preserved. No IAM/services/keys created. All cloud revisions/source features are now frozen until owner test. Codex remains same original thread on main for docs only: no cloud/provider/credential/live actions, new branch/delegation or commits. Parent will refresh fixed scanned evidence after047; no Codex raw/auth read/export.
 
-Coulds candidate implements recap, Forge templates/optional cost-gated mock model path, three-completed-holder-stream **carried-rune visual fade**, and bounded decorative approved copied-word echo within the existing curated two-Keeper prototype. No all-Coulds or live-validation claim. Those features are **not included in the preserved Shoulds/cloud00004 release**. Older “fade/resonance deferred” notes described earlier branch state; they are no longer current implementation status.
+Parent verified Ready/health exact15e/owner-test-ready/liveValidated:false,22 distinct public assets parity, controls/owner Forge401, judges404, unsigned webhook403 before mutation, read-only Atlas/recap/SVG, pure template Forge POST source:template/applied:false with no DB/provider work, and both cloud HTTP/WSS initial snapshots live/waiting (sockets closed). Search is tested by the312 host suite, not asserted as a new live search request. Older health identities stayedfd05/0723. No actual OAuth consent/bootstrap/Twitch API/chat/raid/AI calls or fake seed. These checks are not actual Twitch/OBS validation.
+
+Docs/evidence commits after deployment do not change deployed RELEASE_COMMIT15e and neither require nor authorize a rebuild/redeploy. Parent will prove the55 release files unchanged separately.
+
+Coulds preview implements recap, Forge templates/optional cost-gated mock model path, three-completed-holder-stream **carried-rune visual fade**, and bounded decorative approved copied-word echo within the existing curated two-Keeper prototype. No all-Coulds or live-validation claim. Those features are **not included in the preserved Shoulds/cloud00004 release**. Older “fade/resonance deferred” notes described earlier branch state; they are no longer current implementation status.
 
 Parent baseline:312/312 host tests/zero skips, seven sandboxed browser flows/33 checks PASS (Atlas13,pilot8,judges3,recap3,Forge2,fade2,resonance2), audit0/release55/diff pass. Parent viewed labelled Simulator captures, stable fade count1/same dimmed glyph and echo outline leaving runeDIM. These are not actual Twitch/Shared Chat/physical OBS/AI proof. Paid Chronicle/Forge were not called; keep gatesOFF.
 
@@ -22,7 +26,7 @@ Existing Twitch subscriptions do not move when OAuth redirects or tag environmen
 
 | Item | Parent-verified historical value |
 | --- | --- |
-| Main / Shoulds preview source before proposed merge | `072317a2f127fc3a67137812ba9b762fe1f34ead` (261/261 host at that release) |
+| Preserved Shoulds source / main before completed merge | `072317a2f127fc3a67137812ba9b762fe1f34ead` (261/261 host at that release) |
 | Shoulds build identifier supplied by parent | `c40be500` |
 | Shoulds immutable image | `sha256:69a3dc185158c35cf8d4a23a413ecf5432ad86c1d3643d536f5a33f98437bfa1` |
 | Shoulds revision / traffic | `raid-relic-00004-kul`, tag `shoulds`,0% normal traffic |
@@ -34,9 +38,9 @@ Existing Twitch subscriptions do not move when OAuth redirects or tag environmen
 
 Parent verified Shoulds health0723,15 public assets parity, read-only search/protected401, both initial WSS live-mode waiting, judges404/excluded; canonical healthfd05. No actual Twitch consent/bootstrap/chat/raid/model validation followed from those checks. Shoulds has the five Shoulds, not recap/Forge/fade/decorative echo. Its OAuth/allowlist/EventSub/OVERLAY origins are tagged Shoulds values.
 
-## After owner-approved parent deployment — manual checks only
+## Owner checks after verified deployment — manual only
 
-1. Parent records actual new Coulds source/revision/image and confirms no-traffic tag, unchanged canonical100%/Shoulds0%, resources/secret references and both paid flagsOFF. Until then all Coulds URLs are expected/pending.
+1. Parent has recorded15e/00005-rey and verified no-traffic tag, unchanged canonical100%/Shoulds0%, resources/secret references and both paid gatesOFF. Coordinate an exclusive owner test window before actual live setup.
 2. Owner follows [LIVE_TEST.md](LIVE_TEST.md): exact profiles/three sequential consents, coordinated callback-routing gate, sequential bootstrap of both channels, both readiness flags/all five conditions enabled each, Opt in/Keep and fresh source status with actual holder. No concurrent cross-origin workers.
 3. Read-only Coulds Atlas/search, recap download and Forge template preview must show actual retained data or honest empty state. New-tag OBS uses numeric channel URLs; optional sound needs a gesture, initial/reconnect silent. No judges route/cloud Simulator activation.
 4. At end, close unused browser/OBS sources; at most16 clients, active WebSockets can incur usage. Min0/max1/free-tier eligibility/budget alerts are not a zero-cost guarantee.

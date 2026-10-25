@@ -2,22 +2,22 @@
   "formatVersion": 1,
   "sessionID": "01a1705c-a87d-7143-80f6-021e47b78ced",
   "inputLeaf": "rollout-2026-10-25T00-01-23-01a1705c-a87d-7143-80f6-021e47b78ced.jsonl",
-  "rawSnapshotSHA256": "c756a353b44afedf588c9ba011b1946a22058bb6b215beacc69be32c55d6cb03",
-  "rawBytes": 17248346,
+  "rawSnapshotSHA256": "fa5e8f190575e2012b49433debdc67ff4dfcf97dc521011e6762d44737e7ee1a",
+  "rawBytes": 17509253,
   "eventCounts": {
     "session_meta": 1,
-    "event_msg": 1714,
-    "response_item": 1474,
+    "event_msg": 1754,
+    "response_item": 1504,
     "world_state": 41,
-    "turn_context": 47,
-    "token_usage_record": 427,
+    "turn_context": 49,
+    "token_usage_record": 437,
     "compacted": 3
   },
-  "exportedEntries": 985,
+  "exportedEntries": 1008,
   "omissions": {
     "private": 46,
     "media": 2,
-    "unselected": 2721,
+    "unselected": 2780,
     "truncated": 2,
     "credentialLookingItems": 21,
     "credentialReasons": {
@@ -26,9 +26,9 @@
     }
   },
   "firstTimestamp": "2026-10-25T00:01:23.357Z",
-  "cutoff": "2026-10-25T07:21:42.421Z",
-  "exportSHA256": "fe43afdaa087ff4d1476dc533063613b2c0f77270c4fdcbd444636ac8f166abd",
-  "exportBytes": 2944013,
+  "cutoff": "2026-10-25T07:37:52.839Z",
+  "exportSHA256": "6f3f6f6e94a88d0014f7d3d89708f67aa5a315a38f767c8e8f13d3d5ce78ce93",
+  "exportBytes": 3020699,
   "sourceRunLogs": [
     {
       "leaf": "run-000.jsonl",
@@ -264,6 +264,16 @@
       "leaf": "run-046.jsonl",
       "bytes": 146553,
       "sha256": "f49ed8759ab925a5555b499134a26a99c27b3f7dc569c22948dd5f969b2ea1fd"
+    },
+    {
+      "leaf": "run-047.jsonl",
+      "bytes": 78469,
+      "sha256": "6a9cb89ca73891767ec7fb19fb2c713b819905bdbc9a413c7b4ad9499c06d5a1"
+    },
+    {
+      "leaf": "run-048.jsonl",
+      "bytes": 28366,
+      "sha256": "4cfa897db07b8463239cfca7045cfffbd500912670adda9b412dfd385f3fa9c7"
     }
   ],
   "scope": "Selected sanitized native JSONL; private/internal/media omitted and per-item output bounded. Raw snapshot remains local ignored."

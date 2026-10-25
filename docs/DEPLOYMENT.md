@@ -1,8 +1,37 @@
-# Deployed owner-test pilot handoff
+# Current deployment handoff — Coulds tagged preview
+
+All cloud/host facts here are **parent verified**, not independently inspected by Codex. Parent fast-forward merged/pushed reviewed Coulds and046 docs to main and completed a NEW no-normal-traffic deployment; canonical traffic was not promoted. Ready for owner-operated testing means **`owner-test-ready / liveValidated:false`**, not completed live Twitch validation or all Musts/Coulds.
+
+| Item | Parent-verified Coulds value |
+| --- | --- |
+| Project / region | `raid-relic-hackathon` / `us-central1` |
+| Deployed source / RELEASE_COMMIT | `15e427eca81bcbf7c78a78191d668ee7642e1b96` |
+| Build | `0be349f9-6d62-4bdf-a785-c206bed1f044` |
+| Immutable image | `us-central1-docker.pkg.dev/raid-relic-hackathon/raid-relic/app@sha256:53dc32c5ea650d0287e9d23f089c896e1e689d1cebeac6e63f0fb745bed570d8` |
+| Revision / tag / normal traffic | `raid-relic-00005-rey` / `coulds` /0% |
+| Origin | https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app |
+| New revision origin settings | OAuth URI + exact allowlist `/auth/callback`; EventSub `/eventsub`; OVERLAY origin, all at Coulds host |
+| Paid gates | `CHRONICLE_ENABLED=false`, `CHRONICLE_ALLOW_PAID=false` |
+| Preserved resources | min0/max1, request CPU1vCPU/256Mi, startup boostoff; existing SA/concurrency/timeout |
+| Preserved bindings | All other env and three existing secret references; no disclosed values, no IAM/services/keys created |
+| Preserved canonical | `raid-relic-00003-kwp`,100%, source `fd05a5ee67f841b1ac92ebb221581db227d2353f` |
+| Preserved Shoulds | `raid-relic-00004-kul`,0%, source `072317a2f127fc3a67137812ba9b762fe1f34ead` |
+
+Parent verified cloud Ready and exact15e health,22 distinct public assets byte-matched (including Forge/recap/configured overlay HTML), both private controls/owner Forge401, local-only judges404, unsigned EventSub403 before mutation, read-only Atlas/recap and recapSVG, and both actual cloud HTTP/WSS initial snapshots **mode:live/status:waiting**, then closed sockets. Pure live template `POST /api/forge` returned source:template/applied:false with no DB/provider work. Strict Atlas/search regressions are established by host tests; no new live search request is claimed. Canonicalfd05 and Shoulds0723 health stayed unchanged. No actual OAuth consent, bootstrap, Twitch API/chat/raid/AI calls or fake seed by parent/Codex.
+
+Local release proof: **312/312 host tests, zero skips; seven sandboxed browser workflows/33 checks PASS** (Atlas13,pilot8,judges3,recap3,Forge2,fade2,resonance2); audit0/release55/diff pass. Parent-viewed labelled Simulator captures/downloads are not live Shared Chat/physical OBS/AI proof.
+
+All three cloud revisions/source features are now frozen until owner test. Codex only records docs on main, same original session: no cloud/provider/credential actions, branch creation or commit. Later docs/evidence commits **do not change deployed15e**, require a redeploy or authorize another deployment; parent will prove55 release files unchanged separately. No zero-cost guarantee: active sockets/requests can exceed free quotas. Close unused sources.
+
+Owner next follows [LIVE_TEST.md](LIVE_TEST.md): confirm exact Coulds callback, sequential correct-profile consents, **mandatory same-app exact-ten-condition webhook routing review/migration gate**, both readiness flags, then any real raid test. Tags share real Firestore/auth/control rows with separate in-process fanout; one origin at a time. No broad subscription deletion/global DB reset; unknown dispatch must not be cleared/retried. Future promotion needs separate review and canonical-origin configuration, not promoting a tag as-is. See [tag safety](TAGGED_PREVIEW.md).
+
+---
+
+# Preserved canonical owner-test pilot history
 
 All deployment/host facts below are **parent verified**, recorded by Codex without cloud/Twitch calls or credential reads. This is **raid-pilot / owner-test-ready / liveValidated:false**: ready for owner-operated live validation, not already live proven. No claim that all Musts are complete.
 
-## Current immutable release
+## Preserved canonical immutable release (100% traffic)
 
 | Item | Parent-verified value |
 | --- | --- |
@@ -18,7 +47,7 @@ All deployment/host facts below are **parent verified**, recorded by Codex witho
 
 All other environment values, secret references and resources were preserved by the parent. Three existing named Secret Manager references use `latest`; no values were disclosed. Parent-reported roles remain project `datastore.user`, `secretAccessor` only on the three required objects, and build-SA `run.builder`. Narrow `_Default` OAuth/auth request-URL exclusion remains; other logs preserved. No wider logging/IAM guarantee is inferred.
 
-Parent commits these docs separately. **Runtime stays the exact fd05 source above, not the later docs commit.** No rebuild or deployment occurs in this documentation turn.
+Parent commits these docs separately. **Canonical runtime stays fd05; the separate current Coulds preview stays15e, never a later docs commit.** No rebuild or deployment occurs in this documentation turn.
 
 ## Verified scope
 
