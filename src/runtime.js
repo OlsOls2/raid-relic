@@ -14,6 +14,7 @@ export async function createRuntime(env, { firestoreClient, transport, loadSDK =
   const releaseCommit = validateReleaseCommit(env.RELEASE_COMMIT, { required: production });
   let state; let store;
   const keeperIds = env.KEEPER_CHANNEL_IDS ? env.KEEPER_CHANNEL_IDS.split(',') : [env.TWITCH_STREAMER_ID];
+  if (env.KEEPER_CHANNEL_IDS && (!keeperIds.every(id => ['1591805230', '1591806023'].includes(id)) || env.TWITCH_STREAMER_ID !== '1591805230' || env.TWITCH_BOT_ID !== '1591804828')) throw new Error('Keeper allowlist rejected');
   const lifecycle = env.OAUTH_ENABLED === 'true' ? { channels: keeperIds } : undefined;
   if (env.STATE_STORE === 'firestore') {
     if (env.GOOGLE_CLOUD_PROJECT !== PROJECT_ID || env.FIRESTORE_EMULATOR_HOST) throw new Error('Firestore project configuration rejected');
@@ -28,7 +29,7 @@ export async function createRuntime(env, { firestoreClient, transport, loadSDK =
   if (env.OAUTH_ENABLED === 'true') {
     oauth = createOAuth({ clientId: env.TWITCH_CLIENT_ID, clientSecret: env.TWITCH_CLIENT_SECRET, redirectUri: env.OAUTH_REDIRECT_URI,
       redirectAllowlist: (env.OAUTH_REDIRECT_ALLOWLIST ?? '').split(','), streamerId: env.TWITCH_STREAMER_ID, botId: env.TWITCH_BOT_ID,
-      encryptionKey: env.TOKEN_ENCRYPTION_KEY, store, transport, production });
+      encryptionKey: env.TOKEN_ENCRYPTION_KEY, keeperIds, store, transport, production });
     bot = createBot({ oauth, clientId: env.TWITCH_CLIENT_ID, clientSecret: env.TWITCH_CLIENT_SECRET, streamerId: env.TWITCH_STREAMER_ID,
       botId: env.TWITCH_BOT_ID, callbackUrl: env.EVENTSUB_CALLBACK_URL, webhookSecret: env.TWITCH_EVENTSUB_SECRET, transport });
     if (production) bot.chatSubscription();

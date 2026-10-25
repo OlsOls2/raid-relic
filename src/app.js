@@ -37,7 +37,11 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
   const release = validateReleaseCommit(releaseCommit);
   // Pure request boundary for tests: rawBody is never reserialized before HMAC.
   async function dispatch({ method, path, headers = {}, rawBody = Buffer.alloc(0) }) {
-    if ((path.startsWith('/api/') || path.split('?')[0] === '/auth/callback' || path.startsWith('/oauth/')) && !spend()) return result(429, 'Public request budget reached; retry later');
+    if ((path.startsWith('/control/') || path.startsWith('/api/') || path.split('?')[0] === '/auth/callback' || path.startsWith('/oauth/')) && !spend()) return result(429, 'Public request budget reached; retry later');
+    if (path.startsWith('/control/')) {
+      if (!oauth?.control) return result(503, 'Control not configured');
+      return oauth.control.route({ path, method, headers, rawBody });
+    }
     if (path.startsWith('/oauth/') || (oauth && path.split('?')[0] === oauth.callbackPath)) {
       if (!oauth) return result(503, 'OAuth not configured');
       return oauth.route({ method, path, headers });

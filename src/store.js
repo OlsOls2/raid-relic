@@ -14,6 +14,9 @@ export function ritualFor(id, now, raid) {
 export function createMemoryAuthStore() {
   const records = new Map();
   return {
+    async createControlSession(id, record) { records.set(`control:${id}`, structuredClone(record)); },
+    async getControlSession(id, sessionHash, now) { const r = records.get(`control:${id}`); return r?.sessionHash === sessionHash && r.expiresAt > now ? structuredClone(r) : null; },
+    async revokeControlSession(id, sessionHash, now) { const r = records.get(`control:${id}`); if (r?.sessionHash !== sessionHash || r.expiresAt <= now) return false; records.delete(`control:${id}`); return true; },
     async createState(id, record, now) {
       for (const [key, value] of records) if (!key.includes(':') && value.expiresAt <= now) records.delete(key);
       if (records.has(id) || records.size >= 1024) throw new Error('OAuth state capacity reached');
@@ -164,6 +167,16 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
     async getPrivateMarks(host, actor) {
       if (!isModerator(actor, host)) throw new Error('Moderator identity required');
       return privateMarks((await ref('markChannels', host).get()).data(), host, actor);
+    },
+    async createControlSession(id, record) {
+      await db.runTransaction(async tx => { const doc = ref('controlSessions', id); await tx.get(doc); tx.set(doc, record); });
+    },
+    async getControlSession(id, sessionHash, now) {
+      return db.runTransaction(async tx => { const r = (await tx.get(ref('controlSessions', id))).data(); return r?.sessionHash === sessionHash && r.expiresAt > now ? r : null; });
+    },
+    async revokeControlSession(id, sessionHash, now) {
+      return db.runTransaction(async tx => { const doc = ref('controlSessions', id); const r = (await tx.get(doc)).data();
+        if (r?.sessionHash !== sessionHash || r.expiresAt <= now) return false; tx.delete(doc); return true; });
     },
     async createState(id, record) { await ref('oauthStates', id).create(record); },
     async consumeState(id, binding, now) {
