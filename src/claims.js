@@ -12,7 +12,7 @@ export function publicJourney(lineage) {
 }
 // All inputs are store-owned snapshots. No effects; caller commits every result together.
 export function reduceClaims(registry, channels, marks, previous, chat, now, sentAt = now, presence = {}) {
-  registry = structuredClone(registry); marks = structuredClone(marks); const lineage = structuredClone(previous ?? emptyLineage()); let acknowledgement = null;
+  registry = structuredClone(registry); marks = structuredClone(marks); const lineage = structuredClone(previous ?? emptyLineage()); let acknowledgement = null, acknowledgementKind, ackDeadline;
   // References are private and scoped to source channel/stream/mark/user. Purge
   // permanently when approval/content is removed; never regenerate archived entries.
   for (const stop of lineage.stops) stop.marks = stop.marks.filter(item => {
@@ -35,7 +35,8 @@ export function reduceClaims(registry, channels, marks, previous, chat, now, sen
       && Array.isArray(hop.offers) && Array.isArray(hop.accepts) && now < hop.endsAt && eligible(registry, channels, marks, hop.from, hop.to, retired)
       && (retired ? source.retiredStream.streamId : source?.streamId) === hop.sourceStreamId
       && target?.streamId === hop.targetStreamId;
-    if (!valid && !(hop.policy === 'preclaim-v1' && !hop.verified && now < hop.endsAt && !source?.online && source?.retiredStream?.streamId === hop.sourceStreamId && target?.streamId === hop.targetStreamId && eligible(registry, channels, marks, hop.from, hop.to, true))) { hop.cancelled = true; delete hop.offers; delete hop.accepts; delete hop.movedOffers; }
+    const expiryRetired = retired || (hop.policy === 'preclaim-v1' && !hop.verified && !source?.online && source?.retiredStream?.streamId === hop.sourceStreamId);
+    if (!valid && !(hop.policy === 'preclaim-v1' && !hop.verified && now < hop.endsAt && !source?.online && source?.retiredStream?.streamId === hop.sourceStreamId && target?.streamId === hop.targetStreamId && eligible(registry, channels, marks, hop.from, hop.to, true))) { hop.cancelled = true; hop.cancelReason = now >= hop.endsAt && eligible(registry, channels, marks, hop.from, hop.to, expiryRetired) && (expiryRetired ? source.retiredStream.streamId : source?.streamId) === hop.sourceStreamId && target?.streamId === hop.targetStreamId ? 'window-ended' : 'policy'; delete hop.offers; delete hop.accepts; delete hop.movedOffers; }
     else {
       const allowed = (host, id) => !channels[host].blockedUserIds.includes(id) && !marks[host].blocked.includes(id);
       hop.offers = hop.offers.filter(id => allowed(hop.from, id) && allowed(hop.to, id) && (!hop.movedOffers?.includes(id) || (presence[hop.from]?.streamId === hop.sourceStreamId && presence[hop.from].actors.some(a => a.id === id))));
@@ -48,7 +49,8 @@ export function reduceClaims(registry, channels, marks, previous, chat, now, sen
     if (valid && chat && ['offer', 'accept'].includes(chat.markAction?.type) && !chat.isBot
       && /^\d{1,32}$/.test(chat.chatterId)
       && !channels[chat.broadcasterId]?.blockedUserIds.includes(chat.chatterId)
-      && !marks[chat.broadcasterId]?.blocked.includes(chat.chatterId) && sentAt >= (hop.policy === 'preclaim-v1' ? hop.claimStartedAt : hop.startedAt) && sentAt < hop.endsAt) {
+      && !marks[chat.broadcasterId]?.blocked.includes(chat.chatterId) && sentAt >= (hop.policy === 'preclaim-v1' ? hop.voteStartedAt ?? hop.claimStartedAt : hop.startedAt) && sentAt < hop.endsAt
+      && (hop.claimClock !== 'landing-v2' || sentAt >= hop.claimStartedAt || (Number.isFinite(hop.acceptedAt) && sentAt < hop.acceptedAt + 180000))) {
       const side = chat.markAction.type === 'offer' ? 'offers' : 'accepts';
       const other = side === 'offers' ? 'accepts' : 'offers';
       if ((chat.broadcasterId === (side === 'offers' ? hop.from : hop.to) || (side === 'offers' && chat.broadcasterId === hop.to && hop.policy === 'preclaim-v1' && presence[hop.from]?.streamId === hop.sourceStreamId && presence[hop.from].actors.some(a => a.id === chat.chatterId && a.seenAt <= sentAt)))
@@ -77,6 +79,22 @@ export function reduceClaims(registry, channels, marks, previous, chat, now, sen
         delete hop.offers; delete hop.accepts; delete hop.movedOffers;
       }
   }
+  // Closed replies never restore votes, ownership or the old window.
+  if (hop && !hop.finalized && hop.verified === true && now >= hop.endsAt && now < hop.endsAt + 600000 && hop.cancelReason !== 'policy'
+    && chat && ['offer','accept'].includes(chat.markAction?.type) && !chat.isBot && !chat.copied && /^\d{1,32}$/.test(chat.chatterId)
+    && sentAt <= now && sentAt >= (hop.voteStartedAt ?? hop.claimStartedAt ?? hop.startedAt)) {
+    const source = channels[hop.from], target = channels[hop.to];
+    const retired = !source?.online && source?.retiredStream?.streamId === hop.sourceStreamId && hop.raidSentAt >= source.retiredStream.startedAt && hop.raidSentAt <= source.retiredStream.offlineAt;
+    const host = chat.broadcasterId, actor = chat.chatterId;
+    const correctSide = chat.markAction.type === 'accept' ? host === hop.to : host === hop.from || (host === hop.to && presence[hop.from]?.streamId === hop.sourceStreamId && presence[hop.from].actors.some(a=>a.id===actor&&a.seenAt<=sentAt));
+    const forgotten = [hop.from,hop.to].some(id => presence[id]?.revocations?.some(r=>r.key===hash(JSON.stringify([id,actor]))&&r.expiresAt>now));
+    if (correctSide && !forgotten && eligible(registry,channels,marks,hop.from,hop.to,retired)
+      && (retired ? source.retiredStream.streamId : source?.streamId) === hop.sourceStreamId && target?.streamId === hop.targetStreamId
+      && [hop.from,hop.to].every(id=>!channels[id].blockedUserIds.includes(actor)&&!marks[id].blocked.includes(actor))) {
+      acknowledgement = 'The binding window has closed… The relic stays with its Keeper. Begin a new Send Off to try again.';
+      acknowledgementKind = 'closed'; ackDeadline = now;
+    }
+  }
   if (Buffer.byteLength(JSON.stringify(registry)) > 4096) throw new Error('Relic registry capacity reached');
-  return { registry, marks, lineage, acknowledgement, ackDeadline: registry.pendingHop?.endsAt };
+  return { registry, marks, lineage, acknowledgement, acknowledgementKind, ackDeadline: ackDeadline ?? registry.pendingHop?.endsAt };
 }

@@ -135,7 +135,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
           const h = claiming.registry.pendingHop; raidAck = completionAck(raidAckPrevious, h.to, id, h.endsAt, now); raidAck.host = h.to; tx.set(raidAckRef, raidAck.doc);
         }
         if (managed) for (const [key, doc] of Object.entries(presenceNext)) tx.set(ref('presence', key), doc);
-        if (claiming && ackRef) tx.set(ackRef, ackDocument(ackDoc, chat, claiming.acknowledgement, transition?.channel, claiming.marks[host], now, claiming.ackDeadline));
+        if (claiming && ackRef) tx.set(ackRef, ackDocument(ackDoc, chat, claiming.acknowledgement, transition?.channel, claiming.marks[host], now, claiming.ackDeadline, claiming.acknowledgementKind));
         tx.set(eventRef, { expiresAt });
         if (transition) { tx.set(ref('keeperRegistry', 'single'), transition.registry); tx.set(ref('streamChannels', host), transition.channel); }
         if (raid && !config) tx.set(ref('rituals', raid.to_broadcaster_user_id), ritualFor(id, now, raid));

@@ -2,8 +2,8 @@ import { validFlightText, validSourceLogin } from './cinematic.js';
 import { validClaimMeter } from './claim-meter.js';
 export { validClaimMeter } from './claim-meter.js';
 function validHandoff(h) {
-  return (h.sourceLogin === undefined || validSourceLogin(h.sourceLogin)) && (h.completedAt === undefined || (h.completed === true && Number.isFinite(h.completedAt) && h.completedAt >= h.startedAt && h.completedAt < h.endsAt)) && ['source', 'host'].includes(h.role) && Number.isFinite(h.startedAt) && Number.isFinite(h.endsAt)
-    && (h.clockPolicy === 'preclaim-v1' ? Number.isFinite(h.claimStartedAt) && h.endsAt - h.claimStartedAt === 180000 && h.startedAt >= h.claimStartedAt && h.startedAt < h.endsAt : h.endsAt - h.startedAt === 90000) && Number.isInteger(h.threshold) && h.threshold >= 1 && h.threshold <= 10
+  return (h.clockPolicy === undefined || ['preclaim-v1','landing-v2'].includes(h.clockPolicy)) && (h.sourceLogin === undefined || validSourceLogin(h.sourceLogin)) && (h.completedAt === undefined || (h.completed === true && Number.isFinite(h.completedAt) && h.completedAt >= h.startedAt && h.completedAt < h.endsAt)) && ['source', 'host'].includes(h.role) && Number.isFinite(h.startedAt) && Number.isFinite(h.endsAt)
+    && (h.clockPolicy === 'landing-v2' ? h.claimStartedAt === h.startedAt && h.endsAt-h.startedAt===180000 : h.clockPolicy === 'preclaim-v1' ? Number.isFinite(h.claimStartedAt) && h.endsAt - h.claimStartedAt === 180000 && h.startedAt >= h.claimStartedAt && h.startedAt < h.endsAt : h.endsAt - h.startedAt === 90000) && Number.isInteger(h.threshold) && h.threshold >= 1 && h.threshold <= 10
     && [h.offers, h.accepts].every(v => Number.isInteger(v) && v >= 0 && v <= h.threshold) && typeof h.completed === 'boolean';
 }
 export function resonanceActive(cue, now) { return Boolean(cue && now >= cue.receivedAt && now < cue.expiresAt); }

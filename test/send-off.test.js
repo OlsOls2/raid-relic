@@ -131,7 +131,7 @@ for (const kind of ['memory', 'firestore']) {
     f.advance(30001); await f.worker().processPending();
     assert.equal((await f.state.getKeeperRegistry()).send.status, 'unknown'); assert.equal(f.calls.length, 0);
   });
-  test(`${kind}: only matching signed actual raid confirms accepted/unknown intent and binds existing180s voting clock with verified arrival`, async () => {
+  test(`${kind}: only matching signed actual raid confirms accepted/unknown intent and opens exactly180s from verified receipt with an independent arrival clock`, async () => {
     for (const mode of ['ok', 'timeout']) {
     const f = fixture(kind, mode); await f.setup(); await f.chat('!relic send @targetkeeper'); await f.worker().processPending();
     assert.equal(await f.state.getRitual(target), undefined);
@@ -140,7 +140,8 @@ for (const kind of ['memory', 'firestore']) {
     assert.equal((await f.raid(target, { version: '2' })).status, 400);
     f.advance(5000); const receivedAt = f.now(); await f.raid(target, { sentAt: receivedAt - 1000, id: 'actual-raid' });
     const registry = await f.state.getKeeperRegistry(); assert.equal(registry.send.status, 'confirmed');
-    assert.equal(registry.pendingHop.startedAt, receivedAt); assert.equal(registry.pendingHop.endsAt, (mode === 'timeout' ? receivedAt : base) + 180000);
+    assert.equal(registry.pendingHop.startedAt, receivedAt); assert.equal(registry.pendingHop.endsAt, receivedAt + 180000);
+    assert.equal(registry.pendingHop.claimStartedAt, receivedAt); assert.equal(registry.pendingHop.arrivalStartedAt, receivedAt);
     assert.equal(registry.holderId, source); assert.equal(registry.pendingHop.phase, 'pending-handoff');
     await f.raid(target, { sentAt: receivedAt - 1000, id: 'actual-raid' }); assert.equal((await f.state.getKeeperRegistry()).pendingHop.startedAt, receivedAt);
     assert.ok(!JSON.stringify(await f.state.getPublicMarks(source)).includes('pendingHop'));

@@ -89,7 +89,7 @@ export function sendState(previous, channels, marks, config, op, now) {
       if (intent.status === 'accepted' && eligible(registry, channels, marks, intent.sourceId, intent.targetId) && channels[intent.sourceId].streamId === intent.sourceStreamId && channels[intent.targetId].streamId === intent.targetStreamId) {
         intent.acceptedAt = now;
         registry.pendingHop = { intentId: intent.id, eventId: intent.id, from: intent.sourceId, to: intent.targetId, sourceStreamId: intent.sourceStreamId, targetStreamId: intent.targetStreamId,
-          policy: 'preclaim-v1', provisional: true, verified: false, acceptedAt: now, claimStartedAt: now, claimEndsAt: now + 180000, startedAt: now, endsAt: now + 180000, threshold: claimThreshold(intent.viewerEstimate ?? 1), offers: [], accepts: [] };
+          policy: 'preclaim-v1', claimClock: 'accepted-v1', provisional: true, verified: false, acceptedAt: now, claimStartedAt: now, claimEndsAt: now + 180000, startedAt: now, endsAt: now + 180000, threshold: claimThreshold(intent.viewerEstimate ?? 1), offers: [], accepts: [] };
       }
       if (validRaidDiagnostic(op.diagnostic, intent)) intent.diagnostic = op.diagnostic;
     }
@@ -109,6 +109,7 @@ export function sendState(previous, channels, marks, config, op, now) {
       && (!correlated || (intent.sourceId === source && intent.targetId === target && sentAt <= after + SEND_LIMITS.confirmationMs
         && sourceStreamId === intent.sourceStreamId && channels[target]?.streamId === intent.targetStreamId))
       && (!correlated || intent.status !== 'confirmed')
+      && !(intent && registry.pendingHop?.intentId === intent.id && registry.pendingHop.cancelled && registry.pendingHop.cancelReason !== 'window-ended')
       && eligible(registry, channels, marks, source, target, retired)
       && sentAt >= Math.max(sourceStartedAt, channels[target].startedAt, channels[source].consentAt, channels[target].consentAt)) {
       registry.raidWatermark = sentAt;
@@ -117,7 +118,8 @@ export function sendState(previous, channels, marks, config, op, now) {
         sourceStreamId: sourceStreamId, targetStreamId: channels[target].streamId, retiredSource: Boolean(retired),
         raidSentAt: sentAt, raidSize: raid.viewers, threshold: claimThreshold(raid.viewers), thresholdPolicy: 'small-raid-v2', offers: [], accepts: [],
         startedAt: now, snatchedUntil: now + 1500, endsAt: now + 180000, policy: 'preclaim-v1', verified: true, provisional: false, verifiedRaidReceivedAt: now, arrivalStartedAt: now, claimStartedAt: now, claimEndsAt: now + 180000,
-        ...(preclaim ? { intentId: preclaim.intentId, acceptedAt: preclaim.acceptedAt, claimStartedAt: preclaim.claimStartedAt, claimEndsAt: preclaim.claimEndsAt, endsAt: preclaim.claimEndsAt, offers: preclaim.offers ?? [], accepts: preclaim.accepts ?? [], ...(preclaim.movedOffers ? { movedOffers: preclaim.movedOffers } : {}), cancelled: preclaim.cancelled === true || now >= preclaim.claimEndsAt } : {}) };
+        claimClock: 'landing-v2', voteStartedAt: preclaim?.acceptedAt ?? now,
+        ...(preclaim ? { intentId: preclaim.intentId, acceptedAt: preclaim.acceptedAt, offers: preclaim.offers ?? [], accepts: preclaim.accepts ?? [], ...(preclaim.movedOffers ? { movedOffers: preclaim.movedOffers } : {}), cancelled: preclaim.cancelled === true && preclaim.cancelReason !== 'window-ended' } : {}) };
       if (correlated) intent.status = 'confirmed';
       ritual = { eventId: id, incomingBroadcasterId: source, hostBroadcasterId: target, startedAt: now, endsAt: registry.pendingHop.endsAt };
     }

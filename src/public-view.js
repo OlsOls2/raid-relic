@@ -22,7 +22,7 @@ export function handoffView(registry, channel, now, lineage) {
   const stop = hop.finalized && lineage?.stops?.find(s => s.eventId === hop.eventId && s.from === hop.from && s.to === hop.to);
   const sourceLogin = { '1591805230': 'raidrelichq', '1591806023': 'olsols2' }[hop.from];
   return { ...(sourceLogin ? { sourceLogin } : {}), ...(stop && Number.isFinite(stop.claimedAt) ? { completedAt: stop.claimedAt } : {}), role: hop.to === channel ? 'host' : 'source', startedAt: hop.startedAt, endsAt: hop.endsAt,
-    ...(hop.policy === 'preclaim-v1' ? { clockPolicy: hop.policy, claimStartedAt: hop.claimStartedAt } : {}),
+    ...(hop.policy === 'preclaim-v1' ? { clockPolicy: hop.claimClock === 'landing-v2' ? hop.claimClock : hop.policy, claimStartedAt: hop.claimStartedAt } : {}),
     threshold: hop.threshold, offers: Math.min(hop.threshold, hop.offers?.length ?? hop.threshold), accepts: Math.min(hop.threshold, hop.accepts?.length ?? hop.threshold),
     completed: hop.finalized === true };
 }
@@ -73,7 +73,7 @@ export function atlasSearch(lineage, { query, offset = 0, limit = 20 }) {
 export function claimMeterView(registry, host, now) {
   const hop = registry?.pendingHop;
   if (!hop || ![hop.from, hop.to].includes(host) || hop.cancelled || hop.finalized || now >= hop.endsAt) return null;
-  return { startedAt: hop.claimStartedAt ?? hop.startedAt, endsAt: hop.endsAt, offers: Math.min(10, hop.offers?.length ?? 0), accepts: Math.min(10, hop.accepts?.length ?? 0), threshold: hop.threshold, provisional: hop.policy === 'preclaim-v1' && !hop.verified, awaitingRaid: hop.policy === 'preclaim-v1' && !hop.verified };
+  return { ...(['accepted-v1','landing-v2'].includes(hop.claimClock) ? { clockPolicy: hop.claimClock } : {}), startedAt: hop.claimStartedAt ?? hop.startedAt, endsAt: hop.endsAt, offers: Math.min(10, hop.offers?.length ?? 0), accepts: Math.min(10, hop.accepts?.length ?? 0), threshold: hop.threshold, provisional: hop.policy === 'preclaim-v1' && !hop.verified, awaitingRaid: hop.policy === 'preclaim-v1' && !hop.verified };
 }
 
 // Current holder identity is public channel identity, never a viewer lookup.

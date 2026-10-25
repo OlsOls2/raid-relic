@@ -95,7 +95,7 @@ test('judges overlay serves its complete module graph and projects actual carrie
   const accepted = await view(); assert.equal(accepted.status, 'waiting'); assert.equal(accepted.marks.length, 0); assert.equal(accepted.handoff, null); assert.equal(accepted.claimMeter.awaitingRaid, true);
   data(await action(f, 'raid'));
   const incoming = await view(); assert.equal(incoming.status, 'incoming'); assert.equal(incoming.marks.length, 1); assert.equal(incoming.claimMeter.awaitingRaid, false);
-  assert.equal(incoming.handoff.clockPolicy, 'preclaim-v1'); assert.ok(Number.isFinite(incoming.handoff.claimStartedAt));
+  assert.equal(incoming.handoff.clockPolicy, 'landing-v2'); assert.ok(Number.isFinite(incoming.handoff.claimStartedAt));
   for (const step of ['offer', 'accept']) data(await action(f, step));
   const carried = await view(); assert.equal(carried.status, 'ready'); assert.equal(carried.approvedCount, 1); assert.equal(carried.marks.length, 1); assert.equal(carried.lineageRings, 1);
   assert.equal(carried.handoff.startedAt, incoming.handoff.startedAt); assert.equal(carried.handoff.claimStartedAt, incoming.handoff.claimStartedAt);

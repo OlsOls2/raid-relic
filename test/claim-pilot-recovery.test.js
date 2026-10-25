@@ -143,14 +143,17 @@ for (const kind of ['memory', 'firestore']) {
     const channel = await f.runtime.state.getStreamStatus(HOME); assert.equal(channel.streamId, '9300'); assert.equal(channel.online, true); assert.ok(channel.closedIds.includes(before.pendingHop.sourceStreamId));
     assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, HOME); assert.equal((await f.runtime.state.getPublicJourney()).rings, 0);
   });
-  test(`${kind}: already committed votes have30s delivery grace, equality-deadline votes never count or ACK`, async () => {
+  test(`${kind}: already committed votes have30s delivery grace, equality-deadline votes never count and get a closed-window reply`, async () => {
     const f = await setup(kind), process = f.runtime.claimAcks.process; f.runtime.claimAcks.process = async () => {};
     const hop = (await f.runtime.state.getKeeperRegistry()).pendingHop;
     f.advance(hop.endsAt - f.now() - 1); await vote(f, HOME, HOME, 'grace-vote', '!offer');
     f.advance(2); await process(HOME, ackKey({ broadcasterId: HOME, chatterId: HOME, messageId: 'grace-vote' }));
     assert.equal((await f.runtime.state.getPrivateClaimAcks(HOME)).rows[0].status, 'sent');
     await vote(f, OTHER, OTHER, 'late-vote', '!accept');
-    assert.equal((await f.runtime.state.getPrivateClaimAcks(OTHER)).rows[0].status, 'ignored');
+    assert.equal((await f.runtime.state.getPrivateClaimAcks(OTHER)).rows[0].status, 'queued');
+    assert.match((await f.runtime.state.getPrivateClaimAcks(OTHER)).rows[0].message, /binding window has closed/);
+    await process(OTHER, ackKey({ broadcasterId: OTHER, chatterId: OTHER, messageId: 'late-vote' }));
+    assert.equal((await f.runtime.state.getPrivateClaimAcks(OTHER)).rows[0].status, 'sent');
     assert.equal((await f.runtime.state.getPublicJourney()).rings, 0);
   });
 }

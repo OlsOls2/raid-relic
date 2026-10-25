@@ -23,8 +23,9 @@ export function createOverlayHub(store, channels, { simulator = false, now = Dat
       if (journey.handoff?.sourceLogin !== undefined && !['raidrelichq', 'olsols2'].includes(journey.handoff.sourceLogin)) throw Error('Invalid source Keeper');
       if (journey.movedToLogin !== undefined && !['raidrelichq', 'olsols2'].includes(journey.movedToLogin)) throw Error('Invalid holder');
       const incoming = journey.handoff?.role === 'host' && !journey.handoff.completed;
-      return { type: 'snapshot', revision, mode: simulator ? 'simulator' : 'live', status: incoming && state.status !== 'paused' ? 'incoming' : state.status,
-        ...(state.status === 'waiting' && journey.movedToLogin ? { movedToLogin: journey.movedToLogin } : {}), marks, approvedCount: marks.length, lineageRings: journey.rings, handoff: journey.handoff, claimMeter: journey.claimMeter ?? null, ...(resonance ? { resonance } : {}), serverNow };
+      const status = incoming && state.status !== 'paused' ? 'incoming' : state.status;
+      return { type: 'snapshot', revision, mode: simulator ? 'simulator' : 'live', status,
+        ...(status === 'waiting' && journey.movedToLogin ? { movedToLogin: journey.movedToLogin } : {}), marks, approvedCount: marks.length, lineageRings: journey.rings, handoff: journey.handoff, claimMeter: journey.claimMeter ?? null, ...(resonance ? { resonance } : {}), serverNow };
     } catch { return { type: 'snapshot', revision, mode: simulator ? 'simulator' : 'live', status: 'unavailable', marks: [], approvedCount: 0, lineageRings: 0 }; }
   }
   const wrapped = Object.create(store);

@@ -10,7 +10,7 @@ async function setup(kind) {
   f.streams.get(HOME).viewer_count = 2; return f;
 }
 for (const kind of ['memory', 'firestore']) {
-  test(`${kind}: acceptance opens180s voting only; precollected quorums complete only on verified actual raid without extending clock`, async () => {
+  test(`${kind}: acceptance opens180s voting only; precollected quorums complete only on verified actual raid with a fresh receipt-based binding clock`, async () => {
     const f = await setup(kind); await f.control(HOME, `send:${OTHER}`);
     const root = await f.runtime.state.getKeeperRegistry(), hop = root.pendingHop;
     assert.equal(hop.endsAt - hop.startedAt, 180000); assert.equal(hop.verified, false);
@@ -18,7 +18,7 @@ for (const kind of ['memory', 'firestore']) {
     await f.chat(HOME, HOME, '!offer'); await f.chat(OTHER, OTHER, '!accept');
     assert.equal((await f.runtime.state.getPublicJourney()).rings, 0); assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, HOME);
     f.advance(20000); const receipt = f.now(); await f.raid(HOME, OTHER, 2);
-    const after = await f.runtime.state.getKeeperRegistry(); assert.equal(after.holderId, OTHER); assert.equal(after.pendingHop.endsAt, hop.endsAt);
+    const after = await f.runtime.state.getKeeperRegistry(); assert.equal(after.holderId, OTHER); assert.equal(after.pendingHop.endsAt, receipt + 180000);
     assert.equal(after.pendingHop.arrivalStartedAt, receipt); assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
     assert.equal((await f.runtime.state.getPrivateClaimAcks(OTHER)).rows.filter(r => r.status === 'sent').length, 2);
     assert.ok(!JSON.stringify(await f.runtime.overlayFeeds[OTHER].snapshot()).includes('sourceStreamId'));
@@ -34,14 +34,14 @@ for (const kind of ['memory', 'firestore']) {
       source_message_id: '00000000-0000-4000-8000-000000000001', message: { text: 'hello', fragments: [] } }, HOME, { broadcaster_user_id: HOME, user_id: BOT });
     await f.chat(OTHER, '813', '!offer'); await f.chat(OTHER, BOT, '!offer'); assert.equal((await f.runtime.state.getKeeperRegistry()).pendingHop.offers.length, 0);
   });
-  test(`${kind}: signed actual threshold increases provisional estimate; strict180s boundary and late confirmation never revive votes`, async () => {
+  test(`${kind}: signed actual threshold increases provisional estimate; strict provisional boundary and delayed actual receipt starts a fresh verified window`, async () => {
     const f = await setup(kind); await f.control(HOME, `send:${OTHER}`); await f.chat(HOME, HOME, '!offer'); await f.chat(OTHER, OTHER, '!accept');
     f.advance(); await f.raid(HOME, OTHER, 4); let root = await f.runtime.state.getKeeperRegistry(); assert.equal(root.pendingHop.threshold, 2); assert.equal(root.holderId, HOME);
     await f.chat(HOME, '821', '!offer'); await f.chat(OTHER, '822', '!accept'); assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
     const g = await setup(kind); await g.control(HOME, `send:${OTHER}`); const end = (await g.runtime.state.getKeeperRegistry()).pendingHop.endsAt;
     g.advance(end - g.now()); await g.chat(HOME, HOME, '!offer'); await g.chat(OTHER, OTHER, '!accept'); await g.raid(HOME, OTHER, 1);
-    root = await g.runtime.state.getKeeperRegistry(); assert.equal(root.send.status, 'confirmed'); assert.equal(root.pendingHop.cancelled, true); assert.equal(root.holderId, HOME); assert.equal((await g.runtime.state.getPublicJourney()).rings, 0);
-    assert.equal((await g.runtime.pilot.expireHandoff(HOME, root.send.id, root.pendingHop.eventId)).status, 'expired-handoff');
+    root = await g.runtime.state.getKeeperRegistry(); assert.equal(root.send.status, 'confirmed'); assert.equal(root.pendingHop.cancelled, false); assert.equal(root.pendingHop.endsAt, g.now()+180000); assert.deepEqual(root.pendingHop.offers, []); assert.deepEqual(root.pendingHop.accepts, []); assert.equal(root.holderId, HOME); assert.equal((await g.runtime.state.getPublicJourney()).rings, 0);
+    assert.equal((await g.runtime.pilot.expireHandoff(HOME, root.send.id, root.pendingHop.eventId)).status, 'blocked');
   });
 }
 test('legacy90s/T2 meter and new180s meter validate strictly, clamp arcs, expire and contain no private proof', () => {
@@ -62,12 +62,12 @@ test('presence is stream-scoped, bounded, no text/login retention and clears rat
 });
 
 for (const kind of ['memory', 'firestore']) {
-  test(`${kind}: actual threshold can decrease; concurrent receipt/votes still transfer once and preserve accepted clock`, async () => {
+  test(`${kind}: actual threshold can decrease; concurrent receipt/votes still transfer once and start the receipt clock`, async () => {
     const f = await setup(kind); f.streams.get(HOME).viewer_count = 100; await f.control(HOME, `send:${OTHER}`);
     const before = (await f.runtime.state.getKeeperRegistry()).pendingHop; assert.equal(before.threshold, 10);
     await Promise.all([f.chat(HOME, HOME, '!offer'), f.chat(OTHER, OTHER, '!accept'), f.raid(HOME, OTHER, 2)]);
     await f.raid(HOME, OTHER, 2);
-    const root = await f.runtime.state.getKeeperRegistry(); assert.equal(root.holderId, OTHER); assert.equal(root.pendingHop.endsAt, before.endsAt); assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
+    const root = await f.runtime.state.getKeeperRegistry(); assert.equal(root.holderId, OTHER); assert.equal(root.pendingHop.endsAt, root.pendingHop.startedAt + 180000); assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
   });
   test(`${kind}: source session restart/ban revokes moved proof and absent raid cannot transfer or clear accepted intent`, async () => {
     const f = await setup(kind); await f.chat(HOME, '831', 'hello');
@@ -114,7 +114,7 @@ for (const kind of ['memory', 'firestore']) {
     f.advance(); await f.signed('channel.chat.message', { broadcaster_user_id: HOME, chatter_user_id: HOME, message_id: 'delayed-countdown', message: { text: '!offer', fragments: [] } }, HOME, { broadcaster_user_id: HOME, user_id: BOT }, { sentAt });
     assert.equal((await f.runtime.state.getKeeperRegistry()).pendingHop.offers.length, 1);
     await f.chat(OTHER, OTHER, '!accept'); const result = await f.runtime.state.getKeeperRegistry();
-    assert.equal(result.holderId, OTHER); assert.equal(result.pendingHop.endsAt, before.claimEndsAt); assert.equal(result.pendingHop.arrivalStartedAt, arrival);
+    assert.equal(result.holderId, OTHER); assert.equal(result.pendingHop.endsAt, arrival + 180000); assert.equal(result.pendingHop.arrivalStartedAt, arrival);
   });
   test(`${kind}: moved classification survives raid binding; source forget/block revokes it and duplicate raid cannot restart expired proof`, async () => {
     for (const policy of ['forget', 'block']) {

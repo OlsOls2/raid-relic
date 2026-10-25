@@ -71,7 +71,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
       if (raid && claiming?.registry.pendingHop?.finalized && !registry.pendingHop?.finalized) {
         const h = claiming.registry.pendingHop; raidAck = completionAck(ackDocs.get(h.to), h.to, id, h.endsAt, now); raidAck.host = h.to;
       }
-      const ackNext = claiming && host ? ackDocument(ackDocs.get(host), chat, claiming.acknowledgement, transition?.channel, claiming.marks[host], now, claiming.ackDeadline) : null;
+      const ackNext = claiming && host ? ackDocument(ackDocs.get(host), chat, claiming.acknowledgement, transition?.channel, claiming.marks[host], now, claiming.ackDeadline, claiming.acknowledgementKind) : null;
       // No await between check and insertion: atomic within this process.
       if (pk && !proofSeen) seen.set(pk, now + 600000);
       if (raidAck) ackDocs.set(raidAck.host, raidAck.doc);

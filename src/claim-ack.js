@@ -2,8 +2,9 @@ import { ChatSendError } from './bot.js';
 import { hash } from './crypto.js';
 export const ackKey = chat => hash(JSON.stringify(['claim-ack-v1', chat.broadcasterId, chat.chatterId, chat.messageId]));
 const actorKey = (host, actor) => hash(`${host}:${actor}`);
-export function ackDocument(previous, chat, message, channel, marks, now, deadline = now + 90000) {
+export function ackDocument(previous, chat, message, channel, marks, now, deadline = now + 90000, kind) {
   const doc = structuredClone(previous ?? { rows: [] }); doc.rows = doc.rows.filter(r => r.expiresAt > now);
+  for (const row of doc.rows) if (row.closedRateUntil <= now) { delete row.closedRateKey; delete row.closedRateUntil; }
   for (const row of doc.rows) if (row.status === 'queued' && (now >= row.ackUntil || !channel?.online || !channel?.optedIn || channel.paused || channel.banned || marks?.paused
     || !marks?.context?.optedIn || (chat?.markAction?.type === 'forgetme' && row.actorKey === actorKey(chat.broadcasterId, chat.chatterId))
     || (channel.blockedUserIds?.length > 0 || marks?.blocked?.length > 0)
@@ -13,8 +14,9 @@ export function ackDocument(previous, chat, message, channel, marks, now, deadli
   if (chat && ['offer', 'accept'].includes(chat.markAction?.type) && !chat.isBot && !chat.copied) {
     const key = ackKey(chat);
     if (!doc.rows.some(r => r.key === key)) {
+      if (kind === 'closed' && doc.rows.some(r=>r.closedRateKey===actorKey(chat.broadcasterId,chat.chatterId)&&r.closedRateUntil>now)) message = null;
       if (doc.rows.length >= 128) throw Error('Claim ACK capacity reached');
-      doc.rows.push({ key, expiresAt: now + 600000, status: message ? 'queued' : 'ignored', ...(message ? { message, ackUntil: deadline + 30000, actorKey: actorKey(chat.broadcasterId, chat.chatterId) } : {}) });
+      doc.rows.push({ key, expiresAt: now + 600000, status: message ? 'queued' : 'ignored', ...(message && kind === 'closed' ? { closedRateKey: actorKey(chat.broadcasterId,chat.chatterId), closedRateUntil: now+30000 } : {}), ...(message ? { message, ackUntil: deadline + 30000, actorKey: actorKey(chat.broadcasterId, chat.chatterId) } : {}) });
     }
   }
   if (Buffer.byteLength(JSON.stringify(doc)) > 65536) throw Error('Claim ACK capacity reached');
