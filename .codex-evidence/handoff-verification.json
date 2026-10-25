@@ -1,0 +1,546 @@
+{
+  "generatedAt": "2026-10-25T10:09:31.020Z",
+  "branch": "feature/raid-relic-polish",
+  "sourceCommit": "b079fe88e29269b0af3eacd831146d7d09988c1f",
+  "codexSession": "01a1705c-a87d-7143-80f6-021e47b78ced",
+  "scope": "Local mocked tests only; no deployment, traffic, cloud, live Twitch/chat/raid, credential or paid-provider operation.",
+  "tests": {
+    "total": 351,
+    "passed": 351,
+    "failed": 0,
+    "skipped": 0
+  },
+  "browsers": {
+    "workflows": 9,
+    "checks": 39,
+    "passed": true,
+    "results": [
+      {
+        "name": "browser-results.json",
+        "passed": true,
+        "checks": 13,
+        "failure": null,
+        "script": "scripts/browser-smoke.js"
+      },
+      {
+        "name": "pilot-browser-results.json",
+        "passed": true,
+        "checks": 8,
+        "failure": null,
+        "script": "scripts/browser-smoke-pilot.js"
+      },
+      {
+        "name": "judges-browser-results.json",
+        "passed": true,
+        "checks": 3,
+        "failure": null,
+        "script": "scripts/browser-smoke-judges.js"
+      },
+      {
+        "name": "recap-browser-results.json",
+        "passed": true,
+        "checks": 3,
+        "failure": null,
+        "script": "scripts/browser-smoke-recap.js"
+      },
+      {
+        "name": "forge-browser-results.json",
+        "passed": true,
+        "checks": 2,
+        "failure": null,
+        "script": "scripts/browser-smoke-forge.js"
+      },
+      {
+        "name": "fade-browser-results.json",
+        "passed": true,
+        "checks": 2,
+        "failure": null,
+        "script": "scripts/browser-smoke-fade.js"
+      },
+      {
+        "name": "resonance-browser-results.json",
+        "passed": true,
+        "checks": 2,
+        "failure": null,
+        "script": "scripts/browser-smoke-resonance.js"
+      },
+      {
+        "name": "polish-browser-results.json",
+        "passed": true,
+        "checks": 4,
+        "failure": null,
+        "script": "scripts/browser-smoke-polish.js"
+      },
+      {
+        "name": "handoff-browser-results.json",
+        "passed": true,
+        "checks": 2,
+        "failure": null,
+        "script": "scripts/browser-smoke-handoff.js"
+      }
+    ]
+  },
+  "releaseFileCount": 59,
+  "dependenciesAndDeploymentConfigUnchanged": true,
+  "execution": {
+    "isolation": "bubblewrap unshare-all; private PID/network namespaces; loopback only; fresh namespace per browser workflow",
+    "environmentAllowlist": {
+      "PATH": "/usr/bin:/bin",
+      "HOME": "/work/.home",
+      "TMPDIR": "/work/.tmp",
+      "LANG": "C.UTF-8",
+      "NODE_OPTIONS": "--max-old-space-size=256"
+    },
+    "readOnly": "source snapshot, existing dependencies, toolchain; root remounted read-only",
+    "writable": "512MiB disposable /work tmpfs only",
+    "limits": {
+      "scratchBytes": 536870912,
+      "nodeHeapMiB": 256,
+      "chromiumHeapMiB": 128,
+      "nodeAddressSpaceBytes": 4294967296,
+      "browserDataSegmentBytes": 1073741824,
+      "processes": {
+        "unit": 128,
+        "browser": 256
+      },
+      "openFiles": 2048,
+      "fileBytes": 16777216,
+      "cpuSeconds": 120,
+      "perScriptWallMs": 150000
+    },
+    "chromiumSandbox": true,
+    "externalNetwork": false,
+    "hostHomeOrCredentialsExposed": false
+  },
+  "resolvedHarnessIssues": [
+    "Serial unit execution avoids fixed-loopback-port collisions.",
+    "Browser process allowance supports normal sandboxed Chromium pages.",
+    "Fresh isolated hosts file resolves localhost only to loopback.",
+    "Downloads folder is created inside disposable HOME for local export tests."
+  ],
+  "limitations": [
+    "No actual Twitch/Shared Chat/physical OBS/audio listening/AI validation.",
+    "channel.ban requires channel:moderate; requested OAuth scopes and default five-subscription plan unchanged.",
+    "Ban subscription registration/backfill, unban and timeout-expiry synchronization remain pending.",
+    "Accepted/unknown/claimed Send Off intents cannot be cancelled or retried; operator read-only reconciliation only.",
+    "Shared mark links are public bearer shares of current approved retained actor/channel-scoped entries, not a username index or complete personal lifetime route."
+  ],
+  "sourceFiles": [
+    {
+      "file": "public/arrival.js",
+      "sha256": "08d406d8638856acabbe207140bb2af79f8b53adbc05893c82c2cca89066c63a"
+    },
+    {
+      "file": "public/atlas.css",
+      "sha256": "afd6b7c424b9768b21e7b5145720a8ee092f0bd07eba43b91cfe6ca14ef6f909"
+    },
+    {
+      "file": "public/atlas.html",
+      "sha256": "51dab3c611270451e7e3001f1b8b94c85c19e895cb6f918f20fb2c03bf91ba97"
+    },
+    {
+      "file": "public/atlas.js",
+      "sha256": "9a340cdecb369e339b39195dad758bd24590a4b657fe5b75d1f48455ac36cd58"
+    },
+    {
+      "file": "public/control.css",
+      "sha256": "7cfc37f7661026a3fa2e202e7adf9cbb3c994d869598a31f46a4b9e57503f44f"
+    },
+    {
+      "file": "public/control.html",
+      "sha256": "85ad601fe4aee53bdbb5661481be843d53682ed2ebb4008c200d305412dbac5e"
+    },
+    {
+      "file": "public/control.js",
+      "sha256": "4bcbf477bc94a14125ba310b19e87dad34a178d6fad7aef2bb889e6b3a01c531"
+    },
+    {
+      "file": "public/crystal.svg",
+      "sha256": "6fba39ea1b1bb6c49156c24a1e7eee6ecb3431fb95f9138915cd9089cf845013"
+    },
+    {
+      "file": "public/forge-owner.html",
+      "sha256": "d8abddfdec97e02313b4ba1c6327a803461b3f1ed7dd9fed6d5787cb144bd4b1"
+    },
+    {
+      "file": "public/forge-owner.js",
+      "sha256": "0fe5a1b3f1fc47a382c20e2c50e978ffbc8e1d02ce7fc1dd33e5cdff7d2d3a1f"
+    },
+    {
+      "file": "public/forge.css",
+      "sha256": "255bed1a418729c5dad527f3334726b6259c5ddf14e33ce086393b5069b5ded7"
+    },
+    {
+      "file": "public/forge.html",
+      "sha256": "f5971334fcd013c754ffcd5c0a9a04f38429ac878923ca2bcd878f6eeaa8723f"
+    },
+    {
+      "file": "public/forge.js",
+      "sha256": "ec60da41df9a29b250443f5c7acc62935b2568b46d0df2e89a587d77fca57d94"
+    },
+    {
+      "file": "public/my-marks.html",
+      "sha256": "c42e5d8ade0408728645d08491f51a77e2f11ff85d3b874233ea78b72ec00a66"
+    },
+    {
+      "file": "public/my-marks.js",
+      "sha256": "27be7f8dd77416819297af5135465591af0caf2b9df71837f40792b2afb0f60b"
+    },
+    {
+      "file": "public/overlay-audio.js",
+      "sha256": "6ddf4f78959ca9dbb9b59b534473a44cde89a66cb5a09abb07b7478ee62b47fd"
+    },
+    {
+      "file": "public/overlay-client.js",
+      "sha256": "c5ca43076f5522eb1147920c2c372c1f3f3cb84f94ef3d4cc253e1ca9adcc416"
+    },
+    {
+      "file": "public/overlay-live.html",
+      "sha256": "4385117f01b2f8a9a8dab279cd7004d27807497a17b774228dbdf33b8bb63286"
+    },
+    {
+      "file": "public/overlay.css",
+      "sha256": "43f7d80ef65829603427fb688357f575665047276f1d5d3f28c6c8bda98e797b"
+    },
+    {
+      "file": "public/overlay.html",
+      "sha256": "c05fc8df84da1c066d7eed843a81f4db04fcf3b6065b1186a2651391aa2c3e7d"
+    },
+    {
+      "file": "public/overlay.js",
+      "sha256": "294374ca2eb117cfe49723ff86ab3f2e558172d79254134127c4563ef7795aec"
+    },
+    {
+      "file": "public/recap.css",
+      "sha256": "984a3d64b10044f40b9eb514b93705c1ab73490257b9ce397a58546c06d0005b"
+    },
+    {
+      "file": "public/recap.html",
+      "sha256": "f8093db781c6c638cfc737e64b6cb9f8276c4b10c70c3dfd1d837a80717c7e04"
+    },
+    {
+      "file": "public/recap.js",
+      "sha256": "9e5eedfa8e1fde5f510381ae41b40f99ce446f1106919b276c65da85d0981371"
+    },
+    {
+      "file": "public/relic.svg",
+      "sha256": "0819680dad1da4c1bfea060243468bfb1f385c8fa53d1d1960f62d9bbd7a575e"
+    },
+    {
+      "file": "public/style.css",
+      "sha256": "893d7cb0d26b5c3a2c798f32fb10b9599bf66e853f6b64bca4600803d92ebcb0"
+    },
+    {
+      "file": "scripts/browser-smoke-fade.js",
+      "sha256": "c5af90f42c25a4109537629ff4633d8357a35bd54ad423326959c9e1ebe90b32"
+    },
+    {
+      "file": "scripts/browser-smoke-forge.js",
+      "sha256": "ed099b50ba186bb3a1c5b665ac495b3d1cf061bbaf0ce9eb01138ece9708df4f"
+    },
+    {
+      "file": "scripts/browser-smoke-handoff.js",
+      "sha256": "1990c1dc9cd923147825fa530f5299fb01d768936648c9ce34421859811a73ac"
+    },
+    {
+      "file": "scripts/browser-smoke-judges.js",
+      "sha256": "cd646f43af5719b28decfb50f5bbd94e52cdbcb27b3d8cfbe1380f5a4ae83246"
+    },
+    {
+      "file": "scripts/browser-smoke-pilot.js",
+      "sha256": "a74123bc793e79f7b0a63c9e98656d6f0ddbf36f853038234a1f766054479ec5"
+    },
+    {
+      "file": "scripts/browser-smoke-polish.js",
+      "sha256": "078322eab151000475e29e05857ddb5185e1a152f2d6ff7af5ba7aa032dcb3e8"
+    },
+    {
+      "file": "scripts/browser-smoke-recap.js",
+      "sha256": "88af59356a717e40810dfb9d1e05573ca24a7608e94700dad69e400627a15d32"
+    },
+    {
+      "file": "scripts/browser-smoke-resonance.js",
+      "sha256": "aa0bb5364616167695d44b949f28d67c0000f6e281b1aea57ae012dd93c5efe0"
+    },
+    {
+      "file": "scripts/browser-smoke.js",
+      "sha256": "81df96ca7aeec0b87c420a4d118e818584b2a870fdbabfa68faff6fc878b1051"
+    },
+    {
+      "file": "scripts/export-codex-evidence.js",
+      "sha256": "6f9017552716642bdc1ecace04ec7e32b8c426bf14d5a399a57781dde830bd68"
+    },
+    {
+      "file": "scripts/judges.js",
+      "sha256": "42271a55feec5841655271b6f33aa70edb4b9aefff4c00b4e75aa34b38568f9e"
+    },
+    {
+      "file": "scripts/release-files.js",
+      "sha256": "ddd409d57e259a33bbf180a38e18c8b3e53e24eb7c186b7e5c608fc485c0e7a5"
+    },
+    {
+      "file": "scripts/simulate-journey.js",
+      "sha256": "24dddfcd9853ff70fc1b674f65f832a1eca56d0e08aa1270578a74b287064799"
+    },
+    {
+      "file": "scripts/simulate-overlay.js",
+      "sha256": "87f54dfdaa4a1578d7576081b75480c933932a7ce0adfc009eef8520190ccc94"
+    },
+    {
+      "file": "src/app.js",
+      "sha256": "289ae1205cb3f193d61a540d76148fcd236eb5fa7dfe7307e24f7588024df509"
+    },
+    {
+      "file": "src/bans.js",
+      "sha256": "2e76b0794b972b8b2bc36d212a1a1662f11e4e908c3007e8dbbb9c5465ebb56b"
+    },
+    {
+      "file": "src/bot.js",
+      "sha256": "c0c00f0946686ef0aa347ae5dfeb0be9709a6530186f85d1094ee71d906e12de"
+    },
+    {
+      "file": "src/chronicle.js",
+      "sha256": "7443b865227b4442e308d20a9c989c18bbda37c955c2c99a5b5f8b54f0e2a098"
+    },
+    {
+      "file": "src/claims.js",
+      "sha256": "714448a66b4ea0616a0a13e66990aa2c71992324bcb9851bde84eea46c5b2fc9"
+    },
+    {
+      "file": "src/control.js",
+      "sha256": "8ce002fa86041b7b5d07ba18cd726df6b1ba976b92bd883bc88f095518573fb2"
+    },
+    {
+      "file": "src/crypto.js",
+      "sha256": "fd59442ff91b9eb38341d4de5487a7236a2c05faec8ac9756060b06b3444c45e"
+    },
+    {
+      "file": "src/forge.js",
+      "sha256": "804b4c179f27263264eeb05404a712c3233aa71eac2ec38fca39d40b501ac0dd"
+    },
+    {
+      "file": "src/lifecycle.js",
+      "sha256": "474156e8f94937729789a8c06d2057c2c140a7f9ffd5638b77ebc46f18037204"
+    },
+    {
+      "file": "src/marks.js",
+      "sha256": "d6057b4260827b35367a324c71d57e45b9afa51f1ff6ddfb127dc5fd581d7ffb"
+    },
+    {
+      "file": "src/my-marks.js",
+      "sha256": "62ba5fea8eb849b199afadef9d02eeecbafda4ab35451fe6d1f73b2733857169"
+    },
+    {
+      "file": "src/oauth.js",
+      "sha256": "85ba60d7a5c209d49e967aa4b4bf6fb8164a3a25036daf2e49ead413735f32f6"
+    },
+    {
+      "file": "src/overlay-feed.js",
+      "sha256": "eb51a81ad4d0fdd717a147a14d737329b14e8e96ca1ca3074caf42d6854e0a66"
+    },
+    {
+      "file": "src/overlay-sockets.js",
+      "sha256": "fb029b33fb5a47ca528d0f01cc3d991acdb0218126adc799543b16826b36596c"
+    },
+    {
+      "file": "src/pilot.js",
+      "sha256": "c9e0807cb8b4a1015f4211771c0313e32821fed0de757c3b5ce30beb2c88a815"
+    },
+    {
+      "file": "src/public-view.js",
+      "sha256": "160c4cb5f6994a09808dff9d88f4ec8972694ac2907a0e63e4a0937f93bf9e96"
+    },
+    {
+      "file": "src/recap.js",
+      "sha256": "de6e9b1ddb45dd4e3dff6f7934b1011c3bbb44df92639c61a55355cbc46b61f8"
+    },
+    {
+      "file": "src/release.js",
+      "sha256": "d01c1e1bc111357c95e85b0511cafa9caaf400658060f65e5ba3858db8e31ccf"
+    },
+    {
+      "file": "src/resonance.js",
+      "sha256": "2c90348e5538ee8b956ab657f9b9f8ab1c2d40ff11206a8cdbbcf98d68323323"
+    },
+    {
+      "file": "src/runtime.js",
+      "sha256": "5b9927b2d6a226b051e282d3a6c48a7cb60a9a09206c6bb75165bd42ddaa6fd0"
+    },
+    {
+      "file": "src/send-off.js",
+      "sha256": "3a65b7769fe64c2d7d07d39bb838d1b8e241850713f7b4428fec2fb134e58a60"
+    },
+    {
+      "file": "src/send-state.js",
+      "sha256": "c61658a248b29f84df4a0b104a95582a2b5ec954c4d7a20aa0ecc2c4973a9ab2"
+    },
+    {
+      "file": "src/server.js",
+      "sha256": "9bb710f3b7ae807f08c8c6db5358a8ba9a86556565d420c00cc242f831d52ae3"
+    },
+    {
+      "file": "src/state.js",
+      "sha256": "0770b35417a0374c2d29a3a89c2908a6e6bde3db3def5f63cc1e11fb2727fed2"
+    },
+    {
+      "file": "src/store.js",
+      "sha256": "357eebf9712b02fa9e940b93243baa66266653cde521dbbf283b3d513168f32f"
+    },
+    {
+      "file": "src/subscriptions.js",
+      "sha256": "5c302e9fb817713db7df9b6397a68a1e51891349597613c70003b2ef0daebb6f"
+    },
+    {
+      "file": "test-support/fake-firestore.js",
+      "sha256": "0e8e834488d20adf262fb940da8774c4a60c1982553399b8c263f8819ccbc0c6"
+    },
+    {
+      "file": "test-support/journey-fixture.js",
+      "sha256": "fb8c96c527850ae84aaa3b50d9b54ca02bd6639230bf7b3d6ccc4c1c6d311aed"
+    },
+    {
+      "file": "test-support/judges.js",
+      "sha256": "3e5d558ccb156d0a00d4c6398c572bdd88187682576edc0451af141fb344a15a"
+    },
+    {
+      "file": "test-support/judges/app.js",
+      "sha256": "6a19461e3c4bdcd89cbc0f8c6adc219ad640fec9b4409c8994294d19a487d27d"
+    },
+    {
+      "file": "test-support/judges/index.html",
+      "sha256": "89ad412f68b474383b7976f32bcf2a9cc6383cbba4da14bfd368899533eddb9c"
+    },
+    {
+      "file": "test-support/judges/style.css",
+      "sha256": "711c3dab899686ec4f49ab457c221738ec8fbc863a49051c07c394a4d500b617"
+    },
+    {
+      "file": "test-support/local-tls.js",
+      "sha256": "593269e065210afcad76b2a947fc0041c806902671e28390210e8e8eaf4f6766"
+    },
+    {
+      "file": "test-support/overlay-fixture.js",
+      "sha256": "a37fd5d9666a57e7fe934746e97f31f0de1c25455be4c0ed4b280ba4b4d7fcef"
+    },
+    {
+      "file": "test-support/pilot-fixture.js",
+      "sha256": "487dddbbef63aa7c54c565e75a1101815a2dc7d94095c341c5a382ff3b9da6f5"
+    },
+    {
+      "file": "test/app.test.js",
+      "sha256": "3fe473767f8ec61203204558ff050d61efbb13d56b96cd050965f66e38c112f6"
+    },
+    {
+      "file": "test/atlas-search.test.js",
+      "sha256": "fdff0b1cf52bd8320a100d90a28f4a9ec669bc8053076be30720330ae09917d6"
+    },
+    {
+      "file": "test/atlas.test.js",
+      "sha256": "42b1f99eb328d5f9a348aab50c7398ba04aa20413696ab5564e30cdae3cb66c9"
+    },
+    {
+      "file": "test/ban-recovery.test.js",
+      "sha256": "2309d862a31fe62eb3f151dcc0d96f9274768d188bc011f10b9307863ef7a89e"
+    },
+    {
+      "file": "test/bot.test.js",
+      "sha256": "8fdadeccf0967415b6a873fb8e3ab3bfee45e4a1eb7c413278429e6678a148f3"
+    },
+    {
+      "file": "test/chronicle.test.js",
+      "sha256": "d03ca99d5ac69df5703464a5afc1d5eb80ba95de9a6c5eb7614b6356c89f0e36"
+    },
+    {
+      "file": "test/claims.test.js",
+      "sha256": "cb709d6f9fb0b641c16c9ca60f3f871f1fa3d9279a9a0d7b55d142b3f8961be0"
+    },
+    {
+      "file": "test/cloudbuild.test.js",
+      "sha256": "1c4f9d6a11b72351d15fdae7206c9c33cb3fe9d82559336c488390c435899d03"
+    },
+    {
+      "file": "test/control.test.js",
+      "sha256": "b68314191f2300b299d7c631fee1d19a1b99504ee7de3371707dfd42052371d6"
+    },
+    {
+      "file": "test/evidence-export.test.js",
+      "sha256": "0fa42a960bc4c1783155c9838335bdd7c723c3409c76008c6c98fd76863141e0"
+    },
+    {
+      "file": "test/fade.test.js",
+      "sha256": "bd804f3cac7b1bb462ef3bc768b162f859b508d651807428bf86916320c73337"
+    },
+    {
+      "file": "test/firestore.test.js",
+      "sha256": "59173803010f47517473f634c45f7af768a8d90c9bb03e5e6832841e570aea49"
+    },
+    {
+      "file": "test/forge.test.js",
+      "sha256": "a3cb5b865624eb0227a3a6edfa2992c64a374a29d5ca2ea75b968eb5dbb693fd"
+    },
+    {
+      "file": "test/judges.test.js",
+      "sha256": "0fd7d4e1c5d400cddb4e9ea17785e3817eb165063e46d7268857aa3272b462e1"
+    },
+    {
+      "file": "test/keeper-candidates.test.js",
+      "sha256": "f25d6f1be5fd13b66169c1c02ac3d93d4dc65e717154a50611c5e32d9e669eaf"
+    },
+    {
+      "file": "test/lifecycle.test.js",
+      "sha256": "22c906d51839573053b444dc3051649bf82366575b719ac3ac5296aa89bb820b"
+    },
+    {
+      "file": "test/local-tls.test.js",
+      "sha256": "1dda0048aa4a0feb06da97faea3bfab403f79b1b0d154fc9b90b304d5bde3698"
+    },
+    {
+      "file": "test/marks.test.js",
+      "sha256": "1aa66a0deb215c24e37605f05c0f12aa2ffea062948b99c9ec179088a13e8490"
+    },
+    {
+      "file": "test/my-marks.test.js",
+      "sha256": "f7339c170bec19e75ef350d80ed04ae78d37b13bd4b7a7b1df8851177ca16021"
+    },
+    {
+      "file": "test/oauth.test.js",
+      "sha256": "d356f1fbc314b2023d18859d25dc071e33c8bf3f7051a10b2621d84da1477b0a"
+    },
+    {
+      "file": "test/overlay-audio.test.js",
+      "sha256": "e28de6fc3c9a7b074c0f8ddca2c720a4b53e15eb74de40fe90ff94dcadd05cc9"
+    },
+    {
+      "file": "test/overlay.test.js",
+      "sha256": "8d5830af2218bcbf1b600a8b2334997c31d91b576319c00d79005f2a4c1c3675"
+    },
+    {
+      "file": "test/pilot.test.js",
+      "sha256": "93a6ae049f90c4c2a767524db5cc8fa63b3c4c36d72fdc968f90dd7669941ce6"
+    },
+    {
+      "file": "test/polish.test.js",
+      "sha256": "05094ad9ce25eec38435dba86086da50f4519200da30cf698f3cc16754ca9feb"
+    },
+    {
+      "file": "test/recap.test.js",
+      "sha256": "32393b60f520e410861998b36202938fa825851060b7fc697ceb236a67063888"
+    },
+    {
+      "file": "test/release.test.js",
+      "sha256": "1e54719cb999e522cc32fb1b585e9659670c1bb4a0b8da38e1d96733300a3242"
+    },
+    {
+      "file": "test/resonance.test.js",
+      "sha256": "f7aef9aafb261f7d11797ffa124e21339cd2671b6ff77e35043da8b5d80a2025"
+    },
+    {
+      "file": "test/send-off.test.js",
+      "sha256": "9e396333c9789b04cb68071f07ba828a6e78530648030186b361c526e7e66e5c"
+    },
+    {
+      "file": "test/subscriptions.test.js",
+      "sha256": "25fa62c7a7e10aaea88e7a797df08236bf97a4543c4ad56017783aee7994659e"
+    }
+  ]
+}
