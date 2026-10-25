@@ -38,3 +38,9 @@ Close idle OBS connections to contain usage. Budget alerts and free quotas are n
 [Historical README, preserved verbatim before P4](docs/archive/README-pre-p4.md) · [Architecture/deployment](docs/DEPLOYMENT.md) · [Priority plan](docs/PRIORITY_PLAN.md)
 
 102 local emergency review: incoming snapshots now omit old-holder destination copy; late eligible original claim commands receive a bounded closed-window reply without transfer. Existing confirmed/ended records are not revived or edited. Parent QA for this fix is pending; no new live validation is claimed.
+
+## P5 branch preview (not canonical)
+
+Keeper scores and original geometric badges derive only from retained completed stops. Initial home hold time and historical raider participation are unknown. Public raider names require separate original-chat `!relic scores on` consent before a counted vote; `!relic scores off` or `!relic forgetme` removes the entry. `!relic top` and `!relic badges` are local mocked additions, not enabled on canonical landing1025. Atlas scores refresh manually.
+
+Any parent-deployed P5 tag must set `P5_PREVIEW_READ_ONLY=true`: OAuth, private controls, EventSub and every non-GET request are denied before effects. This tag shares storage and is not an isolated game stage. Canonical cbe88c3 remains frozen at100%; its physical roundtrip retest is pending. Parent baseline519/519,19 mock flows69 checks predates this unverified P5 increment. See [P5 rules and review](docs/P5_RULES.md).
