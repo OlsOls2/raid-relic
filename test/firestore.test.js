@@ -76,14 +76,14 @@ test('OAuth callback and encrypted tokens persist across instances using Firesto
   for (const value of ['synthetic-access', 'synthetic-refresh', 'synthetic-code', cookie.split('=')[1], state]) assert.ok(!serialized.includes(value));
 });
 
-const env = { NODE_ENV: 'production', STATE_STORE: 'firestore', GOOGLE_CLOUD_PROJECT: PROJECT_ID, TWITCH_EVENTSUB_SECRET: 'synthetic-webhook-secret',
+const env = { NODE_ENV: 'production', RELEASE_COMMIT: 'a'.repeat(40), STATE_STORE: 'firestore', GOOGLE_CLOUD_PROJECT: PROJECT_ID, TWITCH_EVENTSUB_SECRET: 'synthetic-webhook-secret',
   OAUTH_ENABLED: 'true', TWITCH_CLIENT_ID: 'client', TWITCH_CLIENT_SECRET: 'synthetic-client-secret', TWITCH_STREAMER_ID: '111', TWITCH_BOT_ID: '222',
   OAUTH_REDIRECT_URI: 'https://example.test/oauth/callback', OAUTH_REDIRECT_ALLOWLIST: 'https://example.test/oauth/callback',
   TOKEN_ENCRYPTION_KEY: Buffer.alloc(32, 3).toString('base64'), EVENTSUB_CALLBACK_URL: 'https://example.test/eventsub', OVERLAY_ORIGIN: 'https://example.test' };
 test('runtime explicitly selects Firestore for only the approved project; never falls back in production', async () => {
   const instance = await createRuntime(env, { firestoreClient: fakeFirestore() }); assert.ok(instance.oauth && instance.bot);
   for (const change of [{ STATE_STORE: 'memory' }, { STATE_STORE: '' }, { GOOGLE_CLOUD_PROJECT: 'another-project' },
-    { FIRESTORE_EMULATOR_HOST: 'localhost:8080' }, { TWITCH_CLIENT_SECRET: '' }, { TOKEN_ENCRYPTION_KEY: '' }, { TWITCH_EVENTSUB_SECRET: '' }, { OAUTH_ENABLED: 'false' }, { EVENTSUB_CALLBACK_URL: '' }, { OVERLAY_ORIGIN: '' }]) {
+    { FIRESTORE_EMULATOR_HOST: 'localhost:8080' }, { TWITCH_CLIENT_SECRET: '' }, { TOKEN_ENCRYPTION_KEY: '' }, { TWITCH_EVENTSUB_SECRET: '' }, { OAUTH_ENABLED: 'false' }, { EVENTSUB_CALLBACK_URL: '' }, { OVERLAY_ORIGIN: '' }, { RELEASE_COMMIT: '' }]) {
     await assert.rejects(createRuntime({ ...env, ...change }, { firestoreClient: fakeFirestore() }));
   }
 });
@@ -95,4 +95,15 @@ test('SDK loading is lazy, configured with exact project, and failure is explici
   const local = await createRuntime({ STATE_STORE: 'memory', OAUTH_ENABLED: 'false', TWITCH_EVENTSUB_SECRET: 'synthetic-webhook-secret' },
     { loadSDK: () => { throw new Error('must not load'); } });
   assert.equal((await local.dispatch({ method: 'GET', path: '/health' })).status, 200);
+});
+test('foundation production startup and health perform no Twitch or database requests', async () => {
+  let twitchRequests = 0; let databaseRequests = 0;
+  const runtime = await createRuntime({ ...env, OAUTH_REDIRECT_URI: 'https://example.test/auth/callback', OAUTH_REDIRECT_ALLOWLIST: 'https://example.test/auth/callback' }, {
+    firestoreClient: { collection() { databaseRequests++; throw new Error('No database requests permitted'); } },
+    transport: async () => { twitchRequests++; throw new Error('No Twitch requests permitted'); },
+  });
+  const response = await runtime.dispatch({ method: 'GET', path: '/health' });
+  assert.equal(JSON.parse(response.body).releaseCommit, env.RELEASE_COMMIT);
+  assert.equal(JSON.parse(response.body).readiness, 'not-ready-for-raids');
+  assert.equal(twitchRequests, 0); assert.equal(databaseRequests, 0);
 });

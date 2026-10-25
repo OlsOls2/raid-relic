@@ -174,12 +174,29 @@ test('AES-GCM rejects corruption, wrong key and role/account substitution', () =
 });
 test('OAuth requires exact configured allowlisted redirect, distinct accounts and encryption key', () => {
   for (const options of [{ clientSecret: '' }, { encryptionKey: '' }, { botId: '111' }, { redirectAllowlist: [] },
-    { redirectUri: 'https://local.example/auth/callback', redirectAllowlist: ['https://local.example/auth/callback'] },
+    { redirectUri: 'https://local.example/other/callback', redirectAllowlist: ['https://local.example/other/callback'] },
     { redirectUri: 'https://evil.example/oauth/callback' }, { redirectUri: 'http://localhost/oauth/callback', redirectAllowlist: ['http://localhost/oauth/callback'], production: true },
     { redirectUri: 'https://local.example/oauth/callback?next=evil', redirectAllowlist: ['https://local.example/oauth/callback?next=evil'] }]) assert.throws(() => harness(options));
   const h = harness({ redirectUri: 'http://localhost:5191/oauth/callback', redirectAllowlist: ['http://localhost:5191/oauth/callback'] });
   assert.ok(h.oauth);
 });
+for (const callbackPath of ['/auth/callback', '/oauth/callback']) {
+  test(`configured ${callbackPath} accepts callback only there and exchanges exact redirect`, async () => {
+    const redirectUri = `https://local.example${callbackPath}`;
+    const h = harness({ redirectUri, redirectAllowlist: [redirectUri] });
+    const instance = createApp({ oauth: h.oauth }); const login = await start(h.oauth);
+    assert.equal(new URL(login.response.headers.location).searchParams.get('redirect_uri'), redirectUri);
+    const wrong = callbackPath === '/auth/callback' ? '/oauth/callback' : '/auth/callback';
+    const suffix = `?state=${login.state}&code=synthetic-code`;
+    assert.equal((await instance.dispatch({ method: 'GET', path: wrong + suffix, headers: { cookie: login.cookie } })).status, 404);
+    assert.equal((await h.oauth.route({ method: 'GET', path: callbackPath.replace('/callback', '/x/../callback') + suffix, headers: { cookie: login.cookie } })).status, 404);
+    assert.equal(h.calls.length, 0);
+    assert.equal((await instance.dispatch({ method: 'GET', path: callbackPath + suffix, headers: {} })).status, 400);
+    assert.equal((await instance.dispatch({ method: 'GET', path: callbackPath + suffix, headers: { cookie: login.cookie } })).status, 200);
+    assert.equal(new URLSearchParams(h.calls[0].body).get('redirect_uri'), redirectUri);
+    assert.equal((await instance.dispatch({ method: 'GET', path: callbackPath + suffix, headers: { cookie: login.cookie } })).status, 400);
+  });
+}
 test('HTTP OAuth boundary preserves cookie/location and disables caching without listening', async () => {
   const h = harness(); const instance = createApp({ oauth: h.oauth });
   const req = Readable.from([]); Object.assign(req, { method: 'GET', url: '/oauth/bot/start', headers: {} });

@@ -4,10 +4,12 @@ import { createMemoryAuthStore, createFirestoreStore } from './store.js';
 import { createOAuth } from './oauth.js';
 import { createBot } from './bot.js';
 import { createOverlayFeed } from './overlay-feed.js';
+import { validateReleaseCommit } from './release.js';
 
 export const PROJECT_ID = 'raid-relic-hackathon';
 export async function createRuntime(env, { firestoreClient, transport, loadSDK = () => import('@google-cloud/firestore') } = {}) {
   const production = env.NODE_ENV === 'production';
+  const releaseCommit = validateReleaseCommit(env.RELEASE_COMMIT, { required: production });
   let state; let store;
   if (env.STATE_STORE === 'firestore') {
     if (env.GOOGLE_CLOUD_PROJECT !== PROJECT_ID || env.FIRESTORE_EMULATOR_HOST) throw new Error('Firestore project configuration rejected');
@@ -32,7 +34,7 @@ export async function createRuntime(env, { firestoreClient, transport, loadSDK =
     if (production && (!env.OVERLAY_ORIGIN || new URL(env.OVERLAY_ORIGIN).origin !== env.OVERLAY_ORIGIN || !env.OVERLAY_ORIGIN.startsWith('https://'))) throw new Error('Exact HTTPS overlay origin required');
     overlayFeed = createOverlayFeed(state, env.TWITCH_STREAMER_ID); state = overlayFeed.store;
   }
-  return { ...createApp({ secret: env.TWITCH_EVENTSUB_SECRET, state, oauth, overlayFeed,
+  return { ...createApp({ secret: env.TWITCH_EVENTSUB_SECRET, state, oauth, overlayFeed, releaseCommit: releaseCommit ?? undefined,
     chatContext: oauth ? { streamerId: env.TWITCH_STREAMER_ID, botId: env.TWITCH_BOT_ID } : undefined }), oauth, bot, store, overlayFeed,
     overlayOrigins: production ? [env.OVERLAY_ORIGIN].filter(Boolean) : ['http://localhost:5191', 'http://127.0.0.1:5191'] };
 }

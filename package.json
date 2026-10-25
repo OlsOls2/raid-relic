@@ -5,6 +5,6 @@
   "type": "module",
   "license": "MIT",
   "engines": { "node": ">=22" },
-  "scripts": { "start": "node src/server.js", "test": "node --test" },
+  "scripts": { "start": "node src/server.js", "test": "node --test", "release:files": "node scripts/release-files.js" },
   "dependencies": { "@google-cloud/firestore": "^9.4.0", "ws": "8.22.0" }
 }

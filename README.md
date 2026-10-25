@@ -18,9 +18,9 @@ node test/overlay.test.js
 
 **Parent-verified host results: 92 tests, 92 pass, 0 fail, 0 skip**, including all four real loopback WebSocket integration/resource tests. The parent also reports **npm audit: 0 vulnerabilities**. These are host results reported by the parent, separate from this thread's sandbox execution.
 
-**Sandbox results: 92 tests, 88 pass, 0 fail, 4 explicitly skip** on Node 24.22.1. All 84 earlier tests and four new socket-free tests pass. The sandbox denies `listen 127.0.0.1:5191` with `EPERM`; tests skip only that exact permission error, not port conflicts or other failures. `npm test` summarizes six passing files here; `node --test --test-isolation=none` exposes named results/skips. The host run resolves the socket-validation blocker; the sandbox restriction remains environment-specific.
+**Current release-prep sandbox results: 98 tests, 94 pass, 0 fail, 4 explicitly skip** on Node 24.22.1. All 84 earlier tests, four overlay socket-free tests, two callback compatibility regressions and two release/health tests, one no-startup-network regression and one Cloud Build substitution regression pass. The sandbox denies `listen 127.0.0.1:5191` with `EPERM`; tests skip only that exact permission error, not port conflicts or other failures. `npm test` summarizes eight passing files here; `node --test --test-isolation=none` exposes named results/skips. The host run resolves the socket-validation blocker; the sandbox restriction remains environment-specific.
 
-The parent launched the labelled local simulator on registered port 5191 and stopped it; host loopback tests also ran and stopped their ephemeral servers. Host Chromium launched successfully with its sandbox enabled, but saving a screenshot under the workspace failed with **Permission denied (13)**. No screenshot was saved and no visual/OBS QA proof is claimed. The earlier Chromium launch failure (`sandbox_host_linux.cc:41` / `Operation not permitted`) applies to Codex's sandbox, not the host. The installed Firestore SDK import was verified separately without constructing a client. Actual database/emulator integration remains **UNTESTED**. No live login, chat/raid, database, or deployment validation has occurred.
+The parent launched the labelled local simulator on registered port 5191 and stopped it; host loopback tests also ran and stopped their ephemeral servers. Host Chromium launched successfully with its sandbox enabled, but saving a screenshot under the workspace failed with **Permission denied (13)**. No screenshot was saved and no visual/OBS QA proof is claimed. The earlier Chromium launch failure (`sandbox_host_linux.cc:41` / `Operation not permitted`) applies to Codex's sandbox, not the host. The installed Firestore SDK import was verified separately without constructing a client. Actual database/emulator integration remains **UNTESTED**. No live login, chat/raid, database, image runtime, or deployment validation has occurred in Codex. The parent-verified 92-test result predates these six release-prep tests; the parent should rerun all 98 including real sockets.
 
 The dependency `@google-cloud/firestore` is declared in package.json and loaded only when explicitly selecting Firestore. The parent reports successful host installation with scripts disabled and a host audit showing **0 vulnerabilities**; this audit result is operator-reported, not rerun here. This thread generated `package-lock.json` using `npm install --package-lock-only --ignore-scripts --offline --no-audit --no-fund` with empty user/global npm configs, then successfully imported the actual installed SDK. No client was constructed and no credentials or database were accessed. SDK import success is not database/emulator integration validation. Tests continue to use the injected fake.
 
@@ -32,6 +32,92 @@ For a later authorized local preview:
 
 The original compass/crystal SVG lives in `public/relic.svg`. Both views remain explicitly static; they show no fabricated ownership, route, chat activity, or live countdown.
 
+## First foundation release preparation
+
+The owner authorized the parent to perform the first Cloud Run deployment in **us-central1**, **min instances 0 / max instances 1**. Codex prepared local code/release files only: no cloud operation, image pull/build/run, credential read, deployment or live Twitch test occurred here. The parent verified the `node:24.22.1-bookworm-slim` tag exists. The parent must still build and validate the image; Codex has not pulled or run it. This is a **foundation release, not ready for raids**. No claim/handoff flow, Raid Send Off implementation or lineage growth exists; stream/Keeper lifecycle remains unwired. Startup never authorizes accounts, refreshes tokens, registers subscriptions, sends chat or starts raids. SDK construction is not database integration validation.
+
+Exact repo commands are `npm test`, `node --test --test-isolation=none`, `npm run release:files`, and `npm start` (equivalent to `node src/server.js`). Local env-file startup, only when authorized, is `node --env-file=.env src/server.js`. The container directly runs `node src/server.js`, as nonroot `node`, with default HTTP `PORT=8080`, binding `0.0.0.0`; direct local default stays 5191. Production requires complete OAuth/Firestore/overlay configuration and a full lowercase 40- or 64-hex `RELEASE_COMMIT`. `/health` reports `{status:"ok", releaseCommit, phase:"foundation", readiness:"not-ready-for-raids"}`. Health is process/release identity only, not token, database or product readiness. Without a local release identity, development reports `releaseCommit:null`.
+
+`Dockerfile` installs locked dependencies with `npm ci --omit=dev --ignore-scripts --no-audit --no-fund`, copies only runtime files/LICENSE, validates the build release hash, and switches to nonroot. No build secrets, auth files, cloud SDKs, tests or simulator are copied. `.dockerignore` and `.gcloudignore` are strict allowlists: package/lock/build files, LICENSE, direct `src/*.js` and `public/*.{html,css,js,svg}`. All other paths—including `.git`, `.codex-evidence`, local env, credential/secret files, `node_modules`, scripts, tests and fixtures—are excluded from build/upload context. `npm run release:files` prints the inspected source-upload inventory (28 files at preparation); the source upload includes `cloudbuild.yaml`, while Docker context/image exclude both that upload-only build recipe and `.gcloudignore`. New nested files require a reviewed allowlist update.
+
+### Parent Cloud Build and first image deployment
+
+Use the explicit `cloudbuild.yaml` with **`gcloud builds submit`**, then deploy its image; do not use automatic `gcloud run deploy --source` builds. The config runs `gcr.io/cloud-builders/docker`, passes `--build-arg RELEASE_COMMIT`, and publishes exactly `us-central1-docker.pkg.dev/raid-relic-hackathon/raid-relic/app:<fullcommit>` through `images`. `_RELEASE_COMMIT` has no default: the parent must supply it. The build rejects anything other than lowercase 40-hex before Docker runs, and Docker independently validates the release identity. `${_RELEASE_COMMIT}` is Cloud Build substitution syntax; `$$RELEASE_COMMIT` escapes the dollar for later quoted Bash expansion, so substitution values are not executed as shell code.
+
+`options.logging` is `CLOUD_LOGGING_ONLY`, compatible with the parent's dedicated builder service account. The config does not select a high-CPU machine or custom pool; it uses the default managed machine for the intended free-tier-eligible build path. Eligibility, remaining billing-account allowances, storage and transfer charges must be checked by the parent; this is not a zero-cost guarantee. No builder/runtime permissions are granted by this config.
+
+Operator-reported preparation, not independently inspected by Codex:
+
+- Parent will provision the isolated Artifact Registry repository **raid-relic**, region **us-central1**, and use a dedicated build service account. The parent must provide that account's scoped repository write, build-source access and Cloud Logging write permissions; no provision/IAM commands were run here.
+- The runtime service account has `secretAccessor` on **only the three required secret objects**, plus `datastore.user`. Build and runtime identities are separate; the builder does not need the application secret values.
+- Parent protected OAuth request logs in the `_Default` sink with an exclusion restricted to service **raid-relic** and OAuth/auth URL paths. Other logs are preserved. This does not prove all possible sinks/proxies redact codes; those remain an operator responsibility. No secret values or log entries were read here.
+
+The following are **parent-only command templates**, after review/commit and repository/SA preparation. Replace the public SA/account/origin and secret-reference placeholders; these are references, not secret values. No actual secrets belong in source uploads, substitutions or build arguments. Use the exact final HTTPS `/auth/callback` for the first deployment.
+
+```sh
+test -z "$(git status --porcelain)"
+RELEASE_COMMIT=$(git rev-parse HEAD)
+test "${#RELEASE_COMMIT}" -eq 40
+git cat-file -e "$RELEASE_COMMIT^{commit}"
+BUILD_SA_RESOURCE='projects/raid-relic-hackathon/serviceAccounts/<dedicated-build-sa-email>'
+RUNTIME_SA_EMAIL='<operator-runtime-sa-email>'
+FOUNDATION_ORIGIN='https://<final-owned-service-host>'
+STREAMER_ID='<parent-resolved-numeric-streamer-id>'
+BOT_ID='<parent-resolved-distinct-numeric-bot-id>'
+CLIENT_SECRET_REF='<operator-client-secret-name>:<pinned-version>'
+TOKEN_KEY_REF='<operator-token-key-name>:<pinned-version>'
+EVENTSUB_SECRET_REF='<operator-eventsub-secret-name>:<pinned-version>'
+IMAGE="us-central1-docker.pkg.dev/raid-relic-hackathon/raid-relic/app:$RELEASE_COMMIT"
+
+gcloud builds submit . \
+  --project=raid-relic-hackathon --region=us-central1 \
+  --config=cloudbuild.yaml --ignore-file=.gcloudignore \
+  --service-account="$BUILD_SA_RESOURCE" \
+  --substitutions="_RELEASE_COMMIT=$RELEASE_COMMIT"
+
+gcloud run deploy raid-relic \
+  --project=raid-relic-hackathon --region=us-central1 \
+  --image="$IMAGE" --service-account="$RUNTIME_SA_EMAIL" \
+  --min=0 --max=1 --port=8080 --timeout=3600s \
+  --set-env-vars="NODE_ENV=production,STATE_STORE=firestore,OAUTH_ENABLED=true,GOOGLE_CLOUD_PROJECT=raid-relic-hackathon,TWITCH_CLIENT_ID=6ggythtvgo572dxu8jo4xoaqtn37ix,TWITCH_STREAMER_ID=$STREAMER_ID,TWITCH_BOT_ID=$BOT_ID,OAUTH_REDIRECT_URI=$FOUNDATION_ORIGIN/auth/callback,OAUTH_REDIRECT_ALLOWLIST=$FOUNDATION_ORIGIN/auth/callback,EVENTSUB_CALLBACK_URL=$FOUNDATION_ORIGIN/eventsub,OVERLAY_ORIGIN=$FOUNDATION_ORIGIN,RELEASE_COMMIT=$RELEASE_COMMIT" \
+  --set-secrets="TWITCH_CLIENT_SECRET=$CLIENT_SECRET_REF,TOKEN_ENCRYPTION_KEY=$TOKEN_KEY_REF,TWITCH_EVENTSUB_SECRET=$EVENTSUB_SECRET_REF"
+```
+
+The command leaves invoker access policy to the parent rather than changing it here. Record the image digest from the build and confirm the deployed revision uses that digest and reviewed commit; a full-commit tag alone is not immutable provenance. Parent should compare runtime manifests below and validate deployed `/health` shows **foundation / not-ready-for-raids** with the same commit. Startup does not invoke Twitch; no real login, chat, subscription, raid or claim action is authorized by these smoke checks. The long WebSocket timeout does not remove active-connection billing or reconnect requirements.
+
+Official references checked for [Cloud Build substitutions](https://docs.cloud.google.com/build/docs/configuring-builds/substitute-variable-values), [user-managed build identity and logging](https://docs.cloud.google.com/build/docs/securing-builds/configure-user-specified-service-accounts), [build submission flags](https://docs.cloud.google.com/sdk/gcloud/reference/builds/submit), [image deploy and secret-reference flags](https://docs.cloud.google.com/sdk/gcloud/reference/run/deploy), and [build pricing/eligibility](https://cloud.google.com/build/pricing). No cloud config was queried or changed by Codex.
+
+After parent review and a reviewed commit, the parent can build and compare runtime file hashes without providing secrets:
+
+```sh
+# Parent only, after the reviewed release is committed and the tree is clean.
+test -z "$(git status --porcelain)"
+RELEASE_COMMIT=$(git rev-parse HEAD)
+git cat-file -e "$RELEASE_COMMIT^{commit}"
+docker build --build-arg RELEASE_COMMIT="$RELEASE_COMMIT" -t raid-relic:foundation .
+node scripts/release-files.js --runtime --json > release-local.json
+docker run --rm --entrypoint node   --mount "type=bind,src=$PWD/scripts/release-files.js,dst=/tmp/release-files.mjs,readonly"   raid-relic:foundation /tmp/release-files.mjs --runtime --json > release-image.json
+diff -u release-local.json release-image.json
+```
+
+The manifest hashes actual runtime files in the reviewed source and built image. Record the reviewed commit plus built/deployed image digest and the deployed health identity; a supplied environment hash alone is not cryptographic proof of source parity. Do not override the image's baked `RELEASE_COMMIT` with an unrelated hash. No commit was made by Codex; these are parent review/build instructions, not completed validation.
+
+For an authorized ephemeral LOCAL image smoke test on registered 5191, use synthetic dev settings, not real secrets. This deliberately validates HTTP/image startup rather than production integrations:
+
+```sh
+docker run --rm --name raid-relic-smoke --read-only --cap-drop=ALL   --security-opt=no-new-privileges   -e NODE_ENV=development -e STATE_STORE=memory -e OAUTH_ENABLED=false   -e TWITCH_EVENTSUB_SECRET=synthetic-container-smoke-secret   -p 127.0.0.1:5191:8080 raid-relic:foundation
+# In a second terminal: check /health and the static page, then stop.
+curl --fail http://127.0.0.1:5191/health
+docker stop raid-relic-smoke
+```
+
+Parent deployed-test checklist (no real raid/chat/login testing is authorized by this preparation):
+
+1. Verify the base tag, lockfile install, nonroot user, runtime-manifest match and local image smoke test; rerun the full 98-test suite with actual loopback sockets. Image runtime testing has not been performed by Codex.
+2. Parent binds named Secret Manager envs, public client/account IDs, exact final callback URI/allowlist, HTTPS overlay origin, approved project and `RELEASE_COMMIT`. Account ID resolution via an app token is parent-operated; Codex makes no Twitch calls. Never paste/print secrets or put them in build args/image layers.
+3. Parent performs the authorized first deployment with single-instance fanout constraints. Check deployed `/health` release hash/phase/readiness and static `/` and `/overlay/<configured-channel>` asset responses. Static asset serving/health does not require a database read or perform automatic Twitch actions. Do not exercise the public snapshot/WebSocket against the real database as an assumed smoke test; actual database integration requires a separately scoped validation.
+4. Confirm the final registered OAuth path matches configuration; the unconfigured callback returns 404. Do not run a real OAuth login, subscription creation, chat send, raid, claim or lineage test under this checklist. Keep the foundation/not-ready-for-raids limitation visible. Stream lifecycle, real database/emulator integration and actual visual/browser/OBS QA remain pending.
+
 ## OAuth connection and required secrets
 
 OAuth is an account connection flow for two preconfigured accounts, not a general login/session or admin authorization system. Set `OAUTH_ENABLED=true` only after supplying all OAuth fields. Production fails closed without OAuth configuration and Firestore selection. No send-chat or subscribe control route is publicly exposed.
@@ -39,19 +125,19 @@ OAuth is an account connection flow for two preconfigured accounts, not a genera
 | Configuration | Requirement |
 | --- | --- |
 | `TWITCH_CLIENT_ID` | Public application ID `6ggythtvgo572dxu8jo4xoaqtn37ix`; not a secret. |
-| `TWITCH_CLIENT_SECRET` | Registered application's secret, supplied by owner through ignored env or a later secret facility. Never log or commit it. |
+| `TWITCH_CLIENT_SECRET` | Registered application's secret, operator-provided and available for parent binding as a named Secret Manager environment variable. Never log or commit it. |
 | `TOKEN_ENCRYPTION_KEY` | Canonical base64 of exactly 32 cryptographically random bytes for AES-256-GCM; identical across instances. A placeholder/password is invalid. Key loss prevents decryption; rotation/migration is not implemented. |
 | `TWITCH_EVENTSUB_SECRET` | Random ASCII webhook HMAC secret, 10–100 characters, shared with subscription transport. Separate from OAuth client secret and encryption key. |
 | `TWITCH_STREAMER_ID`, `TWITCH_BOT_ID` | Distinct numeric Twitch user IDs. Returned token identity must match the configured role's account. This increment supports one streamer and one bot. |
-| `OAUTH_REDIRECT_URI` | Exact registered callback URL ending `/oauth/callback`; no query, fragment, or userinfo. HTTPS required except explicit development `http://localhost`. |
+| `OAUTH_REDIRECT_URI` | Exact registered callback URL ending canonical `/auth/callback` or legacy `/oauth/callback`; no query, fragment, or userinfo. HTTPS required except explicit development `http://localhost`. |
 | `OAUTH_REDIRECT_ALLOWLIST` | Comma-separated exact URLs. Must include the configured canonical URI. No request-controlled redirect is accepted. |
 | `EVENTSUB_CALLBACK_URL` | Owned HTTPS URL ending `/eventsub`, with no query, fragment, or userinfo. Required for subscription creation and production startup. |
 
-**Callback registration mismatch:** the code handles `/oauth/callback`, not the originally registered `/auth/callback` (which returns 404). Configuration rejects `/auth/callback`; there is no alias. Before any local login, the owner must register the exact `http://localhost:5191/oauth/callback` if using that local URI. When deployed, the owner must add the final `https://<owned-host>/oauth/callback` in Twitch app registration and set both redirect env fields to that exact URL. No deployment hostname exists yet; do not treat the example as a registered callback.
+**Exact configured callback only:** canonical `/auth/callback` and legacy `/oauth/callback` are supported configuration choices. Only the path in `OAUTH_REDIRECT_URI` is handled; the other returns 404 and cannot consume OAuth state. Authorization and exchange both use that exact allowlisted URI. Configure/register `http://localhost:5191/auth/callback` for an authorized local login or the final `https://<owned-host>/auth/callback` for the first deployment. Legacy clients can keep their exactly registered `/oauth/callback` URI. Do not treat either example as a verified final registration.
 
-Owner-supplied secrets and tokens are unavailable in this run. No auth or secret files were read. A local placeholder does not create a usable Twitch grant.
+The operator reports secrets are available for the parent to bind through named Secret Manager environment variables (`TWITCH_CLIENT_SECRET`, `TOKEN_ENCRYPTION_KEY`, `TWITCH_EVENTSUB_SECRET`). Codex has not read, received, printed or verified their values. No auth or secret files were read. Secret availability is not a connected OAuth grant: actual streamer/bot authorization remains separate.
 
-`GET /oauth/streamer/start` requests `channel:bot channel:manage:raids`. The raid grant is included now for the owner-committed Raid Send Off feature so consent need not be redone when it is implemented; Send Off itself is still pending. `GET /oauth/bot/start` requests `user:read:chat user:write:chat user:bot`. The bot/chat grants support the selected webhook design without relying on bot moderator status. Validation requires both streamer grants; an older chat-only grant must reconnect. `/oauth/callback` exchanges the code using the exact configured redirect, validates client ID, account, scopes and positive expiry, then stores only encrypted access/refresh tokens. Callback errors are generic and never echo provider error descriptions, authorization codes, client secrets, or tokens. The application has no token/request logging; infrastructure request-log redaction still needs review before any live callback URLs are used.
+`GET /oauth/streamer/start` requests `channel:bot channel:manage:raids`. The raid grant is included now for the owner-committed Raid Send Off feature so consent need not be redone when it is implemented; Send Off itself is still pending. `GET /oauth/bot/start` requests `user:read:chat user:write:chat user:bot`. The bot/chat grants support the selected webhook design without relying on bot moderator status. Validation requires both streamer grants; an older chat-only grant must reconnect. The configured callback exchanges the code using the exact configured redirect, validates client ID, account, scopes and positive expiry, then stores only encrypted access/refresh tokens. Callback errors are generic and never echo provider error descriptions, authorization codes, client secrets, or tokens. The application has no token/request logging; the parent reports a narrow `_Default` sink exclusion for this service’s OAuth/auth paths; review other sinks/proxies before live callbacks.
 
 State and browser secrets use 32 random bytes each. Five-minute state records contain only hashes, role and expiry. The state is consumed atomically with a matching browser hash; valid denial/code-error callbacks consume it too. Replay, expiry, cookie duplication, wrong browser, duplicate query parameters, wrong role/account, and unknown callback parameters fail closed. The browser cookie is HttpOnly, SameSite=Lax, Path=/; HTTPS uses Secure and the `__Host-` prefix. It is cleared after callback. Starting another flow in the same browser replaces the cookie; complete one connection at a time.
 
@@ -120,7 +206,7 @@ The canonical workspace `config/dev-ports.json` was merged with Raid Relic on **
 1. Run `npm test` and `node --test --test-isolation=none`; inspect named skips, not just the file summary. On a host allowing loopback listen, the four real WebSocket tests run at fixed `127.0.0.1:5191` and close their servers/sockets. Do not run another service on 5191 concurrently.
 2. For an authorized manual local test only, run `node scripts/simulate-overlay.js`, then visit `http://127.0.0.1:5191/overlay/111` and its `?corner=1` variant. The launcher binds loopback only, uses explicit synthetic stream/users/marks, and shows **Local simulator · test data**. It refuses production and is never imported by the production server. No fixture mutation endpoint exists. Stop with Ctrl-C.
 3. Verify transparent composition, reduced motion, 160px mode, no-state, disconnect/reconnect, and approved-rune removal before claiming browser/OBS readiness. The parent verified host Chromium launch with sandboxing enabled, but screenshot saving under the workspace failed with Permission denied (13); no saved screenshot or visual proof exists. Codex sandbox Chromium launch and loopback listen remain restricted. The parent ran and stopped the labelled simulator and loopback test servers on 5191; none was left running.
-4. For non-simulator runtime, configure the channel and exact production origin (plus existing required OAuth/Firestore config). Do not seed or fabricate stream state: until trusted lifecycle integration provides it, the overlay must show waiting. Do not deploy or perform live integration checks in this run.
+4. For non-simulator runtime, configure the channel and exact production origin (plus existing required OAuth/Firestore config). Do not seed or fabricate stream state: until trusted lifecycle integration provides it, the overlay must show waiting. Codex does not deploy or perform live integration checks; the parent follows the authorized foundation release checklist above.
 
 ## Store and architecture
 
@@ -140,7 +226,7 @@ The operator reports the following cloud facts as verified for `raid-relic-hacka
 - A project-specific **GBP 1 monthly budget** has **50/90/100% actual-spend alerts** and default IAM email recipients enabled.
 - The default Firestore database is **native Standard**, located in **`us-central1`**, with **`freeTier=true`** and **PITR disabled**.
 - Cloud Run, Firestore, Secret Manager and billing control APIs are enabled.
-- **No Cloud Run service is deployed. No client secret is present.**
+- At the last operator report, no Cloud Run service was deployed. The owner now authorizes the FIRST foundation deployment by the parent; operator-provided secrets are available for parent environment binding, without values disclosed to Codex.
 
 Budget alerts are not a spending cap, and scale-to-zero is not a zero-cost guarantee. Actual database/emulator integration remains **UNTESTED** despite the database being provisioned by the operator. No cloud operations, deploys, IAM/billing changes, or costs were initiated by Codex. Do not commit until parent review.
 

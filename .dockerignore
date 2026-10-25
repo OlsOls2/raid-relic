@@ -1,0 +1,14 @@
+# Strict build allowlist: secrets, evidence, tests and simulator never enter context.
+**
+!package.json
+!package-lock.json
+!Dockerfile
+!.dockerignore
+!LICENSE
+!src/
+!src/*.js
+!public/
+!public/*.html
+!public/*.css
+!public/*.js
+!public/*.svg

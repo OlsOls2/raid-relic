@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { createMemoryState } from './state.js';
 import { parseChat } from './bot.js';
 import { createMarkService } from './marks.js';
+import { validateReleaseCommit } from './release.js';
 
 export const MAX_BODY_BYTES = 65536;
 export const REPLAY_WINDOW_MS = 10 * 60 * 1000;
@@ -19,15 +20,16 @@ const assets = new Map([
 const header = (headers, name) => typeof headers[name] === 'string' ? headers[name] : '';
 const result = (status, body = '', type = 'text/plain; charset=utf-8') => ({ status, body, type });
 
-export function createApp({ secret, state = createMemoryState(), now = Date.now, oauth, chatContext, overlayFeed } = {}) {
+export function createApp({ secret, state = createMemoryState(), now = Date.now, oauth, chatContext, overlayFeed, releaseCommit } = {}) {
+  const release = validateReleaseCommit(releaseCommit);
   // Pure request boundary for tests: rawBody is never reserialized before HMAC.
   async function dispatch({ method, path, headers = {}, rawBody = Buffer.alloc(0) }) {
-    if (path.startsWith('/oauth/')) {
+    if (path.startsWith('/oauth/') || (oauth && path.split('?')[0] === oauth.callbackPath)) {
       if (!oauth) return result(503, 'OAuth not configured');
       return oauth.route({ method, path, headers });
     }
     if (method === 'GET' && path === '/health') {
-      return result(200, JSON.stringify({ status: 'ok' }), 'application/json');
+      return result(200, JSON.stringify({ status: 'ok', releaseCommit: release, phase: 'foundation', readiness: 'not-ready-for-raids' }), 'application/json');
     }
     if (method === 'GET' && overlayFeed && path === `/api/overlay/${overlayFeed.channel}`) {
       return result(200, JSON.stringify(await overlayFeed.snapshot()), 'application/json');

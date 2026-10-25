@@ -1,0 +1,16 @@
+# Strict source-upload allowlist; do not include .gitignore (which permits evidence).
+**
+!package.json
+!package-lock.json
+!Dockerfile
+!cloudbuild.yaml
+!.dockerignore
+!.gcloudignore
+!LICENSE
+!src/
+!src/*.js
+!public/
+!public/*.html
+!public/*.css
+!public/*.js
+!public/*.svg

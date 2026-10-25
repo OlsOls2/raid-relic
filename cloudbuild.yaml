@@ -1,0 +1,19 @@
+# Parent-operated build only. _RELEASE_COMMIT is required; no default or loose substitutions.
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    env:
+      - 'RELEASE_COMMIT=${_RELEASE_COMMIT}'
+    args:
+      - '-ceu'
+      - |
+        if [[ ! "$$RELEASE_COMMIT" =~ ^[a-f0-9]{40}$$ ]]; then
+          echo 'A full lowercase 40-character _RELEASE_COMMIT is required.' >&2
+          exit 1
+        fi
+        docker build --build-arg "RELEASE_COMMIT=$$RELEASE_COMMIT" --tag "us-central1-docker.pkg.dev/raid-relic-hackathon/raid-relic/app:$$RELEASE_COMMIT" .
+images:
+  - 'us-central1-docker.pkg.dev/raid-relic-hackathon/raid-relic/app:${_RELEASE_COMMIT}'
+options:
+  logging: CLOUD_LOGGING_ONLY
+# Omit machineType/pool: use the default managed build machine, no custom pool.

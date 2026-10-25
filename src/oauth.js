@@ -15,7 +15,7 @@ export function createOAuth({ clientId, clientSecret, redirectUri, redirectAllow
   transport = httpTransport, now = Date.now, production = false }) {
   if (!clientId || !clientSecret || !store || !/^\d+$/.test(streamerId ?? '') || !/^\d+$/.test(botId ?? '') || streamerId === botId) throw new Error('OAuth configuration required');
   const redirect = new URL(redirectUri);
-  if (!Array.isArray(redirectAllowlist) || !redirectAllowlist.includes(redirectUri) || redirect.href !== redirectUri || redirect.pathname !== '/oauth/callback'
+  if (!Array.isArray(redirectAllowlist) || !redirectAllowlist.includes(redirectUri) || redirect.href !== redirectUri || !['/auth/callback', '/oauth/callback'].includes(redirect.pathname)
     || redirect.search || redirect.hash || redirect.username || redirect.password
     || (redirect.protocol !== 'https:' && !(redirect.protocol === 'http:' && redirect.hostname === 'localhost' && !production))) throw new Error('Invalid OAuth redirect configuration');
   const cipher = createTokenCipher(encryptionKey);
@@ -77,7 +77,7 @@ export function createOAuth({ clientId, clientSecret, redirectUri, redirectAllow
         auth.search = new URLSearchParams({ client_id: clientId, redirect_uri: redirectUri, response_type: 'code', scope: SCOPES[role].join(' '), state, force_verify: 'true' }).toString();
         return response(302, '', { location: auth.href, 'set-cookie': cookie(browser, 300) });
       }
-      if (url.pathname !== '/oauth/callback') return response(404, 'Not found');
+      if (url.pathname !== redirect.pathname || path.split('?')[0] !== redirect.pathname) return response(404, 'Not found');
       const failure = () => response(400, 'Authorization failed; start again', { 'set-cookie': cookie('', 0) });
       for (const key of url.searchParams.keys()) if (!['state', 'code', 'error', 'error_description', 'scope'].includes(key) || url.searchParams.getAll(key).length !== 1) return failure();
       const state = url.searchParams.get('state');
@@ -99,5 +99,5 @@ export function createOAuth({ clientId, clientSecret, redirectUri, redirectAllow
       return response(400, 'Authorization failed; start again', { 'set-cookie': cookie('', 0) });
     }
   }
-  return { route, accessToken };
+  return { route, accessToken, callbackPath: redirect.pathname };
 }
