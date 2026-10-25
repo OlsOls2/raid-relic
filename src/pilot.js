@@ -1,3 +1,4 @@
+import { subscriptionFailureDiagnostic } from './subscriptions.js';
 import { randomBytes } from 'node:crypto';
 import { hash } from './crypto.js';
 import { parseLifecycle } from './lifecycle.js';
@@ -5,7 +6,7 @@ import { handoffView } from './public-view.js';
 import { httpTransport } from './oauth.js';
 
 export const KEEPERS = Object.freeze({ '1591805230': 'raidrelichq', '1591806023': 'olsols2' });
-export function createPilot({ state, store, oauth, subscriptions, sends, now = Date.now, simulator = false, clientId, transport = httpTransport }) {
+export function createPilot({ state, store, oauth, subscriptions, sends, now = Date.now, simulator = false, clientId, transport = httpTransport, logger = line => console.warn(line) }) {
   const ids = Object.keys(KEEPERS);
   const actions = id => ['bootstrap', 'keep', 'pause', 'resume', 'opt-out', 'process', `send:${ids.find(other => other !== id)}`];
   async function mutate(id, action) {
@@ -25,10 +26,12 @@ export function createPilot({ state, store, oauth, subscriptions, sends, now = D
     if (!await store.acquireJob(id, owner, now())) return { status: 'busy' };
     // Capture both baseline and observation start before ANY network effects.
     const started = now(); const baseline = hash(JSON.stringify(await state.getStreamStatus(id) ?? null));
-    let result;
+    let result; let stage = 'subscriptions';
     try {
       const reconciled = await subscriptions[id].reconcile({ readiness: true });
+      stage = 'keeper-grant';
       const token = await oauth.accessTokenForKeeper(id);
+      stage = 'stream-observation';
       const response = await transport(`https://api.twitch.tv/helix/streams?user_id=${id}`, { headers: { Authorization: `Bearer ${token}`, 'Client-Id': clientId } });
       if (response.status !== 200 || !Array.isArray(response.data?.data) || response.data.data.length > 1) throw new Error('Stream observation failed');
       const stream = response.data.data[0]; let event;
@@ -39,9 +42,15 @@ export function createPilot({ state, store, oauth, subscriptions, sends, now = D
           event: { broadcaster_user_id: id, id: stream.id, type: stream.type, started_at: stream.started_at } }, id, started);
       }
       event.provenance = 'helix-observation';
+      stage = 'observation-commit';
       const observation = await state.accept({ id: `observation:${owner}`, now: now(), sentAt: started, expiresAt: now() + 600000, observation: { baseline, event } });
       result = { status: 'reconciled', subscriptions: reconciled.results, conditions: reconciled.conditions, ready: reconciled.ready, observation };
-    } catch { result = { status: 'failed', ready: false, message: 'Bootstrap failed; review grants and retry explicitly' }; }
+    } catch (error) {
+      result = { status: 'failed', ready: false, message: 'Bootstrap failed; review grants and retry explicitly', diagnostic: subscriptionFailureDiagnostic(error) ?? { stage } };
+      // One JSON warning per failed explicit attempt. Never reflect an error,
+      // upstream body, request URL/header or token. Logging cannot fail the job.
+      try { await logger(JSON.stringify({ severity: 'WARNING', event: 'raid_relic_bootstrap_failed', keeperId: id, diagnostic: result.diagnostic })); } catch { /* Preserve bootstrap outcome. */ }
+    }
     await store.finishJob(id, owner, result); return result;
   }
   return {

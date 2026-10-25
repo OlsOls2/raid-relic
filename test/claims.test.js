@@ -279,3 +279,11 @@ test('Firestore oversized serialized history aborts final claim with all records
   await assert.rejects(f.apps[source].dispatch(request), /Lineage capacity reached/);
   assert.deepEqual([...f.db.docs], before); assert.equal((await f.state.getKeeperRegistry()).holderId, source);
 });
+
+for (const kind of ['memory', 'firestore']) test(`${kind}: actual Twitch empty opposite raid condition still opens verified handoff and atomic claim`, async () => {
+  const f = fixture(kind); await f.setup(); f.advance(1000);
+  await f.raid(target, { condition: { from_broadcaster_user_id: source, to_broadcaster_user_id: '' } });
+  assert.equal((await f.state.getKeeperRegistry()).pendingHop.to, target);
+  await finish(f); assert.equal((await f.state.getKeeperRegistry()).holderId, target);
+  assert.equal((await f.state.getPublicJourney()).rings, 1);
+});

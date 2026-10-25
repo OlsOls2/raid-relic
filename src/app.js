@@ -1,3 +1,4 @@
+import { matchesSubscriptionCondition } from './subscriptions.js';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { createMemoryState } from './state.js';
@@ -134,8 +135,8 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
           || !Number.isInteger(raid.viewers) || raid.viewers < 0 || raid.viewers > 1000000) return result(400, 'Invalid raid');
         if (chatContext) {
           const condition = subscription.condition ?? {};
-          const incoming = Object.keys(condition).length === 1 && keepers.includes(condition.to_broadcaster_user_id) && raid.to_broadcaster_user_id === condition.to_broadcaster_user_id;
-          const outgoing = Object.keys(condition).length === 1 && keepers.includes(condition.from_broadcaster_user_id) && raid.from_broadcaster_user_id === condition.from_broadcaster_user_id;
+          const incoming = matchesSubscriptionCondition('channel.raid', condition, { to_broadcaster_user_id: raid.to_broadcaster_user_id }) && keepers.includes(condition.to_broadcaster_user_id) && raid.to_broadcaster_user_id === condition.to_broadcaster_user_id;
+          const outgoing = matchesSubscriptionCondition('channel.raid', condition, { from_broadcaster_user_id: raid.from_broadcaster_user_id }) && keepers.includes(condition.from_broadcaster_user_id) && raid.from_broadcaster_user_id === condition.from_broadcaster_user_id;
           if (!incoming && !outgoing) return result(400, 'Invalid raid condition');
         }
       }
