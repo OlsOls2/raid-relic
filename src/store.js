@@ -5,7 +5,7 @@ import { echoCandidate, reduceEcho, echoView } from './resonance.js';
 import { forgeMutation } from './forge.js';
 import { recapProjection } from './recap.js';
 import { chronicleMutation } from './chronicle.js';
-import { ackDocument, ackSeen, ackStep, completionAck } from './claim-ack.js';
+import { ackDocument, ackSeen, ackStep, completionAck, completionEligible, cancelCompletionNotices } from './claim-ack.js';
 import { hash as observationHash } from './crypto.js';
 import { atlasPage, atlasSearch, movedToView, claimMeterView, handoffView, withCarriedMarks, withIncomingPreview, keeperCandidates } from './public-view.js';
 import { reduceClaims, publicJourney } from './claims.js';
@@ -70,7 +70,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
       return db.runTransaction(async tx => {
         const eventRef = ref('events', id);
         const existing = await tx.get(eventRef);
-        if (existing.exists && existing.data().expiresAt >= now) return 'duplicate';
+        if (existing.exists && existing.data().expiresAt >= now) return existing.data().completionAcks ? {status:'duplicate',completionAcks:existing.data().completionAcks} : 'duplicate';
         const pk = presenceKey(chat); const proofRef = pk ? ref('events', pk) : null;
         const previousProof = proofRef ? (await tx.get(proofRef)).data() : null;
         const proofSeen = previousProof && previousProof.expiresAt >= now;
@@ -104,10 +104,8 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
           tx.set(eventRef, { expiresAt }); if (next) tx.set(ref('keeperRegistry', 'single'), next);
           return next ? 'resonance' : 'accepted';
         }
-        const raidAckRef = managed && raid ? ref('claimAcks', raid.to_broadcaster_user_id) : null;
-        const raidAckPrevious = raidAckRef ? (await tx.get(raidAckRef)).data() : null;
-        const ackRef = managed && host ? ref('claimAcks', host) : null;
-        const ackDoc = ackRef ? (await tx.get(ackRef)).data() : null;
+        const ackMap={};if(managed)for(const target of config.channels)ackMap[target]=(await tx.get(ref('claimAcks',target))).data();
+        const ackRef=managed&&host?ref('claimAcks',host):null, ackDoc=ackMap[host];
         const scoreAckRef = managed && isScoreCommand(chat) ? ref('scoreAcks', host) : null;
         const scoreAckPrevious = scoreAckRef ? (await tx.get(scoreAckRef)).data() : null;
         const channel = channelMap[host];
@@ -131,7 +129,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
           const op = raid ? { type: 'raid', raid, id, sentAt } : chat?.markAction?.type === 'send'
             ? { type: 'reserve', source: host, actor: chat.chatterId, login: chat.markAction.login, id, sentAt } : { type: 'noop' };
           sending = sendState(transition?.registry ?? registry, channelMap, markMap, config, op, now);
-          claiming = reduceClaims(sending.registry, channelMap, markMap, lineage, ackSeen(ackDoc, chat, now) ? null : chat, now, sentAt, presenceNext);
+          claiming = reduceClaims(sending.registry, channelMap, markMap, lineage, (proofSeen || ackSeen(ackDoc, chat, now)) ? null : chat, now, sentAt, presenceNext);
         }
         if (claiming && chat?.markAction?.type === 'mymarks') claiming.marks[host] = reserveShare(claiming.marks[host], claiming.lineage, chat, share, now);
         if (claiming) {
@@ -141,13 +139,14 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
           if (scores || scoreNext.doc.players.length || scoreNext.doc.receipts.length) tx.set(scoreRef, scoreNext.doc);
         }
         if (proofRef && !proofSeen) tx.set(proofRef, { expiresAt: now + 600000 });
-        let raidAck;
-        if (raid && claiming?.registry.pendingHop?.finalized && !registry?.pendingHop?.finalized) {
-          const h = claiming.registry.pendingHop; raidAck = completionAck(raidAckPrevious, h.to, id, h.endsAt, now); raidAck.host = h.to; tx.set(raidAckRef, raidAck.doc);
-        }
+        const ackUpdates=new Map();if(claiming&&ackRef)ackUpdates.set(host,ackDocument(ackDoc,isScoreCommand(chat)?null:chat,claiming.acknowledgement,transition?.channel,claiming.marks[host],now,claiming.ackDeadline,claiming.acknowledgementKind));
+        if(managed && (['forgetme','pause','opt-out','block'].includes(chat?.markAction?.type)||event?.type==='ban'))for(const target of config.channels){const c=channelMap[target],m=claiming.marks[target],d=ackMap[target];ackUpdates.set(target,cancelCompletionNotices(ackDocument(ackUpdates.get(target)??d,chat,null,c,m,now)));}
+        const completionAcks=[];let completionSkipped=0;
+        if(claiming?.completedScore){const h=claiming.registry.pendingHop;for(const target of[h.from,h.to]){const value=completionAck(ackUpdates.get(target)??ackMap[target],target,h.eventId,h.endsAt,now,h,channelMap);ackUpdates.set(target,value.doc);if(value.key)completionAcks.push({host:target,key:value.key});else completionSkipped++;}}
+        for(const[target,doc]of ackUpdates)tx.set(ref('claimAcks',target),doc);
         if (managed) for (const [key, doc] of Object.entries(presenceNext)) tx.set(ref('presence', key), doc);
-        if (claiming && ackRef) tx.set(ackRef, ackDocument(ackDoc, isScoreCommand(chat) ? null : chat, claiming.acknowledgement, transition?.channel, claiming.marks[host], now, claiming.ackDeadline, claiming.acknowledgementKind));
-        tx.set(eventRef, { expiresAt });
+        tx.set(eventRef, {expiresAt,...(completionAcks.length?{completionAcks}:{})});
+        if(proofRef&&!proofSeen)tx.set(proofRef,{expiresAt:now+600000,...(completionAcks.length?{completionAcks}:{})});
         if (transition) { tx.set(ref('keeperRegistry', 'single'), transition.registry); tx.set(ref('streamChannels', host), transition.channel); }
         if (raid && !config) tx.set(ref('rituals', raid.to_broadcaster_user_id), ritualFor(id, now, raid));
         if (sending) { tx.set(ref('keeperRegistry', 'single'), sending.registry); if (sending.ritual) tx.set(ref('rituals', raid.to_broadcaster_user_id), sending.ritual); }
@@ -159,7 +158,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         }
         if (receipt && receipt.chatterId === chat?.chatterId) tx.delete(receiptRef);
         if (chat && !chat.markAction) tx.set(ref('chatReceipts', chat.broadcasterId), { messageId: chat.messageId, chatterId: chat.chatterId, receivedAt: now });
-        return raidAck ? { status: 'accepted', completionAck: { host: raidAck.host, key: raidAck.key } } : observation ? (transition.channel.lifecycleAt === event.sentAt && transition.channel.lifecycleSource === 'helix-observation' ? 'applied' : 'no-change') : sending?.result ?? 'accepted';
+        return (completionAcks.length||completionSkipped) ? {status:'accepted',completionAcks,completionSkipped} : (proofSeen&&previousProof?.completionAcks) ? {status:'accepted',completionAcks:previousProof.completionAcks} : observation ? (transition.channel.lifecycleAt === event.sentAt && transition.channel.lifecycleSource === 'helix-observation' ? 'applied' : 'no-change') : sending?.result ?? 'accepted';
       });
     },
     async scoreAckStep(host, op, now) {
@@ -172,7 +171,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
       return db.runTransaction(async tx => {
         const doc = ref('claimAcks', host), previous = (await tx.get(doc)).data();
         const channel = (await tx.get(ref('streamChannels', host))).data(), marks = (await tx.get(ref('markChannels', host))).data();
-        const next = ackStep(previous, op, channel, marks, now); tx.set(doc, next.doc); return next.result;
+        const registry=(await tx.get(ref('keeperRegistry','single'))).data(),channels={},markMap={};for(const id of config.channels){channels[id]=(await tx.get(ref('streamChannels',id))).data();markMap[id]=(await tx.get(ref('markChannels',id))).data();}const next = ackStep(previous, op, channel, marks, now, completionEligible(previous,op.key,registry,channels,markMap,now)); tx.set(doc, next.doc); return next.result;
       });
     },
     async getRitual(hostId) { return (await ref('rituals', hostId).get()).data(); },
@@ -199,6 +198,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
           const presenceMap = {};
           for (const key of config.channels) { channelMap[key] = (await tx.get(ref('streamChannels', key))).data(); markMap[key] = (await tx.get(ref('markChannels', key))).data(); presenceMap[key] = (await tx.get(ref('presence', key))).data(); }
           const ackRef = ref('claimAcks', host), ackDoc = (await tx.get(ackRef)).data();
+        const otherAcks={};for(const target of config.channels)if(target!==host)otherAcks[target]=(await tx.get(ref('claimAcks',target))).data();
         const scoreRef = ref('scoreboard','single'), scores = (await tx.get(scoreRef)).data();
           const transition = reduceLifecycle({ registry, channel, marks: previous, host, chat: { ...actor, markAction: action }, now, sentAt: now });
           channelMap[host] = transition.channel; markMap[host] = transition.marks;
@@ -206,7 +206,8 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
           const checked = reduceClaims(transition.registry, channelMap, markMap, history, null, now, now, presenceMap);
           if (scores) tx.set(scoreRef, reduceScores(scores, { channels: channelMap, marks: checked.marks, chat: { ...actor, markAction: action }, now }).doc);
         for (const [key, doc] of Object.entries(presenceMap)) tx.set(ref('presence', key), doc);
-        tx.set(ackRef, ackDocument(ackDoc, { ...actor, markAction: action }, null, transition.channel, transition.marks, now));
+        if(['forgetme','pause','opt-out','block'].includes(action.type))for(const[target,doc]of Object.entries(otherAcks))tx.set(ref('claimAcks',target),cancelCompletionNotices(doc));
+        tx.set(ackRef, ackDocument(['forgetme','pause','opt-out','block'].includes(action.type)?cancelCompletionNotices(ackDoc):ackDoc, { ...actor, markAction: action }, null, transition.channel, transition.marks, now));
           tx.set(ref('lineage', 'single'), checked.lineage);
           tx.set(ref('keeperRegistry', 'single'), checked.registry); tx.set(ref('streamChannels', host), transition.channel); next = transition.marks;
         } else next = reduceMark(previous, host, actor, action, now);
@@ -253,6 +254,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         const presenceMap = {};
           for (const key of config.channels) { channelMap[key] = (await tx.get(ref('streamChannels', key))).data(); markMap[key] = (await tx.get(ref('markChannels', key))).data(); presenceMap[key] = (await tx.get(ref('presence', key))).data(); }
         const ackRef = ref('claimAcks', host), ackDoc = (await tx.get(ackRef)).data();
+        const otherAcks={};for(const target of config.channels)if(target!==host)otherAcks[target]=(await tx.get(ref('claimAcks',target))).data();
         const scoreRef = ref('scoreboard','single'), scores = (await tx.get(scoreRef)).data();
         const next = reduceLifecycle({ registry, channel, marks, host, policy, now, sentAt: now });
         channelMap[host] = next.channel; markMap[host] = next.marks;
@@ -260,7 +262,8 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         const checked = reduceClaims(next.registry, channelMap, markMap, history, null, now, now, presenceMap);
         if (scores) tx.set(scoreRef, reduceScores(scores, { channels: channelMap, marks: checked.marks, now }).doc);
         for (const [key, doc] of Object.entries(presenceMap)) tx.set(ref('presence', key), doc);
-        tx.set(ackRef, ackDocument(ackDoc, { broadcasterId: host }, null, next.channel, next.marks, now));
+        for(const[target,doc]of Object.entries(otherAcks))tx.set(ref('claimAcks',target),cancelCompletionNotices(doc));
+        tx.set(ackRef, ackDocument(cancelCompletionNotices(ackDoc), { broadcasterId: host }, null, next.channel, next.marks, now));
         tx.set(ref('lineage', 'single'), checked.lineage);
         tx.set(ref('keeperRegistry', 'single'), checked.registry); tx.set(ref('streamChannels', host), next.channel); tx.set(ref('markChannels', host), next.marks);
       });

@@ -156,7 +156,7 @@ for (const kind of ['memory', 'firestore']) {
       if (mode === 'finalize') f.runtime.state.claimAckStep = (...args) => { if (args[1].type === 'finish') throw Error('synthetic-finalize'); return step(...args); };
       assert.equal((await f.runtime.dispatch(original)).status, 204); f.runtime.state.claimAckStep = step;
       assert.equal((await f.runtime.dispatch(original)).status, 204);
-      assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages')).length, before + 1); assert.equal((await f.runtime.state.getPublicJourney()).rings, 1); assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, OTHER);
+      assert.equal(f.calls.filter(c => c.url.endsWith('/chat/messages')).length, before + 2); assert.equal((await f.runtime.state.getPublicJourney()).rings, 1); assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, OTHER);
     }
   });
 }

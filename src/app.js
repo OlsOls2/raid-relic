@@ -1,6 +1,6 @@
 import { canonicalLogin, shareRequestHash } from './my-marks.js';
 import { parseBan } from './bans.js';
-import { ackKey, completionAckKey } from './claim-ack.js';
+import { ackKey } from './claim-ack.js';
 import { matchesSubscriptionCondition } from './subscriptions.js';
 import { strictJSON, templateDesign, forgeResult } from './forge.js';
 import { recapSVG } from './recap.js';
@@ -237,7 +237,8 @@ export function createApp({ scoreAcks, claimAcks, secret, state = createMemorySt
     const share = chat?.markAction?.type === 'mymarks' && shares && !chat.isBot && !chat.copied && chat.chatterLogin && (!chat.markAction.login || chat.markAction.login === chat.chatterLogin) ? shares.issue(chat.broadcasterId, chat.chatterId, receivedAt, chat.chatterLogin) : undefined;
     const accepted = await state.accept({ share, id, now: receivedAt, sentAt, expiresAt: sentAt + REPLAY_WINDOW_MS, raid, chat, lifecycle });
     if (accepted === 'full') return result(503, 'Event capacity reached');
-    if (claimAcks && raid) { try { await claimAcks.process(raid.to_broadcaster_user_id, completionAckKey(raid.to_broadcaster_user_id, id)); } catch {} }
+    if(claimAcks&&Array.isArray(accepted?.completionAcks))for(const row of accepted.completionAcks.slice(0,2)){try{await claimAcks.process(row.host,row.key);}catch{}}
+    if(accepted?.completionSkipped){try{console.warn(JSON.stringify({severity:'WARNING',event:'raid_relic_completion_ack_capacity',skipped:Math.min(2,accepted.completionSkipped)}));}catch{}}
     // Exact proven request only; duplicates can recover an unclaimed row, never another viewer's.
     if (share && replies) {
       try { await replies.processPending(chat.broadcasterId, shareRequestHash(chat)); } catch { /* No sensitive diagnostics or post-response worker. */ }

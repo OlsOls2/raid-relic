@@ -51,8 +51,8 @@ try {
   stage = 'post-expiry-send'; f.advance(); const send = await f.control(HOME, `send:${OTHER}`); if (JSON.parse(send.body).status !== 'accepted') throw Error('mock send blocked');
   stage = 'verified-raid'; f.advance(); await f.raid(HOME, OTHER, 2);
   stage = 't1-votes-ack'; await f.chat(HOME, HOME, '!offer'); await f.chat(OTHER, OTHER, '!accept');
-  for (const host of [HOME, OTHER]) { const doc = await f.runtime.state.getPrivateClaimAcks(host); if (doc.rows.filter(r => r.status === 'sent').length !== 1) throw Error('mock ACK not sent'); }
-  if ((await f.runtime.state.getPublicJourney()).rings !== 1 || f.calls.filter(c => c.url.endsWith('/chat/messages')).length !== 2) throw Error('Mocked T1/ACK failed');
+  for (const host of [HOME, OTHER]) { const doc = await f.runtime.state.getPrivateClaimAcks(host); if (doc.rows.filter(r => r.status === 'sent').length !== (host===HOME?2:1)) throw Error('mock ACK not sent'); }
+  if ((await f.runtime.state.getPublicJourney()).rings !== 1 || f.calls.filter(c => c.url.endsWith('/chat/messages')).length !== 3) throw Error('Mocked T1/ACK failed');
   // #account exists in initial HTML: it cannot prove the async status fetch rendered.
   // Arm status BEFORE navigation, then assert both response and committed DOM.
   const statusReload = page.waitForResponse(r => new URL(r.url()).pathname === `/control/${HOME}/status` && r.request().method() === 'GET');
@@ -90,7 +90,7 @@ try {
   if (pageErrors.length) throw Error('control page error');
   stage = 'simulator-label'; await page.evaluate(() => { const label = document.createElement('p'); label.textContent = 'SIMULATOR · LOCAL MOCK ONLY · NO REAL CHAT/RAID'; document.body.prepend(label); document.title = 'SIMULATOR claims'; });
   // Functional hotfix gate only: no screenshot capture or visual-proof assertion.
-  checks.push({ name: 'SIMULATOR T1 two-account claim, two SENT ACKs and postclaim control response/DOM', passed: true });
+  checks.push({ name: 'SIMULATOR T1 two-account claim, three SENT ACKs including both completion channels and postclaim control response/DOM', passed: true });
   stage = 'complete';
 } catch (error) { failure = true; failureCategory = ['EPERM', 'EADDRINUSE', 'ENOENT'].includes(error?.code) ? error.code : pageErrors.length ? 'page-error' : error?.name === 'TimeoutError' ? 'timeout' : 'assertion-or-browser'; }
 finally {

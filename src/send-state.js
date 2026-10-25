@@ -113,7 +113,9 @@ export function sendState(previous, channels, marks, config, op, now) {
       && eligible(registry, channels, marks, source, target, retired)
       && sentAt >= Math.max(sourceStartedAt, channels[target].startedAt, channels[source].consentAt, channels[target].consentAt)) {
       registry.raidWatermark = sentAt;
-      const preclaim = registry.pendingHop?.policy === 'preclaim-v1' && registry.pendingHop.intentId === intent?.id ? registry.pendingHop : null;
+      const candidate=registry.pendingHop;
+      const preclaim = candidate?.policy === 'preclaim-v1' && candidate.intentId === intent?.id
+        && candidate.from===source && candidate.to===target && candidate.sourceStreamId===sourceStreamId && candidate.targetStreamId===channels[target].streamId ? candidate : null;
       registry.pendingHop = { eventId: hash(id), from: source, to: target, phase: 'pending-handoff', origin: correlated ? 'planned' : 'manual',
         sourceStreamId: sourceStreamId, targetStreamId: channels[target].streamId, retiredSource: Boolean(retired),
         raidSentAt: sentAt, raidSize: raid.viewers, threshold: claimThreshold(raid.viewers), thresholdPolicy: 'small-raid-v2', offers: [], accepts: [],

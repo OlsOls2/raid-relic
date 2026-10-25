@@ -32,12 +32,17 @@ export function reduceClaims(registry, channels, marks, previous, chat, now, sen
       && source?.retiredStream?.streamId === hop.sourceStreamId
       && Number.isFinite(hop.raidSentAt) && hop.raidSentAt >= source.retiredStream.startedAt
       && hop.raidSentAt <= source.retiredStream.offlineAt;
+    const reservedRetired = hop.policy === 'preclaim-v1' && !hop.verified && hop.intentId === registry.send?.id
+      && ['accepted','unknown','dispatching'].includes(registry.send?.status) && !source?.online && source?.streamId === null
+      && source?.retiredStream?.streamId === hop.sourceStreamId && Number.isFinite(hop.acceptedAt)
+      && hop.acceptedAt >= source.retiredStream.startedAt && hop.acceptedAt <= source.retiredStream.offlineAt;
+    const sourceRetired = retired || reservedRetired;
     const valid = Number.isInteger(hop.threshold) && hop.threshold >= 1 && hop.threshold <= 10
-      && Array.isArray(hop.offers) && Array.isArray(hop.accepts) && now < hop.endsAt && eligible(registry, channels, marks, hop.from, hop.to, retired)
-      && (retired ? source.retiredStream.streamId : source?.streamId) === hop.sourceStreamId
+      && Array.isArray(hop.offers) && Array.isArray(hop.accepts) && now < hop.endsAt && eligible(registry, channels, marks, hop.from, hop.to, sourceRetired)
+      && (sourceRetired ? source.retiredStream.streamId : source?.streamId) === hop.sourceStreamId
       && target?.streamId === hop.targetStreamId;
     const expiryRetired = retired || (hop.policy === 'preclaim-v1' && !hop.verified && !source?.online && source?.retiredStream?.streamId === hop.sourceStreamId);
-    if (!valid && !(hop.policy === 'preclaim-v1' && !hop.verified && now < hop.endsAt && !source?.online && source?.retiredStream?.streamId === hop.sourceStreamId && target?.streamId === hop.targetStreamId && eligible(registry, channels, marks, hop.from, hop.to, true))) { hop.cancelled = true; hop.cancelReason = now >= hop.endsAt && eligible(registry, channels, marks, hop.from, hop.to, expiryRetired) && (expiryRetired ? source.retiredStream.streamId : source?.streamId) === hop.sourceStreamId && target?.streamId === hop.targetStreamId ? 'window-ended' : 'policy'; delete hop.offers; delete hop.accepts; delete hop.movedOffers; }
+    if (!valid) { hop.cancelled = true; hop.cancelReason = now >= hop.endsAt && eligible(registry, channels, marks, hop.from, hop.to, expiryRetired) && (expiryRetired ? source.retiredStream.streamId : source?.streamId) === hop.sourceStreamId && target?.streamId === hop.targetStreamId ? 'window-ended' : 'policy'; delete hop.offers; delete hop.accepts; delete hop.movedOffers; }
     else {
       const allowed = (host, id) => !channels[host].blockedUserIds.includes(id) && !marks[host].blocked.includes(id);
       hop.offers = hop.offers.filter(id => allowed(hop.from, id) && allowed(hop.to, id) && (!hop.movedOffers?.includes(id) || (presence[hop.from]?.streamId === hop.sourceStreamId && presence[hop.from].actors.some(a => a.id === id))));
@@ -47,7 +52,7 @@ export function reduceClaims(registry, channels, marks, previous, chat, now, sen
         if (side) { hop[side] = hop[side].filter(id => id !== chat.chatterId); if (hop.policy === 'preclaim-v1') { hop.offers = hop.offers.filter(id => id !== chat.chatterId); hop.accepts = hop.accepts.filter(id => id !== chat.chatterId); } }
       }
     }
-    if (valid && chat && ['offer', 'accept'].includes(chat.markAction?.type) && !chat.isBot
+    if (valid && !reservedRetired && chat && ['offer', 'accept'].includes(chat.markAction?.type) && !chat.isBot
       && /^\d{1,32}$/.test(chat.chatterId)
       && !channels[chat.broadcasterId]?.blockedUserIds.includes(chat.chatterId)
       && !marks[chat.broadcasterId]?.blocked.includes(chat.chatterId) && sentAt >= (hop.policy === 'preclaim-v1' ? hop.voteStartedAt ?? hop.claimStartedAt : hop.startedAt) && sentAt < hop.endsAt
@@ -59,7 +64,10 @@ export function reduceClaims(registry, channels, marks, previous, chat, now, sen
         && hop[side].length < (hop.policy === 'preclaim-v1' ? 10 : hop.threshold)) {
         hop[side].push(chat.chatterId); scoreVote = chat.chatterId;
         if (side === 'offers' && chat.broadcasterId === hop.to) { hop.movedOffers ??= []; hop.movedOffers.push(chat.chatterId); }
-        acknowledgement = `${side === 'offers' ? 'Offers' : 'Accepts'} ${hop[side].length}/${hop.threshold}. ${hop.policy === 'preclaim-v1' && !hop.verified ? 'The relic stirs… waiting for Twitch to confirm the raid. Both chats must bind it.' : 'Bound by two chats: keep offering and accepting before the ritual ends.'}`;
+        const names = { '1591805230':'raidrelichq', '1591806023':'olsols2' };
+        const needOffers=Math.max(0,hop.threshold-hop.offers.length), needAccepts=Math.max(0,hop.threshold-hop.accepts.length);
+        const missing=[needOffers?`${needOffers} ${needOffers===1?'offer':'offers'} in @${names[hop.from]??hop.from}`:null,needAccepts?`${needAccepts} ${needAccepts===1?'accept':'accepts'} in @${names[hop.to]??hop.to}`:null].filter(Boolean);
+        acknowledgement = `${side === 'offers' ? 'Offers' : 'Accepts'} ${hop[side].length}/${hop.threshold}. ${hop.verified ? '' : 'Waiting for Twitch to confirm the raid. '}${missing.length?'Waiting for '+missing.join(' and ')+'.':(hop.verified?'Both chats reached the threshold.':'Both chats reached the threshold; waiting for Twitch to confirm the raid.')}`;
       }
     }
       if (valid && (hop.policy !== 'preclaim-v1' || hop.verified === true) && hop.offers.length >= hop.threshold && hop.accepts.length >= hop.threshold) {
@@ -74,7 +82,7 @@ export function reduceClaims(registry, channels, marks, previous, chat, now, sen
             marks: approved.map(({ id, userId, text }) => ({ id, userId, text })) });
           if (Buffer.byteLength(JSON.stringify(lineage)) > LINEAGE_LIMITS.bytes) throw new Error('Lineage capacity reached');
           completedScore = scoreCompletion(hop, [...hop.offers, ...hop.accepts]);
-          acknowledgement = 'Claim complete: both chats reached the threshold. Relic transferred; one growth ring recorded.';
+          acknowledgement = null;
           delete registry.echo; registry.holderId = hop.to; registry.carriedClosures = 0; delete registry.send; hop.finalized = true;
           marks[hop.from].context.holdsRelic = false; marks[hop.to].context.holdsRelic = true;
         }

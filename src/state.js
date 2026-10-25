@@ -5,7 +5,7 @@ import { echoCandidate, reduceEcho, echoView } from './resonance.js';
 import { forgeMutation } from './forge.js';
 import { recapProjection } from './recap.js';
 import { chronicleMutation } from './chronicle.js';
-import { ackDocument, ackSeen, ackStep, completionAck } from './claim-ack.js';
+import { ackDocument, ackSeen, ackStep, completionAck, completionEligible, cancelCompletionNotices } from './claim-ack.js';
 import { hash as observationHash } from './crypto.js';
 import { atlasPage, atlasSearch, movedToView, claimMeterView, handoffView, withCarriedMarks, withIncomingPreview, keeperCandidates } from './public-view.js';
 import { reduceClaims, emptyLineage, publicJourney } from './claims.js';
@@ -18,7 +18,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
   const config = lifecycleConfig(lifecycle);
   let lineage = emptyLineage(); let scores;
   let registry = emptyRegistry(); const channels = new Map();
-  const seen = new Map();
+  const seen = new Map(); const completionReceipts = new Map();
   const rituals = new Map();
   const chatReceipts = new Map();
   const markDocs = new Map(); const scoreAckDocs = new Map(); const ackDocs = new Map(); const presenceDocs = new Map();
@@ -27,7 +27,8 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
     accept({ id, expiresAt, now, raid, chat, lifecycle: providedEvent, observation, share, sentAt = now }) {
       for (const [key, expiry] of seen) if (expiry < now) seen.delete(key);
       for (const [key, ritual] of rituals) if (ritual.endsAt <= now) rituals.delete(key);
-      if (seen.has(id)) return 'duplicate';
+      for(const[key,value]of completionReceipts)if(value.until<now)completionReceipts.delete(key);
+      if (seen.has(id)) return completionReceipts.has(id) ? {status:'duplicate',completionAcks:completionReceipts.get(id).rows} : 'duplicate';
       if (seen.size >= maxEvents) return 'full';
       const pk = presenceKey(chat); const proofSeen = pk && seen.has(pk);
       if (pk && !proofSeen && seen.size + 2 > maxEvents) return 'full';
@@ -65,7 +66,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
         const op = raid ? { type: 'raid', raid, id, sentAt } : chat?.markAction?.type === 'send'
           ? { type: 'reserve', source: host, actor: chat.chatterId, login: chat.markAction.login, id, sentAt } : { type: 'noop' };
         sending = sendState(transition?.registry ?? registry, channelMap, markMap, config, op, now);
-        claiming = reduceClaims(sending.registry, channelMap, markMap, lineage, ackSeen(ackDocs.get(host), chat, now) ? null : chat, now, sentAt, presenceNext);
+        claiming = reduceClaims(sending.registry, channelMap, markMap, lineage, (proofSeen || ackSeen(ackDocs.get(host), chat, now)) ? null : chat, now, sentAt, presenceNext);
       }
       if (claiming && chat?.markAction?.type === 'mymarks') claiming.marks[host] = reserveShare(claiming.marks[host], claiming.lineage, chat, share, now);
       let scoreNext;
@@ -75,20 +76,21 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
         if (['top','badges'].includes(scoreNext.message)) scoreNext.message = scoreMessage(scoreNext.message, scoreboard(claiming.lineage, claiming.registry, scoreNext.doc, config, now), host);
 
       }
-      let raidAck;
-      if (raid && claiming?.registry.pendingHop?.finalized && !registry.pendingHop?.finalized) {
-        const h = claiming.registry.pendingHop; raidAck = completionAck(ackDocs.get(h.to), h.to, id, h.endsAt, now); raidAck.host = h.to;
-      }
-      const ackNext = claiming && host ? ackDocument(ackDocs.get(host), isScoreCommand(chat) ? null : chat, claiming.acknowledgement, transition?.channel, claiming.marks[host], now, claiming.ackDeadline, claiming.acknowledgementKind) : null;
+      const ackUpdates=new Map();
+      if(claiming&&host) ackUpdates.set(host,ackDocument(ackDocs.get(host),isScoreCommand(chat)?null:chat,claiming.acknowledgement,transition?.channel,claiming.marks[host],now,claiming.ackDeadline,claiming.acknowledgementKind));
+      if(config && (['forgetme','pause','opt-out','block'].includes(chat?.markAction?.type)||event?.type==='ban'))for(const target of config.channels){const c=target===host?transition.channel:channels.get(target),m=claiming.marks[target],d=ackDocs.get(target);ackUpdates.set(target,cancelCompletionNotices(ackDocument(ackUpdates.get(target)??d,chat,null,c,m,now)));}
+      const completionAcks=[];let completionSkipped=0;
+      if(claiming?.completedScore){const h=claiming.registry.pendingHop;for(const target of[h.from,h.to]){const value=completionAck(ackUpdates.get(target)??ackDocs.get(target),target,h.eventId,h.endsAt,now,h,Object.assign(Object.fromEntries(channels),transition?{[host]:transition.channel}:{}));ackUpdates.set(target,value.doc);if(value.key)completionAcks.push({host:target,key:value.key});else completionSkipped++;}}
       const scoreAckNext = isScoreCommand(chat) ? scoreAckDocument(scoreAckDocs.get(host), chat, scoreNext?.message, transition?.channel, claiming?.marks[host], now) : null;
       // No await between check and insertion: atomic within this process.
       if (pk && !proofSeen) seen.set(pk, now + 600000);
-      if (raidAck) ackDocs.set(raidAck.host, raidAck.doc);
+      for(const[target,doc]of ackUpdates)ackDocs.set(target,doc);
       if (presenceNext) for (const [key, value] of Object.entries(presenceNext)) presenceDocs.set(key, value);
-      if (ackNext) ackDocs.set(host, ackNext);
+
       if (scoreNext) scores = scoreNext.doc;
       if (scoreAckNext) scoreAckDocs.set(host, scoreAckNext);
       seen.set(id, expiresAt);
+      if(completionAcks.length){const receipt={until:expiresAt,rows:completionAcks};completionReceipts.set(id,receipt);if(pk)completionReceipts.set(pk,receipt);}
       if (raid && !config) rituals.set(raid.to_broadcaster_user_id, {
         eventId: id,
         incomingBroadcasterId: raid.from_broadcaster_user_id,
@@ -102,7 +104,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
       if (claiming) { registry = claiming.registry; lineage = claiming.lineage; for (const [key, doc] of Object.entries(claiming.marks)) markDocs.set(key, doc); }
       if (chat?.markAction?.type === 'forgetme' && chatReceipts.get(chat.broadcasterId)?.chatterId === chat.chatterId) chatReceipts.delete(chat.broadcasterId);
       if (chat && !chat.markAction) chatReceipts.set(chat.broadcasterId, { broadcasterId: chat.broadcasterId, chatterId: chat.chatterId, messageId: chat.messageId, receivedAt: now });
-      return raidAck ? { status: 'accepted', completionAck: { host: raidAck.host, key: raidAck.key } } : observation ? (transition.channel.lifecycleAt === event.sentAt && transition.channel.lifecycleSource === 'helix-observation' ? 'applied' : 'no-change') : sending?.result ?? 'accepted';
+      return (completionAcks.length||completionSkipped) ? {status:'accepted',completionAcks,completionSkipped} : (pk&&completionReceipts.has(pk)) ? {status:'accepted',completionAcks:completionReceipts.get(pk).rows} : observation ? (transition.channel.lifecycleAt === event.sentAt && transition.channel.lifecycleSource === 'helix-observation' ? 'applied' : 'no-change') : sending?.result ?? 'accepted';
     },
     getRitual(hostId) {
       const ritual = rituals.get(hostId);
@@ -123,6 +125,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
           if (action.type === 'forgetme') Object.assign(nextPresence, revokePresenceActor(nextPresence, key, actor.chatterId, now));
           presenceDocs.set(key, nextPresence); }
       }
+      if(config&&['forgetme','pause','opt-out','block'].includes(action.type))for(const target of config.channels)ackDocs.set(target,cancelCompletionNotices(ackDocs.get(target)));
       if (config) ackDocs.set(host, ackDocument(ackDocs.get(host), { ...actor, markAction: action }, null, transition.channel, doc, now));
       markDocs.set(host, doc);
       if (config) { const next = reduceClaims(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), lineage, null, now, now, Object.fromEntries(presenceDocs)); registry = next.registry; lineage = next.lineage; }
@@ -139,7 +142,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
     getKeeperCandidates(host) { return keeperCandidates(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), config, host); },
     scoreAckStep(host, op, now) { if (!config?.channels.includes(host)) throw Error('Unconfigured score ACK'); const next=scoreAckMutation(scoreAckDocs.get(host),op,channels.get(host),markDocs.get(host),now,scores,lineage,registry,config,host);scoreAckDocs.set(host,next.doc);return next.result; },
     getPrivateClaimAcks(host) { return structuredClone(ackDocs.get(host)); },
-    claimAckStep(host, op, now) { if (!config?.channels.includes(host)) throw Error('Unconfigured ACK'); const next = ackStep(ackDocs.get(host), op, channels.get(host), markDocs.get(host), now); ackDocs.set(host, next.doc); return next.result; },
+    claimAckStep(host, op, now) { if (!config?.channels.includes(host)) throw Error('Unconfigured ACK'); const next = ackStep(ackDocs.get(host), op, channels.get(host), markDocs.get(host), now, completionEligible(ackDocs.get(host),op.key,registry,Object.fromEntries(channels),Object.fromEntries(markDocs),now)); ackDocs.set(host, next.doc); return next.result; },
     getKeeperRegistry() { return structuredClone(registry); },
     getStreamStatus(host) { return structuredClone(channels.get(host)); },
     setChannelPolicy(host, policy, now = Date.now()) {
@@ -147,6 +150,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
       const next = reduceLifecycle({ registry, channel: channels.get(host), marks: markDocs.get(host), host, policy, now, sentAt: now });
       presenceDocs.set(host, updatePresence(presenceDocs.get(host), host, next.channel, next.marks, null, now, now));
       ackDocs.set(host, ackDocument(ackDocs.get(host), { broadcasterId: host }, null, next.channel, next.marks, now));
+      for(const target of config.channels)ackDocs.set(target,cancelCompletionNotices(ackDocs.get(target)));
       registry = next.registry; channels.set(host, next.channel); markDocs.set(host, next.marks);
       const checked = reduceClaims(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), lineage, null, now, now, Object.fromEntries(presenceDocs)); registry = checked.registry; lineage = checked.lineage;
       scores = reduceScores(scores, { channels: Object.fromEntries(channels), marks: Object.fromEntries(markDocs), now }).doc;

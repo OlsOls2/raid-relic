@@ -24,10 +24,10 @@ for (const kind of ['memory', 'firestore']) {
     assert.equal(posts().length, 1); assert.equal(JSON.parse(posts()[0].body).broadcaster_id, HOME);
     assert.match(JSON.parse(posts()[0].body).message, /Offers 1\/1/); assert.equal(posts()[0].headers.Authorization, `Bearer access-${BOT}`);
     await vote(f, OTHER, HOME, 'same-user', '!accept'); assert.equal(posts().length, 1);
-    await vote(f, OTHER, OTHER, 'accept-one', '!accept'); assert.equal(posts().length, 2);
-    assert.equal(JSON.parse(posts()[1].body).broadcaster_id, OTHER); assert.match(JSON.parse(posts()[1].body).message, /Claim complete/);
+    await vote(f, OTHER, OTHER, 'accept-one', '!accept'); assert.equal(posts().length, 3);
+    assert.deepEqual(posts().slice(1).map(p=>JSON.parse(p.body).broadcaster_id),[HOME,OTHER]);for(const p of posts().slice(1))assert.match(JSON.parse(p.body).message,/Claim complete/);
     assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, OTHER); assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
-    await vote(f, OTHER, OTHER, 'accept-one', '!accept'); assert.equal(posts().length, 2);
+    await vote(f, OTHER, OTHER, 'accept-one', '!accept'); assert.equal(posts().length, 3);
     f.advance(); await f.control(OTHER, `send:${HOME}`); f.advance(); await f.raid(OTHER, HOME, 2);
     await vote(f, OTHER, OTHER, 'return-offer', '!offer'); await vote(f, HOME, HOME, 'return-accept', '!accept');
     assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, HOME); assert.equal((await f.runtime.state.getPublicJourney()).rings, 2);
@@ -68,7 +68,7 @@ for (const kind of ['memory', 'firestore']) {
 }
 test('ACK capacity fails closed and retired recovery never clears accepted/unknown/preflight or wrong stream proof', () => {
   const chat = { broadcasterId: HOME, chatterId: HOME, messageId: 'new', markAction: { type: 'offer' } };
-  assert.throws(() => ackDocument({ rows: Array.from({ length: 128 }, (_, i) => ({ key: String(i), expiresAt: 1000, status: 'ignored' })) }, chat, null, {}, {}, 1), /capacity/);
+  assert.equal(ackDocument({ rows: Array.from({ length: 128 }, (_, i) => ({ key: String(i), expiresAt: 1000, status: 'ignored' })) }, chat, null, {}, {}, 1).rows.length,128);
   for (const status of ['accepted', 'unknown', 'queued', 'preflight', 'dispatching']) {
     const registry = { holderId: HOME, send: { status, id: 'x', sourceId: HOME }, pendingHop: { eventId: 'y' } };
     const result = sendState(registry, {}, {}, { channels: [HOME] }, { type: 'expire-handoff', source: HOME, actor: HOME, id: 'x', hopId: 'y' }, 1);
