@@ -13,7 +13,8 @@ export async function createRuntime(env, { firestoreClient, transport, loadSDK =
   const production = env.NODE_ENV === 'production';
   const releaseCommit = validateReleaseCommit(env.RELEASE_COMMIT, { required: production });
   let state; let store;
-  const lifecycle = env.OAUTH_ENABLED === 'true' ? { channels: [env.TWITCH_STREAMER_ID] } : undefined;
+  const keeperIds = env.KEEPER_CHANNEL_IDS ? env.KEEPER_CHANNEL_IDS.split(',') : [env.TWITCH_STREAMER_ID];
+  const lifecycle = env.OAUTH_ENABLED === 'true' ? { channels: keeperIds } : undefined;
   if (env.STATE_STORE === 'firestore') {
     if (env.GOOGLE_CLOUD_PROJECT !== PROJECT_ID || env.FIRESTORE_EMULATOR_HOST) throw new Error('Firestore project configuration rejected');
     const db = firestoreClient ?? new (await loadSDK()).Firestore({ projectId: PROJECT_ID });
@@ -41,6 +42,6 @@ export async function createRuntime(env, { firestoreClient, transport, loadSDK =
   }
   const sendOff = oauth ? createSendOff({ state, oauth, clientId: env.TWITCH_CLIENT_ID, streamerId: env.TWITCH_STREAMER_ID, transport }) : undefined;
   return { ...createApp({ secret: env.TWITCH_EVENTSUB_SECRET, state, oauth, overlayFeed, releaseCommit: releaseCommit ?? undefined,
-    chatContext: oauth ? { streamerId: env.TWITCH_STREAMER_ID, botId: env.TWITCH_BOT_ID } : undefined }), oauth, bot, store, subscriptions, sendOff, overlayFeed,
+    chatContext: oauth ? { streamerId: env.TWITCH_STREAMER_ID, botId: env.TWITCH_BOT_ID, keeperIds } : undefined }), oauth, bot, store, subscriptions, sendOff, overlayFeed,
     overlayOrigins: production ? [env.OVERLAY_ORIGIN].filter(Boolean) : ['http://localhost:5191', 'http://127.0.0.1:5191'] };
 }

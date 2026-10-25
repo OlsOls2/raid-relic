@@ -1,3 +1,4 @@
+import { reduceClaims, emptyLineage, publicJourney } from './claims.js';
 import { sendState } from './send-state.js';
 import { lifecycleConfig, reduceLifecycle, emptyRegistry } from './lifecycle.js';
 import { setMarkContext, reduceMark, publicMarks, publicOverlayState, privateMarks, isModerator, isChatIdentity } from './marks.js';
@@ -5,6 +6,7 @@ import { setMarkContext, reduceMark, publicMarks, publicOverlayState, privateMar
 // Synchronous mutations are atomic within a single process; tests/dev only.
 export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
   const config = lifecycleConfig(lifecycle);
+  let lineage = emptyLineage();
   let registry = emptyRegistry(); const channels = new Map();
   const seen = new Map();
   const rituals = new Map();
@@ -21,13 +23,14 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
       if (config && host && !config.channels.includes(host)) throw new Error('Unconfigured lifecycle channel');
       const transition = config && host ? reduceLifecycle({ registry, channel: channels.get(host), marks: markDocs.get(host), host, event, chat, now, sentAt }) : null;
       const markDoc = transition ? transition.marks : chat?.markAction ? reduceMark(markDocs.get(chat.broadcasterId), chat.broadcasterId, chat, chat.markAction, now) : null;
-      let sending;
+      let claiming; let sending;
       if (config) {
         const channelMap = Object.fromEntries(channels); const markMap = Object.fromEntries(markDocs);
         if (transition) { channelMap[host] = transition.channel; markMap[host] = transition.marks; }
         const op = raid ? { type: 'raid', raid, id, sentAt } : chat?.markAction?.type === 'send'
           ? { type: 'reserve', source: host, actor: chat.chatterId, login: chat.markAction.login, id, sentAt } : { type: 'noop' };
         sending = sendState(transition?.registry ?? registry, channelMap, markMap, config, op, now);
+        claiming = reduceClaims(sending.registry, channelMap, markMap, lineage, chat, now, sentAt);
       }
       // No await between check and insertion: atomic within this process.
       seen.set(id, expiresAt);
@@ -41,6 +44,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
       if (transition) { registry = transition.registry; channels.set(host, transition.channel); }
       if (sending) { registry = sending.registry; if (sending.ritual) rituals.set(raid.to_broadcaster_user_id, sending.ritual); }
       if (markDoc) markDocs.set(host, markDoc);
+      if (claiming) { registry = claiming.registry; lineage = claiming.lineage; for (const [key, doc] of Object.entries(claiming.marks)) markDocs.set(key, doc); }
       if (chat?.markAction?.type === 'forgetme' && chatReceipts.get(chat.broadcasterId)?.chatterId === chat.chatterId) chatReceipts.delete(chat.broadcasterId);
       if (chat && !chat.markAction) chatReceipts.set(chat.broadcasterId, { broadcasterId: chat.broadcasterId, chatterId: chat.chatterId, messageId: chat.messageId, receivedAt: now });
       return 'accepted';
@@ -59,6 +63,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
       const doc = transition ? transition.marks : reduceMark(markDocs.get(host), host, actor, action, now);
       if (transition) { registry = transition.registry; channels.set(host, transition.channel); }
       markDocs.set(host, doc);
+      if (config) { const next = reduceClaims(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), lineage, null, now); registry = next.registry; lineage = next.lineage; }
       if (action.type === 'forgetme' && chatReceipts.get(host)?.chatterId === actor.chatterId) chatReceipts.delete(host);
     },
     sendOffStep(op, now) {
@@ -72,7 +77,9 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
       if (!config?.channels.includes(host)) throw new Error('Unconfigured lifecycle channel');
       const next = reduceLifecycle({ registry, channel: channels.get(host), marks: markDocs.get(host), host, policy, now, sentAt: now });
       registry = next.registry; channels.set(host, next.channel); markDocs.set(host, next.marks);
+      const checked = reduceClaims(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), lineage, null, now); registry = checked.registry; lineage = checked.lineage;
     },
+    getPublicJourney() { return publicJourney(lineage); },
     getPublicMarks(host) { return publicMarks(markDocs.get(host), host); },
     getOverlayState(host) { return publicOverlayState(markDocs.get(host), host); },
     getPrivateMarks(host, actor) { return privateMarks(markDocs.get(host), host, actor); },

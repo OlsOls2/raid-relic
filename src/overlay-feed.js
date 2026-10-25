@@ -10,9 +10,10 @@ export function createOverlayFeed(store, channel, { simulator = false } = {}) {
     try {
       const state = await store.getOverlayState(channel);
       if (!['ready', 'waiting', 'paused'].includes(state.status) || !Array.isArray(state.marks) || state.marks.length > 160) throw new Error('Invalid public state');
+      const journey = store.getPublicJourney ? await store.getPublicJourney() : { rings: 0 };
       const marks = state.marks.map(({ id, runeSvg }) => ({ id, runeSvg }));
       return { type: 'snapshot', revision, mode: simulator ? 'simulator' : 'live', status: state.status, marks,
-        approvedCount: marks.length, lineageRings: 0 };
+        approvedCount: marks.length, lineageRings: journey.rings };
     } catch {
       return { type: 'snapshot', revision, mode: simulator ? 'simulator' : 'live', status: 'unavailable', marks: [], approvedCount: 0, lineageRings: 0 };
     }

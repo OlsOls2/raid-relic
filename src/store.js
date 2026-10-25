@@ -1,3 +1,4 @@
+import { reduceClaims, publicJourney } from './claims.js';
 import { sendState } from './send-state.js';
 import { lifecycleConfig, reduceLifecycle } from './lifecycle.js';
 import { hash } from './crypto.js';
@@ -57,6 +58,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
           channelMap[channelId] = (await tx.get(ref('streamChannels', channelId))).data();
           markMap[channelId] = (await tx.get(ref('markChannels', channelId))).data();
         }
+        const lineage = managed ? (await tx.get(ref('lineage', 'single'))).data() : null;
         const channel = channelMap[host];
         const markRef = host && (managed || chat?.markAction) ? ref('markChannels', host) : null;
         const markDoc = managed ? markMap[host] : markRef ? (await tx.get(markRef)).data() : null;
@@ -64,12 +66,13 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         const receipt = receiptRef ? (await tx.get(receiptRef)).data() : null;
         const transition = managed && host ? reduceLifecycle({ registry, channel, marks: markDoc, host, event, chat, now, sentAt }) : null;
         const next = transition ? transition.marks : markRef ? reduceMark(markDoc, chat.broadcasterId, chat, chat.markAction, now) : null;
-        let sending;
+        let claiming; let sending;
         if (managed) {
           if (transition) { channelMap[host] = transition.channel; markMap[host] = transition.marks; }
           const op = raid ? { type: 'raid', raid, id, sentAt } : chat?.markAction?.type === 'send'
             ? { type: 'reserve', source: host, actor: chat.chatterId, login: chat.markAction.login, id, sentAt } : { type: 'noop' };
           sending = sendState(transition?.registry ?? registry, channelMap, markMap, config, op, now);
+          claiming = reduceClaims(sending.registry, channelMap, markMap, lineage, chat, now, sentAt);
         }
         tx.set(eventRef, { expiresAt });
         if (transition) { tx.set(ref('keeperRegistry', 'single'), transition.registry); tx.set(ref('streamChannels', host), transition.channel); }
@@ -77,6 +80,10 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         if (sending) { tx.set(ref('keeperRegistry', 'single'), sending.registry); if (sending.ritual) tx.set(ref('rituals', raid.to_broadcaster_user_id), sending.ritual); }
         // Store only bounded metadata, never raw chat text or proof of membership.
         if (next) tx.set(markRef, next);
+        if (claiming) {
+          tx.set(ref('keeperRegistry', 'single'), claiming.registry); tx.set(ref('lineage', 'single'), claiming.lineage);
+          for (const [key, doc] of Object.entries(claiming.marks)) if (doc) tx.set(ref('markChannels', key), doc);
+        }
         if (receipt && receipt.chatterId === chat?.chatterId) tx.delete(receiptRef);
         if (chat && !chat.markAction) tx.set(ref('chatReceipts', chat.broadcasterId), { messageId: chat.messageId, chatterId: chat.chatterId, receivedAt: now });
         return 'accepted';
@@ -102,8 +109,13 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
           if (!config.channels.includes(host)) throw new Error('Unconfigured lifecycle channel');
           const registry = (await tx.get(ref('keeperRegistry', 'single'))).data();
           const channel = (await tx.get(ref('streamChannels', host))).data();
+          const history = (await tx.get(ref('lineage', 'single'))).data(); const channelMap = {}; const markMap = {};
+          for (const key of config.channels) { channelMap[key] = (await tx.get(ref('streamChannels', key))).data(); markMap[key] = (await tx.get(ref('markChannels', key))).data(); }
           const transition = reduceLifecycle({ registry, channel, marks: previous, host, chat: { ...actor, markAction: action }, now, sentAt: now });
-          tx.set(ref('keeperRegistry', 'single'), transition.registry); tx.set(ref('streamChannels', host), transition.channel); next = transition.marks;
+          channelMap[host] = transition.channel; markMap[host] = transition.marks;
+          const checked = reduceClaims(transition.registry, channelMap, markMap, history, null, now);
+          tx.set(ref('lineage', 'single'), checked.lineage);
+          tx.set(ref('keeperRegistry', 'single'), checked.registry); tx.set(ref('streamChannels', host), transition.channel); next = transition.marks;
         } else next = reduceMark(previous, host, actor, action, now);
         tx.set(doc, next);
         if (receipt && receipt.chatterId === actor?.chatterId) tx.delete(receiptRef);
@@ -128,10 +140,16 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         const registry = (await tx.get(ref('keeperRegistry', 'single'))).data();
         const channel = (await tx.get(ref('streamChannels', host))).data();
         const marks = (await tx.get(ref('markChannels', host))).data();
+        const history = (await tx.get(ref('lineage', 'single'))).data(); const channelMap = {}; const markMap = {};
+        for (const key of config.channels) { channelMap[key] = (await tx.get(ref('streamChannels', key))).data(); markMap[key] = (await tx.get(ref('markChannels', key))).data(); }
         const next = reduceLifecycle({ registry, channel, marks, host, policy, now, sentAt: now });
-        tx.set(ref('keeperRegistry', 'single'), next.registry); tx.set(ref('streamChannels', host), next.channel); tx.set(ref('markChannels', host), next.marks);
+        channelMap[host] = next.channel; markMap[host] = next.marks;
+        const checked = reduceClaims(next.registry, channelMap, markMap, history, null, now);
+        tx.set(ref('lineage', 'single'), checked.lineage);
+        tx.set(ref('keeperRegistry', 'single'), checked.registry); tx.set(ref('streamChannels', host), next.channel); tx.set(ref('markChannels', host), next.marks);
       });
     },
+    async getPublicJourney() { return publicJourney((await ref('lineage', 'single').get()).data()); },
     async getPublicMarks(host) { return publicMarks((await ref('markChannels', host).get()).data(), host); },
     async getOverlayState(host) { return publicOverlayState((await ref('markChannels', host).get()).data(), host); },
     async getPrivateMarks(host, actor) {

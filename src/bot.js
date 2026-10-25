@@ -10,6 +10,7 @@ export function parseChat(payload, { streamerId, botId, includeMarkCommands = fa
     || !Array.isArray(event.message.fragments) || event.message.fragments.length > 500
     || !event.message.fragments.every(fragment => fragment && ['text', 'emote', 'cheermote', 'mention'].includes(fragment.type) && typeof fragment.text === 'string')) throw new Error('Invalid chat payload');
   const chat = { broadcasterId: streamerId, chatterId: event.chatter_user_id, messageId: event.message_id };
+  if (event.chatter_user_id === botId) chat.isBot = true;
   if (includeMarkCommands) {
     const action = parseMarkCommand(event.message.text);
     if (action) {

@@ -22,6 +22,10 @@ const header = (headers, name) => typeof headers[name] === 'string' ? headers[na
 const result = (status, body = '', type = 'text/plain; charset=utf-8') => ({ status, body, type });
 
 export function createApp({ secret, state = createMemoryState(), now = Date.now, oauth, chatContext, overlayFeed, releaseCommit } = {}) {
+  const keepers = chatContext?.keeperIds ?? (chatContext ? [chatContext.streamerId] : []);
+  if (!Array.isArray(keepers) || keepers.length > 4 || (chatContext && !keepers.length)
+    || !keepers.every(id => typeof id === 'string' && /^\d{1,32}$/.test(id))
+    || (chatContext && !keepers.includes(chatContext.streamerId))) throw new Error('Configured Keeper allowlist required');
   const release = validateReleaseCommit(releaseCommit);
   // Pure request boundary for tests: rawBody is never reserialized before HMAC.
   async function dispatch({ method, path, headers = {}, rawBody = Buffer.alloc(0) }) {
@@ -32,6 +36,7 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
     if (method === 'GET' && path === '/health') {
       return result(200, JSON.stringify({ status: 'ok', releaseCommit: release, phase: 'foundation', readiness: 'not-ready-for-raids' }), 'application/json');
     }
+    if (method === 'GET' && path === '/api/journey' && state.getPublicJourney) return result(200, JSON.stringify(await state.getPublicJourney()), 'application/json');
     if (method === 'GET' && overlayFeed && path === `/api/overlay/${overlayFeed.channel}`) {
       return result(200, JSON.stringify(await overlayFeed.snapshot()), 'application/json');
     }
@@ -70,22 +75,26 @@ export function createApp({ secret, state = createMemoryState(), now = Date.now,
     const subscription = payload.subscription;
     if (!subscription || typeof subscription.type !== 'string') return result(400, 'Missing subscription');
     let raid; let chat; let lifecycle;
+    const signedHost = subscription.condition?.broadcaster_user_id;
+    const context = chatContext && keepers.includes(signedHost) ? { ...chatContext, streamerId: signedHost } : null;
     if (type === 'notification') {
       if (['stream.online', 'stream.offline'].includes(subscription.type)) {
         if (!chatContext || !state.lifecycleEnabled) return result(503, 'Lifecycle not configured');
-        try { lifecycle = parseLifecycle(payload, chatContext.streamerId, sentAt); } catch { return result(400, 'Invalid lifecycle'); }
+        if (!context) return result(400, 'Unconfigured lifecycle channel');
+        try { lifecycle = parseLifecycle(payload, context?.streamerId, sentAt); } catch { return result(400, 'Invalid lifecycle'); }
       } else if (subscription.type === 'channel.chat.message') {
         if (!chatContext) return result(503, 'Chat not configured');
-        try { chat = parseChat(payload, { ...chatContext, includeMarkCommands: true }); } catch { return result(400, 'Invalid chat'); }
+        if (!context) return result(400, 'Unconfigured chat channel');
+        try { chat = parseChat(payload, { ...context, includeMarkCommands: true }); } catch { return result(400, 'Invalid chat'); }
       } else {
         if (subscription.type !== 'channel.raid' || subscription.version !== '1') return result(400, 'Unsupported subscription');
         raid = payload.event;
         if (!raid || !['from_broadcaster_user_id', 'to_broadcaster_user_id'].every(key => typeof raid[key] === 'string' && /^\d+$/.test(raid[key]))
-          || !Number.isInteger(raid.viewers) || raid.viewers < 0) return result(400, 'Invalid raid');
+          || !Number.isInteger(raid.viewers) || raid.viewers < 0 || raid.viewers > 1000000) return result(400, 'Invalid raid');
         if (chatContext) {
           const condition = subscription.condition ?? {};
-          const incoming = Object.keys(condition).length === 1 && condition.to_broadcaster_user_id === chatContext.streamerId && raid.to_broadcaster_user_id === chatContext.streamerId;
-          const outgoing = Object.keys(condition).length === 1 && condition.from_broadcaster_user_id === chatContext.streamerId && raid.from_broadcaster_user_id === chatContext.streamerId;
+          const incoming = Object.keys(condition).length === 1 && keepers.includes(condition.to_broadcaster_user_id) && raid.to_broadcaster_user_id === condition.to_broadcaster_user_id;
+          const outgoing = Object.keys(condition).length === 1 && keepers.includes(condition.from_broadcaster_user_id) && raid.from_broadcaster_user_id === condition.from_broadcaster_user_id;
           if (!incoming && !outgoing) return result(400, 'Invalid raid condition');
         }
       }

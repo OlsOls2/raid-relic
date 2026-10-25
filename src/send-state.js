@@ -19,7 +19,7 @@ export function sendState(previous, channels, marks, config, op, now) {
   const intent = registry.send;
   if (op.type === 'reserve') {
     const targetId = config.logins[op.login];
-    if (op.actor === op.source && targetId && !busy(intent) && !(registry.pendingHop?.endsAt > now)
+    if (op.actor === op.source && targetId && !busy(intent) && !((registry.pendingHop?.endsAt > now && !registry.pendingHop.finalized && !registry.pendingHop.cancelled))
       && op.sentAt > (registry.sendWatermark ?? -1) && eligible(registry, channels, marks, op.source, targetId)
       && op.sentAt >= Math.max(channels[op.source].startedAt, channels[targetId].startedAt, channels[op.source].consentAt, channels[targetId].consentAt)) {
       registry.send = { id: hash(op.id), sourceId: op.source, targetId, targetLogin: op.login, status: 'queued', createdAt: now,
@@ -44,7 +44,7 @@ export function sendState(previous, channels, marks, config, op, now) {
     if (intent.status === 'dispatching') intent.status = ['accepted', 'rejected', 'unknown'].includes(op.status) ? op.status : 'unknown';
     else if (intent.status === 'preflight' && intent.leaseUntil > now && op.status === 'rejected') intent.status = 'rejected';
   }
-  if (op.type === 'raid') {
+  if (op.type === 'raid' && Number.isInteger(op.raid?.viewers) && op.raid.viewers >= 0 && op.raid.viewers <= 1000000) {
     const { raid, sentAt, id } = op; const source = raid.from_broadcaster_user_id; const target = raid.to_broadcaster_user_id;
     const correlated = busy(intent);
     const closed = channels[source]?.retiredStream;
@@ -54,13 +54,15 @@ export function sendState(previous, channels, marks, config, op, now) {
     const sourceStreamId = retired ? closed.streamId : channels[source]?.streamId;
     const sourceStartedAt = retired ? closed.startedAt : channels[source]?.startedAt;
     const after = correlated ? (intent.dispatchAt ?? intent.createdAt) : Math.max(channels[source]?.startedAt ?? Infinity, channels[target]?.startedAt ?? Infinity);
-    if (!(registry.pendingHop?.endsAt > now) && sentAt > (registry.raidWatermark ?? -1) && sentAt >= after
+    if (!((registry.pendingHop?.endsAt > now && !registry.pendingHop.finalized && !registry.pendingHop.cancelled)) && sentAt > (registry.raidWatermark ?? -1) && sentAt >= after
       && (!correlated || (intent.sourceId === source && intent.targetId === target && sentAt <= after + SEND_LIMITS.confirmationMs
         && sourceStreamId === intent.sourceStreamId && channels[target]?.streamId === intent.targetStreamId))
       && eligible(registry, channels, marks, source, target, retired)
       && sentAt >= Math.max(sourceStartedAt, channels[target].startedAt, channels[source].consentAt, channels[target].consentAt)) {
       registry.raidWatermark = sentAt;
       registry.pendingHop = { eventId: hash(id), from: source, to: target, phase: 'pending-handoff', origin: correlated ? 'planned' : 'manual',
+        sourceStreamId: sourceStreamId, targetStreamId: channels[target].streamId, retiredSource: Boolean(retired),
+        raidSentAt: sentAt, raidSize: raid.viewers, threshold: Math.min(10, Math.ceil(Math.sqrt(Math.max(1, raid.viewers)))), offers: [], accepts: [],
         startedAt: now, snatchedUntil: now + 1500, endsAt: now + SEND_LIMITS.ritualMs };
       if (correlated) intent.status = 'confirmed';
       ritual = { eventId: id, incomingBroadcasterId: source, hostBroadcasterId: target, startedAt: now, endsAt: now + SEND_LIMITS.ritualMs };

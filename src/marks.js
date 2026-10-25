@@ -34,6 +34,8 @@ export function parseMarkCommand(text) {
   if (mark) return { type: 'mark', text: normalizeMark(mark[1]) };
   if (text === '!relic forgetme') return { type: 'forgetme' };
   if (text === '!relic veto-last') return { type: 'veto-last' };
+  if (text === '!offer') return { type: 'offer' };
+  if (text === '!accept') return { type: 'accept' };
   if (text === '!relic pause') return { type: 'pause', paused: true };
   if (text === '!relic resume') return { type: 'pause', paused: false };
   if (text === '!relic opt-out') return { type: 'opt-out' };
@@ -98,7 +100,10 @@ export function reduceMark(previous, host, actor, action, now) {
       const mark = session?.marks.find(item => item.id === action.markId);
       if (mark && active(doc, host) && !doc.blocked.includes(mark.userId) && !doc.context.blockedUserIds.includes(mark.userId)) mark.status = 'approved';
     }
-    if (action.type === 'veto-last' && session?.marks.length) session.marks.pop();
+    if (action.type === 'veto-last') {
+      const last = session?.marks.length ? session : [...doc.sessions].reverse().find(item => item.marks.length);
+      last?.marks.pop();
+    }
     if (action.type === 'block' && userId(action.userId)) {
       if (!doc.blocked.includes(action.userId)) {
         if (doc.blocked.length >= MARK_LIMITS.blockedUsers) throw new Error('Block capacity reached');
