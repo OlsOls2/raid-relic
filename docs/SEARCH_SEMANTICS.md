@@ -1,0 +1,9 @@
+# What “Where has my mark been?” can truthfully find
+
+Local polish audit: current main already implements the Should approved-text search and its exact heading. Canonical production hotfixd529 is fd05-based and does **not** include that Should; the older deployed UI can therefore lack the search entirely. This local increment does not deploy or alter production. The Atlas now gives the exact heading a visible navigation link/anchor and a name-as-mark-text example.
+
+The search reads only surviving approved public mark **text** at completed stops. A name such as Alex is searchable only if `alex` was the submitted, approved mark text; results are shared text matches, not verified personal ownership. One-word/emoji normalization and literal substring matching remain unchanged. Up to16 retained stops ×160 entries are scanned in one bounded lineage read; each POST result page has at most20 matches. There is no all-time/unbounded promise or silent reconstruction of removed marks.
+
+Private marks/history retain numeric user associations solely for moderation/erasure, not a public account-name journey index. No durable account-login-to-viewer-mark mapping or authenticated viewer lookup/consent flow exists. Entering a name proves neither account identity nor ownership. Genuine account-name lookup would need separately designed authenticated viewer consent/opt-in and privacy-safe data/retention rules; it is not implemented here. No account resolver, OAuth scope, API subscription, public private-association projection or forgotten-link reconstruction is added.
+
+Queries remain transient POST bodies, never URL/history/analytics/storage/logs. The static `#mark-history` navigation anchor contains no query. Only completed approved surviving text/runes are returned; pending/removed content and viewer IDs are excluded. Manual refresh/search reads fresh content. Failure/clear/navigation hides prior matches; downloaded old snapshots cannot be recalled.

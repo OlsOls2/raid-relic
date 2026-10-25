@@ -73,3 +73,25 @@ test('search form cannot fall back to GET and client keeps query out of navigati
   assert.ok(script.includes('event.preventDefault()')); assert.ok(script.includes('JSON.stringify({ query, offset: searchOffset, limit: 20 })'));
   assert.ok(!/localStorage|sessionStorage|pushState|replaceState|innerHTML|console\./.test(script));
 });
+
+test('Atlas search heading has a discoverable named anchor and honest name-as-text guidance', async () => {
+  const html = await readFile('public/atlas.html', 'utf8');
+  assert.match(html, /href="#mark-history"[^>]*>Where has my mark been\?<\/a>/);
+  assert.match(html, /id="mark-history"[^>]*aria-labelledby="search-title"/);
+  assert.match(html, /id="search-title">Where has my mark been\?/);
+  assert.match(html, /approved mark was a name such as Alex/);
+  assert.match(html, /not a Twitch account or viewer name/);
+});
+test('all16 stops ×160 approved name-text entries page completely without an identity lookup', () => {
+  const stops = Array.from({ length: 16 }, (_, n) => ({ stopId: (n + 1).toString(16).padStart(64, '0'), from: '1', to: '2', ringIndex: n + 1, claimedAt: n,
+    marks: Array.from({ length: 160 }, (_, i) => ({ id: `m${i + 1}`, userId: 'PRIVATE_ASSOCIATION', text: 'alex' })) }));
+  let offset = 0; const seen = new Set();
+  do {
+    const page = atlasSearch({ stops }, { query: 'alex', offset, limit: 20 });
+    assert.equal(page.total, 2560); assert.equal(page.matches.length, 20);
+    for (const match of page.matches) { seen.add(`${match.stopId}:${match.runeSvg}:${seen.size}`); assert.equal(match.text, 'alex'); assert.ok(!JSON.stringify(match).includes('PRIVATE_ASSOCIATION')); }
+    offset = page.nextOffset;
+  } while (offset !== null);
+  assert.equal(seen.size, 2560);
+  const empty = atlasSearch({ stops: [] }, { query: 'alex', limit: 20 }); assert.equal(empty.total, 0); assert.equal(empty.nextOffset, null);
+});
