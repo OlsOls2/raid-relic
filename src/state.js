@@ -32,7 +32,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
         if (!config || observationHash(JSON.stringify(channels.get(host) ?? null)) !== observation.baseline) return 'superseded';
         if (event.type === 'online' && channels.get(host)?.closedIds.includes(event.streamId)) return 'closed';
       }
-      const transition = config && host ? reduceLifecycle({ registry, channel: channels.get(host), marks: markDocs.get(host), host, event, chat, now, sentAt }) : null;
+      const transition = config && host ? reduceLifecycle({ registry, channel: channels.get(host), marks: markDocs.get(host), host, event, chat, now, sentAt, observed: Boolean(observation) }) : null;
       const markDoc = transition ? transition.marks : chat?.markAction ? reduceMark(markDocs.get(chat.broadcasterId), chat.broadcasterId, chat, chat.markAction, now) : null;
       let claiming; let sending;
       if (config) {
@@ -58,7 +58,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle } = {}) {
       if (claiming) { registry = claiming.registry; lineage = claiming.lineage; for (const [key, doc] of Object.entries(claiming.marks)) markDocs.set(key, doc); }
       if (chat?.markAction?.type === 'forgetme' && chatReceipts.get(chat.broadcasterId)?.chatterId === chat.chatterId) chatReceipts.delete(chat.broadcasterId);
       if (chat && !chat.markAction) chatReceipts.set(chat.broadcasterId, { broadcasterId: chat.broadcasterId, chatterId: chat.chatterId, messageId: chat.messageId, receivedAt: now });
-      return 'accepted';
+      return observation ? (transition.channel.lifecycleAt === event.sentAt && transition.channel.lifecycleSource === 'helix-observation' ? 'applied' : 'no-change') : sending?.result ?? 'accepted';
     },
     getRitual(hostId) {
       const ritual = rituals.get(hostId);

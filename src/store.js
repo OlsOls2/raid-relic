@@ -82,7 +82,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         const markDoc = managed ? markMap[host] : markRef ? (await tx.get(markRef)).data() : null;
         const receiptRef = chat?.markAction?.type === 'forgetme' ? ref('chatReceipts', chat.broadcasterId) : null;
         const receipt = receiptRef ? (await tx.get(receiptRef)).data() : null;
-        const transition = managed && host ? reduceLifecycle({ registry, channel, marks: markDoc, host, event, chat, now, sentAt }) : null;
+        const transition = managed && host ? reduceLifecycle({ registry, channel, marks: markDoc, host, event, chat, now, sentAt, observed: Boolean(observation) }) : null;
         const next = transition ? transition.marks : markRef ? reduceMark(markDoc, chat.broadcasterId, chat, chat.markAction, now) : null;
         let claiming; let sending;
         if (managed) {
@@ -104,7 +104,7 @@ export function createFirestoreStore(db, { lifecycle } = {}) {
         }
         if (receipt && receipt.chatterId === chat?.chatterId) tx.delete(receiptRef);
         if (chat && !chat.markAction) tx.set(ref('chatReceipts', chat.broadcasterId), { messageId: chat.messageId, chatterId: chat.chatterId, receivedAt: now });
-        return 'accepted';
+        return observation ? (transition.channel.lifecycleAt === event.sentAt && transition.channel.lifecycleSource === 'helix-observation' ? 'applied' : 'no-change') : sending?.result ?? 'accepted';
       });
     },
     async getRitual(hostId) { return (await ref('rituals', hostId).get()).data(); },

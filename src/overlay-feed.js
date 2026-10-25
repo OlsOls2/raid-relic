@@ -23,7 +23,7 @@ export function createOverlayHub(store, channels, { simulator = false, now = Dat
       if (name === 'accept') {
         const input = args[0];
         const quiet = input.chat && !input.chat.markAction && !input.raid && !input.lifecycle && !input.observation;
-        if (quiet || result !== 'accepted') return result;
+        if (quiet || !(result === 'accepted' || result === 'applied' || result?.status === 'reserved')) return result;
       }
       revision++;
       for (const channel of channels) { const snapshot = await read(channel); for (const listener of listeners.get(channel)) { try { listener(snapshot); } catch { /* Client cannot fail commit. */ } } }

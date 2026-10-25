@@ -10,7 +10,7 @@ async function refresh() {
     const response = await fetch(`/control/${id}/status`, { cache: 'no-store' });
     if (!response.ok) throw new Error(); const value = await response.json(); csrf = value.csrf; document.getElementById('simulator').hidden = value.pilot.mode !== 'simulator';
     document.getElementById('account').textContent = `${names[id]} · Keeper control`;
-    for (const key of ['account', 'online', 'optedIn', 'paused', 'holder', 'subscriptions', 'bothReadiness', 'ownerStep', 'intent', 'handoff']) {
+    for (const key of ['account', 'online', 'optedIn', 'paused', 'holder', 'subscriptions', 'bothReadiness', 'eligibility', 'ownerStep', 'intent', 'handoff']) {
       const dt = document.createElement('dt'); dt.textContent = key; const dd = document.createElement('dd'); dd.textContent = JSON.stringify(value.pilot[key], null, 2); document.getElementById('ledger').append(dt, dd);
     }
     for (const group of ['setup', 'keeper', 'raid']) document.getElementById(group).replaceChildren();

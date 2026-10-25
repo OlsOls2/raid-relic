@@ -2,9 +2,9 @@ import { randomBytes } from 'node:crypto';
 import { httpTransport } from './oauth.js';
 
 export function createSendOff({ state, oauth, clientId, streamerId, transport = httpTransport, now = Date.now, authorize }) {
-  async function processPending() {
+  async function processPending(expectedId) {
     const owner = randomBytes(24).toString('hex');
-    const intent = await state.sendOffStep({ type: 'claim', source: streamerId, owner }, now());
+    const intent = await state.sendOffStep({ type: 'claim', source: streamerId, owner, ...(expectedId ? { expectedId } : {}) }, now());
     if (!intent) return { status: 'idle-or-reconcile-only' };
     const finish = status => state.sendOffStep({ type: 'finish', id: intent.id, owner, status }, now());
     let token; let refreshed = false;

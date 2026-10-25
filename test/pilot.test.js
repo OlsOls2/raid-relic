@@ -99,7 +99,7 @@ for (const kind of ['memory', 'firestore']) {
     const f = await pilotFixture(kind); await ready(f);
     await f.chat(HOME, HOME, '!relic send @olsols2');
     const count = f.calls.length; const result = JSON.parse((await f.control(OTHER, 'process')).body);
-    assert.equal(result.status, 'idle-or-reconcile-only'); assert.equal(f.calls.length, count);
+    assert.equal(result.status, 'blocked'); assert.equal(result.reason, 'no-own-queued-intent'); assert.equal(f.calls.length, count);
     await Promise.all([f.control(HOME, 'process'), f.control(HOME, 'process')]);
     assert.equal(f.calls.filter(c => c.url.includes('/raids')).length, 1);
     assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, HOME);
