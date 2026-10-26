@@ -113,7 +113,7 @@ export function createControl({ store, keeperIds, origin, secure, now = Date.now
         if (match[2]) {
           let pilotStatus; try { pilotStatus = pilot ? await boundedCall(() => pilot.status(id)) : undefined; } catch { return reply(503, JSON.stringify({ error: 'Status unavailable' }), 'application/json'); }
           const fresh = await activity(record);
-          return reply(200, JSON.stringify({ forgeEnabled: pilot?.forgeEnabled === true, keeperId: id, expiresAt: fresh.expiresAt, csrf: csrf(record.secret), actions: ['logout', ...(pilot?.actions(id) ?? [])], ...(pilot ? { pilot: pilotStatus } : {}) }), 'application/json'); }
+          return reply(200, JSON.stringify({ canonicalBotConsentStartURL: new URL('/oauth/bot/start?features=p7', origin).href, forgeEnabled: pilot?.forgeEnabled === true, keeperId: id, expiresAt: fresh.expiresAt, csrf: csrf(record.secret), actions: ['logout', ...(pilot?.actions(id) ?? [])], ...(pilot ? { pilot: pilotStatus } : {}) }), 'application/json'); }
         if (pilot) return reply(200, await readFile(new URL('../public/control.html', import.meta.url)), 'text/html; charset=utf-8');
         return reply(200, `<h1>Keeper control</h1><p>Authenticated Keeper ${id}.</p><p>Worker and subscription bootstrap actions are not available yet.</p><a href="/control/${id}/status">Private session status</a>`, 'text/html; charset=utf-8');
       } catch { return reply(403, 'Control authorization required'); }

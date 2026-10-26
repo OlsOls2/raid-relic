@@ -35,3 +35,13 @@ export function actionMessage(value, targetLogin) {
   }
   return 'The request did not complete. Refresh and review the current state; never blindly repeat a raid request.';
 }
+
+// Only trusted server configuration; HTTP is exclusively a local Simulator convenience.
+export function botConsentStartURL(value, mode, pageOrigin) {
+  try {
+    const u = new URL(value);
+    const https = u.protocol === 'https:' && (u.origin === 'https://raid-relic-760724762396.us-central1.run.app' || u.origin === pageOrigin);
+    const local = mode === 'simulator' && u.protocol === 'http:' && u.origin === pageOrigin && u.port === '5191' && ['127.0.0.1', 'localhost'].includes(u.hostname);
+    return (https || local) && !u.username && !u.password && !u.hash && u.pathname === '/oauth/bot/start' && u.search === '?features=p7' ? u.href : null;
+  } catch { return null; }
+}

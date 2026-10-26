@@ -1,5 +1,8 @@
 # Raid Relic
 
+> **26 October operator update:** Olly authorized live P7 activation. Parent reports read-only validation of the bot's exact identity/client, all seven scopes and moderator membership in both Keeper rooms at 00:24:22 UTC. Parent verified the configuration-only `raid-relic-p7live1026` revision at 100% at 00:27:44 UTC, using the same b23 image (digest prefix `1a9a9cf`). All five P7 flags are true, pin duration is 300 seconds and replacement acknowledgement is explicit. Parent reports 40 staged and 40 canonical responses byte-matched, with SecretRefs, caps, service account, origins and callbacks unchanged; judge ff56 remains zero traffic. No real chat, announcement, pin, shoutout or raid POST was performed by parent; Grok's live action test remains pending. This judge-track UX is candidate-only, not production source. Source defaults remain OFF; no new physical P7 claim/action proof is asserted.
+
+
 One original relic, carried between Twitch communities and bound by two chats.
 
 ![Labelled simulated browser demo — no Twitch connection](.codex-evidence/judge-preview/judge-demo-desktop.png)

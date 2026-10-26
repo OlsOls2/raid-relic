@@ -4,14 +4,15 @@ import { completionEligible } from './claim-ack.js';
 export { P7_SCOPES } from './p7-scopes.js';
 export const P7_KINDS=Object.freeze(['announcement','pin','shoutout']);
 export function p7Config(env={}){
- const off={enabled:false,announcement:false,pin:false,shoutout:false,duration:300};
+ const configured={master:env.P7_BOT_ACTIONS_ENABLED==='true',announcement:env.P7_ANNOUNCEMENTS_ENABLED==='true',pin:env.P7_PIN_ENABLED==='true',shoutout:env.P7_SHOUTOUTS_ENABLED==='true',pinReplace:env.P7_ALLOW_PIN_REPLACE==='true',duration:env.P7_PIN_DURATION_SECONDS===undefined?300:/^[1-9]\d{1,3}$/.test(env.P7_PIN_DURATION_SECONDS)&&Number(env.P7_PIN_DURATION_SECONDS)>=30&&Number(env.P7_PIN_DURATION_SECONDS)<=1800?Number(env.P7_PIN_DURATION_SECONDS):null};
+ const off={enabled:false,announcement:false,pin:false,shoutout:false,duration:300,configured};
  if(env.P7_BOT_ACTIONS_ENABLED!=='true')return off;
  for(const k of['P7_ANNOUNCEMENTS_ENABLED','P7_PIN_ENABLED','P7_SHOUTOUTS_ENABLED','P7_ALLOW_PIN_REPLACE'])if(env[k]!==undefined&&!['true','false'].includes(env[k]))return off;
  if(env.P7_PIN_DURATION_SECONDS!==undefined&&(typeof env.P7_PIN_DURATION_SECONDS!=='string'||!/^\d{2,4}$/.test(env.P7_PIN_DURATION_SECONDS)))return off;
  const duration=env.P7_PIN_DURATION_SECONDS===undefined?300:Number(env.P7_PIN_DURATION_SECONDS);
  if((env.P7_PIN_DURATION_SECONDS?.startsWith('0'))||!Number.isInteger(duration)||duration<30||duration>1800)return off;
  const flags={announcement:env.P7_ANNOUNCEMENTS_ENABLED==='true',pin:env.P7_PIN_ENABLED==='true'&&env.P7_ALLOW_PIN_REPLACE==='true',shoutout:env.P7_SHOUTOUTS_ENABLED==='true'};
- return{...flags,duration,enabled:Object.values(flags).some(Boolean)};
+ return{...flags,duration,configured,enabled:Object.values(flags).some(Boolean)};
 }
 export const p7Key=(kind,host,eventId)=>hash(JSON.stringify(['p7-action-v1',kind,host,eventId]));
 const messageId=v=>typeof v==='string'&&/^[A-Za-z0-9_-]{1,128}$/.test(v);
@@ -59,7 +60,7 @@ export async function p7HTTP(url,options={},fetchImpl=globalThis.fetch){
  });
 }
 export function createP7({flags,env, state,oauth,clientId,clientSecret,botId,keeperIds,logins={},transport=p7HTTP,now=Date.now,logger=line=>console.warn(line)}){
- const config=flags??p7Config(env);if(!config.enabled)return{enabled:false,config,status:()=>({enabled:false,reason:'disabled'}),async process(){return{status:'disabled'};}};
+ const config=flags??p7Config(env);const settings=config.configured??{master:config.enabled===true,announcement:config.announcement===true,pin:config.pin===true,shoutout:config.shoutout===true,pinReplace:config.pin===true,duration:Number.isInteger(config.duration)&&config.duration>=30&&config.duration<=1800?config.duration:null};const safeSettings=()=>({master:settings.master===true,announcement:settings.announcement===true,pin:settings.pin===true,shoutout:settings.shoutout===true,pinReplace:settings.pinReplace===true,duration:Number.isInteger(settings.duration)&&settings.duration>=30&&settings.duration<=1800?settings.duration:null});const effective=()=>({announcement:config.enabled===true&&config.announcement===true,pin:config.enabled===true&&config.pin===true,shoutout:config.enabled===true&&config.shoutout===true});if(!config.enabled)return{enabled:false,config,status:()=>({enabled:false,reason:'disabled',configured:safeSettings(),effective:effective()}),async process(){return{status:'disabled'};}};
  if(!Array.isArray(keeperIds)||keeperIds.length<2||keeperIds.length>4||new Set(keeperIds).size!==keeperIds.length||!keeperIds.every(v=>/^\d{1,32}$/.test(v))||!/^\d{1,32}$/.test(botId)||keeperIds.includes(botId))throw Error('P7 configured identities');
  let app=null,minting=null,roles=null,checking=null,grantsUntil=0;
  const call=(url,options)=>boundedCall(signal=>transport(url,{...options,signal}));
@@ -101,7 +102,7 @@ export function createP7({flags,env, state,oauth,clientId,clientSecret,botId,kee
   try{await logger(JSON.stringify({severity:outcome==='sent'?'INFO':'WARNING',event:'raid_relic_p7_action',host,key,kind:job.kind,outcome,httpStatus}));}catch{}
   return{status:outcome};
  }
- return{enabled:true,config,process,status:()=>({enabled:true,moderatorChecked:!!roles&&roles.until>now(),reason:roles?.until>now()?'cached-capability':'capability-required'})};
+ return{enabled:true,config,process,status:()=>({enabled:true,configured:safeSettings(),effective:effective(),moderatorChecked:!!roles&&roles.until>now(),reason:roles?.until>now()?'cached-capability':'capability-required'})};
 }
 
 export function cancelP7(previous){if(!previous)return previous;const doc=structuredClone(previous);for(const r of doc.rows)if(r.status==='queued'){r.status='cancelled';delete r.proof;delete r.messageId;}return doc;}
