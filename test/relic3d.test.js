@@ -13,7 +13,7 @@ test('original crystal geometry is deterministic and all Forge bounds stay below
   }
 });
 test('frame budgets distinguish idle, verified arrival and reduced corner', () => {
-  assert.equal(frameInterval(false), 1000 / 30); assert.equal(frameInterval(true), 1000 / 60); assert.equal(frameInterval(true, true), 1000 / 30);assert.equal(frameInterval(true,false,true),1000/24);assert.equal(frameInterval(false,false,true),1000/12);assert.equal(frameInterval(true,true,true),1000/30);assert.equal(frameInterval(false,true,true),1000/30);
+  assert.equal(frameInterval(false), 1000 / 30); assert.equal(frameInterval(true), 1000 / 60); assert.equal(frameInterval(true, true), 1000 / 30);assert.equal(frameInterval(true,false,true),1000/24);assert.equal(frameInterval(false,false,true),1000/10);assert.equal(frameInterval(true,true,true),1000/30);assert.equal(frameInterval(false,true,true),1000/30);
 });
 test('reduced motion never imports WebGL; missing vendor fails to SVG without throwing', async () => {
   let imports = 0; const archive = { classList: { remove() {} } };
@@ -59,6 +59,7 @@ test('injected renderer pauses hidden, discards stale sprite loads, and context 
   doc.hidden = true; listeners.visibilitychange(); assert.equal(pending.size, 0); assert.equal(classes.has('webgl-relic'), false);
   doc.hidden = false; listeners.visibilitychange(); tick(272); assert.equal(classes.has('webgl-relic'), true);
   view.update({lineageRings:3,marks:[]});view.update(null); listeners.visibilitychange(); assert.equal(pending.size, 0);assert.equal(canvas.hidden,true);assert.equal(canvas.style.display,'none');assert.equal(canvas.dataset.bands,'0');assert.equal(canvas.dataset.sprites,'0');assert.equal(forced,0);const pausedRenders=renders;tick(306);assert.equal(renders,pausedRenders);
+  view.update({lineageRings:1,marks:[]},{animate:false});const staticRenders=renders;assert.equal(canvas.hidden,false);assert.equal(canvas.dataset.bands,'2');assert.equal(pending.size,0);tick(320);assert.equal(renders,staticRenders);view.update(null);assert.equal(canvas.hidden,true);assert.equal(canvas.dataset.bands,'0');
   view.update({ lineageRings: 0, marks: [] }); tick(340);
   listeners.webglcontextlost({ preventDefault() {} }); assert.equal(pending.size, 0); assert.equal(canvas.hidden, true);assert.equal(canvas.style.display,'none'); assert.equal(classes.has('webgl-relic'), false);view.wake();assert.equal(canvas.style.display,'none');
   assert.equal(forced,0);const staleRestore=listeners.webglcontextrestored;listeners.webglcontextrestored();tick(374);assert.equal(canvas.dataset.contextStatus,'active');assert.equal(canvas.hidden,false);assert.equal(forced,0);

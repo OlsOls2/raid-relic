@@ -51,7 +51,8 @@ try {
       assert(await core.evaluate(n=>Number(getComputedStyle(n).opacity)>.9));
       if(ms===1500&&mode==='webgl')await capture(page,'p31-simulator-comet.png');
     }
-    for(const ms of [3200,3600]) {
+    // Positive browser frames use margin for native transport/GPU/locator latency; pure tests pin the exact late edge.
+    for(const ms of [3200,3350]) {
       stage=`${mode}-impact-${ms}`;await seek(ms);
       await page.waitForFunction(()=>!document.querySelector('.p3-flash').hidden&&Number(getComputedStyle(document.querySelector('.p3-flash')).opacity)>0);
       const alpha=await page.locator('.p3-flash').evaluate(n=>Number(getComputedStyle(n).opacity));assert(alpha>0&&alpha<=.45);

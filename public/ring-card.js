@@ -26,4 +26,5 @@ export async function ringCardPNG(model){
  const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));if(!blob||blob.type!=='image/png'||blob.size>CARD_MAX_BYTES)throw Error('Card encoding');return blob;
  }finally{canvas.width=canvas.height=0;}
 }
-export function saveRingCard(blob,simulated=false){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=simulated?'raid-relic-simulated-ring.png':'raid-relic-recorded-ring.png';try{a.click();}finally{setTimeout(()=>URL.revokeObjectURL(url),1000);}}
+export function ringCardFilename(ringIndex,keeper){if(!Number.isInteger(ringIndex)||ringIndex<1||ringIndex>16||typeof keeper!=='string'||keeper!==keeper.trim()||!/^@[a-z0-9_]{1,25}$/i.test(keeper))throw Error('Card filename');return `raid-relic-stop-${ringIndex}-${keeper.slice(1).toLowerCase()}.png`;}
+export function saveRingCard(blob,simulated=false,filename=null){if(filename!==null&&(typeof filename!=='string'||filename!==filename.trim()||!/^raid-relic-stop-(?:[1-9]|1[0-6])-[a-z0-9_]{1,25}\.png$/.test(filename)))throw Error('Card filename');const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename??(simulated?'raid-relic-simulated-ring.png':'raid-relic-recorded-ring.png');try{a.click();}finally{setTimeout(()=>URL.revokeObjectURL(url),1000);}}

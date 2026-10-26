@@ -11,3 +11,6 @@
 .skip-link{position:absolute;top:0;left:12px;transform:translateY(-150%);z-index:50;padding:12px;background:#101d30;color:#e6bb70}.skip-link:focus{transform:none}
 a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,main:focus-visible{outline:3px solid #e6bb70;outline-offset:3px}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+
+#demo-streak{font:13px/1.5 system-ui;color:#e6bb70;margin:2px 0}#demo-mark-approved{position:absolute;bottom:12%;color:#e6bb70;font:16px Cinzel,serif;pointer-events:none}.edition-label,.edition-disclaimer{font-size:13px;line-height:1.5}
+@media(max-width:650px){.demo-visual{max-height:min(35vh,220px)}.demo-visual .edition-label{font-size:13px;line-height:1.5}.demo-visual #demo-streak{font-size:12px}}

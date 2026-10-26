@@ -115,3 +115,5 @@ test('source charge seeks only the valid180-second accepted window, expires and 
   }
   assert.deepEqual(sourceCharge(s, 91000, true), { charge: false, chargeLevel: 0 });
 });
+
+test('fresh verified host flash keeps the exact700ms late edge while shock continues',()=>{for(const elapsed of[3600,3699]){const p=cinematicPhase(view(),hop.startedAt+elapsed,{fresh:true});assert.equal(p.host,true);assert.equal(p.elapsed,elapsed);assert.ok(p.flash>0&&p.flash<=.45);assert.ok(p.shock>0&&p.shock<1);}const end=cinematicPhase(view(),hop.startedAt+3700,{fresh:true});assert.equal(end.flash,0);assert.ok(end.shock>0&&end.shock<1);assert.equal(cinematicPhase(view(),hop.startedAt+3600,{fresh:false}).flash,0);});

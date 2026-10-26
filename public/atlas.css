@@ -28,3 +28,5 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,su
 nav>a{min-height:24px;display:inline-flex;align-items:center}.skip-link{z-index:50}
 @media(max-width:380px){header{flex-wrap:wrap}.ledger-heading{flex-wrap:wrap}.keeper-leaderboard{grid-template-columns:minmax(0,1fr)}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+
+.edition-label,.edition-disclaimer{font-size:13px;line-height:1.5}
