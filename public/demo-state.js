@@ -27,3 +27,6 @@ export function demoControls(s,{playing=false,tour=false}={}){
  const locked=playing&&tour;
  return{locked,pauseLabel:s.phase==='settled'?'Replay tour':playing?'Pause':'Resume',pauseDisabled:s.phase==='idle',notice:locked?'Controls locked during the tour. Press Pause to take over.':s.phase==='settled'?'Tour complete. Replay tour starts a fresh fictional run at zero rings.':tour?'Tour paused. Manual controls are unlocked; using them takes over. Resume continues the tour.':'Manual controls are ready. Send Off starts a new run only before departure or after completion; Reset starts over.'};
 }
+
+// Clock advances animate presentation without changing the scene payload. All fictional semantic fields are covered.
+export function demoSceneKey(s){return s===null?null:JSON.stringify([s.rings,s.phase,s.acceptedAt,s.receiptAt,s.completedAt,s.offer,s.accept,s.source,s.target,s.notice]);}

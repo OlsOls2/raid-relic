@@ -27,11 +27,20 @@ export function crystalMesh(design = DEFAULT_DESIGN) {
   }
   return { positions, colors, triangles: positions.length / 9 };
 }
-export function frameInterval(arriving, corner = false) { return 1000 / (arriving && !corner ? 60 : 30); }
+// DPR1 physical bounds; uniform cap preserves the CSS aspect without oversampling.
+export function renderViewport(width,height){
+  if(!Number.isFinite(width)||!Number.isFinite(height)||width<=0||height<=0)return null;
+  const scale=Math.min(1,480/Math.max(width,height));
+  const w=Math.max(1,Math.min(480,Math.round(width*scale))),h=Math.max(1,Math.min(480,Math.round(height*scale)));
+  return {width:w,height:h,aspect:w/h};
+}
+// Context attribute chosen once; resizing never churns a live context. Invalid bounds keep normal AA.
+export function lowPowerWidget(width,height,corner=false){return corner===true||(Number.isFinite(width)&&Number.isFinite(height)&&width>0&&height>0&&Math.min(width,height)<=160);}
+export function frameInterval(arriving, corner = false, small = false) { return 1000 / (corner ? 30 : small ? arriving ? 24 : 12 : arriving ? 60 : 30); }
 export function ringSummary(n) { const total = Number.isInteger(n) && n > 0 ? n : 0; return { total, visible: Math.min(16, total), text: total > 16 ? `${total} completed rings · 16 visual bands shown` : `${total} completed growth rings` }; }
 export async function createRelic3D({ signal, archive, reducedMotion, corner = false, design = DEFAULT_DESIGN,
   load = () => import('/vendor/three.module.js'), document: doc = globalThis.document, window: win = globalThis.window } = {}) {
-  let renderer, scene, camera, group, canvas, disposed = false, lost = false, frame = null, last = -Infinity, snapshot = null, revision = 0, visualSignature = null, resumeCalls = 0;
+  let renderer, scene, camera, group, canvas, disposed = false, lost = false, frame = null, last = -Infinity, snapshot = null, revision = 0, visualSignature = null, resumeCalls = 0, smallWidget = false;
   const resources = new Set(), sprites = [], bands = [];
   const remove = items => { for (const item of items.splice(0)) { group.remove(item); scene?.remove?.(item); item.geometry?.dispose(); item.material?.map?.dispose(); item.material?.dispose(); } };
   const diagnostic = reason => {
@@ -47,13 +56,27 @@ export async function createRelic3D({ signal, archive, reducedMotion, corner = f
   const theme=()=>customDesign?null:selectEdition(Date.now());
   const rebuildEdition=()=>{const e=theme(),id=e?.id??'base';if(id===editionId)return;editionId=id;if(!customDesign)presentEdition(archive);const chosen=e?.design??design;const mesh=crystalMesh(chosen),g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(mesh.positions,3));g.setAttribute('color',new T.Float32BufferAttribute(mesh.colors,3));g.computeVertexNormals();if(coreGeometry){resources.delete(coreGeometry);coreGeometry.dispose();}coreGeometry=g;resources.add(g);if(coreMesh)coreMesh.geometry=g;if(haloMesh)haloMesh.geometry=g;if(particles){scene.remove(particles);resources.delete(particles.geometry);resources.delete(particles.material);particles.geometry.dispose();particles.material.dispose();particles=null;}if(e&&T.Points&&T.PointsMaterial&&e.particles.count){const a=[];for(let i=0;i<e.particles.count;i++){const angle=i*2.399963,r=1.2+(i%7)*.055;a.push(Math.cos(angle)*r,Math.sin(angle)*r,(i%5-2)*.08);}const pg=new T.BufferGeometry();pg.setAttribute('position',new T.Float32BufferAttribute(a,3));const pm=new T.PointsMaterial({color:e.design.palette[3],size:.035,transparent:true,opacity:.6,depthWrite:false,blending:T.AdditiveBlending});particles=new T.Points(pg,pm);particles.visible=false;scene.add(particles);resources.add(pg);resources.add(pm);}if(canvas)Object.assign(canvas.dataset,{edition:id,facets:String(chosen.facets),particles:String(particles?e.particles.count:0),coreCount:'1'});};
   const safely = fn => { try { fn(); } catch { /* Cleanup cannot defeat the SVG fallback. */ } };
-  const dispose = () => { if (disposed) return; disposed = true; revision++; safely(stop); safely(fallback); safely(() => doc?.removeEventListener?.('visibilitychange', resume)); safely(() => reducedMotion?.removeEventListener?.('change', resume)); safely(() => signal?.removeEventListener?.('abort', dispose)); if (group) { safely(() => remove(sprites)); safely(() => remove(bands)); } for (const resource of resources) safely(() => resource.dispose?.()); safely(() => renderer?.dispose?.()); safely(() => canvas?.remove?.()); };
+  const contextLost = e => { if(disposed)return; e.preventDefault(); canvas.dataset.contextStatus='lost';lost=true;stop();fallback();diagnostic('lost'); };
+  const contextRestored = () => { if(disposed)return;lost=false;canvas.dataset.contextStatus='active';visualSignature=null;update(snapshot); };
+  const dispose = () => {
+    if(disposed)return;disposed=true;if(canvas)canvas.dataset.disposed='true';revision++;safely(stop);safely(fallback);
+    safely(()=>canvas?.removeEventListener?.('webglcontextlost',contextLost));safely(()=>canvas?.removeEventListener?.('webglcontextrestored',contextRestored));
+    safely(()=>doc?.removeEventListener?.('visibilitychange',resume));safely(()=>reducedMotion?.removeEventListener?.('change',resume));safely(()=>signal?.removeEventListener?.('abort',dispose));
+    if(group){safely(()=>remove(sprites));safely(()=>remove(bands));}for(const resource of resources)safely(()=>resource.dispose?.());resources.clear();
+    safely(()=>{if(renderer?.debug)renderer.debug.onShaderError=null;});
+    safely(()=>renderer?.dispose?.());safely(()=>renderer?.forceContextLoss?.());safely(()=>canvas?.remove?.());
+    snapshot=null;visualSignature=null;coreGeometry=null;coreMesh=null;haloMesh=null;particles=null;group=null;scene=null;camera=null;renderer=null;canvas=null;
+  };
   signal?.addEventListener?.('abort', dispose, { once: true });
   const render = time => {
     frame = null;
     if (!snapshot || disposed || lost || doc.hidden || reducedMotion.matches) { fallback(); diagnostic(disposed ? 'disposed' : lost ? 'lost' : !snapshot ? 'no-snapshot' : doc.hidden ? 'hidden' : 'reduced'); return; }
     const phase = archive.dataset.phase, arriving = ['streak', 'impact', 'unfurl'].includes(phase);
-    if (time - last >= frameInterval(arriving, corner) - .1) {
+    if (time - last >= frameInterval(arriving, corner, smallWidget) - .1) {
+      const box=archive.getBoundingClientRect(),viewport=renderViewport(box.width,box.height);smallWidget=lowPowerWidget(box.width,box.height)&&!corner;
+      if(!viewport){fallback();diagnostic('zero-size');frame=win.requestAnimationFrame(render);return;}
+      if(canvas.width!==viewport.width||canvas.height!==viewport.height){renderer.setSize(viewport.width,viewport.height,false);camera.aspect=viewport.aspect;camera.updateProjectionMatrix?.();}else if(camera.aspect!==viewport.aspect){camera.aspect=viewport.aspect;camera.updateProjectionMatrix?.();}
+      Object.assign(canvas.dataset,{viewportWidth:String(viewport.width),viewportHeight:String(viewport.height),projectionAspect:String(viewport.aspect)});
       rebuildEdition();if(particles){particles.visible=arriving;particles.rotation.z=time*.00006;}if(canvas)canvas.dataset.particlesVisible=String(Boolean(particles?.visible));
       last = time; group.rotation.y = time * .00018; group.rotation.z = Math.sin(time * .00013) * .06;
       for (let i = 0; i < bands.length; i++) bands[i].rotation.z = time * .0001 * (i % 2 ? 1 : -1);
@@ -62,7 +85,7 @@ export async function createRelic3D({ signal, archive, reducedMotion, corner = f
         const pose = runePose(sprite.orbitIndex, snapshot.marks?.length ?? 0, time, unfurl);
         sprite.visible = !['streak', 'impact'].includes(phase) && (phase !== 'unfurl' || pose.flight > 0);
         const span = 2 * (6 - .5) * Math.tan(Math.PI / 10); // camera36deg, sprite plane z=.5
-        sprite.position.set((pose.x - 50) / 100 * span, (50 - pose.y) / 100 * span, .5);
+        sprite.position.set((pose.x - 50) / 100 * span * camera.aspect, (50 - pose.y) / 100 * span, .5);
       }
       const fusionWait = archive.dataset.fusionPending === 'true';
       const fusionProgress = Number(archive.style?.getPropertyValue('--p3-fusion') ?? '1');
@@ -74,13 +97,12 @@ export async function createRelic3D({ signal, archive, reducedMotion, corner = f
 
         if (band.scale?.setScalar) band.scale.setScalar(newest && fusionWait ? .7 + .3 * fusionProgress : 1);
       }
-      const box = archive.getBoundingClientRect(); const size = Math.max(1, Math.min(480, Math.round(box.width)));
-      if (canvas.width !== size) renderer.setSize(size, size, false);
-      try { renderer.render(scene, camera); if (lost) { fallback(); diagnostic('lost'); return; } canvas.dataset.triangles = String(renderer.info?.render?.triangles ?? 0); canvas.dataset.sprites = String(sprites.length); canvas.dataset.fps = String(arriving && !corner ? 60 : 30); canvas.dataset.fadedSprites = String(sprites.filter(s => s.material.opacity === .28).length); canvas.dataset.frames = String(Number(canvas.dataset.frames ?? 0) + 1); canvas.hidden = false; if(canvas.style)canvas.style.display='block'; archive.classList.add('webgl-relic'); if (canvas.hasAttribute?.('data-pixel-probe')) canvas.dispatchEvent(new Event('relic3d-frame')); } catch (error) { canvas.dataset.renderError = ['TypeError','RangeError','Error'].includes(error?.name) ? error.name : 'OtherError'; lost = true; fallback(); diagnostic('lost'); return; }
+      try { renderer.render(scene, camera); if (lost) { fallback(); diagnostic('lost'); return; } canvas.dataset.triangles = String(renderer.info?.render?.triangles ?? 0); canvas.dataset.sprites = String(sprites.length); canvas.dataset.fps = String(Math.round(1000/frameInterval(arriving,corner,smallWidget))); canvas.dataset.fadedSprites = String(sprites.filter(s => s.material.opacity === .28).length); canvas.dataset.frames = String(Number(canvas.dataset.frames ?? 0) + 1); canvas.hidden = false; if(canvas.style)canvas.style.display='block'; archive.classList.add('webgl-relic'); if (canvas.hasAttribute?.('data-pixel-probe')) canvas.dispatchEvent(new Event('relic3d-frame')); } catch (error) { canvas.dataset.renderError = ['TypeError','RangeError','Error'].includes(error?.name) ? error.name : 'OtherError'; lost = true; fallback(); diagnostic('lost'); return; }
     }
     frame = win.requestAnimationFrame(render); diagnostic('animating');
   };
   const resume = () => {
+    if(disposed)return;
     resumeCalls++;
     const blocked = disposed ? 'disposed' : lost ? 'lost' : !snapshot ? 'no-snapshot' : doc.hidden ? 'hidden' : reducedMotion.matches ? 'reduced' : null;
     if (blocked) { stop(); fallback(); diagnostic(blocked); return; }
@@ -90,9 +112,10 @@ export async function createRelic3D({ signal, archive, reducedMotion, corner = f
   try {
     if (signal?.aborted || reducedMotion.matches) { dispose(); return { update() {}, wake() {}, dispose() {}, available: false }; }
     T = await load(); if (disposed || signal?.aborted) { dispose(); return { update() {}, wake() {}, dispose() {}, available: false }; }
-    renderer = new T.WebGLRenderer({ alpha: true, antialias: !corner, powerPreference: 'low-power' }); renderer.setPixelRatio(1); renderer.setClearColor(0, 0);
+    const initialBox=archive.getBoundingClientRect(),antialias=!lowPowerWidget(initialBox.width,initialBox.height,corner);
+    renderer = new T.WebGLRenderer({ alpha: true, antialias, powerPreference: 'low-power' }); renderer.setPixelRatio(1); renderer.setClearColor(0, 0);
     if (renderer.debug) renderer.debug.onShaderError = () => { if (canvas) canvas.dataset.shaderErrors = String(Number(canvas.dataset.shaderErrors ?? 0) + 1); lost = true; stop(); fallback(); diagnostic('lost'); };
-    canvas = renderer.domElement; canvas.className = 'relic3d'; canvas.setAttribute('aria-hidden', 'true'); canvas.hidden = true; if(canvas.style)canvas.style.display='none'; canvas.dataset.contextStatus = 'active'; canvas.dataset.shaderErrors = '0'; archive.append(canvas);
+    canvas = renderer.domElement; canvas.className = 'relic3d'; canvas.setAttribute('aria-hidden', 'true'); canvas.hidden = true; if(canvas.style)canvas.style.display='none'; canvas.dataset.antialiasRequested=String(antialias);canvas.dataset.contextStatus = 'active'; canvas.dataset.shaderErrors = '0'; archive.append(canvas);
     scene = new T.Scene(); camera = new T.PerspectiveCamera(36, 1, .1, 20); camera.position.z = 6;
     group = new T.Group(); scene.add(group);
     const geometry = new T.BufferGeometry(); coreGeometry=geometry; resources.add(geometry);
@@ -117,19 +140,17 @@ export async function createRelic3D({ signal, archive, reducedMotion, corner = f
       const aura = new T.Sprite(auraMaterial); aura.scale.set(3.5, 3.5, 1); aura.position.z = -.5; scene.add(aura);
       resources.add(texture); resources.add(auraMaterial);
     }
-    canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); canvas.dataset.contextStatus = 'lost'; lost = true; stop(); fallback(); diagnostic('lost'); });
+    canvas.addEventListener('webglcontextlost',contextLost);canvas.addEventListener('webglcontextrestored',contextRestored);
     doc?.addEventListener?.('visibilitychange', resume); reducedMotion?.addEventListener?.('change', resume); resume();
   } catch { dispose(); return { update() {}, wake() {}, dispose() {}, available: false }; }
-  return {
-    available: true,
-    update(value) {
+  function update(value) {
       if (disposed) return;
       snapshot = value;
       const signature = snapshot ? JSON.stringify([ringSummary(snapshot.lineageRings).visible, snapshot.status ?? 'preview',
         (snapshot.marks ?? []).slice(0, 160).map(m => [m.id ?? '', m.runeSvg, m.faded === true])]) : null;
       if (signature !== null && signature === visualSignature) { diagnostic('unchanged'); return; }
       visualSignature = signature; const ownRevision = ++revision; remove(sprites); remove(bands);
-      if (!snapshot) { fallback(); stop(); diagnostic('no-snapshot'); return; }
+      if (!snapshot) { if(canvas){canvas.dataset.bands='0';canvas.dataset.sprites='0';} fallback(); stop(); diagnostic('no-snapshot'); return; }
       const rings = ringSummary(snapshot.lineageRings).visible;
       for (let i = 0; i < rings; i++) {
         // 2 toruses *16 rings *8*24*2 triangles =12,288; core+halo<=144,
@@ -160,7 +181,9 @@ export async function createRelic3D({ signal, archive, reducedMotion, corner = f
         }; image.onerror = () => { if (!disposed && ownRevision === revision && !lost) canvas.dataset.spriteFailures = String(++spriteFailures); }; image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(mark.runeSvg)}`;
       }
       resume();
-    },
+  }
+  return {
+    available:true,update,
     ringInset() { const rings = ringSummary(snapshot?.lineageRings).visible; return 50 - (1.05 + Math.max(0, rings - 1) * .018) / (12 * Math.tan(Math.PI / 10)) * 100; },
     wake: resume,
     dispose
