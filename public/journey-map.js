@@ -308,6 +308,7 @@ if (typeof document !== 'undefined' && document.querySelector('#journey-map')) {
         if (!embed) {
           const download = document.createElement('button');
           download.type = 'button';
+          download.className = 'ring-card-download';
           download.textContent = 'Download ring card · Stop ' + h.ringIndex;
           download.setAttribute('aria-label', 'Download ring card Stop ' + h.ringIndex);
           const own = data;

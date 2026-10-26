@@ -170,14 +170,14 @@ for (const kind of ['memory', 'firestore'])
     assert.equal(retained.sessions[0].marks[0].status, 'approved');
     assert.equal(
       JSON.parse(f.calls.filter((c) => c.url.endsWith('/chat/messages')).at(-1).body).message,
-      'Mark approved. Your community rune is now public.',
+      'Your mark is public on the relic.',
     );
     await f.chat(HOME, '812', '!mark spoiler');
     retained = await f.runtime.state.getPrivateMarks(HOME, own);
     assert.equal(retained.sessions[0].marks[1].status, 'pending');
     assert.equal(
       JSON.parse(f.calls.filter((c) => c.url.endsWith('/chat/messages')).at(-1).body).message,
-      'Mark held for private moderator review. It is not visible on the relic.',
+      'Waiting for moderator approval. Your mark is private and is not visible on the relic.',
     );
     await f.signed(
       'channel.chat.message',
@@ -228,9 +228,11 @@ for (const kind of ['memory', 'firestore'])
     const replies = f.calls
       .filter((c) => c.url.endsWith('/chat/messages'))
       .map((c) => JSON.parse(c.body).message);
-    assert.ok(replies.includes('Mark approved. Your community rune is now public.'));
+    assert.ok(replies.includes('Your mark is public on the relic.'));
     assert.ok(
-      replies.includes('Mark held for private moderator review. It is not visible on the relic.'),
+      replies.includes(
+        'Waiting for moderator approval. Your mark is private and is not visible on the relic.',
+      ),
     );
     assert.ok(replies.every((m) => !m.includes('spoiler')));
     assert.ok(replies.every((m) => [...m].length <= 500));

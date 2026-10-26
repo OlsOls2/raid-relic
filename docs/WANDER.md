@@ -1,3 +1,5 @@
+> Current safety amendment 182: the operator reports the owned worker cron entry commented out at 16:36:54.531 UTC on 26 October 2026, pending explicit owner GO. Keep live Wander OFF and every new visual candidate read-only / live-moving OFF. Older installation/activation discussion below is historical guidance, never authorization to schedule or enable it. The browser-only filming route cannot call a tick. See [VISUAL_RECORDING.md](VISUAL_RECORDING.md).
+
 # Auto-wander: a separate idle ownership transfer
 
 Part 3B source candidate, awaiting parent native QA. No production promotion, worker installation, cloud operation or actual Twitch action was performed by the source author. Part 3A's parent-reported 754 tests / zero skips and 33 workflows / 106 checks predate this code. The third Keeper remains a later, separately authorised admission step.

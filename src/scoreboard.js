@@ -1,7 +1,7 @@
 import { RECEIVING_KEEPERS } from './receiving.js';
 import { streakView, stopStreak } from './streaks.js';
 import { selectEdition, editionBadgesForInterval } from '../public/editions.js';
-import { ackDocument, ackKey, ackStep } from './claim-ack.js';
+import { ackDocument, ackKey, ackStep, KEEPER_SETUP_HINT } from './claim-ack.js';
 import { hash } from './crypto.js';
 import { INITIAL_HOME } from './lifecycle.js';
 export const SCORE_LIMITS = Object.freeze({ players: 128, bytes: 65536, top: 20 });
@@ -82,12 +82,14 @@ export function reduceScores(
     reason = 'not-command';
   const safe =
     command &&
-    channels[host]?.optedIn &&
+    ((channels[host]?.optedIn && marks[host]?.context?.optedIn) ||
+      (['seek-on', 'seek-off', 'seek-status'].includes(action) &&
+        chat.chatterId === host &&
+        channels[host])) &&
     !channels[host].banned &&
-    marks[host]?.context?.optedIn &&
     !channels[host].blockedUserIds?.includes(chat.chatterId) &&
-    !marks[host].blocked?.includes(chat.chatterId) &&
-    !marks[host].context?.blockedUserIds?.includes(chat.chatterId);
+    !marks[host]?.blocked?.includes(chat.chatterId) &&
+    !marks[host]?.context?.blockedUserIds?.includes(chat.chatterId);
   if (command) {
     reason = safe ? 'queued' : 'policy-blocked';
     if (duplicate) reason = 'duplicate';
@@ -150,7 +152,9 @@ export function reduceScores(
                 ? 'The authorised Keeper Seeker pilot is off.'
                 : channels[host].seeking === true
                   ? 'Seeker queue on. Your configured channel may be suggested while live and eligible. !seek off to leave.'
-                  : 'Seeker queue off. Opt in as a Keeper first, then !seek to join; !seek off to leave.';
+                  : channels[host]?.optedIn === true
+                    ? 'Seeker queue off. Type !seek to rejoin.'
+                    : KEEPER_SETUP_HINT;
         else if (action === 'where') {
           const holder = names[registry?.holderId];
           message = holder
@@ -166,7 +170,7 @@ export function reduceScores(
           message =
             hop && !hop.cancelled && !hop.finalized && now < hop.endsAt
               ? 'That vote was not counted. Check the ritual, chat role and deadline.'
-              : 'No vote was saved. Ask the Keeper to Send Off, then watch the claim meter and try again after the raid lands.';
+              : 'No Send Off is active yet. The keeper starts one on the control page, then raid and !offer.';
         else if (action === 'forgetme')
           message =
             'Your retained marks, shared links and public scores were erased. Stream quota and cooldown are not refunded.';
@@ -184,23 +188,25 @@ export function reduceScores(
             markOutcome === 'vetoed'
               ? 'Vetoed latest mark.'
               : markOutcome === 'empty'
-                ? 'Nothing to veto. Only retained marks in this channel can be removed; veto never refunds quota or cooldown.'
+                ? 'Nothing is retained to veto in this channel. Moderators can remove the latest approved or pending mark; veto never refunds the five-mark allowance or waiting time.'
                 : 'Veto unavailable: an eligible retained mark and authorized same-channel moderator are required.';
         else if (action === 'mark' && ['approved', 'pending'].includes(markOutcome))
           message =
             markOutcome === 'approved'
-              ? 'Mark approved. Your community rune is now public.'
-              : 'Mark held for private moderator review. It is not visible on the relic.';
+              ? 'Your mark is public on the relic.'
+              : 'Waiting for moderator approval. Your mark is private and is not visible on the relic.';
         else if (action === 'mark' && markOutcome === 'not-added')
           message =
-            'No mark was added. Check the valid word or emoji, five-mark budget, 30-second cooldown and current Keeper status. Nothing held is public.';
+            !channels[host]?.online || channels[host]?.paused || !marks[host]?.context?.holdsRelic
+              ? 'Marks are open only while this channel is live, unpaused and holding the relic. No mark was added.'
+              : 'No mark was added. Use one allowed word or emoji, wait 30 seconds between marks, and use at most five marks per stream. Private review text is never public.';
         else if (action === 'mark')
           message =
             channels[host].online && !channels[host].paused && marks[host]?.context?.holdsRelic
               ? autoApprove
                 ? 'Mark request checked under quota and cooldown. Clean valid marks become public automatically; held marks stay private until moderator approval.'
                 : 'Mark request processed under the stream quota and cooldown. Only moderator-approved marks become public.'
-              : 'Marks require a live, unpaused Keeper holding the relic. Nothing pending is public.';
+              : 'Marks are open only while this channel is live, unpaused and holding the relic. No mark was added.';
         else if (action === 'send')
           message =
             'Send Off request checked. The Keeper uses private control to process an eligible queued request; never repeat an unknown dispatch.';
@@ -232,7 +238,20 @@ export function reduceScores(
 }
 export const scoreCompletion = (hop, actors) => ({ link: link(hop), actors });
 // Public projection is an explicit whitelist; history is bounded, never an all-time claim.
-export function scoreboard(lineage, registry, scores, config, now) {
+export function publicKeeperProfiles(config, channels, marks) {
+  return (config?.channels ?? [])
+    .filter(
+      (id) =>
+        channels[id]?.optedIn &&
+        !channels[id]?.banned &&
+        marks[id]?.context?.optedIn &&
+        !channels[id]?.blockedUserIds?.includes(id) &&
+        !marks[id]?.blocked?.includes(id),
+    )
+    .map((id) => Object.entries(config.logins ?? {}).find(([, v]) => v === id)?.[0])
+    .filter(Boolean);
+}
+export function scoreboard(lineage, registry, scores, config, now, publicProfiles = []) {
   const stops = lineage?.stops ?? [];
   if (stops.length > 16 || !Number.isSafeInteger(now) || now < 0)
     throw Error('Invalid score archive');
@@ -343,6 +362,7 @@ export function scoreboard(lineage, registry, scores, config, now) {
     coverage:
       'Retained completed archive only. Initial home hold start is unknown; historical raider participation is not available. Raider counts start after explicit score opt-in, never retroactively.',
     channels: rows,
+    ...(config.seekersEnabled ? { publicProfiles } : {}),
     raiders,
     event: TWITCHCON,
   };
@@ -395,6 +415,12 @@ export function scoreAckDocument(previous, chat, message, channel, marks, now) {
   const row = doc.rows.find((r) => r.key === ackKey(chat));
   if (row?.status === 'queued') {
     row.scoreKind = chat.markAction.type;
+    if (
+      chat.chatterId === chat.broadcasterId &&
+      ['seek-on', 'seek-off', 'seek-status'].includes(row.scoreKind) &&
+      message === KEEPER_SETUP_HINT
+    )
+      row.keeperSetup = chat.broadcasterId;
     if (row.scoreKind === 'scores-status') row.selfStatusKey = actorKey(chat.chatterId);
     row.readSummary =
       ['top', 'badges'].includes(row.scoreKind) &&

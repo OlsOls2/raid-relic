@@ -71,3 +71,7 @@ an unchanged full state snapshot. Its independent at-most-once message outbox ne
 uses P7 raid proof/jobs. The operator-only existing-VM worker is authored, not installed;
 canonical health gates metadata/credential access. Public reads cannot trigger a tick,
 refresh a grant or reset activity. No new infrastructure or default scope is added.
+
+## Visual recording safety amendment (182)
+
+`/demo/wander` is an isolated static client fixture with `connect-src 'none'`; its virtual clock never enters the server Wander engine. The shared growth renderer packs bounded physical bands and one reusable numeric medallion texture, without expanding retained history. Every new visual preview is read-only with Wander/P7/clip/paid gates OFF; the operator reports the owned cron entry commented out pending explicit GO. See [VISUAL_RECORDING.md](docs/VISUAL_RECORDING.md) for exact safety settings and native capture gates.

@@ -1,3 +1,4 @@
+import { presentGrowth } from './growth.js';
 import { ringCardModel, ringCardPNG, saveRingCard, demoCardFilename } from './ring-card.js';
 import { presentEdition } from './edition-view.js';
 import {
@@ -16,6 +17,7 @@ import { createRelic3D } from './relic3d.js';
 const $ = (id) => document.getElementById(id),
   motion = matchMedia('(prefers-reduced-motion: reduce)');
 const time = (ms) => '00:' + String(Math.max(0, Math.floor(ms / 1000))).padStart(2, '0');
+let growthExample = null;
 let state = freshDemo(),
   playing = false,
   tour = false,
@@ -54,7 +56,7 @@ function snapshot() {
         };
   return {
     status: handoff ? 'incoming' : 'archive',
-    lineageRings: state.rings,
+    lineageRings: growthExample ?? state.rings,
     marks: [],
     handoff,
   };
@@ -66,7 +68,7 @@ function text(id, value) {
   assign($(id), 'textContent', value);
 }
 function scene() {
-  const key = demoSceneKey(state);
+  const key = demoSceneKey(state) + ':' + String(growthExample);
   if (key !== sceneKey) {
     sceneKey = key;
     sceneSnapshot = snapshot();
@@ -82,11 +84,11 @@ function updateView() {
   }
   if (!view) return;
   if (!playing) {
-    if (state.phase === 'settled' && state.completedAt !== null) {
+    if (growthExample !== null || (state.phase === 'settled' && state.completedAt !== null)) {
       const value = scene(),
         key = 'static:' + sceneKey;
       if (viewKey !== key) {
-        view.update(value, { animate: false });
+        view.update(value, { animate: false, growthFeedback: growthExample === null });
         viewKey = key;
       }
       return;
@@ -97,12 +99,13 @@ function updateView() {
   }
   const value = scene();
   if (viewKey !== sceneKey) {
-    view.update(value);
+    view.update(value, { growthFeedback: growthExample === null });
     viewKey = sceneKey;
   }
 }
 function render() {
   presentEdition($('demo-art'));
+  presentGrowth($('demo-art'), growthExample ?? state.rings);
   $('demo-art').dataset.demoCharging = String(state.phase === 'countdown');
   $('demo-art').style.setProperty(
     '--demo-charge',
@@ -354,6 +357,9 @@ $('demo-host-chat').onsubmit = (e) => {
   }
 };
 function reset() {
+  growthExample = null;
+  $('demo-growth-example').value = '';
+  text('demo-growth-note', 'Style previews are SIMULATED, not recorded history.');
   stop();
   state = freshDemo();
   $('demo-proof').open = false;
@@ -431,4 +437,21 @@ $('demo-download').onclick = async () => {
     cardPending = false;
     button.disabled = !demoHolder(state);
   }
+};
+
+$('demo-growth-example').onchange = () => {
+  const value = $('demo-growth-example').value;
+  growthExample = ['9', '17', '42', '120'].includes(value) ? Number(value) : null;
+  sceneKey = null;
+  viewKey = null;
+  text(
+    'demo-growth-note',
+    growthExample === null
+      ? 'Style previews are SIMULATED, not recorded history.'
+      : `Style preview: ${growthExample} rings (SIMULATED). No recorded history or awards.`,
+  );
+  // Switching presentation examples (including back to the game count) awards nothing.
+  if (view) view.update(scene(), { animate: playing, growthFeedback: false });
+  if (growthExample !== null) renderer();
+  render();
 };

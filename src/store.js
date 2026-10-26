@@ -1,3 +1,4 @@
+import { publicKeeperProfiles } from './scoreboard.js';
 import { wanderMutation, wanderActivity } from './wander-state.js';
 import { receivingView } from './receiving.js';
 import { streakView } from './streaks.js';
@@ -972,6 +973,7 @@ export function createFirestoreStore(
           retainedScores(scores, channels, marks),
           config ?? { channels: [], logins: {} },
           now,
+          publicKeeperProfiles(config, channels, marks),
         );
       });
     },

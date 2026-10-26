@@ -188,6 +188,7 @@ async function motionController(overrides = {}) {
     sceneSnapshot: { stale: true },
     state: { phase: 'countdown', completedAt: null },
     playing: true,
+    growthExample: null,
     AbortController,
     $: () => ({}),
     scene: () => ({ marks: [] }),

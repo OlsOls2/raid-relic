@@ -478,7 +478,7 @@ h1 {
 .keeper-ledger {
   width: 100%;
   padding: 16px 0 24px;
-  border-block: 1px solid #52617a;
+  border-top: 1px solid #52617a;
   margin: 0 0 24px;
   min-width: 0;
   scroll-margin-top: 28px;
@@ -733,4 +733,71 @@ nav > a {
 .keeper-glyphs figcaption {
   max-width: 12em;
   overflow-wrap: anywhere;
+}
+
+/* Original numeric medallion; SVG stays readable when GPU/motion is unavailable. */
+:is(.archive, .atlas-relic) {
+  position: relative;
+}
+:is(.archive, .atlas-relic) .growth-fallback {
+  position: absolute;
+  width: 64px;
+  height: 49px;
+  left: 50%;
+  top: 58%;
+  transform: translateX(-50%);
+  z-index: 4;
+  pointer-events: none;
+}
+:is(.archive, .atlas-relic).webgl-relic .growth-fallback {
+  display: block;
+  height: 34.5%;
+  width: auto;
+  aspect-ratio: 100 / 76;
+  top: 65.4%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transform-origin: center;
+}
+.corner :is(.archive, .atlas-relic) .growth-fallback {
+  width: 54px;
+  height: 41px;
+}
+
+#map-stops button + button,
+#map-stops .ring-card-download {
+  margin-block-start: 1rem;
+}
+
+:is(.archive, .atlas-relic) .growth-tick {
+  position: absolute;
+  left: 58%;
+  top: 53%;
+  z-index: 5;
+  color: #d8e6ef;
+  font: 700 15px/1.5 system-ui;
+  pointer-events: none;
+  animation: growth-rise 750ms ease-out both;
+}
+@keyframes growth-rise {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-18px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.archive, .atlas-relic) .growth-tick {
+    display: none;
+    animation: none;
+  }
+}
+
+/* Same projected engraved emblem, composited over the genuine GL crystal. */
+.corner :is(.archive, .atlas-relic).webgl-relic .growth-fallback {
+  height: 36.3%;
+  width: auto;
 }

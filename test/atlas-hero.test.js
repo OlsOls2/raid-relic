@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { atlasRings, createAtlasHero } from '../public/atlas-hero.js';
 const archive = () => ({ dataset: {}, classList: { remove() {} } });
 test('Atlas accepts bounded actual aggregate rings only', () => {
@@ -55,4 +56,128 @@ test('Atlas import failure and stale asynchronous creation retain fallback witho
   await failed.update(2);
   failed.dispose();
   assert.equal(disposed, 0);
+});
+
+test('Atlas reduced preference disposes the scene, skips imports and normal return creates one fresh scene', async () => {
+  const a = archive();
+  let change,
+    loads = 0,
+    disposed = 0,
+    created = 0;
+  const motion = {
+    matches: false,
+    addEventListener(type, fn) {
+      change = fn;
+    },
+    removeEventListener() {},
+  };
+  const hero = createAtlasHero({
+    archive: a,
+    motion,
+    load: async () => {
+      loads++;
+      return {
+        createRelic3D: async () => {
+          created++;
+          return {
+            update() {},
+            dispose() {
+              disposed++;
+            },
+          };
+        },
+      };
+    },
+  });
+  await hero.update(3);
+  motion.matches = true;
+  change();
+  await hero.update(3);
+  assert.equal(disposed, 1);
+  assert.equal(loads, 1);
+  assert.equal(a.dataset.rings, '3');
+  motion.matches = false;
+  await hero.update(3);
+  assert.equal(created, 2);
+  hero.dispose();
+  assert.equal(disposed, 2);
+});
+test('Atlas motion change during import fences late creation and retains exact static count', async () => {
+  let resolve,
+    created = 0;
+  const motion = { matches: false };
+  const a = archive();
+  const hero = createAtlasHero({
+    archive: a,
+    motion,
+    load: () =>
+      new Promise((r) => {
+        resolve = r;
+      }),
+  });
+  const pending = hero.update(4);
+  motion.matches = true;
+  resolve({
+    createRelic3D() {
+      created++;
+      throw Error('Must not create');
+    },
+  });
+  await pending;
+  assert.equal(created, 0);
+  assert.equal(a.dataset.rings, '4');
+  hero.dispose();
+});
+
+test('Atlas renderer-observed reduced preference notifies its owner and preserves count without reload', async () => {
+  const a = archive(),
+    motion = { matches: false };
+  let notify,
+    loads = 0,
+    disposed = 0;
+  const hero = createAtlasHero({
+    archive: a,
+    motion,
+    load: async () => {
+      loads++;
+      return {
+        createRelic3D: async ({ onReducedMotion }) => {
+          notify = onReducedMotion;
+          return {
+            update() {},
+            dispose() {
+              disposed++;
+            },
+          };
+        },
+      };
+    },
+  });
+  await hero.update(2);
+  motion.matches = true;
+  notify();
+  assert.equal(a.dataset.rings, '2');
+  assert.equal(disposed, 1);
+  assert.equal(loads, 1);
+  assert.equal(a.dataset.motionChanges, '1');
+  motion.matches = false;
+  await hero.update(2);
+  assert.equal(loads, 2);
+  hero.dispose();
+});
+
+test('Atlas composited growth styles target the actual hero root in normal and reduced presentation', async () => {
+  const css = await readFile(new URL('../public/atlas.css', import.meta.url), 'utf8');
+  const html = await readFile(new URL('../public/atlas.html', import.meta.url), 'utf8');
+  assert.match(html, /id="atlas-relic"[^>]*class="atlas-relic"/);
+  assert.match(
+    css,
+    /:is\(\.archive,\s*\.atlas-relic\)\s+\.growth-fallback\s*\{[^}]*position:\s*absolute/s,
+  );
+  assert.match(
+    css,
+    /:is\(\.archive,\s*\.atlas-relic\)\.webgl-relic\s+\.growth-fallback\s*\{[^}]*height:\s*34\.5%[^}]*top:\s*65\.4%[^}]*translate\(-50%,\s*-50%\)/s,
+  );
+  assert.match(css, /:is\(\.archive,\s*\.atlas-relic\)\s+\.growth-tick/);
+  assert.match(css, /prefers-reduced-motion:\s*reduce/);
 });

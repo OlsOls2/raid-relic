@@ -1,3 +1,4 @@
+import { keeperNames } from './keeper-network.js';
 import { validStreak, streakText } from './streak-view.js';
 import { EDITION_CONFIG, editionWindowLabel } from './editions.js';
 const $ = (id) => document.getElementById(id);
@@ -24,9 +25,14 @@ export function validScores(v) {
       v.rings >= 0 &&
       v.rings <= 16 &&
       Object.keys(v)
-        .filter((k) => !['streak', 'wanderStops'].includes(k))
+        .filter((k) => !['streak', 'wanderStops', 'publicProfiles'].includes(k))
         .sort()
         .join(',') === 'asOf,channels,coverage,event,mode,previewReadOnly,raiders,rings' &&
+      (v.publicProfiles === undefined ||
+        (Array.isArray(v.publicProfiles) &&
+          v.publicProfiles.length <= 4 &&
+          new Set(v.publicProfiles).size === v.publicProfiles.length &&
+          v.publicProfiles.every((n) => Object.values(keeperNames).includes(n)))) &&
       (v.wanderStops === undefined ||
         (Number.isInteger(v.wanderStops) && v.wanderStops >= 1 && v.wanderStops <= v.rings)) &&
       (v.streak === undefined ||
@@ -118,6 +124,18 @@ export function badgeDescription(name) {
     return `Carried the relic on recorded raid/legacy hand-off ${name.slice(5)}. Wander growth is excluded from this milestone.`;
   return Object.hasOwn(meanings, name) ? meanings[name] : '';
 }
+export function scoreProfileURL(login, profiles = [], names = keeperNames) {
+  if (typeof login !== 'string' || !/^[a-z0-9_]{1,25}$/.test(login)) return null;
+  return Object.values(names).includes(login) && profiles.includes(login)
+    ? '/keeper/' + login
+    : 'https://twitch.tv/' + login;
+}
+function profileName(login, profiles) {
+  const href = scoreProfileURL(login, profiles),
+    n = node(href ? 'a' : 'span', login ? '@' + login : 'Unknown Keeper');
+  if (href) n.href = href;
+  return n;
+}
 let expanded = false;
 const clear = () => {
   $('keeper-rows').replaceChildren();
@@ -183,10 +201,9 @@ async function loadScores() {
         'aria-label',
         `${row.knownHoldSeconds} seconds time held; ${row.hopsCarried} ${row.hopsCarried === 1 ? 'raid' : 'raids'} carried`,
       );
-      li.append(
-        node('h3', `${index + 1}. ${row.login ? '@' + row.login : 'Channel ' + row.channelId}`),
-        time,
-      );
+      const heading = node('h3', `${index + 1}. `);
+      heading.append(profileName(row.login, v.publicProfiles ?? []));
+      li.append(heading, time);
       const badges = node('ul', undefined, 'score-badges');
       for (const b of row.badges) badges.append(badge(b, true));
       if (!row.badges.includes(EVENT_BADGE)) badges.append(badge(EVENT_BADGE, false));
@@ -194,13 +211,16 @@ async function loadScores() {
       $('keeper-rows').append(li);
     }
     $('scores-all').hidden = v.channels.length <= 3;
-    for (const row of v.raiders)
-      $('raider-rows').append(
-        node(
-          'li',
-          `@${row.login} · ${row.claimsJoined} completed ${row.claimsJoined === 1 ? 'claim' : 'claims'} joined · since opt-in ${new Date(row.since).toLocaleString()}`,
+    for (const row of v.raiders) {
+      const li = node('li');
+      li.append(
+        profileName(row.login, v.publicProfiles ?? []),
+        document.createTextNode(
+          ` · ${row.claimsJoined} completed ${row.claimsJoined === 1 ? 'claim' : 'claims'} joined · since opt-in ${new Date(row.since).toLocaleString()}`,
         ),
       );
+      $('raider-rows').append(li);
+    }
     if (!v.raiders.length)
       $('raider-rows').append(node('li', 'Raiders: type !relic scores on to join the ledger.'));
     $('scores-coverage').textContent = v.coverage;

@@ -141,20 +141,34 @@ let receiptServerTime = 0;
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
 let relic3d,
   relic3dClosed = false;
-const relic3dAbort = new AbortController();
-createRelic3D({
-  signal: relic3dAbort.signal,
-  archive: document.querySelector('.archive'),
-  reducedMotion: motion,
-  corner: document.body.classList.contains('corner'),
-}).then((view) => {
-  if (relic3dClosed) {
-    view?.dispose();
-    return;
-  }
-  relic3d = view;
-  view?.update(current);
-});
+let relic3dAbort = new AbortController(),
+  relic3dEpoch = 0;
+function loadRelicView() {
+  const own = ++relic3dEpoch;
+  relic3dAbort.abort();
+  relic3dAbort = new AbortController();
+  createRelic3D({
+    signal: relic3dAbort.signal,
+    archive: document.querySelector('.archive'),
+    reducedMotion: motion,
+    corner: document.body.classList.contains('corner'),
+  }).then((view) => {
+    if (relic3dClosed || own !== relic3dEpoch) {
+      view?.dispose();
+      return;
+    }
+    relic3d = view;
+    view?.update(current);
+  });
+}
+loadRelicView();
+function syncRelicMotion() {
+  relic3d?.dispose();
+  relic3d = null;
+  relic3dAbort.abort();
+  if (!relic3dClosed) loadRelicView();
+}
+motion.addEventListener('change', syncRelicMotion);
 addEventListener('pagehide', () => {
   clearCinema();
   relic3dClosed = true;
@@ -358,9 +372,11 @@ function frame() {
   frameId = null;
   if (document.hidden || document.body.dataset.connection === 'suspended') return;
   if (motion.matches !== lastReduced || document.hidden !== lastHidden) {
+    const motionChanged = motion.matches !== lastReduced;
     lastReduced = motion.matches;
     lastHidden = document.hidden;
-    relic3d?.wake();
+    if (motionChanged) syncRelicMotion();
+    else relic3d?.wake();
   }
   const echoOn = resonanceActive(
     current?.resonance,

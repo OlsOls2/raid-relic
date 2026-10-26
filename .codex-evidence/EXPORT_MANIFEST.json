@@ -1,23 +1,23 @@
 {
   "formatVersion": 1,
   "sessionID": "01a1705c-a87d-7143-80f6-021e47b78ced",
-  "inputLeaf": "rollout-2026-10-26T16-04-18-036Z-01a1705c-a87d-7143-80f6-021e47b78ced.jsonl",
-  "rawSnapshotSHA256": "c51a98d05b91a793de14d0beb2412ce21a71514697b32a2ae64e4275633a2b4c",
-  "rawBytes": 74381395,
+  "inputLeaf": "rollout-2026-10-26T20-07-33-015Z-01a1705c-a87d-7143-80f6-021e47b78ced.jsonl",
+  "rawSnapshotSHA256": "9eac0c88ea8840e7ba5dc00e9b410698e141fb90d6686702aa862245af604896",
+  "rawBytes": 79065154,
   "eventCounts": {
     "session_meta": 1,
-    "event_msg": 6689,
-    "response_item": 5892,
-    "world_state": 128,
-    "turn_context": 183,
-    "token_usage_record": 1728,
-    "compacted": 14
+    "event_msg": 7118,
+    "response_item": 6265,
+    "world_state": 131,
+    "turn_context": 194,
+    "token_usage_record": 1842,
+    "compacted": 15
   },
-  "exportedEntries": 3880,
+  "exportedEntries": 4130,
   "omissions": {
-    "private": 112,
+    "private": 113,
     "media": 2,
-    "unselected": 10754,
+    "unselected": 11435,
     "truncated": 6,
     "credentialLookingItems": 53,
     "credentialReasons": {
@@ -26,10 +26,10 @@
     }
   },
   "firstTimestamp": "2026-10-25T00:01:23.357Z",
-  "cutoff": "2026-10-26T16:03:25.272Z",
-  "exportSHA256": "09c1eca373360b01147a96c5483b00143cf410adb477d7d98f5e5cb8734a4ccf",
-  "exportBytes": 11974462,
-  "sourceRunLogCount": 182,
+  "cutoff": "2026-10-26T20:07:10.245Z",
+  "exportSHA256": "6719640fc9fbd4d849f29e5b30ccc60e941f17a2516be431544cb1c05b561b35",
+  "exportBytes": 12686601,
+  "sourceRunLogCount": 193,
   "sourceRunLogs": [
     {
       "leaf": "run-000.jsonl",
@@ -940,6 +940,61 @@
       "leaf": "run-181.jsonl",
       "bytes": 8984,
       "sha256": "3610800442e48373d1eff705a1a6e7d20bf8c252d0854585f900b84c3887fa08"
+    },
+    {
+      "leaf": "run-182.jsonl",
+      "bytes": 670280,
+      "sha256": "9116d4d99ef8f716d734a0d961262627e245cab876fa58dafc0e63adb6b5d579"
+    },
+    {
+      "leaf": "run-183.jsonl",
+      "bytes": 51128,
+      "sha256": "b8d2aefead4f403946a7bf466babbbe4b36f42ee2ef20a7bfbed86b26a6ebc7a"
+    },
+    {
+      "leaf": "run-184.jsonl",
+      "bytes": 56172,
+      "sha256": "d4950b791c65219bc1d821431dca19f3782fec768f2596f090a20f7d3c39ec38"
+    },
+    {
+      "leaf": "run-185.jsonl",
+      "bytes": 46272,
+      "sha256": "491ac1b46fc369842fe5f4d92eaf92911fbf083ac3b91b73df164345490de6cb"
+    },
+    {
+      "leaf": "run-186.jsonl",
+      "bytes": 47878,
+      "sha256": "7af38ae153e1f0d353693adc1037cf8987d06c3c312b363754fc15900939dd89"
+    },
+    {
+      "leaf": "run-187.jsonl",
+      "bytes": 11413,
+      "sha256": "e0425be5d791515b49d70cdc06586ceb3ef20ff2de9a4da6b1aa5df2875e13b7"
+    },
+    {
+      "leaf": "run-188.jsonl",
+      "bytes": 52260,
+      "sha256": "a9efe79d7965b2509221661cfab106199550d2f5bd50f50f633b955ceec1aa92"
+    },
+    {
+      "leaf": "run-189.jsonl",
+      "bytes": 33241,
+      "sha256": "55287305e3dcbfe48912a2a9e29a95b64c3b4d5bbe884511fa654ecb020bb30c"
+    },
+    {
+      "leaf": "run-190.jsonl",
+      "bytes": 49648,
+      "sha256": "8367188ecebdcb1d9d2d8fbd52f003730682ac11584ed3a5302abef837903478"
+    },
+    {
+      "leaf": "run-191.jsonl",
+      "bytes": 24989,
+      "sha256": "54e4ec74f6124fb62be623de872def1bd8ce56d349abd218eafbfae3b4ab37fe"
+    },
+    {
+      "leaf": "run-192.jsonl",
+      "bytes": 37948,
+      "sha256": "c76084f0efd2af7c9cc5071329b545093bfa8755d24e3cba3edf00086481b91d"
     }
   ],
   "scope": "Selected sanitized native JSONL; private/internal/media omitted and per-item output bounded. Raw snapshot remains local ignored. Secondary scanner findings cause whole selected-entry omission, including public identifiers; zero-finding rescan required.",
@@ -953,6 +1008,6 @@
     },
     "omissionReportSHA256": "f7d9d91ab7dc699ae8cd590f91c224919b5b7f579e5574aaf70561df58e79457",
     "reportSHA256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
-    "scannedExportSHA256": "09c1eca373360b01147a96c5483b00143cf410adb477d7d98f5e5cb8734a4ccf"
+    "scannedExportSHA256": "6719640fc9fbd4d849f29e5b30ccc60e941f17a2516be431544cb1c05b561b35"
   }
 }

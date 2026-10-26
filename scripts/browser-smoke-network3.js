@@ -128,8 +128,13 @@ try {
     name: 'Signed A to B to C to A, early source quorum, distinct users and actual third GL pixels',
     passed: true,
   });
+  stage = 'keeper-profile-links';
+  await page.goto(origin + '/atlas/');
+  for (const login of Object.values(NETWORK3))
+    await page.locator(`#keeper-rows a[href="/keeper/${login}"]`).waitFor();
+  await page.locator('#keeper-rows a[href="/keeper/olsols3"]').click();
+  await page.locator('#keeper-title').filter({ hasText: '@olsols3 · received rings' }).waitFor();
   stage = 'third-profile-card';
-  await page.goto(origin + '/keeper/olsols3');
   await page
     .getByRole('button', { name: 'Download landscape card · Ring 2', exact: true })
     .waitFor();

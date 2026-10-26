@@ -21,6 +21,12 @@ const actions = [
   'reset',
 ];
 const assets = new Set([
+  '/growth.js',
+  '/wander-demo.js',
+  '/wander-demo-state.js',
+  '/wander-demo.css',
+  '/demo/wander',
+  '/demo/wander/',
   '/keeper-network.js',
   '/receiving.js',
   '/keeper-card.js',

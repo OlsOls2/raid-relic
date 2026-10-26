@@ -20,6 +20,19 @@
       <div class="buttons"><button id="demo-tour">Autoplay 35-second tour</button></div>
       <section class="demo-layout" aria-label="Fictional two-chat ritual">
         <div>
+          <div class="demo-growth-controls">
+            <label for="demo-growth-example">Growth style preview</label
+            ><select id="demo-growth-example">
+              <option value="">Actual demo binding count</option>
+              <option>9</option>
+              <option>17</option>
+              <option>42</option>
+              <option>120</option>
+            </select>
+            <p id="demo-growth-note" role="status">
+              Style previews are SIMULATED, not recorded history.
+            </p>
+          </div>
           <div class="demo-visual">
             <div id="demo-art" class="archive" data-phase="idle">
               <div id="demo-bands"></div>
@@ -45,6 +58,7 @@
             Choose two Keepers, then Send Off.
           </p>
           <p id="demo-lock" role="status" aria-live="polite">Manual controls are ready.</p>
+          <p><a href="/demo/wander">Film a simulated Wander</a></p>
           <p id="demo-card-status" role="status">
             Saved downloads cannot be recalled after erasure.
           </p>

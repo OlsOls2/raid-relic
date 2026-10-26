@@ -163,7 +163,7 @@ for (const kind of ['memory', 'firestore']) {
     await f.chat(HOME, HOME, '!relic veto');
     assert.equal(
       replies(f).at(-1).message,
-      'Nothing to veto. Only retained marks in this channel can be removed; veto never refunds quota or cooldown.',
+      'Nothing is retained to veto in this channel. Moderators can remove the latest approved or pending mark; veto never refunds the five-mark allowance or waiting time.',
     );
     assert.equal((await f.runtime.state.getPrivateMarks(HOME, actor)).sessions[0].spent, 2);
     assert.equal(

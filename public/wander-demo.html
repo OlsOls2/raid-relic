@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Raid Relic · simulated Wander recording</title>
+    <link rel="icon" href="/favicon.svg" />
+    <link rel="stylesheet" href="/fonts.css" />
+    <link rel="stylesheet" href="/demo.css" />
+    <link rel="stylesheet" href="/wander-demo.css" />
+    <script type="module" src="/wander-demo.js"></script>
+  </head>
+  <body>
+    <p id="demo-banner" class="demo-banner">
+      SIMULATED · NOT LIVE · local fictional recording only; no Twitch connection or game effects.
+    </p>
+    <main id="main" tabindex="-1">
+      <h1>A quiet relic finds a new home</h1>
+      <p>
+        Film a labelled idle journey in three clicks. This virtual clock never changes the
+        production 72-hour / 12-hour policy.
+      </p>
+      <section aria-label="Fictional idle transfer">
+        <div id="wander-art" class="archive">
+          <img class="crystal" src="/crystal.svg" alt="Original simulated relic" />
+        </div>
+        <p id="wander-holder"></p>
+        <p id="wander-clock"></p>
+        <p id="wander-status" role="status" aria-live="polite"></p>
+        <div class="buttons">
+          <button id="wander-play">Play / next scene</button
+          ><button id="wander-warn">Advance to 60h warning</button
+          ><button id="wander-move" disabled>Advance 12h / Wander</button
+          ><button id="wander-reset">Reset recording</button>
+        </div>
+        <svg viewBox="0 0 500 120" role="img" aria-label="Fictional Wander path, not a raid">
+          <circle cx="70" cy="45" r="16" fill="#d8b46a" />
+          <circle cx="430" cy="45" r="16" fill="#d8e6ef" />
+          <path
+            id="wander-path"
+            d="M90 45 Q250 110 410 45"
+            fill="none"
+            stroke="#d8b46a"
+            stroke-width="4"
+            stroke-dasharray="5 9"
+            hidden
+          />
+          <text x="20" y="105" fill="#d8e6ef">fixture_keeper</text>
+          <text x="345" y="105" fill="#d8e6ef">fixture_seeker</text>
+        </svg>
+        <p id="wander-arrival" hidden>
+          Wandered here · one typed growth ring · no raid audience · streak reset to 0.
+        </p>
+      </section>
+      <p><a href="/demo/">35-second binding demo and growth examples</a></p>
+      <p>
+        Only fictional public fixtures are used. A real Wander requires explicit operator GO,
+        recipient consent, fresh eligibility and the trusted server tick. This page cannot call it.
+      </p>
+    </main>
+    <footer>
+      <p>Unofficial fan edition; not affiliated with or endorsed by Twitch/TwitchCon.</p>
+    </footer>
+  </body>
+</html>

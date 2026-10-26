@@ -23,6 +23,7 @@ let judges,
   passed = false,
   deadlineTimer,
   finished = false;
+let contextLossEvents = [];
 const samples = [],
   checks = [],
   sockets = new Set();
@@ -384,6 +385,8 @@ try {
           storageWrites: 0,
         };
         window.__demoSoakIO = io;
+        const lifecycleStartedAt = performance.now();
+        window.__demoSoakContextLossEvents = [];
         window.__demoSoakLifecycle = {
           contextLostEvents: 0,
           activeContextLostEvents: 0,
@@ -395,12 +398,30 @@ try {
           (event) => {
             const v = window.__demoSoakLifecycle;
             v.contextLostEvents++;
-            if (
+            const active =
               event.target.isConnected &&
               event.target.dataset.disposed !== 'true' &&
-              document.body?.dataset.demoPlaying === 'true'
-            )
-              v.activeContextLostEvents++;
+              document.body?.dataset.demoPlaying === 'true';
+            if (active) v.activeContextLostEvents++;
+            const records = window.__demoSoakContextLossEvents;
+            if (records.length < 4) {
+              const finite = (value) =>
+                Number.isFinite(Number(value))
+                  ? Math.max(0, Math.min(999999999, Number(value)))
+                  : 0;
+              records.push({
+                relativePerformanceMs: finite(performance.now() - lifecycleStartedAt),
+                demoClockMs: finite(document.body?.dataset.demoClock),
+                phaseCode:
+                  ['idle', 'streak', 'impact', 'unfurl', 'settled'].indexOf(
+                    document.querySelector('#demo-art')?.dataset.phase,
+                  ) + 1,
+                isConnected: Number(Boolean(event.target.isConnected)),
+                disposed: Number(event.target.dataset.disposed === 'true'),
+                playing: Number(document.body?.dataset.demoPlaying === 'true'),
+                active: Number(Boolean(active)),
+              });
+            }
           },
           true,
         );
@@ -626,6 +647,14 @@ try {
       tourStartedAt === null ? 0 : Math.round(performance.now() - tourStartedAt);
   clearTimeout(deadlineTimer);
   await frameDiagnostic();
+  try {
+    contextLossEvents = await bounded(
+      page.evaluate(() => window.__demoSoakContextLossEvents.slice(0, 4)),
+      2000,
+    );
+  } catch {
+    /* A closed page cannot supply event records; the failure gate stays unchanged. */
+  }
   await processMetrics(false);
   if (steadyStart !== null)
     soak = { ...soak, ...partialDemoSoak(samples, performance.now() - steadyStart, cycles) };
@@ -667,7 +696,16 @@ try {
   soak.stressCycles = stressCycles;
   soak.actualWallClock = true;
   soak.passed = passed;
-  const report = { passed, stage, failureCategory, failureName, checks, soak, samples };
+  const report = {
+    passed,
+    stage,
+    failureCategory,
+    failureName,
+    checks,
+    soak,
+    samples,
+    contextLossEvents,
+  };
   let text = JSON.stringify(report);
   if (Buffer.byteLength(text) > MAX_REPORT_BYTES) {
     passed = false;

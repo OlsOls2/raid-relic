@@ -200,7 +200,7 @@ for (const kind of ['memory', 'firestore']) {
       extra.every(
         (c) =>
           c.message ===
-          'No vote was saved. Ask the Keeper to Send Off, then watch the claim meter and try again after the raid lands.',
+          'No Send Off is active yet. The keeper starts one on the control page, then raid and !offer.',
       ),
     );
     assert.equal((await f.runtime.state.getPublicJourney()).rings, 0);

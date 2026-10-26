@@ -40,7 +40,7 @@ for (const kind of ['memory', 'firestore']) {
       assert.match(posts(f).at(-3).message, /Recorded Keepers/);
       assert.match(posts(f).at(-2).message, /Keeper badges/);
       await f.chat(host, '812', '!offer');
-      assert.match(posts(f).at(-1).message, /No vote was saved.*watch the claim meter/);
+      assert.match(posts(f).at(-1).message, /No Send Off is active yet.*control page.*!offer/);
     }
     assert.equal((await f.runtime.state.getPublicJourney()).rings, 0);
     assert.equal(JSON.parse((await f.request('/api/scores')).body).raiders.length, 0);

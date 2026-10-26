@@ -11,6 +11,7 @@ const checks = [],
   images = new Map(),
   captures = [],
   fallbackProofs = [];
+const diagnostic = {};
 async function paintCommit(page) {
   await page.bringToFront();
   await page.evaluate(() => document.fonts.ready);
@@ -133,6 +134,13 @@ async function recordFallback(page, error) {
       };
     });
   } catch {}
+  for (const [key, value] of Object.entries(proof)) {
+    if (typeof value === 'boolean' || Number.isFinite(value)) diagnostic[key] = value;
+  }
+  diagnostic.errorEnum =
+    errorKind === null ? 0 : errorKind === 'TimeoutError' ? 1 : errorKind === 'TypeError' ? 2 : 3;
+  const line = /browser-smoke-editions[.]js:(\d+)/.exec(error?.stack ?? '');
+  if (line) diagnostic.sourceAssertionLine = Number(line[1]);
   fallbackProofs.push({ stage, errorKind, ...proof });
   if (fallbackProofs.length > 8) fallbackProofs.shift();
   return proof;
@@ -258,10 +266,13 @@ try {
     '/edition-crystal/twitchcon-2026.svg',
   );
   await fallbackPaint(page, 'mobile');
+  stage = 'mobile-permanent-release';
+  assert.equal(await page.locator('canvas.relic3d').count(), 0);
   assert.equal(
-    await page.locator('canvas.relic3d').getAttribute('data-particles-visible'),
-    'false',
+    await page.locator('.archive').evaluate((a) => a.classList.contains('webgl-relic')),
+    false,
   );
+  assert.ok(await decodedCrystal(page));
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   await capture('edition-mobile.png');
   await page.setViewportSize({ width: 160, height: 160 });
@@ -439,6 +450,7 @@ try {
         checks,
         captures,
         fallbackProofs,
+        diagnostic,
       },
       null,
       2,

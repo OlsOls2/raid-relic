@@ -1,3 +1,4 @@
+import { publicKeeperProfiles } from './scoreboard.js';
 import { wanderMutation, wanderActivity } from './wander-state.js';
 import { receivingView } from './receiving.js';
 import { streakView } from './streaks.js';
@@ -771,6 +772,7 @@ export function createMemoryState({
         retainedScores(scores, Object.fromEntries(channels), Object.fromEntries(markDocs)),
         config ?? { channels: [], logins: {} },
         now,
+        publicKeeperProfiles(config, Object.fromEntries(channels), Object.fromEntries(markDocs)),
       );
     },
     getRecap() {

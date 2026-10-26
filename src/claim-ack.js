@@ -2,6 +2,13 @@ import { RECEIVING_KEEPERS } from './receiving.js';
 import { claimComplete } from '../public/ritual-copy.js';
 import { ChatSendError } from './bot.js';
 import { hash } from './crypto.js';
+export const KEEPER_SETUP_HINT =
+  'Seeker queue off. Opt in as a Keeper first, then !seek to join; !seek off to leave.';
+const ownSetupHint = (row) =>
+  /^\d{1,32}$/.test(row.keeperSetup ?? '') &&
+  row.actorKey === hash(`${row.keeperSetup}:${row.keeperSetup}`) &&
+  ['seek-on', 'seek-off', 'seek-status'].includes(row.scoreKind) &&
+  row.message === KEEPER_SETUP_HINT;
 export const ackKey = (chat) =>
   hash(JSON.stringify(['claim-ack-v1', chat.broadcasterId, chat.chatterId, chat.messageId]));
 const actorKey = (host, actor) => hash(`${host}:${actor}`);
@@ -27,11 +34,11 @@ export function ackDocument(
       row.status === 'queued' &&
       (now >= row.ackUntil ||
         (!channel?.online && !row.completion) ||
-        !channel?.optedIn ||
+        (!channel?.optedIn && !ownSetupHint(row)) ||
         channel.paused ||
         channel.banned ||
         marks?.paused ||
-        !marks?.context?.optedIn ||
+        (!marks?.context?.optedIn && !ownSetupHint(row)) ||
         (chat?.markAction?.type === 'forgetme' && row.completion) ||
         (chat?.markAction?.type === 'forgetme' &&
           row.actorKey === actorKey(chat.broadcasterId, chat.chatterId)) ||
@@ -109,6 +116,7 @@ export function ackStep(previous, op, channel, marks, now, completionAllowed = f
     delete row.actorKey;
     delete row.ackUntil;
     delete row.completion;
+    delete row.keeperSetup;
   }
   if (op.type === 'finish' && row?.status === 'dispatching')
     row.status = op.sent ? 'sent' : 'unknown';

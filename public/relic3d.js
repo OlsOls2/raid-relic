@@ -1,3 +1,4 @@
+import { growthSummary, presentGrowth, pulseGrowth, clearGrowthFeedback } from './growth.js';
 import { presentEdition } from './edition-view.js';
 import { selectEdition } from './editions.js';
 import { runePose } from './cinematic.js';
@@ -83,21 +84,15 @@ export function frameInterval(arriving, corner = false, small = false) {
   return 1000 / (corner ? 30 : small ? (arriving ? 24 : 10) : arriving ? 60 : 30);
 }
 export function ringSummary(n) {
-  const total = Number.isInteger(n) && n > 0 ? n : 0;
-  return {
-    total,
-    visible: Math.min(16, total),
-    text:
-      total > 16
-        ? `${total} completed rings · 16 visual bands shown`
-        : `${total} completed growth rings`,
-  };
+  return growthSummary(n) ?? growthSummary(0);
 }
 export async function createRelic3D({
   signal,
   archive,
   reducedMotion,
   corner = false,
+  previousGrowth = null,
+  onReducedMotion = () => {},
   design = DEFAULT_DESIGN,
   load = () => import('/vendor/three.module.js'),
   document: doc = globalThis.document,
@@ -117,7 +112,8 @@ export async function createRelic3D({
     visualSignature = null,
     resumeCalls = 0,
     smallWidget = false,
-    staticMode = false;
+    staticMode = false,
+    lastGrowth = growthSummary(previousGrowth)?.total ?? null;
   const resources = new Set(),
     sprites = [],
     bands = [];
@@ -130,18 +126,50 @@ export async function createRelic3D({
       item.material?.dispose();
     }
   };
+  const clearMedallion = () => clearGrowthFeedback(archive);
+  const growth = (n, feedback = true) => {
+    const model = presentGrowth(archive, n) ?? growthSummary(n);
+    if (!model) return;
+    if (!feedback) {
+      clearGrowthFeedback(archive);
+      archive.querySelector?.('.growth-tick')?.remove();
+    }
+    if (feedback && lastGrowth !== null && n > lastGrowth && !reducedMotion.matches) {
+      pulseGrowth(archive);
+      canvas.dataset.growthTicks = String(Number(canvas.dataset.growthTicks ?? 0) + 1);
+      if (archive.ownerDocument?.createElement) {
+        archive.querySelector?.('.growth-tick')?.remove();
+        const tick = archive.ownerDocument.createElement('span');
+        tick.className = 'growth-tick';
+        tick.textContent = '+' + String(n - lastGrowth);
+        tick.setAttribute('aria-hidden', 'true');
+        archive.append(tick);
+      }
+    }
+    lastGrowth = n;
+    Object.assign(canvas.dataset, {
+      growthTotal: String(n),
+      growthTier: model.tier,
+      growthTextures: '0',
+      growthRepresentation: 'composited-svg-sprite',
+      growthSprites: archive.querySelector?.('.growth-fallback') ? '1' : '0',
+    });
+  };
+  const data = (key, value) => {
+    if (!canvas) return;
+    const text = String(value);
+    if (canvas.dataset[key] !== text) canvas.dataset[key] = text;
+  };
   const diagnostic = (reason) => {
     if (!canvas) return;
-    Object.assign(canvas.dataset, {
-      snapshotPresent: String(Boolean(snapshot)),
-      disposed: String(disposed),
-      lost: String(lost),
-      documentHidden: String(Boolean(doc?.hidden)),
-      internalMotion: String(Boolean(reducedMotion?.matches)),
-      resumeCalls: String(resumeCalls),
-      frameScheduled: String(frame !== null),
-      resumeReason: reason,
-    });
+    data('snapshotPresent', Boolean(snapshot));
+    data('disposed', disposed);
+    data('lost', lost);
+    data('documentHidden', Boolean(doc?.hidden));
+    data('internalMotion', Boolean(reducedMotion?.matches));
+    data('resumeCalls', resumeCalls);
+    data('frameScheduled', frame !== null);
+    data('resumeReason', reason);
   };
   const fallback = () => {
     if (particles) particles.visible = false;
@@ -242,6 +270,7 @@ export async function createRelic3D({
     e.preventDefault();
     canvas.dataset.contextStatus = 'lost';
     lost = true;
+    clearMedallion();
     stop();
     fallback();
     diagnostic('lost');
@@ -272,6 +301,9 @@ export async function createRelic3D({
     }
     for (const resource of resources) safely(() => resource.dispose?.());
     resources.clear();
+    safely(clearMedallion);
+    safely(() => archive.querySelector?.('.growth-tick')?.remove());
+    safely(() => presentGrowth(archive, undefined));
     safely(() => {
       if (renderer?.debug) renderer.debug.onShaderError = null;
     });
@@ -293,7 +325,14 @@ export async function createRelic3D({
   signal?.addEventListener?.('abort', dispose, { once: true });
   const render = (time) => {
     frame = null;
-    if (!snapshot || disposed || lost || doc.hidden || reducedMotion.matches) {
+    if (!disposed && reducedMotion.matches) {
+      const count = snapshot?.lineageRings;
+      dispose();
+      presentGrowth(archive, count);
+      onReducedMotion();
+      return;
+    }
+    if (!snapshot || disposed || lost || doc.hidden) {
       fallback();
       diagnostic(
         disposed
@@ -328,17 +367,15 @@ export async function createRelic3D({
         camera.aspect = viewport.aspect;
         camera.updateProjectionMatrix?.();
       }
-      Object.assign(canvas.dataset, {
-        viewportWidth: String(viewport.width),
-        viewportHeight: String(viewport.height),
-        projectionAspect: String(viewport.aspect),
-      });
+      data('viewportWidth', viewport.width);
+      data('viewportHeight', viewport.height);
+      data('projectionAspect', viewport.aspect);
       rebuildEdition();
       if (particles) {
         particles.visible = arriving;
         particles.rotation.z = time * 0.00006;
       }
-      if (canvas) canvas.dataset.particlesVisible = String(Boolean(particles?.visible));
+      data('particlesVisible', Boolean(particles?.visible));
       last = time;
       group.rotation.y = time * 0.00018;
       group.rotation.z = Math.sin(time * 0.00013) * 0.06;
@@ -359,25 +396,32 @@ export async function createRelic3D({
         );
       }
       const fusionWait = archive.dataset.fusionPending === 'true';
-      const fusionProgress = Number(archive.style?.getPropertyValue('--p3-fusion') ?? '1');
+      const fusionProgress = fusionWait
+        ? Number(archive.style?.getPropertyValue('--p3-fusion') ?? '1')
+        : 1;
+      const newestIndex = Math.floor(bands.length / 2) - 1;
+      const fusionFlare = fusionWait
+        ? Math.max(0, Math.min(1, Number(archive.style?.getPropertyValue('--fusion-glow') ?? '0')))
+        : 0;
       for (const band of bands) {
-        const newest = band.ringIndex === ringSummary(snapshot.lineageRings).visible - 1;
-        band.visible = !newest || !fusionWait || fusionProgress > 0;
-        const flare =
-          newest && fusionWait
-            ? Math.max(
-                0,
-                Math.min(1, Number(archive.style?.getPropertyValue('--fusion-glow') ?? '0')),
-              )
-            : 0;
-        band.material.color?.setRGB?.(
-          0.835 + flare * 0.165,
-          0.667 + flare * 0.25,
-          0.384 + flare * 0.4,
-        );
-
-        if (band.scale?.setScalar)
-          band.scale.setScalar(newest && fusionWait ? 0.7 + 0.3 * fusionProgress : 1);
+        const newest = band.ringIndex === newestIndex;
+        const visible = !newest || !fusionWait || fusionProgress > 0;
+        if (band.visible !== visible) band.visible = visible;
+        const flare = newest ? fusionFlare : 0;
+        if (band.lastFlare !== flare) {
+          const [r, g, b] = band.baseRGB;
+          band.material.color?.setRGB?.(
+            r + flare * (1 - r),
+            g + flare * (0.917 - g),
+            b + flare * (0.784 - b),
+          );
+          band.lastFlare = flare;
+        }
+        const scale = newest && fusionWait ? 0.7 + 0.3 * fusionProgress : 1;
+        if (band.lastScale !== scale) {
+          band.scale?.setScalar?.(scale);
+          band.lastScale = scale;
+        }
       }
       try {
         renderer.render(scene, camera);
@@ -386,18 +430,22 @@ export async function createRelic3D({
           diagnostic('lost');
           return;
         }
-        canvas.dataset.triangles = String(renderer.info?.render?.triangles ?? 0);
-        canvas.dataset.sprites = String(sprites.length);
-        canvas.dataset.fps = String(
-          Math.round(1000 / frameInterval(arriving, corner, smallWidget)),
-        );
+        data('triangles', renderer.info?.render?.triangles ?? 0);
+        // Opt-in local diagnostic sampling; no extra draw, history or provider data.
+        if (canvas.hasAttribute?.('data-render-profile')) {
+          data('drawCalls', renderer.info?.render?.calls ?? 0);
+          data('textureCount', renderer.info?.memory?.textures ?? 0);
+          data('geometryCount', renderer.info?.memory?.geometries ?? 0);
+        }
+        data('sprites', sprites.length);
+        data('fps', Math.round(1000 / frameInterval(arriving, corner, smallWidget)));
         canvas.dataset.fadedSprites = String(
           sprites.filter((s) => s.material.opacity === 0.28).length,
         );
         canvas.dataset.frames = String(Number(canvas.dataset.frames ?? 0) + 1);
-        canvas.hidden = false;
-        if (canvas.style) canvas.style.display = 'block';
-        archive.classList.add('webgl-relic');
+        if (canvas.hidden) canvas.hidden = false;
+        if (canvas.style && canvas.style.display !== 'block') canvas.style.display = 'block';
+        if (!archive.classList.contains?.('webgl-relic')) archive.classList.add('webgl-relic');
         if (canvas.hasAttribute?.('data-pixel-probe'))
           canvas.dispatchEvent(new Event('relic3d-frame'));
       } catch (error) {
@@ -415,6 +463,13 @@ export async function createRelic3D({
   };
   const resume = () => {
     if (disposed) return;
+    if (reducedMotion.matches) {
+      const count = snapshot?.lineageRings;
+      dispose();
+      presentGrowth(archive, count);
+      onReducedMotion();
+      return;
+    }
     resumeCalls++;
     const blocked = disposed
       ? 'disposed'
@@ -442,12 +497,30 @@ export async function createRelic3D({
   try {
     if (signal?.aborted || reducedMotion.matches) {
       dispose();
-      return { update() {}, wake() {}, dispose() {}, available: false };
+      return {
+        update(value) {
+          presentGrowth(archive, value?.lineageRings);
+        },
+        wake() {},
+        dispose() {
+          presentGrowth(archive, undefined);
+        },
+        available: false,
+      };
     }
     T = await load();
     if (disposed || signal?.aborted) {
       dispose();
-      return { update() {}, wake() {}, dispose() {}, available: false };
+      return {
+        update(value) {
+          presentGrowth(archive, value?.lineageRings);
+        },
+        wake() {},
+        dispose() {
+          presentGrowth(archive, undefined);
+        },
+        available: false,
+      };
     }
     const initialBox = archive.getBoundingClientRect(),
       antialias = !lowPowerWidget(initialBox.width, initialBox.height, corner);
@@ -483,11 +556,14 @@ export async function createRelic3D({
     const material = new T.ShaderMaterial({
       vertexColors: true,
       transparent: true,
+      // Near-opaque faceted metal needs one double-sided draw, not a separate
+      // back-face transparent pass. Keep the same shader, depth and geometry.
+      forceSinglePass: true,
       side: T.DoubleSide,
       vertexShader:
         'varying vec3 tint; varying vec3 norm; varying vec3 eye; void main(){ tint=color; vec4 p=modelViewMatrix*vec4(position,1.0); norm=normalize(normalMatrix*normal); eye=normalize(-p.xyz); gl_Position=projectionMatrix*p; }',
       fragmentShader:
-        'varying vec3 tint; varying vec3 norm; varying vec3 eye; void main(){ float f=pow(1.0-abs(dot(normalize(norm),normalize(eye))),2.0); vec3 moon=mix(vec3(.70,.63,.84),vec3(.86,.90,.94),f); float shine=pow(max(0.0,dot(reflect(-normalize(eye),normalize(norm)),normalize(vec3(-.5,.8,1.0)))),12.0); vec3 metal=tint*(.65+.35*abs(norm.y)) + moon*(f*1.25+shine*.85); gl_FragColor=vec4(metal,.98); }',
+        'varying vec3 tint; varying vec3 norm; varying vec3 eye; void main(){ vec3 N=normalize(norm); vec3 E=normalize(eye); const vec3 L=normalize(vec3(-.5,.8,1.0)); float rim=1.0-abs(dot(N,E)); float f=rim*rim; vec3 moon=mix(vec3(.70,.63,.84),vec3(.86,.90,.94),f); float x=max(0.0,dot(reflect(-E,N),L)); float x2=x*x; float x4=x2*x2; float shine=x4*x4*x4; vec3 metal=tint*(.65+.35*abs(norm.y)) + moon*(f*1.25+shine*.85); gl_FragColor=vec4(metal,.98); }',
     });
     coreMesh = new T.Mesh(geometry, material);
     group.add(coreMesh);
@@ -501,7 +577,7 @@ export async function createRelic3D({
       vertexShader:
         'varying vec3 n; varying vec3 e; void main(){ vec4 p=modelViewMatrix*vec4(position*1.14,1.0); n=normalize(normalMatrix*normal); e=normalize(-p.xyz); gl_Position=projectionMatrix*p; }',
       fragmentShader:
-        'varying vec3 n; varying vec3 e; void main(){ float rim=pow(1.0-abs(dot(normalize(n),normalize(e))),2.0); gl_FragColor=vec4(vec3(.58,.70,1.0),rim*.42); }',
+        'varying vec3 n; varying vec3 e; void main(){ vec3 N=normalize(n); vec3 E=normalize(e); float edge=1.0-abs(dot(N,E)); float rim=edge*edge; gl_FragColor=vec4(vec3(.58,.70,1.0),rim*.42); }',
     });
     haloMesh = new T.Mesh(geometry, haloMaterial);
     group.add(haloMesh);
@@ -540,22 +616,44 @@ export async function createRelic3D({
     resume();
   } catch {
     dispose();
-    return { update() {}, wake() {}, dispose() {}, available: false };
+    return {
+      update(value) {
+        presentGrowth(archive, value?.lineageRings);
+      },
+      wake() {},
+      dispose() {
+        presentGrowth(archive, undefined);
+      },
+      available: false,
+    };
   }
-  function update(value, { animate = true } = {}) {
+  function update(value, { animate = true, growthFeedback = true } = {}) {
     if (disposed) return;
+    if (reducedMotion.matches) {
+      const count = growthSummary(value?.lineageRings)?.total;
+      dispose();
+      presentGrowth(archive, count);
+      onReducedMotion();
+      return;
+    }
+    if (value && !growthSummary(value.lineageRings)) value = null;
     snapshot = value;
+    presentGrowth(archive, value?.lineageRings);
     staticMode = Boolean(value) && animate === false;
     const signature = snapshot
       ? JSON.stringify([
           staticMode,
-          ringSummary(snapshot.lineageRings).visible,
+          snapshot.lineageRings,
           snapshot.status ?? 'preview',
           (snapshot.marks ?? [])
             .slice(0, 160)
             .map((m) => [m.id ?? '', m.runeSvg, m.faded === true]),
         ])
       : null;
+    if (!growthFeedback) {
+      clearGrowthFeedback(archive);
+      archive.querySelector?.('.growth-tick')?.remove();
+    }
     if (signature !== null && signature === visualSignature) {
       diagnostic('unchanged');
       return;
@@ -565,6 +663,8 @@ export async function createRelic3D({
     remove(sprites);
     remove(bands);
     if (!snapshot) {
+      clearMedallion();
+      archive.querySelector?.('.growth-tick')?.remove();
       if (canvas) {
         canvas.dataset.bands = '0';
         canvas.dataset.sprites = '0';
@@ -574,19 +674,21 @@ export async function createRelic3D({
       diagnostic('no-snapshot');
       return;
     }
-    const rings = ringSummary(snapshot.lineageRings).visible;
+    growth(snapshot.lineageRings, growthFeedback);
+    const summary = ringSummary(snapshot.lineageRings),
+      rings = summary.visible;
     for (let i = 0; i < rings; i++) {
       // 2 toruses *16 rings *8*24*2 triangles =12,288; core+halo<=144,
       // 160 sprites<=320: total comfortably below20k.
       for (const orbit of [false, true]) {
         const geometry = new T.TorusGeometry(
           1.05 + i * 0.018,
-          orbit ? 0.008 : 0.013,
+          summary.groups[i] >= 10 ? (orbit ? 0.015 : 0.03) : orbit ? 0.008 : 0.013,
           corner ? 3 : 8,
           corner ? 16 : 24,
         );
         const material = new T.MeshBasicMaterial({
-          color: '#d5aa62',
+          color: summary.groups[i] >= 10 ? summary.color : '#d8b46a',
           transparent: true,
           opacity: orbit ? 0.45 : 0.7,
         });
@@ -594,11 +696,24 @@ export async function createRelic3D({
         band.rotation.x = orbit ? 0.7 + i * 0.04 : 0;
         band.rotation.y = orbit ? 0.25 : 0;
         band.ringIndex = i;
+        // Preserve Three's linear-space tier color; never overwrite it with a
+        // fixed gold value on every frame. Only the newest fusion band flares.
+        band.baseRGB = [
+          material.color?.r ?? 0.835,
+          material.color?.g ?? 0.667,
+          material.color?.b ?? 0.384,
+        ];
+        band.lastFlare = 0;
+        band.lastScale = 1;
         bands.push(band);
         scene.add(band);
       }
     }
-    if (canvas) canvas.dataset.bands = String(bands.length);
+    if (canvas) {
+      canvas.dataset.bands = String(bands.length);
+      canvas.dataset.physicalBands = String(summary.visible);
+      canvas.dataset.bandUnits = JSON.stringify(summary.groups);
+    }
     let spriteFailures = 0;
     if (canvas) canvas.dataset.spriteFailures = '0';
     for (const [index, mark] of (snapshot.marks ?? []).slice(0, 160).entries()) {

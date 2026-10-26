@@ -96,10 +96,10 @@ for (const kind of ['memory', 'firestore']) {
     assert.equal(v.holder.login, 'raidrelichq');
     assert.equal(v.holder.heldSince, null);
     await f.chat(HOME, '7101', '!mark moon');
-    assert.match(posts(f).at(-1).message, /Mark approved/);
+    assert.match(posts(f).at(-1).message, /Your mark is public/);
     f.advance(30001);
     await f.chat(HOME, '7102', '!mark spoiler');
-    assert.match(posts(f).at(-1).message, /held for private moderator review/);
+    assert.match(posts(f).at(-1).message, /Waiting for moderator approval.*private/);
     assert.doesNotMatch(posts(f).at(-1).message, /spoiler/);
     await f.control(HOME, 'send:' + OTHER);
     f.advance();

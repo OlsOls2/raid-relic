@@ -19,6 +19,7 @@ export const MAX_BODY_BYTES = 65536;
 export const REPLAY_WINDOW_MS = 10 * 60 * 1000;
 const assets = new Map([
   ['/keeper-network.js', ['keeper-network.js', 'text/javascript; charset=utf-8']],
+  ['/growth.js', ['growth.js', 'text/javascript; charset=utf-8']],
   ['/streak-view.js', ['streak-view.js', 'text/javascript; charset=utf-8']],
   ['/ring-card.js', ['ring-card.js', 'text/javascript; charset=utf-8']],
   ['/ring-card-client.js', ['ring-card-client.js', 'text/javascript; charset=utf-8']],
@@ -67,6 +68,12 @@ const faviconAssets = new Map([
   ['/favicon.ico', 'favicon.svg'],
 ]);
 const demoAssets = new Map([
+  ['/demo/wander', 'wander-demo.html'],
+  ['/demo/wander/', 'wander-demo.html'],
+  ['/wander-demo.js', 'wander-demo.js'],
+  ['/wander-demo-state.js', 'wander-demo-state.js'],
+  ['/wander-demo.css', 'wander-demo.css'],
+  ['/growth.js', 'growth.js'],
   ['/ring-card.js', 'ring-card.js'],
   ['/demo', 'demo.html'],
   ['/demo/', 'demo.html'],

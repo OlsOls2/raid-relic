@@ -1,18 +1,17 @@
 # Dated quality record
 
 <!-- CURRENT_QUALITY_START -->
-
 Generated from successful operator reports; not source-author execution or physical Twitch proof.
 
-| Latest observed cohort     | Value                                                            |
-| -------------------------- | ---------------------------------------------------------------- |
-| Observed UTC               | 2026-10-26T16:10:47.618Z                                         |
-| Node                       | 22.23.4                                                          |
-| Unit tests / pass / skip   | 790 / 790 / 0                                                    |
-| Browser workflows / checks | 35 / 112                                                         |
-| Source identity SHA256     | 64e4f8726c0bb191bca9d3bcb1745192aecf3165f88026581c2e64a3a0bcfac1 |
-| Unit report SHA256         | ce2e63b080f34de29243990c5cc27c287c0a5cae4d046f7055236867d08f4b75 |
-| Browser report SHA256      | b527eafd3106394f9eceb833b697cf9328e2310f4645ec069eb5bb2ecd6b0a8c |
+| Latest observed cohort | Value |
+|---|---|
+| Observed UTC | 2026-10-26T20:16:58.465Z |
+| Node | 22.23.4 |
+| Unit tests / pass / skip | 812 / 812 / 0 |
+| Browser workflows / checks | 37 / 116 |
+| Source identity SHA256 | 8476c4a41e62a062562b0c2d382f75af4ae99ef90cb7c0f2c2f7da7082ef8a8b |
+| Unit report SHA256 | 8a63533d73803379de8cc916bcfc1d5d55c64ab22497c0cb4fe22a9b1c76927a |
+| Browser report SHA256 | e8e66b82286909fd3088086ac4c10080e1a9a46ef0d6e9f2839dcb709f298f5a |
 
 <!-- CURRENT_QUALITY_END -->
 

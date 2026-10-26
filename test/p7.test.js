@@ -405,7 +405,7 @@ for (const kind of ['memory', 'firestore']) {
     assert.equal(posts.filter((c) => c.message.startsWith('Claim complete')).length, 2);
     assert.equal(
       posts.at(-1).message,
-      'No vote was saved. Ask the Keeper to Send Off, then watch the claim meter and try again after the raid lands.',
+      'No Send Off is active yet. The keeper starts one on the control page, then raid and !offer.',
     );
     await f.chat(OTHER, '812', '!accept', { messageId: 'new-after-finalize-fault' });
     assert.equal(f.calls.filter((c) => c.url.endsWith('/chat/messages')).length, 4);

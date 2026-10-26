@@ -1,4 +1,5 @@
 // Parent-run local-only P2 gate. No screenshots, providers or synthetic live claims.
+import assert from 'node:assert/strict';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { createJudges, JUDGES_ORIGIN } from '../test-support/judges.js';
 const judges = await createJudges({ intent: true, env: {} });
@@ -172,9 +173,17 @@ try {
     () =>
       matchMedia('(prefers-reduced-motion: reduce)').matches &&
       !document.querySelector('.archive').classList.contains('webgl-relic') &&
-      document.querySelector('canvas.relic3d').hidden,
+      !document.querySelector('canvas.relic3d'),
   );
   await page.locator('.rune').waitFor({ state: 'visible' });
+  assert.equal(await page.locator('canvas.relic3d').count(), 0);
+  assert.equal(await page.locator('.archive .crystal').isVisible(), true);
+  assert.ok(
+    await page.locator('.archive .crystal').evaluate(async (img) => {
+      await img.decode();
+      return img.complete && img.naturalWidth > 0;
+    }),
+  );
   stage = 'resume-webgl';
   await page.bringToFront();
   await page.emulateMedia({ reducedMotion: 'no-preference' });
@@ -182,6 +191,7 @@ try {
   await page.waitForFunction(
     () => document.querySelector('canvas.relic3d')?.dataset.sprites === '1',
   );
+  assert.equal(await page.locator('canvas.relic3d').count(), 1);
   stage = 'private-capacity-fixture';
   const capacity = await page.evaluate(async () => {
     const { createRelic3D } = await import('/relic3d.js');
@@ -209,7 +219,7 @@ try {
       });
       if (!view.available) return null;
       view.update({
-        lineageRings: 19,
+        lineageRings: 159, // SIMULATOR-only maximum physical-band capacity, not server history.
         marks: Array.from({ length: 160 }, () => ({ runeSvg: publicView.marks[0].runeSvg })),
       });
       const result = await new Promise((resolve) => {
@@ -224,7 +234,12 @@ try {
           if (c?.dataset.sprites === '160' && Number(c.dataset.triangles) > 0) {
             done = true;
             clearTimeout(timer);
-            resolve({ triangles: Number(c.dataset.triangles), sprites: Number(c.dataset.sprites) });
+            resolve({
+              triangles: Number(c.dataset.triangles),
+              sprites: Number(c.dataset.sprites),
+              physicalBands: Number(c.dataset.physicalBands),
+              bandUnitsSum: JSON.parse(c.dataset.bandUnits).reduce((sum, units) => sum + units, 0),
+            });
           } else setTimeout(check, 50);
         };
         check();
@@ -239,6 +254,8 @@ try {
   if (
     !capacity ||
     capacity.sprites !== 160 ||
+    capacity.physicalBands !== 16 ||
+    capacity.bandUnitsSum !== 159 ||
     capacity.triangles >= 20000 ||
     capacity.triangles < 12000
   )
