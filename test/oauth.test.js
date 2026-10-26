@@ -239,7 +239,7 @@ test('refresh failures and transport exceptions do not expose upstream secrets',
     assert.ok(!JSON.stringify(await callback(other.oauth, login)).includes('LEAK'));
   }
 });
-test('concurrent refreshes are serialized across instances by token lease', async () => {
+test('fresh validation in another instance does not acquire a lease or block fresh use', async () => {
   const h = harness();
   assert.equal((await callback(h.oauth, await start(h.oauth))).status, 200);
   let unlock;
@@ -263,7 +263,7 @@ test('concurrent refreshes are serialized across instances by token lease', asyn
   });
   const pending = second.oauth.accessToken('bot');
   await ready;
-  await assert.rejects(h.oauth.accessToken('bot'), /busy/);
+  assert.equal(await h.oauth.accessToken('bot'), 'synthetic-access');
   unlock();
   await pending;
   assert.equal(await h.oauth.accessToken('bot'), 'synthetic-access');

@@ -101,7 +101,8 @@ export function receivingView(registry, channels, marks, lineage, config, now) {
   };
 }
 
-// Explicit local injection; no timer, startup networking, token refresh or writes.
+// Explicit local injection; no timer or startup networking. Existing OAuth grants
+// may be maintained on readiness reads; no gameplay mutation or consent is added.
 export function createReceiving({
   enabled = false,
   state,
@@ -237,9 +238,7 @@ export function createReceiving({
       return true;
     } catch (error) {
       warnGrant(
-        error?.code === 'grant-expired-or-invalid'
-          ? 'grant-expired-or-invalid'
-          : 'keeper-grant-unavailable',
+        error?.code === 'reconsent-required' ? 'reconsent-required' : 'keeper-grant-unavailable',
       );
       return false;
     }
@@ -307,7 +306,7 @@ export function createReceiving({
       if (!enabled) return;
       const rows = await this.candidates(source);
       if (!rows.some((r) => r.id === target)) throw Error('Recipient unavailable');
-      // Validate the bot principal and grant again at dispatch; no refresh/save.
+      // Maintain and validate the existing bot grant again before dispatch.
       const token = await oauth.readAccessToken('bot', ['user:read:moderated_channels']);
       const isModerator = await boundedCall(async (signal) => {
         let after = null;

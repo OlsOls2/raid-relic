@@ -259,8 +259,13 @@ export function createPilot({
         try {
           await oauth.accessTokenForKeeper(id);
           return { status: 'processed', authorization: 'ready' };
-        } catch {
-          return { status: 'processed', authorization: 'needs-reconnect' };
+        } catch (error) {
+          return {
+            status: 'processed',
+            authorization: ['reconsent-required', 'authorization-required'].includes(error?.code)
+              ? 'needs-reconnect'
+              : 'retry-later',
+          };
         }
       }
       if (action === 'seek-status')

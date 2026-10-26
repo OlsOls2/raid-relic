@@ -91,7 +91,9 @@ export function createOAuth({
     try {
       return await boundedCall((signal) => transport(url, { ...options, signal }));
     } catch {
-      throw new Error('Twitch request failed');
+      throw Object.assign(new Error('Authorization temporarily unavailable'), {
+        code: 'transient-unavailable',
+      });
     }
   };
   async function exchange(parameters) {
@@ -104,6 +106,8 @@ export function createOAuth({
         ...parameters,
       }).toString(),
     });
+    if (parameters.grant_type === 'refresh_token' && [400, 401].includes(response.status))
+      throw Object.assign(new Error('Reconnect this account'), { code: 'reconsent-required' });
     const token = response.data;
     if (
       response.status !== 200 ||
@@ -114,7 +118,7 @@ export function createOAuth({
       !token.refresh_token ||
       token.token_type?.toLowerCase() !== 'bearer'
     )
-      throw new Error('Token exchange failed');
+      throw Object.assign(new Error('Token exchange failed'), { code: 'transient-unavailable' });
     return { access_token: token.access_token, refresh_token: token.refresh_token };
   }
   async function validate(token, role, required = scopes(role)) {
@@ -122,6 +126,10 @@ export function createOAuth({
       headers: { Authorization: `OAuth ${token.access_token}` },
     });
     if (response.status === 401) return false;
+    if (response.status !== 200)
+      throw Object.assign(Error('Authorization temporarily unavailable'), {
+        code: 'transient-unavailable',
+      });
     const data = response.data;
     if (
       response.status !== 200 ||
@@ -129,38 +137,104 @@ export function createOAuth({
       data.user_id !== accounts[role] ||
       !Array.isArray(data.scopes) ||
       !required.every((scope) => data.scopes.includes(scope)) ||
-      !(data.expires_in > 0)
+      !(Number.isFinite(data.expires_in) && data.expires_in >= 0)
     )
       throw new Error('Token identity or grants invalid');
-    return data.scopes;
+    return { scopes: data.scopes, expiresIn: data.expires_in };
   }
   async function locked(role, operation) {
     const owner = nonce();
-    if (!(await store.acquire(role, owner, now())))
-      throw new Error('Token operation busy; retry later');
+    let acquired = false;
+    for (const delay of [0, 50, 100, 200, 400, 800, 800, 800]) {
+      if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
+      if (await store.acquire(role, owner, now())) {
+        acquired = true;
+        break;
+      }
+    }
+    if (!acquired)
+      throw Object.assign(new Error('Token operation busy; retry later'), {
+        code: 'transient-unavailable',
+      });
     try {
       return await operation(owner);
     } finally {
       await store.release(role, owner);
     }
   }
-  async function accessToken(role, { refresh = false, scopeCheck, p7 = false } = {}) {
-    if (!validRole(role)) throw new Error('Invalid role');
-    // A distributed lease serializes rotated refresh tokens across instances.
-    return locked(role, async (owner) => {
-      const record = await store.getToken(role);
-      if (!record) throw new Error('Authorization required');
-      let token = cipher.open(record, context(role));
-      const required = p7 && role === 'bot' ? [...SCOPES.bot, ...P7_SCOPES] : scopes(role);
-      let granted = refresh ? false : await validate(token, role, required);
-      if (refresh || !granted) {
-        token = await exchange({ grant_type: 'refresh_token', refresh_token: token.refresh_token });
-        granted = await validate(token, role, required);
-        if (!granted) throw new Error('Authorization required');
-        await store.saveToken(role, cipher.seal(token, context(role)), owner, now());
-      }
-      return scopeCheck ? granted.includes(scopeCheck) : token.access_token;
-    });
+  const flights = new Map();
+  async function accessToken(
+    role,
+    { refresh = false, scopeCheck, p7 = false, extraScopes = [] } = {},
+  ) {
+    if (
+      !validRole(role) ||
+      !Array.isArray(extraScopes) ||
+      extraScopes.some((s) => s !== 'user:read:moderated_channels')
+    )
+      throw Error('Invalid role or scope');
+    let flight = flights.get(role);
+    if (!flight) {
+      flight = { forceRequested: refresh, promise: null };
+      flights.set(role, flight);
+      const open = (record) => {
+        if (!record)
+          throw Object.assign(Error('Authorization required'), { code: 'authorization-required' });
+        const token = cipher.open(record, context(role));
+        if (
+          typeof token?.access_token !== 'string' ||
+          !token.access_token ||
+          typeof token.refresh_token !== 'string' ||
+          !token.refresh_token
+        )
+          throw Object.assign(Error('Stored authorization unavailable'), {
+            code: 'transient-unavailable',
+          });
+        return token;
+      };
+      flight.promise = (async () => {
+        const initial = await store.getToken(role);
+        const original = open(initial);
+        const initialProof = flight.forceRequested ? false : await validate(original, role);
+        // Fresh ordinary use is read/validate only: no lease transaction/write.
+        // Recheck the mutable force request after validation has completed.
+        if (initialProof && initialProof.expiresIn > 120 && !flight.forceRequested)
+          return { token: original.access_token, proof: initialProof };
+        return locked(role, async (owner) => {
+          const record = await store.getToken(role);
+          let token = open(record);
+          const force = flight.forceRequested && JSON.stringify(record) === JSON.stringify(initial);
+          let proof = force ? false : await validate(token, role);
+          if (flight.forceRequested && JSON.stringify(record) === JSON.stringify(initial))
+            proof = false;
+          if (!proof || proof.expiresIn <= 120) {
+            token = await exchange({
+              grant_type: 'refresh_token',
+              refresh_token: token.refresh_token,
+            });
+            proof = await validate(token, role);
+            if (!proof || proof.expiresIn <= 120)
+              throw Object.assign(Error('Fresh authorization unavailable'), {
+                code: 'transient-unavailable',
+              });
+            await store.saveToken(role, cipher.seal(token, context(role)), owner, now());
+          }
+          return { token: token.access_token, proof };
+        });
+      })();
+      void flight.promise
+        .finally(() => {
+          if (flights.get(role) === flight) flights.delete(role);
+        })
+        .catch(() => {});
+    } else if (refresh) flight.forceRequested = true;
+    const { token, proof } = await flight.promise;
+    const required = [...scopes(role), ...(p7 && role === 'bot' ? P7_SCOPES : []), ...extraScopes];
+    if (!required.every((scope) => proof.scopes.includes(scope)))
+      throw Object.assign(Error('Required permission unavailable'), {
+        code: 'permission-unavailable',
+      });
+    return scopeCheck ? proof.scopes.includes(scopeCheck) : token;
   }
   async function route({ path, method, headers }) {
     const response = (status, body, extra = {}) => ({
@@ -266,9 +340,14 @@ export function createOAuth({
   return {
     route,
     accessToken,
-    // Read-only validation for public receiving observations: no lease, refresh,
-    // grant save or implicit consent. Missing/expired grants fail closed.
-    async readAccessToken(role, extraScopes = []) {
+    // Compatibility name: receiving readiness now maintains existing grants.
+    // It cannot consent, add scopes or perform a gameplay/provider action.
+    readAccessToken(role, extraScopes = []) {
+      return accessToken(role, { extraScopes });
+    },
+    ensureValidAccess: accessToken,
+    // Explicit pure validation remains available for operator/read-only probes.
+    async validateAccessToken(role, extraScopes = []) {
       if (
         !validRole(role) ||
         !Array.isArray(extraScopes) ||
@@ -276,7 +355,8 @@ export function createOAuth({
       )
         throw Error('Read grant rejected');
       const record = await store.getToken(role);
-      if (!record) throw Error('Read grant unavailable');
+      if (!record)
+        throw Object.assign(Error('Read grant unavailable'), { code: 'authorization-required' });
       const token = cipher.open(record, context(role));
       if (!(await validate(token, role, [...scopes(role), ...extraScopes])))
         throw Object.assign(Error('Read grant unavailable'), { code: 'grant-expired-or-invalid' });

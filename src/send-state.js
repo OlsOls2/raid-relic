@@ -209,7 +209,6 @@ export function sendState(previous, channels, marks, config, op, now) {
   if (op.type === 'dispatch' && owns && intent.status === 'preflight' && intent.leaseUntil > now) {
     if (
       intent.expiresAt <= now ||
-      (config.seekersEnabled && channels[intent.targetId]?.seeking !== true) ||
       !eligible(registry, channels, marks, intent.sourceId, intent.targetId) ||
       channels[intent.sourceId].streamId !== intent.sourceStreamId ||
       channels[intent.targetId].streamId !== intent.targetStreamId
@@ -437,7 +436,6 @@ export function reservationReason(
     )
       return role + '-timestamp';
   }
-  if (config.seekersEnabled && channels[target]?.seeking !== true) return 'target-not-seeking';
   if (!eligible(registry, channels, marks, op.source, target)) return 'cross-channel-block';
   return null;
 }

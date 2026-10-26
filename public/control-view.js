@@ -4,6 +4,8 @@ export const keeperNames = networkNames;
 export function actionMessage(value, targetLogin) {
   if (value?.authorization === 'ready')
     return 'Your Keeper authorization is ready. Refresh status to check current targets; ordinary status reads never renew tokens.';
+  if (value?.authorization === 'retry-later')
+    return 'Authorization is temporarily unavailable. Retry later; this does not establish a need for new consent. No raid or bootstrap was performed.';
   if (value?.authorization === 'needs-reconnect')
     return 'Your Keeper authorization could not be renewed. Reconnect only this matching Keeper using the canonical app login link; no raid or bootstrap was performed.';
   const target =

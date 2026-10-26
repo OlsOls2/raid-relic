@@ -210,7 +210,7 @@ test('one-minute batched observations, deterministic low-viewer ordering, no sta
 });
 
 for (const kind of ['memory', 'firestore']) {
-  test(`${kind}: actual preflight rechecks queue leave before dispatch, gate-off does not require membership`, async () => {
+  test(`${kind}: manual raid retains full preflight eligibility when an otherwise-ready target leaves the optional Seeker queue`, async () => {
     const f = await setup(kind);
     await f.control(OTHER, 'seek-on');
     f.advance();
@@ -224,11 +224,11 @@ for (const kind of ['memory', 'firestore']) {
     });
     const response = await f.control(HOME, 'send:' + OTHER);
     assert.equal(response.status, 200);
-    assert.equal(JSON.parse(response.body).status, 'blocked');
-    assert.equal(f.calls.filter((c) => c.url.includes('/helix/raids?')).length, 0);
+    assert.equal(JSON.parse(response.body).status, 'accepted');
+    assert.equal(f.calls.filter((c) => c.url.includes('/helix/raids?')).length, 1);
     assert.equal((await f.runtime.state.getPublicJourney()).rings, 0);
   });
-  test(`${kind}: missing grants are not refreshed by public reading; own status does not join`, async () => {
+  test(`${kind}: rejected refresh remains ineligible and own status does not enroll in Seekers`, async () => {
     const f = await setup(kind);
     await f.chat(OTHER, OTHER, '!seek status');
     assert.notEqual((await f.runtime.state.getStreamStatus(OTHER)).seeking, true);
@@ -240,7 +240,8 @@ for (const kind of ['memory', 'firestore']) {
       page.seekers.some((r) => r.login === 'olsols2'),
       false,
     );
-    assert.equal(f.calls.filter((c) => c.url.endsWith('/token')).length, saved);
+    assert.equal(f.calls.filter((c) => c.url.endsWith('/token')).length, saved + 1);
+    assert.equal((await f.runtime.state.getStreamStatus(OTHER)).seeking, true);
   });
 }
 
@@ -293,7 +294,7 @@ for (const kind of ['memory', 'firestore']) {
 }
 
 for (const kind of ['memory', 'firestore']) {
-  test(`${kind}: expired grants stay hidden until explicit own CSRF recovery; non-Seekers remain manual targets only`, async () => {
+  test(`${kind}: expired access renews through existing grants without consent; own CSRF controls and non-Seeker boundaries remain`, async () => {
     const f = await setup(kind);
     await f.control(OTHER, 'seek-on');
     assert.equal(JSON.parse((await f.control(HOME, 'send:' + OTHER)).body).status, 'accepted');
@@ -304,10 +305,20 @@ for (const kind of ['memory', 'firestore']) {
     f.advance(60001);
     f.expire(HOME);
     f.expire(OTHER);
-    const before = f.calls.filter((c) => c.url.endsWith('/token')).length;
-    assert.deepEqual(await f.runtime.receiving.candidates(OTHER), []);
-    assert.deepEqual((await f.runtime.receiving.page()).seekers, []);
-    assert.equal(f.calls.filter((c) => c.url.endsWith('/token')).length, before);
+    const initial = f.calls.filter((c) => c.url.endsWith('/token')).length;
+    await assert.rejects(() => f.runtime.oauth.validateAccessToken('streamer'));
+    await assert.rejects(() => f.runtime.oauth.validateAccessToken('keeper:' + OTHER));
+    assert.equal(f.calls.filter((c) => c.url.endsWith('/token')).length, initial);
+    assert.deepEqual(
+      (await f.runtime.receiving.candidates(OTHER)).map((r) => r.login),
+      ['raidrelichq'],
+    );
+    assert.deepEqual(
+      (await f.runtime.receiving.page()).seekers.map((r) => r.login),
+      ['olsols2'],
+    );
+    assert.equal(f.calls.filter((c) => c.url.endsWith('/token')).length, initial + 2);
+    const before = initial + 2;
     const blocked = await f.request(
       '/control/' + HOME,
       'POST',
@@ -336,10 +347,12 @@ for (const kind of ['memory', 'firestore']) {
     assert.equal(recovered.status, 200);
     assert.equal(JSON.parse(recovered.body).authorization, 'ready');
     let refreshes = f.calls.filter((c) => c.url.endsWith('/token')).slice(before);
-    assert.equal(refreshes.length, 1);
-    assert.equal(new URLSearchParams(refreshes[0].body).get('refresh_token'), 'refresh-' + OTHER);
+    assert.equal(refreshes.length, 0); // Already-valid authorization does not rotate again.
     assert.equal((await f.runtime.receiving.page()).seekers[0].login, 'olsols2');
-    assert.deepEqual(await f.runtime.receiving.candidates(OTHER), []); // HOME still invalid.
+    assert.deepEqual(
+      (await f.runtime.receiving.candidates(OTHER)).map((r) => r.login),
+      ['raidrelichq'],
+    );
     assert.equal((await f.control(HOME, 'refresh-authorization')).status, 200);
     assert.deepEqual(
       (await f.runtime.receiving.candidates(OTHER)).map((r) => r.login),
@@ -349,6 +362,10 @@ for (const kind of ['memory', 'firestore']) {
     const calls = f.calls.length;
     await f.runtime.receiving.authorize(OTHER, HOME);
     assert.ok(f.calls.length > calls); // Dispatch revalidates rather than trusting selection.
+    const homeSend = await f.control(OTHER, 'send:' + HOME);
+    assert.equal(homeSend.status, 200);
+    assert.equal(JSON.parse(homeSend.body).status, 'accepted');
+    assert.equal((await f.runtime.state.getPublicJourney()).rings, 1); // No fabricated arrival/binding.
     f.revoke(HOME);
     await assert.rejects(() => f.runtime.receiving.authorize(OTHER, HOME));
     assert.equal(
