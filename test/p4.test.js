@@ -62,7 +62,7 @@ test('closed human results never echo arbitrary provider text or guess generic f
   assert.match(actionMessage({status:'blocked',diagnostic:{category:'incoming-raid-policy',message:secret}},'olsols2'),/olsols2 raid settings.*minimum account age\/viewers/);
   const generic=actionMessage({status:'blocked',diagnostic:{category:'provider-forbidden',message:secret,nextStep:secret}},'olsols2');assert.ok(!generic.includes('minimum account'));assert.ok(!generic.includes(secret));
   assert.ok(!actionMessage({status:secret,message:secret,diagnostic:{category:secret}}).includes(secret));
-  assert.match(actionMessage({status:'accepted'}),/only after Twitch confirms/);
+  assert.match(actionMessage({status:'accepted'}),/Watch the claim meter: if your offer is not counted yet.*Binding needs both chats and a verified arrival/);
 });
 test('local Cinzel font and licence match reviewed bytes; only two font assets are vendored',async()=>{
   for(const [path,digest]of [['public/fonts/Cinzel.ttf','f4d83d34d1f6c741193e4acf4b3dff9531e5a67b6aa65228d00a7db72a4e0f34'],['public/fonts/OFL-Cinzel.txt','f2b3029aba64c378bf0963b62945eee15e564fe4330b934c8f2eb058282b5e83']])assert.equal(createHash('sha256').update(await readFile(path)).digest('hex'),digest);

@@ -15,7 +15,7 @@ import { reduceClaims, publicJourney } from './claims.js';
 import { sendState } from './send-state.js';
 import { lifecycleConfig, reduceLifecycle } from './lifecycle.js';
 import { hash } from './crypto.js';
-import { setMarkContext, reduceMark, publicMarks, publicOverlayState, privateMarks, isModerator, isChatIdentity, markPrivacyChange, trustedReviewPolicy } from './marks.js';
+import { setMarkContext, reduceMark, publicMarks, publicOverlayState, privateMarks, isModerator, isChatIdentity, markPrivacyChange, markCommandOutcome, trustedReviewPolicy } from './marks.js';
 
 export function ritualFor(id, now, raid) {
   return { eventId: id, incomingBroadcasterId: raid.from_broadcaster_user_id,
@@ -125,6 +125,7 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false, reviewP
         const receipt = receiptRef ? (await tx.get(receiptRef)).data() : null;
         const transition = managed && host ? reduceLifecycle({ reviewPolicy, registry, channel, marks: markDoc, host, event, chat:proofSeen?null:chat, now, sentAt, observed: Boolean(observation) }) : null;
         const next = transition ? transition.marks : markRef&&!proofSeen ? reduceMark(markDoc, chat.broadcasterId, chat, chat.markAction, now, reviewPolicy) : null;
+        const markOutcome=markCommandOutcome(markDoc,next,host,chat,chat?.markAction);
         const privacyChanged=event?.type==='ban'||(!proofSeen&&markPrivacyChange(markDoc,next,chat,host,chat?.markAction));
         let claiming; let sending;
         if (managed) {
@@ -141,8 +142,8 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false, reviewP
         if (claiming && chat?.markAction?.type === 'mymarks') claiming.marks[host] = reserveShare(claiming.marks[host], claiming.lineage, chat, share, now);
         let commandReply;
         if (claiming) {
-          const scoreNext = reduceScores(scores, { channels: channelMap, marks: claiming.marks, chat, now, autoApprove:reviewPolicy.autoApprove, vote: claiming.scoreVote, completion: claiming.completedScore, hop: claiming.registry.pendingHop, acknowledged:Boolean(proofSeen||claiming.acknowledgement||claiming.completedScore||(chat?.markAction?.type==='mymarks'&&share&&claiming.marks[host]?.shares?.some(row=>row.nonce===share.nonce&&row.status==='queued'))) });
-          if(isReplyCommand(chat))commandReply={kind:chat.markAction.type,reason:scoreNext.reason};
+          const scoreNext = reduceScores(scores, { channels: channelMap, marks: claiming.marks, chat, now, awaitingRaid:claiming.awaitingRaid, markOutcome, autoApprove:reviewPolicy.autoApprove, vote: claiming.scoreVote, completion: claiming.completedScore, hop: claiming.registry.pendingHop, acknowledged:Boolean(proofSeen||claiming.acknowledgement||claiming.completedScore||(chat?.markAction?.type==='mymarks'&&share&&claiming.marks[host]?.shares?.some(row=>row.nonce===share.nonce&&row.status==='queued'))) });
+          if(isReplyCommand(chat))commandReply={kind:chat.markAction.type,reason:scoreNext.reason,...(markOutcome?{outcome:markOutcome}:{})};
           if (['top','badges'].includes(scoreNext.message)) scoreNext.message = scoreMessage(scoreNext.message, scoreboard(claiming.lineage, claiming.registry, scoreNext.doc, config, now), host);
           if (scoreAckRef) tx.set(scoreAckRef, scoreAckDocument(scoreAckPrevious, chat, scoreNext.message, transition?.channel, claiming.marks[host], now));
           if (scores || scoreNext.doc.players.length || scoreNext.doc.receipts.length) tx.set(scoreRef, scoreNext.doc);
@@ -203,7 +204,7 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false, reviewP
     async controlMarks(host, actor, action, now) {
       if (!isChatIdentity(actor, host)) throw new Error('Authenticated chat identity required');
       if (action.type !== 'forgetme' && !isModerator(actor, host)) throw new Error('Moderator identity required');
-      await db.runTransaction(async tx => {
+      return db.runTransaction(async tx => {
         const doc = ref('markChannels', host); const previous = (await tx.get(doc)).data();
         const receiptRef = ref('chatReceipts', host);
         const receipt = action.type === 'forgetme' ? (await tx.get(receiptRef)).data() : null;
@@ -232,8 +233,10 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false, reviewP
           tx.set(ref('lineage', 'single'), checked.lineage);
           tx.set(ref('keeperRegistry', 'single'), checked.registry); tx.set(ref('streamChannels', host), transition.channel); next = transition.marks;
         } else next = reduceMark(previous, host, actor, action, now, reviewPolicy);
+        const commandOutcome=markCommandOutcome(previous,next,host,actor,action);
         tx.set(doc, next);
         if (receipt && receipt.chatterId === actor?.chatterId) tx.delete(receiptRef);
+        return commandOutcome;
       });
     },
     async sendOffStep(op, now) {

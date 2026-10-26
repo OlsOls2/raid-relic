@@ -14,7 +14,7 @@ import { atlasPage, atlasSearch, movedToView, claimMeterView, handoffView, withC
 import { reduceClaims, emptyLineage, publicJourney } from './claims.js';
 import { sendState } from './send-state.js';
 import { lifecycleConfig, reduceLifecycle, emptyRegistry } from './lifecycle.js';
-import { setMarkContext, reduceMark, publicMarks, publicOverlayState, privateMarks, isModerator, isChatIdentity, markPrivacyChange, trustedReviewPolicy } from './marks.js';
+import { setMarkContext, reduceMark, publicMarks, publicOverlayState, privateMarks, isModerator, isChatIdentity, markPrivacyChange, markCommandOutcome, trustedReviewPolicy } from './marks.js';
 
 // Synchronous mutations are atomic within a single process; tests/dev only.
 export function createMemoryState({ maxEvents = 10000, lifecycle, p7Enabled = false, reviewPolicy } = {}) {
@@ -59,6 +59,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle, p7Enabled = fa
       }
       const transition = config && host ? reduceLifecycle({ reviewPolicy, registry, channel: channels.get(host), marks: markDocs.get(host), host, event, chat:proofSeen?null:chat, now, sentAt, observed: Boolean(observation) }) : null;
       const markDoc = transition ? transition.marks : !proofSeen&&chat?.markAction ? reduceMark(markDocs.get(chat.broadcasterId), chat.broadcasterId, chat, chat.markAction, now, reviewPolicy) : null;
+      const markOutcome=markCommandOutcome(markDocs.get(host),markDoc,host,chat,chat?.markAction);
       const privacyChanged=event?.type==='ban'||(!proofSeen&&markPrivacyChange(markDocs.get(host),markDoc,chat,host,chat?.markAction));
       let claiming; let sending; let presenceNext;
       if (config) {
@@ -78,7 +79,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle, p7Enabled = fa
       let scoreNext;
       if (claiming) {
         const scoreChannels = Object.fromEntries(channels); if (transition) scoreChannels[host] = transition.channel;
-        scoreNext = reduceScores(scores, { channels: scoreChannels, marks: claiming.marks, chat, now, autoApprove:reviewPolicy.autoApprove, vote: claiming.scoreVote, completion: claiming.completedScore, hop: claiming.registry.pendingHop, acknowledged:Boolean(proofSeen||claiming.acknowledgement||claiming.completedScore||(chat?.markAction?.type==='mymarks'&&share&&claiming.marks[host]?.shares?.some(row=>row.nonce===share.nonce&&row.status==='queued'))) });
+        scoreNext = reduceScores(scores, { channels: scoreChannels, marks: claiming.marks, chat, now, awaitingRaid:claiming.awaitingRaid, markOutcome, autoApprove:reviewPolicy.autoApprove, vote: claiming.scoreVote, completion: claiming.completedScore, hop: claiming.registry.pendingHop, acknowledged:Boolean(proofSeen||claiming.acknowledgement||claiming.completedScore||(chat?.markAction?.type==='mymarks'&&share&&claiming.marks[host]?.shares?.some(row=>row.nonce===share.nonce&&row.status==='queued'))) });
         if (['top','badges'].includes(scoreNext.message)) scoreNext.message = scoreMessage(scoreNext.message, scoreboard(claiming.lineage, claiming.registry, scoreNext.doc, config, now), host);
 
       }
@@ -111,7 +112,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle, p7Enabled = fa
       if(p7Enabled&&privacyChanged)for(const target of config.channels)if(p7Docs.has(target))p7Docs.set(target,cancelP7(p7Docs.get(target)));
       if (chat?.markAction?.type === 'forgetme' && chatReceipts.get(chat.broadcasterId)?.chatterId === chat.chatterId) chatReceipts.delete(chat.broadcasterId);
       if (chat && !chat.markAction) chatReceipts.set(chat.broadcasterId, { broadcasterId: chat.broadcasterId, chatterId: chat.chatterId, messageId: chat.messageId, receivedAt: now });
-      if(isReplyCommand(chat)&&!completionAcks.length&&!completionSkipped&&!sending?.result&&!(pk&&completionReceipts.has(pk)))return{status:'accepted',commandReply:{kind:chat.markAction.type,reason:scoreNext?.reason??'not-command'}};
+      if(isReplyCommand(chat)&&!completionAcks.length&&!completionSkipped&&!sending?.result&&!(pk&&completionReceipts.has(pk)))return{status:'accepted',commandReply:{kind:chat.markAction.type,reason:scoreNext?.reason??'not-command',...(markOutcome?{outcome:markOutcome}:{})}};
       return (completionAcks.length||completionSkipped) ? {status:'accepted',completionAcks,completionSkipped} : (pk&&completionReceipts.has(pk)) ? {status:'accepted',completionAcks:completionReceipts.get(pk).rows} : observation ? (transition.channel.lifecycleAt === event.sentAt && transition.channel.lifecycleSource === 'helix-observation' ? 'applied' : 'no-change') : sending?.result ?? 'accepted';
     },
     getRitual(hostId) {
@@ -126,6 +127,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle, p7Enabled = fa
       if (config && !config.channels.includes(host)) throw new Error('Unconfigured lifecycle channel');
       const transition = config ? reduceLifecycle({ reviewPolicy, registry, channel: channels.get(host), marks: markDocs.get(host), host, chat: { ...actor, markAction: action }, now, sentAt: now }) : null;
       const doc = transition ? transition.marks : reduceMark(markDocs.get(host), host, actor, action, now, reviewPolicy);
+      const commandOutcome=markCommandOutcome(markDocs.get(host),doc,host,actor,action);
       const privacyChanged=markPrivacyChange(markDocs.get(host),doc,actor,host,action);
       if (transition) { registry = transition.registry; channels.set(host, transition.channel); }
       if (config) {
@@ -141,6 +143,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle, p7Enabled = fa
       if (config) { const next = reduceClaims(registry, Object.fromEntries(channels), Object.fromEntries(markDocs), lineage, null, now, now, Object.fromEntries(presenceDocs), config?.streakEnabled); registry = next.registry; lineage = next.lineage; }
       if (config) scores = reduceScores(scores, { channels: Object.fromEntries(channels), marks: Object.fromEntries(markDocs), chat: { ...actor, markAction: action }, now }).doc;
       if (action.type === 'forgetme' && chatReceipts.get(host)?.chatterId === actor.chatterId) chatReceipts.delete(host);
+      return commandOutcome;
     },
     sendOffStep(op, now) {
       if (!config) throw new Error('Lifecycle required');

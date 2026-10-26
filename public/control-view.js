@@ -13,7 +13,7 @@ export function actionMessage(value, targetLogin) {
     'target-not-found': 'Twitch could not find this target channel. Review the configured account.',
     'native-state-review': 'Twitch rejected the request. Review the saved diagnostic and native raid state.',
   };
-  if (value?.status === 'accepted') return 'Send Off accepted. Complete the native Twitch raid; both chats can gather now. The relic moves only after Twitch confirms the raid and both chats bind it.';
+  if (value?.status === 'accepted') return 'Raid accepted. Watch the claim meter: if your offer is not counted yet, send !offer after the raid lands. Binding needs both chats and a verified arrival.';
   if (diagnostic[category]) return diagnostic[category];
   if (value?.status === 'unknown') return diagnostic['unknown-reconcile-only'];
   if (value?.status === 'reconciled') return value.ready ? 'Channel reconciled. All five subscriptions are enabled. Refresh the source after reconciling both Keepers.' : 'Channel setup is waiting for Twitch callbacks. Reconcile again explicitly once they are enabled.';

@@ -57,7 +57,7 @@ export function runeSvg(input) {
 }
 
 export function parseMarkCommand(text) {
-  const score = new Map(Object.entries({ '!relic scores on':'scores-on', '!relic scores off':'scores-off', '!relic top':'top', '!relic badges':'badges' })).get(text);
+  const score = new Map(Object.entries({ '!relic scores':'scores-status', '!relic scores on':'scores-on', '!relic scores off':'scores-off', '!relic top':'top', '!relic badges':'badges' })).get(text);
   if (score) return { type: score };
   const send = /^!relic send @([a-zA-Z0-9_]{1,25})$/.exec(text);
   if (send) return { type: 'send', login: send[1].toLowerCase() };
@@ -115,7 +115,7 @@ export function reduceMark(previous, host, actor, action, now, reviewPolicy) {
   const doc = structuredClone(previous ?? empty());
   if (actor?.isBot || actor?.copied || !userId(host) || actor?.broadcasterId !== host || !userId(actor.chatterId) || !Number.isFinite(now) || !action) return doc;
   doc.cooldowns = doc.cooldowns.filter(entry => now - entry.at < MARK_LIMITS.cooldownMs);
-  if (['scores-on','scores-off','top','badges','help'].includes(action.type)) return doc;
+  if (['scores-status','scores-on','scores-off','top','badges','help'].includes(action.type)) return doc;
   if (action.type === 'forgetme') {
     if (doc.shares) doc.shares = doc.shares.filter(s => s.actor !== actor.chatterId);
     for (const session of doc.sessions) session.marks = session.marks.filter(mark => mark.userId !== actor.chatterId);
@@ -197,4 +197,15 @@ export function createMarkService(store, { now = Date.now } = {}) {
     publicProjection: host => store.getPublicMarks(host),
     moderationView: (host, actor) => store.getPrivateMarks(host, actor),
   };
+}
+
+// Derived from the same transaction's before/after documents, never an external pre-read.
+export function markCommandOutcome(previous,next,host,actor,action){
+  if(action?.type!=='veto-last')return undefined;
+  if(!isChatIdentity(actor,host)||actor.isBot||actor.copied||!isModerator(actor,host)
+    ||previous?.blocked?.includes(actor.chatterId)||previous?.context?.blockedUserIds?.includes(actor.chatterId))return 'denied';
+  if(!next)return 'inactive';
+  const count=doc=>(doc?.sessions??[]).reduce((n,s)=>n+s.marks.length,0);
+  if(count(next)<count(previous))return 'vetoed';
+  return count(previous)===0?'empty':'inactive';
 }

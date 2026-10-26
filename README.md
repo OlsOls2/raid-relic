@@ -2,10 +2,23 @@
 
 An original, evolving relic travels between Twitch communities: a verified raid brings it to the next room, and two chats bind it together. Each completed hand-off adds a gold growth ring and carries approved community runes into a recorded journey. The transparent OBS artwork, Atlas constellation and replay make that shared history visible—without treating chat presence as proof of raid membership.
 
+## Operator-reported live checkpoint — 26 October, 09:13–09:19 UK
+
+Grok/operator reports promotion at 09:11 UK: canonical `raid-relic-p9live1026`, source `312d8ef60b76032f2d8217adf6e2d5bb2a898d7f`, now 100%. This is reported evidence, not Codex-observed Twitch activity.
+
+| Reported check | Observed by Grok/operator | Scope/remaining issue |
+|---|---|---|
+| Native raid and two-chat binding | olsols2 → raidrelichq; Ring7/Streak0 → Ring8/Streak1, accepted Send Off, Raid Now about 10s, offer/accept bound | Part1 below changes early-offer promises; no new live pass claimed |
+| Atlas/replay | Stop8, tracked streak1 and replay worked | Retained records only |
+| Announcement/pin/shoutout | Purple bound-to-raidrelichq announcement, visible pin, shoutout/follow card for olsols2; no duplicates reported | Pin attribution label showed raidrelichqbot; parent public identity read and pin diagnostic confirm configured BOT1591804828 / raidrelicbot; the different UI attribution remains unexplained |
+| Top/badges | Correct live replies reported | Bare `!relic scores` and veto-specific outcome replies are new candidate fixes, not live-verified |
+
+Source166–167 Part 1 is awaiting parent QA and a **new zero-traffic** `p9-livefix` / `raid-relic-livefix1026` preview cloned from actual production configuration. It is not published or promoted. Watch the claim meter: eligible early offers can be retained, but an uncounted offer must be resent after the raid lands. Binding still requires both chats and verified arrival; landing opens 180 seconds. All signed-role, privacy and at-most-once guards remain. [Four-point source review and retest](docs/LIVE_PART1_REVIEW.md). No assistant live actions occurred.
+
 ## Judge in 60 seconds
 
 1. Open the **[P9 review demo](https://p9-review---raid-relic-vz4bhnskgq-uc.a.run.app/demo/)** (published zero-traffic, read-only preview). No Twitch login, installation or credentials are needed. Press **Autoplay 35-second tour**.
-2. Pause to take over, or Reset → Send Off → offer early → simulate receipt → accept. Tab/Enter operate the controls; reduced motion uses static presentation. A fictional completed binding establishes a holder and unlocks a permanently watermarked **SIMULATED DEMO** PNG; Reset disables downloading again.
+2. Pause to take over, or Reset → Send Off → simulate receipt → offer → accept. Tab/Enter operate the controls; reduced motion uses static presentation. A fictional completed binding establishes a holder and unlocks a permanently watermarked **SIMULATED DEMO** PNG; Reset disables downloading again.
 3. Open the **[P9 review Atlas](https://p9-review---raid-relic-vz4bhnskgq-uc.a.run.app/atlas/)** (published zero-traffic, read-only preview) for recorded stops, configured Keepers, badges, local replay and per-stop ring cards. Reading never opts a viewer into public scores.
 
 The immutable prior [readiness demo](https://readiness---raid-relic-vz4bhnskgq-uc.a.run.app/demo/) and [readiness Atlas](https://readiness---raid-relic-vz4bhnskgq-uc.a.run.app/atlas/) remain available (`raid-relic-ready1026`, source `1a2a1b7`, zero traffic/read-only/P7 OFF). **Published at zero traffic, read-only:** `raid-relic-p9review1026`, tag `p9-review`, runtime source `4289b5d37f05909ab4c31136f0e998237e78f4b9`. [Prior P9ee demo](https://p9-stretch---raid-relic-vz4bhnskgq-uc.a.run.app/demo/) and its Atlas remain immutable too.
@@ -14,7 +27,7 @@ The permanently labelled demo starts with fictional Keepers and zero rings. It r
 
 ![Labelled simulated browser demo — no Twitch connection](.codex-evidence/judge-preview/judge-demo-desktop.png)
 
-**Delivery boundary, parent-reported 26 October:** canonical `raid-relic-judgefix1026` / `6401dcb` remains 100%, P7 five gates ON/pin 300, paid OFF. Published P9 `eeabe365` / tag `p9-stretch` remains **0%, read-only, P7 OFF**; existing P8 previews remain pinned. This readiness increment changes neither deployment. Preview HTTP/demo works; preview self-origin WSS403 is intentional under strict canonical-only origins. Canonical callbacks still run 6401, so a real raid there does **not** validate new P9 code. Promotion needs Grok approval.
+**Historical delivery boundary before the operator-reported09:11 promotion:** canonical `raid-relic-judgefix1026` / `6401dcb` remains 100%, P7 five gates ON/pin 300, paid OFF. Published P9 `eeabe365` / tag `p9-stretch` remains **0%, read-only, P7 OFF**; existing P8 previews remain pinned. This readiness increment changes neither deployment. Preview HTTP/demo works; preview self-origin WSS403 is intentional under strict canonical-only origins. Canonical callbacks still run 6401, so a real raid there does **not** validate new P9 code. Promotion needs Grok approval.
 
 ## Install for an owner-configured Keeper
 
@@ -93,4 +106,4 @@ Freeze: **31 October 2026, 18:00 UK/UTC**. J5's pinned read-only daily checker a
 
 The new [eight-point P9 review](docs/P9_REVIEW_POINTS.md) is published in the read-only zero-traffic preview: fictional streak/moderation, holder-gated cards, exact per-stop filenames, one primary Replay action and a frozen completed 3D relic. Its current unchanged runtime has the parent-reported 900383 ms real-soak pass; all 31 serial browser workflows/100 checks passed and the separate zero preview is published. No live command fix or physical validation is claimed. Grok/Olly physical commands/raid/OBS review and explicit approval remain necessary before any canonical promotion.
 
-**Parent-only next configuration plan (not deployed):** a separate zero-traffic `p9-live` / `raid-relic-p9live1026` candidate will preserve actual production configuration, with read-only mode false, P7 five gates ON/pin 300, P9 streaks/local auto-review enabled and both clip gates OFF. Canonical6401 stays100%; no promotion or Main merge is authorized here. Published P9 review links above remain valid. [Exact owner-approved plan and three copy nits](docs/P9_REVIEW_POINTS.md#owner-approved-ui-review-and-copy-follow-up165).
+**Configuration plan165 is historical:** the owner reports p9-live312 promoted as noted above. Part166 prepares only a separate zero-traffic livefix preview; no new source has been promoted. P7 stays configured ON/pin300, P9 streak/local auto-review ON with spoiler held, both clip gates OFF/unwired, paid features OFF and existing resources/refs/callbacks/origins unchanged. No new scopes, consent, services, Main merge or J5/J6 operations are authorized here.

@@ -14,7 +14,7 @@ export function publicJourney(lineage) {
 }
 // All inputs are store-owned snapshots. No effects; caller commits every result together.
 export function reduceClaims(registry, channels, marks, previous, chat, now, sentAt = now, presence = {}, streakEnabled = false) {
-  registry = structuredClone(registry); marks = structuredClone(marks); const lineage = structuredClone(previous ?? emptyLineage()); let acknowledgement = null, acknowledgementKind, ackDeadline, scoreVote, completedScore;
+  registry = structuredClone(registry); marks = structuredClone(marks); const lineage = structuredClone(previous ?? emptyLineage()); let awaitingRaid = false; let acknowledgement = null, acknowledgementKind, ackDeadline, scoreVote, completedScore;
   observeStreak(registry,now,streakEnabled);
   // References are private and scoped to source channel/stream/mark/user. Purge
   // permanently when approval/content is removed; never regenerate archived entries.
@@ -108,8 +108,24 @@ export function reduceClaims(registry, channels, marks, previous, chat, now, sen
       acknowledgementKind = 'closed'; ackDeadline = now;
     }
   }
+  // Status only, derived from this transaction. Never invent votes or eligibility.
+  const intent = registry.send;
+  const source = intent?.sourceId, target = intent?.targetId;
+  const beganAt = intent?.acceptedAt ?? intent?.dispatchAt;
+  awaitingRaid = Boolean(!acknowledgement && !hop?.offers?.includes(chat?.chatterId) && chat?.markAction?.type === 'offer'
+    && !chat.isBot && !chat.copied && /^\d{1,32}$/.test(chat.chatterId)
+    && chat.broadcasterId === source && ['accepted','dispatching','unknown'].includes(intent?.status)
+    && Number.isFinite(beganAt) && now >= beganAt && now < beganAt + 180000
+    && sentAt >= beganAt && sentAt <= now
+    && eligible(registry, channels, marks, source, target)
+    && channels[source]?.streamId === intent.sourceStreamId
+    && channels[target]?.streamId === intent.targetStreamId
+    && [source,target].every(id => !channels[id].blockedUserIds.includes(chat.chatterId)
+      && !marks[id].blocked.includes(chat.chatterId)
+      && !marks[id].context?.blockedUserIds?.includes(chat.chatterId)
+      && !presence[id]?.revocations?.some(row => row.key === hash(JSON.stringify([id,chat.chatterId])) && row.expiresAt > now)));
   if (Buffer.byteLength(JSON.stringify(registry)) > 4096) throw new Error('Relic registry capacity reached');
   observeStreak(registry,now,streakEnabled);
   if(streakEnabled&&Buffer.byteLength(JSON.stringify(registry))>4096)throw Error('Relic registry capacity reached');
-  return { registry, marks, lineage, scoreVote, completedScore, acknowledgement, acknowledgementKind, ackDeadline: ackDeadline ?? registry.pendingHop?.endsAt };
+  return { registry, marks, lineage, awaitingRaid, scoreVote, completedScore, acknowledgement, acknowledgementKind, ackDeadline: ackDeadline ?? registry.pendingHop?.endsAt };
 }

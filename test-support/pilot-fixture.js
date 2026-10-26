@@ -5,7 +5,7 @@ import { fakeFirestore } from './fake-firestore.js';
 export const HOME = '1591805230', OTHER = '1591806023', BOT = '1591804828';
 export async function pilotFixture(kind = 'memory', { simulator = true, extraKeeperScopes = [], extraBotScopes = [], p7HTTP, chronicleEnv = {}, chronicleHTTP, forgeHTTP, origin = 'https://pilot.example' } = {}) {
   const db = kind === 'firestore' ? fakeFirestore() : undefined;
-  let time = Date.parse('2026-10-25T12:00:00Z'); let seq = 0;
+  let time = Date.parse('2026-10-25T12:00:00Z'); let seq = 0;let validationOverride=null;
   const secret = 'synthetic-pilot-hmac-secret';
   const streams = new Map([[HOME, { user_id: HOME, id: '9001', type: 'live', started_at: new Date(time - 10000).toISOString() }],
     [OTHER, { user_id: OTHER, id: '9002', type: 'live', started_at: new Date(time - 10000).toISOString() }]]);
@@ -23,7 +23,7 @@ export async function pilotFixture(kind = 'memory', { simulator = true, extraKee
       const id = options.headers.Authorization.slice('OAuth access-'.length);
       if (revoked.has(id)) return { status: 401, data: {} };
       return { status: 200, data: { client_id: 'public-client', user_id: id, expires_in: 3600,
-        scopes: id === BOT ? ['user:read:chat', 'user:write:chat', 'user:bot', ...extraBotScopes] : ['channel:bot', 'channel:manage:raids', ...extraKeeperScopes] } };
+        scopes: id === BOT ? ['user:read:chat', 'user:write:chat', 'user:bot', ...extraBotScopes] : ['channel:bot', 'channel:manage:raids', ...extraKeeperScopes],...(validationOverride?.(id)??{}) } };
     }
     if (u.pathname.endsWith('/subscriptions')) {
       if (options.method === 'POST') {
@@ -76,6 +76,7 @@ export async function pilotFixture(kind = 'memory', { simulator = true, extraKee
     message_id: options.messageId ?? `chat-${++seq}`, badges: [], message: { text, fragments: [] } }, host, { broadcaster_user_id: host, user_id: BOT }, options);
   const raid = (from = HOME, to = OTHER, viewers = 1) => signed('channel.raid', { from_broadcaster_user_id: from, to_broadcaster_user_id: to, viewers }, from, { from_broadcaster_user_id: from });
   return { runtime, db, request, control, login, cookies, calls, subscriptions, streams, chat, raid, signed, now: () => time,
+    validation(fn){validationOverride=fn;},
     chatFailure(mode) { chatFailure = mode; },
     revoke(id) { revoked.add(id); }, advance(ms = 1) { time += ms; }, hook(fn) { streamsHook = fn; }, conflict() { conflict = true; }, timeout() { timeoutRaid = true; } };
 }
