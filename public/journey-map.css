@@ -7,3 +7,5 @@
 #map-svg .map-node-label{paint-order:stroke;stroke:#101d30;stroke-width:3;stroke-linejoin:round}
 
 #map-svg .map-hop,#map-svg .map-comet-tail,#map-svg .map-growth-band{vector-effect:non-scaling-stroke}#map-svg .map-hop{filter:drop-shadow(0 0 2px #9486b7)}#map-svg .map-selected{filter:drop-shadow(0 0 5px #e6bb70)}#map-svg .map-node-label{font-size:20px}
+
+#map-stops{padding-inline-start:32px}#map-stops>li{padding-inline-start:8px;margin-block:8px}#map-stops button{min-height:44px}

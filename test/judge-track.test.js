@@ -38,3 +38,13 @@ test('cleanup API array is dry-run preparation only, untagged-only delete plus f
  assert.deepEqual(rules,[{name:'delete-untagged-14d',action:{type:'Delete'},condition:{tagState:'untagged',packageNamePrefixes:['app'],olderThan:'14d'}},{name:'keep-five-recent',action:{type:'Keep'},mostRecentVersions:{packageNamePrefixes:['app'],keepCount:5}}]);
  const intent=JSON.parse(await readFile('ops/image-retention-policy.json','utf8'));assert.equal(intent.deletionAuthorized,false);
 });
+
+test('35-second demo total and phase guidance are presentation-only; countdown advances',async()=>{
+ const {DEMO_TOUR_MS,demoProgress}=await import('../public/demo-state.js');assert.equal(DEMO_TOUR_MS,35000);
+ let s=demoStep(freshDemo(),{type:'send',source:'demo_keeper_a',target:'demo_keeper_b'});assert.match(demoProgress(s),/Step 2\/5/);
+ s=demoStep(s,{type:'advance',ms:1000});assert.equal(Math.ceil(10-(s.clock-s.acceptedAt)/1000),9);
+ for(let i=0;i<4;i++)s=demoStep(s,{type:'advance',ms:1000});assert.equal(Math.ceil(10-(s.clock-s.acceptedAt)/1000),5);
+ assert.equal(s.rings,0);for(const type of ['offer','raid','accept'])s=demoStep(s,{type});assert.match(demoProgress(s),/Step 4\/5/);assert.equal(s.rings,1);
+ const {raiderCount}=await import('../public/journey-map.js');assert.deepEqual([0,1,2].map(raiderCount),['0 raiders','1 raider','2 raiders']);
+ for(const file of ['public/atlas.html','public/forge.html','public/recap.html'])assert.doesNotMatch(await readFile(file,'utf8'),/href="\/control\//);
+});

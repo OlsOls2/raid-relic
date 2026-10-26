@@ -1,5 +1,6 @@
 import { claimComplete } from './ritual-copy.js';
 // Fictional browser-memory presentation only. Never imported by server/game code.
+export const DEMO_TOUR_MS=35000;
 export const DEMO_NAMES=Object.freeze(['demo_keeper_a','demo_keeper_b']);
 export const freshDemo=()=>({clock:0,rings:0,phase:'idle',acceptedAt:null,receiptAt:null,completedAt:null,offer:false,accept:false,source:DEMO_NAMES[0],target:DEMO_NAMES[1],notice:'Choose two fictional Keepers, then Send Off.'});
 export function demoStep(previous,action){let s={...previous};
@@ -12,4 +13,12 @@ export function demoStep(previous,action){let s={...previous};
  if(s.phase==='arrival'&&s.offer&&s.accept){s.rings++;s.completedAt=s.clock;s.phase='bound';s.notice=claimComplete(s.target);}
  if(action.type==='settle'&&s.phase==='bound')s.phase='settled';
  return s;
+}
+
+export function demoProgress(s){
+ if(s.phase==='idle')return 'Step 1/5: choose two fictional Keepers, then Send Off or Autoplay.';
+ if(s.phase==='countdown')return 'Step 2/5: simulated raid in flight. Offer early; accept unlocks after the simulated receipt. Skip countdown is available.';
+ if(s.phase==='arrival')return s.offer?'Step 3/5: simulated raid received. Send !accept from the other fictional chat.':'Step 3/5: simulated raid received. Add the source offer and distinct host accept.';
+ if(s.phase==='bound')return 'Step 4/5: claim complete. Watch the receipt-time arrival and one new ring settle.';
+ return 'Step 5/5: tour complete. The real relic is unchanged. Reset to zero or Send Off again.';
 }

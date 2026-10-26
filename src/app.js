@@ -77,7 +77,7 @@ export function createApp({ scoreAcks, claimAcks, secret, state = createMemorySt
       return{...result(200,await readFile(new URL(`../public/${file}`,import.meta.url)),type),headers:{'cache-control':'public, max-age=3600','content-security-policy':"default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'self'"}};
     }
     if (method === 'GET' && path === '/health') {
-      return result(200, JSON.stringify({status:'ok',releaseCommit:release,phase:raidPilot?'live':'foundation',...(!raidPilot?{readiness:'not-ready-for-raids'}:{}),mode:overlayFeed?.simulator?'simulator':'live',...(previewReadOnly?{preview:'Read-only preview'}:{})}), 'application/json');
+      return result(200, JSON.stringify({status:'ok',demo:'simulated-client-only',releaseCommit:release,phase:raidPilot?'live':'foundation',...(!raidPilot?{readiness:'not-ready-for-raids'}:{}),mode:overlayFeed?.simulator?'simulator':'live',...(previewReadOnly?{preview:'Read-only preview'}:{})}), 'application/json');
     }
     // Preview shares live storage: deny before authentication, DB access or effects.
     if (previewReadOnly && (method !== 'GET' || path.startsWith('/control/') || path.startsWith('/oauth/') || path.split('?')[0] === '/auth/callback' || path.split('?')[0] === '/eventsub')) return { ...result(403, 'P5 read-only preview. Live chat commands are not enabled on canonical yet.'), headers: { 'cache-control': 'no-store' } };

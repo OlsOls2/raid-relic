@@ -34,7 +34,7 @@ async function httpResponse(instance, input) {
 test('health is available without a webhook secret', async () => {
   const response = await createApp().dispatch({ method: 'GET', path: '/health' });
   assert.equal(response.status, 200);
-  assert.deepEqual(JSON.parse(response.body), { status: 'ok', releaseCommit: null, phase: 'foundation', readiness: 'not-ready-for-raids', mode:'live' });
+  assert.deepEqual(JSON.parse(response.body), { status: 'ok', demo:'simulated-client-only', releaseCommit: null, phase: 'foundation', readiness: 'not-ready-for-raids', mode:'live' });
 });
 test('valid raid starts a local 90-second ritual', async () => {
   const instance = app();
