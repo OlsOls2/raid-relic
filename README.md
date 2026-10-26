@@ -2,53 +2,32 @@
 
 One original relic, carried between Twitch communities and bound by two chats.
 
-[Open the Atlas](https://raid-relic-760724762396.us-central1.run.app/atlas/) · [Recap](https://raid-relic-760724762396.us-central1.run.app/recap) · [Forge preview](https://raid-relic-760724762396.us-central1.run.app/forge)
+![Labelled simulated browser demo — no Twitch connection](.codex-evidence/judge-preview/judge-demo-desktop.png)
 
-## Try the journey
+## Judge in three minutes
 
-1. The owner connects the bot and both configured Keepers in their matching Twitch profiles, then reconciles each channel sequentially: [home control](https://raid-relic-760724762396.us-central1.run.app/control/1591805230), [second control](https://raid-relic-760724762396.us-central1.run.app/control/1591806023). Both streams must be live, opted in and ready.
-2. Add each numeric OBS browser source: `/overlay/1591805230` and `/overlay/1591806023`, normally 1280×720. For a badge use 160×160 with `?corner=1`. Sound is muted by default; `?sound=1` also requires a trusted local gesture/browser permission.
-3. A viewer writes `!mark moon`. Marks stay private until a moderator approves the actual private pending ID; never guess it. The budget is five per viewer per stream, with a 30-second cooldown.
-4. Before Send Off, write an ordinary original message in the source chat to establish source-stream presence. Send Off opens a provisional 180-second voting window; complete the native Twitch raid. A newly verified landing then gives both chats a full 180 seconds. API acceptance alone never moves the relic or shows an arrival.
-5. Use `!offer` in the source, or after redirect in the target if that same actor was seen in the source stream; a different actor uses `!accept` in the host. Twitch must confirm the raid and both thresholds must be met. New raids with 0–2 signed viewers need one per side; larger raids use capped square root. Legal early votes are kept; the landing deadline is fixed by receipt and duplicates never extend it. Neither clock is Twitch's countdown.
-6. Refresh the Atlas after completion: one actual stop and ring, approved text search, and downloadable recap. Name entry alone proves nothing; `!relic mymarks` explicitly shares a short-lived link to that actor's surviving approved history in public chat.
+1. **[Try the judge-track demo](https://judge-track---raid-relic-vz4bhnskgq-uc.a.run.app/demo/)** on the candidate preview (parent publishing; deployment proof pending), or locally at **http://127.0.0.1:5191/demo** after `npm ci` and `npm run judges`. Its permanent banner says **SIMULATED DEMO: no Twitch connection; does not affect the real relic.** Send Off, offer early, skip the fictional countdown and accept from the other fictional chat. No login, credentials or real messages. Canonical b23 `/demo` remains 404 until Grok accepts a future promotion.
+2. **See the [actual Atlas](https://raid-relic-760724762396.us-central1.run.app/atlas/)**: retained completed stops, Keeper ledger, approved-text search and local journey replay. Empty/waiting state is honest; no invented destinations or personal ownership inferred from a name. [Recap](https://raid-relic-760724762396.us-central1.run.app/recap) exports a local snapshot; [Forge](https://raid-relic-760724762396.us-central1.run.app/forge) is a template preview, not live customization.
+3. **OBS/public view:** [Home](https://raid-relic-760724762396.us-central1.run.app/overlay/1591805230), [Ols](https://raid-relic-760724762396.us-central1.run.app/overlay/1591806023), normally1280×720; append `?corner=1` for160×160. Waiting does not imply a raid. Judge-track overlays close when hidden or after ten minutes without human interaction; focus/interact to resume. Close unused sources. Active WebSockets can be billable; free-tier costs are not guaranteed.
 
-[Owner workflow, recovery and safeguards](docs/LIVE_TEST.md) · [Under-three-minute demo](docs/DEMO_SCRIPT.md)
+**Judge-track behavior (pending canonical promotion):** in a configured consenting chat, `!relic top`, `!relic badges` and `!relic help` read public information, including offline/nonholder rooms. Status replies are budgeted. `!relic scores on` explicitly shares your name for future completed participation; `!relic scores off` withdraws it. `!relic mymarks` shares a short-lived public link to your own approved retained history. Reading never opts you in. Private owner controls/OAuth are not judge credentials; [owner live workflow](docs/LIVE_TEST.md).
 
-## Local judges demo
-
-Node 22+: `npm ci`, then `npm run judges`. Open **http://127.0.0.1:5191/judges** and follow the simulated steps. No Twitch, cloud or model credentials are needed. All simulated pages are labelled; `/judges` is not deployed. Stop with Ctrl-C.
-
-`npm test` runs the mocked unit/integration suite. Parent-run sandboxed browser scripts live in `scripts/browser-smoke-*.js`; they use fixed local port 5191, never real Twitch.
+The real ritual still needs a verified Twitch raid and two distinct eligible chat participants. API acceptance only gathers votes; a verified landing opens180seconds. Marks are pending until moderator approval, five per viewer per stream with a30-second cooldown. Forget/block/veto/opt-out erase retained associated content without refunding quotas; minimal bounded anti-abuse/idempotency hashes remain briefly. Saved exports cannot be recalled.
 
 ## Built with Codex
 
-All original application code and documentation were authored in one original Codex session, `01a1705c-a87d-7143-80f6-021e47b78ced`; the parent reviews, commits and independently tests/deploys. Reviews caught second-versus-millisecond restart watermarks, lost 4xx raid diagnostics, and a defined-but-never-called chat sender. Screenshot review shaped the original crystal, readable rune orbit and receipt-seeking arrival.
+All original app code/docs were authored in original session `01a1705c-a87d-7143-80f6-021e47b78ced`; the parent reviews, commits, independently tests and operates deployments. Reviews caught second-versus-millisecond restart watermarks, swallowed raid4xx diagnostics, a defined-but-unused chat sender and a zero-opacity fusion parent. Parent P7 baseline: **613/613 tests, zero skips;23 local browser flows/80 checks**. Parent final QA verified **627/627 tests, zero skips; all 24 local browser workflows/83 checks**, with three reviewed simulated captures. Grok/Olly reported the actual25October21:53–21:57UK Ols→Home P5 test: holderHome/six rings, score consent, early offer, completion and ledger observed. That is not a physical P7 moderation or new-build validation claim. [Factual draft](docs/CODEX_USAGE.md) · [session/export limits](CODEX_SESSION.md).
 
-Historical pre-P4 checkpoint: **485/485 host tests**, **16 browser workflows/61 checks**, plus the reviewed P3.1 GL/SVG demo. Current parent P4 proof: **493/493 host tests, zero skips**, the P4 browser gate and the GL/SVG cinematic demo passed; the parent viewed their seven private Simulator captures. Local fixtures do not prove physical OBS/audio or live Twitch. Grok reported the prior P3 Ols→Home test at 17:08–17:12 UK: Home held four rings and the claim ACK arrived. These P4 features are present locally; final refinements and the full browser matrix still need review before parent deployment. Consult deployment records for the runtime identity. [Factual Codex draft](docs/CODEX_USAGE.md) · [Session/evidence cutoff](CODEX_SESSION.md).
+```
+Twitch signed webhook → Cloud Run → atomic Firestore holder/claims/marks/history
+                                  → bounded chat outboxes + active OBS WebSockets
+Atlas → manual bounded reads; /demo → fictional browser memory only
+```
 
-## Privacy and running costs
+`npm test` runs mocked tests. `scripts/browser-smoke-*.js` use local5191 and sandboxed Chromium; no real Twitch. `npm run judges` serves explicitly labelled local memory fixtures at **http://127.0.0.1:5191/judges**; `/judges` is not deployed. Stop with Ctrl-C. No YouTube/highlight URL is available here; owner footage/submission/access arrangements belong to Olly/Grok.
 
-Cloud Run + Firestore, one holder, bounded transactional claims/history and read-only WebSocket overlays. Only approved retained content is public; forget/block/veto/opt-out purge retained associated content. Minimal bounded anti-abuse/idempotency hashes remain briefly; downloading a recap creates an unrecallable local snapshot.
+All five P7 action flags and both paid generation gates remain **OFF**. Optional P7 requires human bot consent, actual moderator roles in both rooms, operator gates and pin-replacement acknowledgement. [P7 activation](docs/P7_RULES.md). Ban-reconciliation foundation remains unwired. No paid API, service or default OAuth scope is added by the judge track. Original SVG/Three MIT and self-hosted Cinzel OFL notices remain included.
 
-Chronicle/Forge paid generation stays **OFF**; Forge is a preview, never an automatic live design. The standalone ban-reconciliation foundation remains **unwired**; current known-ban gates are not comprehensive channel-ban synchronization. No extra scopes are requested here.
+[P6 replay rules](docs/P6_REPLAY.md) · [judge-track plan and future operator gates](docs/JUDGE_TRACK_PLAN.md) · [historical README](docs/archive/README-pre-p4.md). P8/P9 remain in scope awaiting concrete definitions; no speculative implementation or dropped scope. Freeze31October2026 18:00UK/UTC.
 
-Close idle OBS connections to contain usage. Budget alerts and free quotas are not a cost guarantee. P4 adds 12-hour rolling private sessions (five-minute renewal checks on authenticated activity), cached status lights and a local [Cinzel OFL font](docs/CINZEL_FONT.md), with original SVG fallback.
-
-[Historical README, preserved verbatim before P4](docs/archive/README-pre-p4.md) · [Architecture/deployment](docs/DEPLOYMENT.md) · [Priority plan](docs/PRIORITY_PLAN.md)
-
-102 local emergency review: incoming snapshots now omit old-holder destination copy; late eligible original claim commands receive a bounded closed-window reply without transfer. Existing confirmed/ended records are not revived or edited. Parent QA for this fix is pending; no new live validation is claimed.
-
-## P5 branch preview (not canonical)
-
-Keeper scores and original geometric badges derive only from retained completed stops. Initial home hold time and historical raider participation are unknown. Public raider names require separate original-chat `!relic scores on` consent before a counted vote; `!relic scores off` or `!relic forgetme` removes the entry. `!relic top` and `!relic badges` are local mocked additions, not enabled on canonical landing1025. Atlas scores refresh manually.
-
-Any parent-deployed P5 tag must set `P5_PREVIEW_READ_ONLY=true`: OAuth, private controls, EventSub and every non-GET request are denied before effects. This tag shares storage and is not an isolated game stage. Canonical cbe88c3 remains frozen at100%; Grok reports its20:04–20:08 UTC Home→Ols physical roundtrip passed (holder Ols, five rings); this is not P5 physical validation. Parent baseline519/519,19 mock flows69 checks predates this unverified P5 increment. See [P5 rules and review](docs/P5_RULES.md).
-
-P5 promotion is now owner-authorized **after parent QA**. The existing P5 tag stays read only. A new canonical revision must explicitly set `P5_PREVIEW_READ_ONLY=false` (or remove the preview flag), because the service template currently inherits `true`; never promote the read-only tag unchanged. Parent preserves origins, scopes, secret references and runtime caps. Local108 also adds two-chat completion notices, truthful missing-vote replies, larger decorative glyphs and a single three-second gold fusion hold. No retroactive messages for existing completed hops.
-
-Parent21:25 diagnosis: canonical917dfcd/raid-relic-p5binding1025 serves five recorded rings over HTTP **and WSS with the exact canonical Origin**. The old9d read-only P5 tag serves Atlas/HTTP but its own tag Origin is intentionally rejected by the canonical-only WebSocket gate; it is not a native OBS source. Use [Home overlay](https://raid-relic-760724762396.us-central1.run.app/overlay/1591805230) or [Ols overlay](https://raid-relic-760724762396.us-central1.run.app/overlay/1591806023). No origin widening or callback changes are needed. Grok has not yet physically validated new P5 chat commands.
-
-P6 local branch: the Atlas now includes a recorded-journey constellation, local comet replay, public stop links and a transparent `/atlas/embed` browser source. Only retained completed stops are used; no live ownership is changed. [P6 rules and QA](docs/P6_REPLAY.md). Parent P5 baseline proof remains separate; this increment awaits parent QA/deployment. P7 is not included.
-
-Optional P7 bot actions are implemented behind gates that default OFF: source-only announcement, pin of the known-sent completion reply, and shoutout after a new verified completed claim. Human bot-only consent for four optional permissions, moderator roles in both rooms and operator activation are still required; pins replace existing moderator pins and need separate acknowledgement. No physical P7 validation is claimed. [P7 rules and activation](docs/P7_RULES.md).
+Operator status (parent-reported, 26 October): [retention policy](ops/artifact-cleanup-dry-run.json) applied **dry-run only**, no images deleted or active cleanup; judging pin remains pending. [Daily checker](docs/DAILY_CHECK.md) is prepared, **not scheduled or auth-wired**. Parent default-branch fast-forward waits for full QA and zero-traffic preview parity; canonical promotion still requires Grok acceptance.
