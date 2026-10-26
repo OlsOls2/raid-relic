@@ -18,7 +18,7 @@ tokens.json
 .codex/
 .agents/
 /.codex-evidence/*
-!/.codex-evidence/run-[0-9][0-9][0-9].jsonl
+/.codex-evidence/run-*.jsonl
 !/.codex-evidence/SESSION_ID
 **/rollout-backups/
 **/raw-rollout*/
@@ -29,6 +29,6 @@ coverage/
 
 # Local browser QA captures (not release payload).
 /artifacts/
-# Only these sanitized evidence outputs are publishable; raw backups stay ignored.
+# Only parent-reviewed curated evidence outputs may be staged; raw runs stay ignored.
 !/.codex-evidence/EXPORTED_TRANSCRIPT.md
 !/.codex-evidence/EXPORT_MANIFEST.json
