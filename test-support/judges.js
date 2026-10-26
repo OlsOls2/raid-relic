@@ -146,6 +146,7 @@ export async function createJudges({ intent = false, env = process.env } = {}) {
     } catch { const error = req.url?.startsWith('/api/') ? json(500, { error: 'Simulator unavailable' }) : { type: 'text/html; charset=utf-8', body: html('<h1>SIMULATOR error · local only</h1>') }; res.writeHead(500, { ...headers, 'content-type': error.type }); res.end(error.body); }
   }
   return { dispatch, handler, server,
+    auditCounts() { return { providerCalls: fixture.calls.length, websocketClients: sockets.clients.size }; },
     // Test-author-only helper: actual signed lifecycle and claims, never a public route.
     async seedReviewJourney() { return ordered(async () => {
       await step('setup');

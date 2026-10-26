@@ -26,9 +26,18 @@ Parent previously reviewed **seven scanner matches**, all the same public Twitch
 
 ## Gates still pending
 
-- 149: parent fresh doc/unit proof and small reviewable commits; no new pass counts claimed here. Native execution remains restricted to the existing isolated workflow, unavailable to this author.
-- 150: full regression and **about15 actual wall-clock minutes** of demo autoplay soak, not accelerated browser time. Record bounded memory/socket trends, reset/pause/finish behavior and zero real demo API/socket/storage/provider traffic; fix findings before claiming stability.
-- 151: actual keyboard/focus/contrast/reduced-motion/mobile/empty/error review of landing/demo/Atlas. Existing historical captures are not proof of this new review.
+- 149 completed by parent:687/687 zero skips; small commitsa05c5a8 and4b28d4c; read-only npm audit omit-dev0 vulnerabilities; all-ref scan7 reviewed public-client-ID matches/0 unresolved. These are parent-reported149 results, not150 soak results. Native execution remains restricted to the existing isolated workflow, unavailable to this author.
+- 150 script/measurement unit tests are prepared; **actual run pending**. See [real-clock soak contract](RELIABILITY_SOAK.md). Full regression and **about15 actual wall-clock minutes** of demo autoplay soak, not accelerated browser time. Record bounded memory/socket trends, reset/pause/finish behavior and zero real demo API/socket/storage/provider traffic; fix findings before claiming stability.
+- 151 reliability correction follows the failed initial real soak (473368ms,13 samples/12 steady cycles, no pass). Permanent context release and closed partial/CPU/frame diagnostics await fresh parent QA/900s soak. See [soak findings](RELIABILITY_SOAK.md#first-parent-run-and-reliability-correction151).
+- 156 accessibility waits for a completed passing real soak: actual keyboard/focus/contrast/reduced-motion/mobile/empty/error review of landing/demo/Atlas. Existing historical captures are not proof of this new review.
 - After all green: parent publishes one new read-only preview tag, keeps old tags and production unchanged, then Grok reviews. Further canonical/callback activation needs separate approval. No new P9 live proof is implied.
 
 J5 pinned24f29c0 checker/job and J6 baseline pins/protected cleanup/dry-run policy are immutable in this increment. No scheduler/cleanup/config/credential operation is authorized. Existing hosting costs are not guaranteed zero. Multiple simultaneous relics and active clipping are future work, not extra readiness features.
+
+- 152 visible demo scene reuse follows the second incomplete parent soak (72499ms, active-context-loss, GPU CPU109.78s). One cleared hidden scene is retained only while visible; lifecycle teardown remains permanent. Fresh parent regression and real900s proof are pending; no pass is claimed.
+
+- 153 corrects the proven square-buffer/fixed-aspect defect for rectangular CSS bounds. Parent third soak was incomplete at71779ms with active-context-loss; fourth real900s proof and native resized-pixel checks remain pending. No CPU-limit cause or performance pass is claimed.
+
+- 154 applies the existing corner no-MSAA profile to initially small (≤160px on either valid CSS axis) widgets. Fourth parent soak remained incomplete at248622ms; fifth real900s proof is pending. This is an explicit edge-smoothing tradeoff, not a cap/frame-rate waiver or passing result.
+
+- 155 reduces actual tiny-widget3D cadence to24 arrival/12 idle and memoizes fictional scene semantics/unchanged DOM writes. Fifth parent soak failed incomplete at389302ms; sixth real900s and fresh regressions are pending, without cap/timing/memory waivers. Accessibility156 remains gated on that result.

@@ -77,7 +77,7 @@ All original app code and docs were authored in the single original session **`0
 
 Reviews caught seconds-versus-milliseconds guards, swallowed4xx diagnostics, an unused chat sender, zero-opacity fusion and a vendor inline canvas style covering its SVG fallback. Grok/Olly reported physical P5 success; that is not proof of all newer features. [Curated Codex account](docs/CODEX_USAGE.md) · [session/evidence limits](CODEX_SESSION.md).
 
-**Last parent-verified ee baseline:**685/685 tests, zero skips;29 browser workflows/94 checks;four viewed labelled simulation images;54 HTTP-response SHA matches and unchanged three OAuth metadata timestamps (zero fields read). This is historical proof before readiness changes. Fresh regression, a **real fifteen-minute wall-clock soak** (increment150) and accessibility review (151) are pending. [Judge guide](docs/JUDGES_QUICKSTART.md).
+**Last parent-verified ee baseline:**685/685 tests, zero skips;29 browser workflows/94 checks;four viewed labelled simulation images;54 HTTP-response SHA matches and unchanged three OAuth metadata timestamps (zero fields read). This is historical proof before readiness changes. Fresh regression, a **real fifteen-minute wall-clock soak** (increments150–155) and accessibility review (156) are pending. [Judge guide](docs/JUDGES_QUICKSTART.md).
 
 ## Local development and what's next
 
