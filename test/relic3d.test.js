@@ -24,7 +24,7 @@ test('reduced motion never imports WebGL; missing vendor fails to SVG without th
 });
 test('injected renderer pauses hidden, discards stale sprite loads, and context loss restores SVG', async () => {
   const listeners = {}, classes = new Set(), pending = new Map(), images = []; let sequence = 0, renders = 0, disposed = 0;
-  const canvas = { dataset: {}, width: 0, hidden: true, setAttribute() {}, addEventListener(n, f) { listeners[n] = f; }, remove() {} };
+  const canvas = { style:{display:'block'}, dataset: {}, width: 0, hidden: true, setAttribute() {}, addEventListener(n, f) { listeners[n] = f; }, remove() {} };
   class Object3D { constructor() { this.rotation = {}; this.position = { set() {} }; this.scale = { set() {} }; } add() {} remove() {} }
   class Resource { constructor() {} setAttribute() {} computeVertexNormals() {} dispose() { disposed++; } }
   class Mesh extends Object3D { constructor(g, m) { super(); this.geometry = g; this.material = m; } }
@@ -39,16 +39,17 @@ test('injected renderer pauses hidden, discards stale sprite loads, and context 
   const reducedMotion = { matches: false, addEventListener(n, f) { listeners.motion = f; }, removeEventListener() {} };
   const archive = { dataset: { phase: 'idle' }, getBoundingClientRect: () => ({ width: 160 }), append() {}, classList: { add: n => classes.add(n), remove: n => classes.delete(n) } };
   const view = await createRelic3D({ archive, reducedMotion, corner: true, document: doc, window: win, load: async () => T });
+  assert.equal(canvas.hidden,true);assert.equal(canvas.style.display,'none'); // vendor inline block must not flash before first successful frame
   const tick = time => { const item = pending.entries().next().value; if (item) { pending.delete(item[0]); item[1](time); } };
-  view.update({ lineageRings: 16, marks: [{ runeSvg: '<svg/>', faded: true }] }); tick(0); assert.equal(renders, 1); tick(10); assert.equal(renders, 1); tick(34); assert.equal(renders, 2);
+  view.update({ lineageRings: 16, marks: [{ runeSvg: '<svg/>', faded: true }] }); tick(0); assert.equal(renders, 1);assert.equal(canvas.style.display,'block'); tick(10); assert.equal(renders, 1); tick(34); assert.equal(renders, 2);
   const beforeReuse = disposed, imageCount = images.length;
   view.update({ lineageRings: 16, marks: [{ runeSvg: '<svg/>', faded: true }], claimMeter: { offers: 1 }, serverNow: 500 });
   assert.equal(disposed, beforeReuse); assert.equal(images.length, imageCount); assert.equal(pending.size, 1);
   tick(40); assert.equal(renders, 2); // unchanged update must not reset the30fps budget
   assert.equal(canvas.dataset.snapshotPresent, 'true');
-  reducedMotion.matches = true; listeners.motion(); assert.equal(canvas.hidden, true); assert.equal(classes.has('webgl-relic'), false); assert.equal(pending.size, 0);
-  reducedMotion.matches = false; listeners.motion(); tick(68); assert.equal(canvas.hidden, false); assert.equal(classes.has('webgl-relic'), true);
-  reducedMotion.matches = true; listeners.motion(); assert.equal(canvas.hidden, true);
+  reducedMotion.matches = true; listeners.motion(); assert.equal(canvas.hidden, true);assert.equal(canvas.style.display,'none'); assert.equal(classes.has('webgl-relic'), false); assert.equal(pending.size, 0);
+  reducedMotion.matches = false; listeners.motion();assert.equal(canvas.style.display,'none'); tick(68);assert.equal(canvas.style.display,'block'); assert.equal(canvas.hidden, false); assert.equal(classes.has('webgl-relic'), true);
+  reducedMotion.matches = true; listeners.motion(); assert.equal(canvas.hidden, true);assert.equal(canvas.style.display,'none');
   reducedMotion.matches = false; view.wake(); tick(102); // transition wake recovers a missed MQL event
   assert.equal(canvas.hidden, false); assert.equal(classes.has('webgl-relic'), true); assert.equal(pending.size, 1);
   images[0].onerror(); assert.equal(canvas.dataset.spriteFailures, '1');
@@ -57,7 +58,7 @@ test('injected renderer pauses hidden, discards stale sprite loads, and context 
   doc.hidden = false; listeners.visibilitychange(); tick(100); assert.equal(classes.has('webgl-relic'), true);
   view.update(null); listeners.visibilitychange(); assert.equal(pending.size, 0);
   view.update({ lineageRings: 0, marks: [] }); tick(140);
-  listeners.webglcontextlost({ preventDefault() {} }); assert.equal(pending.size, 0); assert.equal(canvas.hidden, true); assert.equal(classes.has('webgl-relic'), false);
+  listeners.webglcontextlost({ preventDefault() {} }); assert.equal(pending.size, 0); assert.equal(canvas.hidden, true);assert.equal(canvas.style.display,'none'); assert.equal(classes.has('webgl-relic'), false);view.wake();assert.equal(canvas.style.display,'none');
   view.dispose(); assert.ok(disposed > 0);
   listeners.visibilitychange(); assert.equal(pending.size, 0);
 });

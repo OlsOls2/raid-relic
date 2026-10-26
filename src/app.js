@@ -1,3 +1,4 @@
+import { EDITION_CONFIG, validEditions, editionSVG } from '../public/editions.js';
 import { canonicalLogin, shareRequestHash } from './my-marks.js';
 import { parseBan } from './bans.js';
 import { ackKey } from './claim-ack.js';
@@ -15,6 +16,8 @@ import { parseLifecycle } from './lifecycle.js';
 export const MAX_BODY_BYTES = 65536;
 export const REPLAY_WINDOW_MS = 10 * 60 * 1000;
 const assets = new Map([
+  ['/editions.js',['editions.js','text/javascript; charset=utf-8']],
+  ['/edition-view.js',['edition-view.js','text/javascript; charset=utf-8']],
   ['/journey-map.js', ['journey-map.js', 'text/javascript; charset=utf-8']],
   ['/journey-map.css', ['journey-map.css', 'text/css; charset=utf-8']],
   ['/scoreboard.js', ['scoreboard.js', 'text/javascript; charset=utf-8']],
@@ -53,7 +56,7 @@ const assets = new Map([
   ['/overlay-client.js', ['overlay-client.js', 'text/javascript; charset=utf-8']],
   ['/crystal.svg', ['crystal.svg', 'image/svg+xml']],
 ]);
-const demoAssets=new Map([['/demo','demo.html'],['/demo/','demo.html'],['/demo.js','demo.js'],['/demo-state.js','demo-state.js'],['/demo.css','demo.css'],['/ritual-copy.js','ritual-copy.js']]);
+const demoAssets=new Map([['/demo','demo.html'],['/demo/','demo.html'],['/demo.js','demo.js'],['/demo-state.js','demo-state.js'],['/demo.css','demo.css'],['/ritual-copy.js','ritual-copy.js'],['/editions.js','editions.js'],['/edition-view.js','edition-view.js']]);
 const header = (headers, name) => typeof headers[name] === 'string' ? headers[name] : '';
 const result = (status, body = '', type = 'text/plain; charset=utf-8') => ({ status, body, type });
 
@@ -69,6 +72,8 @@ export function createApp({ scoreAcks, claimAcks, secret, state = createMemorySt
   const publicHTML=async file=>{const bytes=await readFile(new URL(`../public/${file}`,import.meta.url));return overlayFeed?.simulator?bytes.toString().replace(/<p([^>]*\bid="simulator"[^>]*)><\/p>/,(_,attrs)=>`<p${attrs.replace(/\s+hidden\b/,'')}>SIMULATOR · local test data</p>`):bytes;};
   // Pure request boundary for tests: rawBody is never reserialized before HMAC.
   async function dispatch({ method, path, headers = {}, rawBody = Buffer.alloc(0) }) {
+    // Explicit same-origin generated art route before any OAuth/store property access.
+    if(path.startsWith('/edition-crystal/')){if(method!=='GET')return result(previewReadOnly?403:405,'Read only');const match=/^\/edition-crystal\/([a-z0-9-]{1,40})\.svg$/.exec(path),edition=match&&validEditions(EDITION_CONFIG)&&EDITION_CONFIG.find(e=>e.id===match[1]);if(!edition)return result(404,'Unknown edition art');return{...result(200,editionSVG(edition),'image/svg+xml'),headers:{'cache-control':'no-store','content-security-policy':"default-src 'none'"}};}
     const demoPath=path.split('?')[0];
     if(demoAssets.has(demoPath)){
       if(method!=='GET')return result(previewReadOnly?403:405,'Static demo is read only');

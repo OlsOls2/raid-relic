@@ -1,3 +1,4 @@
+import { selectEdition, editionBadgesForInterval } from '../public/editions.js';
 import { ackDocument, ackKey, ackStep } from './claim-ack.js';
 import { hash } from './crypto.js';
 import { INITIAL_HOME } from './lifecycle.js';
@@ -73,10 +74,13 @@ export function scoreboard(lineage, registry, scores, config, now) {
   for (let i=0;i<stops.length;i++) { const s=stops[i], r=row(s.from); r.hopsCarried++;
     if ([1,5,10].includes(s.ringIndex)) r.badges.push(`Ring ${s.ringIndex}`);
     if (i>=2) r.badges.push('Chain of 3');
+    if(i===0&&selectEdition(s.claimedAt))r.badges.push(selectEdition(s.claimedAt).badgeLabel);
+    if(i)row(stops[i-1].to).badges.push(...editionBadgesForInterval(stops[i-1].claimedAt,s.claimedAt));
     if (i===0 && s.claimedAt>=TWITCHCON.startsAt && s.claimedAt<TWITCHCON.endsAt) r.badges.push('Carried during TwitchCon San Diego 2026');
     if (i) { const held=row(stops[i-1].to), start=stops[i-1].claimedAt; held.knownHoldSeconds += (s.claimedAt-start)/1000; if(start < TWITCHCON.endsAt && s.claimedAt > TWITCHCON.startsAt && s.claimedAt > start) held.badges.push('Carried during TwitchCon San Diego 2026'); }
   }
   if (stops.length && registry?.holderId === stops.at(-1).to) { const held=row(registry.holderId), start=stops.at(-1).claimedAt; held.knownHoldSeconds += (now-start)/1000; if(start < TWITCHCON.endsAt && now >= TWITCHCON.startsAt) held.badges.push('Carried during TwitchCon San Diego 2026'); }
+  if(stops.length&&registry?.holderId===stops.at(-1).to)row(registry.holderId).badges.push(...editionBadgesForInterval(stops.at(-1).claimedAt,now,{ongoing:true}));
   for (const r of rows) { r.knownHoldSeconds=Math.floor(r.knownHoldSeconds); if(r.knownHoldSeconds>=86400)r.badges.push('24h Keeper'); r.badges=[...new Set(r.badges)]; }
   rows.sort((a,b)=>b.knownHoldSeconds-a.knownHoldSeconds||b.hopsCarried-a.hopsCarried||a.channelId.localeCompare(b.channelId));
   if ((scores?.players?.length ?? 0) > 128 || (scores?.players ?? []).some(p => !login(p.login) || !Number.isInteger(p.joined) || p.joined < 0 || p.joined > 16 || !Number.isSafeInteger(p.since) || p.since < 0 || p.since > now)) throw Error('Invalid score aggregate');

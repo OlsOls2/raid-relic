@@ -1,12 +1,13 @@
+import { EDITION_CONFIG, editionWindowLabel } from './editions.js';
 const $ = id => document.getElementById(id);
 let generation = 0, controller;
-const badgeNames = new Set(['First Keeper','24h Keeper','Ring 1','Ring 5','Ring 10','Chain of 3','Carried during TwitchCon San Diego 2026']);
+const badgeNames = new Set([...EDITION_CONFIG.map(e=>e.badgeLabel),'First Keeper','24h Keeper','Ring 1','Ring 5','Ring 10','Chain of 3','Carried during TwitchCon San Diego 2026']);
 export function validScores(v) {
   try { return v && Number.isSafeInteger(v.asOf) && v.asOf >= 0 && Number.isInteger(v.rings) && v.rings >= 0 && v.rings <= 16
     && Object.keys(v).sort().join(',') === 'asOf,channels,coverage,event,mode,previewReadOnly,raiders,rings' && ['live','simulator'].includes(v.mode) && typeof v.previewReadOnly === 'boolean' && typeof v.coverage === 'string' && v.coverage.length <= 500
     && v.event && Object.keys(v.event).sort().join(',') === 'checked,endsAt,label,source,startsAt' && v.event.label === 'TwitchCon San Diego 2026' && v.event.source === 'https://www.twitchcon.com/san-diego-2026/' && v.event.checked === '2026-10-25' && v.event.startsAt === Date.parse('2026-11-13T08:00:00Z') && v.event.endsAt === Date.parse('2026-11-16T08:00:00Z')
     && Array.isArray(v.channels) && v.channels.length <= 4 && v.channels.every(r => Object.keys(r).sort().join(',') === 'badges,channelId,hopsCarried,knownHoldSeconds,login'
-      && /^\d{1,32}$/.test(r.channelId) && (r.login === null || (typeof r.login === 'string' && /^[a-z0-9_]{1,25}$/.test(r.login))) && Number.isInteger(r.knownHoldSeconds) && r.knownHoldSeconds >= 0 && Number.isInteger(r.hopsCarried) && r.hopsCarried >= 0 && r.hopsCarried <= 16 && Array.isArray(r.badges) && r.badges.length <= 8 && r.badges.every(b => badgeNames.has(b)))
+      && /^\d{1,32}$/.test(r.channelId) && (r.login === null || (typeof r.login === 'string' && /^[a-z0-9_]{1,25}$/.test(r.login))) && Number.isInteger(r.knownHoldSeconds) && r.knownHoldSeconds >= 0 && Number.isInteger(r.hopsCarried) && r.hopsCarried >= 0 && r.hopsCarried <= 16 && Array.isArray(r.badges) && r.badges.length <= 7 + EDITION_CONFIG.length && r.badges.every(b => badgeNames.has(b)))
     && Array.isArray(v.raiders) && v.raiders.length <= 20 && v.raiders.every(r => Object.keys(r).sort().join(',') === 'claimsJoined,login,since' && typeof r.login === 'string' && /^[a-z0-9_]{1,25}$/.test(r.login) && Number.isInteger(r.claimsJoined) && r.claimsJoined >= 0 && r.claimsJoined <= 16 && Number.isSafeInteger(r.since) && r.since <= v.asOf); } catch { return false; }
 }
 export function holdDuration(seconds) {
@@ -14,6 +15,7 @@ export function holdDuration(seconds) {
 }
 export const EVENT_BADGE='Carried during TwitchCon San Diego 2026';
 export function badgeDescription(name) {
+  const edition=EDITION_CONFIG.find(e=>e.badgeLabel===name);if(edition)return 'Recorded carrying during the cosmetic '+edition.name+' edition, '+editionWindowLabel(edition)+'. This does not prove conference attendance.';
   const meanings={'First Keeper':'The first Keeper of this recorded journey.','24h Keeper':'Held the relic for at least 24 hours of recorded time.','Chain of 3':'Carried the relic on the third or later raid in an unbroken chain.',[EVENT_BADGE]:'Hold the relic during TwitchCon San Diego, 13–15 Nov 2026, to earn this badge.'};
   if(/^Ring (1|5|10)$/.test(name))return `Carried the relic on recorded raid ${name.slice(5)}, creating that growth ring.`;
   return Object.hasOwn(meanings,name)?meanings[name]:'';

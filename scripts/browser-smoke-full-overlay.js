@@ -12,8 +12,14 @@ try {
   await new Promise((resolve, reject) => { server.once('error', reject); server.listen(5191, '127.0.0.1', resolve); });
   const { chromium } = await import('playwright'); browser = await chromium.launch({ executablePath: '/snap/bin/chromium', chromiumSandbox: true, headless: true });
   const context = await browser.newContext({ ignoreHTTPSErrors: true, viewport: { width: 1280, height: 800 } });
-  // Legacy SVG-fallback contract; default real WebGL is exercised independently.
+  // BASE pre-edition SVG contract. Active edition/decode/context-loss/mobile/corner
+  // coverage lives in browser-smoke-editions.js; fixture/server receipt clocks stay unchanged.
   await context.addInitScript(() => {
+    const NativeDate = Date;
+    window.Date = class extends NativeDate {
+      constructor(...args) { super(...(args.length ? args : ['2026-10-22T12:00:00Z'])); }
+      static now() { return NativeDate.parse('2026-10-22T12:00:00Z'); }
+    };
     const original = HTMLCanvasElement.prototype.getContext;
     HTMLCanvasElement.prototype.getContext = function(type, ...args) { return /^webgl/.test(type) ? null : original.call(this, type, ...args); };
   });

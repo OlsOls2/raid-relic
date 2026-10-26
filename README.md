@@ -1,5 +1,8 @@
 # Raid Relic
 
+> **P8 candidate,26 October:** production remains parent-verified judgefix1026/source6401 at100%, P7 five gates true/pin300 and paid OFF. New same-relic cosmetic edition code is local/unverified; parent may publish **zero traffic only**, intended `p8-edition` preview not yet proven. [P8 rules and test path](docs/P8_RULES.md). P9 retained, definition missing.
+
+
 > **26 October operator update:** Olly authorized live P7 activation. Parent reports read-only validation of the bot's exact identity/client, all seven scopes and moderator membership in both Keeper rooms at 00:24:22 UTC. Parent verified the configuration-only `raid-relic-p7live1026` revision at 100% at 00:27:44 UTC, using the same b23 image (digest prefix `1a9a9cf`). All five P7 flags are true, pin duration is 300 seconds and replacement acknowledgement is explicit. Parent reports 40 staged and 40 canonical responses byte-matched, with SecretRefs, caps, service account, origins and callbacks unchanged; judge ff56 remains zero traffic. No real chat, announcement, pin, shoutout or raid POST was performed by parent; Grok's live action test remains pending. This judge-track UX is candidate-only, not production source. Source defaults remain OFF; no new physical P7 claim/action proof is asserted.
 
 
@@ -33,6 +36,8 @@ All five P7 action flags and both paid generation gates remain **OFF**. Optional
 
 [P6 replay rules](docs/P6_REPLAY.md) · [judge-track plan and future operator gates](docs/JUDGE_TRACK_PLAN.md) · [historical README](docs/archive/README-pre-p4.md). P8/P9 remain in scope awaiting concrete definitions; no speculative implementation or dropped scope. Freeze31October2026 18:00UK/UTC.
 
-Operator status (parent-reported, 26 October): [retention policy](ops/artifact-cleanup-dry-run.json) applied **dry-run only**, no images deleted or active cleanup; judging pin remains pending. [Daily checker](docs/DAILY_CHECK.md) is prepared, **not scheduled or auth-wired**. Parent default-branch fast-forward waits for full QA and zero-traffic preview parity; owner128 authorizes parent promotion of reviewed fixes after QA, following Grok’s ff56 acceptance.
+Operator status (parent-reported, 26 October): [retention policy](ops/artifact-cleanup-dry-run.json) applied **dry-run only**, no images deleted or active cleanup; immutable judging-baseline pin is complete; final-v1 completion is not claimed. [Daily checker](docs/DAILY_CHECK.md) is parent-installed at09:00UTC with pinned24f29c0 code, first read-only probe OK, hard expiry3November00:00UTC. Parent default-branch fast-forward waits for full QA and zero-traffic preview parity; owner128 authorizes parent promotion of reviewed fixes after QA, following Grok’s ff56 acceptance.
 
 Owner128: Grok reported the old ff56 judge demo overall passed (not live Twitch proof); parent may promote reviewed judge fixes after QA, preserving production P7 true/pin300 and paid OFF. J5 now has an operator-only current-100%-revision read adapter and uninstalled OS-cron wrapper; no scheduler/probe is claimed run by Codex. P8 is now defined **for next increment only**: one same-relic timeboxed cosmetic edition, TwitchCon2026 from 23 October through 30 November (end-exclusive 1 December UTC), plus badge; no simultaneous relics. P9 remains retained but undefined. Freeze31 October18:00UK/UTC.
+
+Parent checkpoint130: production6401,636/636 zero skips and24 local browser flows/84 checks predate P8. J5 installed/pinned24f29c0, first read-only probe OK, expires3November; J6 judging-baseline pin/approved protected cleanup complete, automatic policy dry-run. No new P8 test or physical proof asserted.

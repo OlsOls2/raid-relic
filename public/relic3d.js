@@ -1,3 +1,5 @@
+import { presentEdition } from './edition-view.js';
+import { selectEdition } from './editions.js';
 import { runePose } from './cinematic.js';
 // Original procedural renderer. The reviewed local Three.js vendor is optional;
 // failed imports, reduced motion and context loss retain the original SVG.
@@ -38,9 +40,12 @@ export async function createRelic3D({ signal, archive, reducedMotion, corner = f
       documentHidden: String(Boolean(doc?.hidden)), internalMotion: String(Boolean(reducedMotion?.matches)),
       resumeCalls: String(resumeCalls), frameScheduled: String(frame !== null), resumeReason: reason });
   };
-  const fallback = () => { archive.classList.remove('webgl-relic'); if (canvas) canvas.hidden = true; };
+  const fallback = () => { if(particles)particles.visible=false;if(canvas)canvas.dataset.particlesVisible='false';archive.classList.remove('webgl-relic'); if (canvas) { canvas.hidden = true; if(canvas.style)canvas.style.display='none'; } };
   const stop = () => { if (frame !== null) win.cancelAnimationFrame(frame); frame = null; };
-  let T;
+  let T,coreGeometry,coreMesh,haloMesh,particles=null,editionId=null;
+  const customDesign=design!==DEFAULT_DESIGN;
+  const theme=()=>customDesign?null:selectEdition(Date.now());
+  const rebuildEdition=()=>{const e=theme(),id=e?.id??'base';if(id===editionId)return;editionId=id;if(!customDesign)presentEdition(archive);const chosen=e?.design??design;const mesh=crystalMesh(chosen),g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(mesh.positions,3));g.setAttribute('color',new T.Float32BufferAttribute(mesh.colors,3));g.computeVertexNormals();if(coreGeometry){resources.delete(coreGeometry);coreGeometry.dispose();}coreGeometry=g;resources.add(g);if(coreMesh)coreMesh.geometry=g;if(haloMesh)haloMesh.geometry=g;if(particles){scene.remove(particles);resources.delete(particles.geometry);resources.delete(particles.material);particles.geometry.dispose();particles.material.dispose();particles=null;}if(e&&T.Points&&T.PointsMaterial&&e.particles.count){const a=[];for(let i=0;i<e.particles.count;i++){const angle=i*2.399963,r=1.2+(i%7)*.055;a.push(Math.cos(angle)*r,Math.sin(angle)*r,(i%5-2)*.08);}const pg=new T.BufferGeometry();pg.setAttribute('position',new T.Float32BufferAttribute(a,3));const pm=new T.PointsMaterial({color:e.design.palette[3],size:.035,transparent:true,opacity:.6,depthWrite:false,blending:T.AdditiveBlending});particles=new T.Points(pg,pm);particles.visible=false;scene.add(particles);resources.add(pg);resources.add(pm);}if(canvas)Object.assign(canvas.dataset,{edition:id,facets:String(chosen.facets),particles:String(particles?e.particles.count:0),coreCount:'1'});};
   const safely = fn => { try { fn(); } catch { /* Cleanup cannot defeat the SVG fallback. */ } };
   const dispose = () => { if (disposed) return; disposed = true; revision++; safely(stop); safely(fallback); safely(() => doc?.removeEventListener?.('visibilitychange', resume)); safely(() => reducedMotion?.removeEventListener?.('change', resume)); safely(() => signal?.removeEventListener?.('abort', dispose)); if (group) { safely(() => remove(sprites)); safely(() => remove(bands)); } for (const resource of resources) safely(() => resource.dispose?.()); safely(() => renderer?.dispose?.()); safely(() => canvas?.remove?.()); };
   signal?.addEventListener?.('abort', dispose, { once: true });
@@ -49,6 +54,7 @@ export async function createRelic3D({ signal, archive, reducedMotion, corner = f
     if (!snapshot || disposed || lost || doc.hidden || reducedMotion.matches) { fallback(); diagnostic(disposed ? 'disposed' : lost ? 'lost' : !snapshot ? 'no-snapshot' : doc.hidden ? 'hidden' : 'reduced'); return; }
     const phase = archive.dataset.phase, arriving = ['streak', 'impact', 'unfurl'].includes(phase);
     if (time - last >= frameInterval(arriving, corner) - .1) {
+      rebuildEdition();if(particles){particles.visible=arriving;particles.rotation.z=time*.00006;}if(canvas)canvas.dataset.particlesVisible=String(Boolean(particles?.visible));
       last = time; group.rotation.y = time * .00018; group.rotation.z = Math.sin(time * .00013) * .06;
       for (let i = 0; i < bands.length; i++) bands[i].rotation.z = time * .0001 * (i % 2 ? 1 : -1);
       const unfurl = phase === 'unfurl' ? Number.parseFloat(archive.style?.getPropertyValue('--arrival') ?? '1') : 1;
@@ -70,7 +76,7 @@ export async function createRelic3D({ signal, archive, reducedMotion, corner = f
       }
       const box = archive.getBoundingClientRect(); const size = Math.max(1, Math.min(480, Math.round(box.width)));
       if (canvas.width !== size) renderer.setSize(size, size, false);
-      try { renderer.render(scene, camera); if (lost) { fallback(); diagnostic('lost'); return; } canvas.dataset.triangles = String(renderer.info?.render?.triangles ?? 0); canvas.dataset.sprites = String(sprites.length); canvas.dataset.fps = String(arriving && !corner ? 60 : 30); canvas.dataset.fadedSprites = String(sprites.filter(s => s.material.opacity === .28).length); canvas.dataset.frames = String(Number(canvas.dataset.frames ?? 0) + 1); canvas.hidden = false; archive.classList.add('webgl-relic'); if (canvas.hasAttribute?.('data-pixel-probe')) canvas.dispatchEvent(new Event('relic3d-frame')); } catch (error) { canvas.dataset.renderError = ['TypeError','RangeError','Error'].includes(error?.name) ? error.name : 'OtherError'; lost = true; fallback(); diagnostic('lost'); return; }
+      try { renderer.render(scene, camera); if (lost) { fallback(); diagnostic('lost'); return; } canvas.dataset.triangles = String(renderer.info?.render?.triangles ?? 0); canvas.dataset.sprites = String(sprites.length); canvas.dataset.fps = String(arriving && !corner ? 60 : 30); canvas.dataset.fadedSprites = String(sprites.filter(s => s.material.opacity === .28).length); canvas.dataset.frames = String(Number(canvas.dataset.frames ?? 0) + 1); canvas.hidden = false; if(canvas.style)canvas.style.display='block'; archive.classList.add('webgl-relic'); if (canvas.hasAttribute?.('data-pixel-probe')) canvas.dispatchEvent(new Event('relic3d-frame')); } catch (error) { canvas.dataset.renderError = ['TypeError','RangeError','Error'].includes(error?.name) ? error.name : 'OtherError'; lost = true; fallback(); diagnostic('lost'); return; }
     }
     frame = win.requestAnimationFrame(render); diagnostic('animating');
   };
@@ -86,19 +92,19 @@ export async function createRelic3D({ signal, archive, reducedMotion, corner = f
     T = await load(); if (disposed || signal?.aborted) { dispose(); return { update() {}, wake() {}, dispose() {}, available: false }; }
     renderer = new T.WebGLRenderer({ alpha: true, antialias: !corner, powerPreference: 'low-power' }); renderer.setPixelRatio(1); renderer.setClearColor(0, 0);
     if (renderer.debug) renderer.debug.onShaderError = () => { if (canvas) canvas.dataset.shaderErrors = String(Number(canvas.dataset.shaderErrors ?? 0) + 1); lost = true; stop(); fallback(); diagnostic('lost'); };
-    canvas = renderer.domElement; canvas.className = 'relic3d'; canvas.setAttribute('aria-hidden', 'true'); canvas.hidden = true; canvas.dataset.contextStatus = 'active'; canvas.dataset.shaderErrors = '0'; archive.append(canvas);
+    canvas = renderer.domElement; canvas.className = 'relic3d'; canvas.setAttribute('aria-hidden', 'true'); canvas.hidden = true; if(canvas.style)canvas.style.display='none'; canvas.dataset.contextStatus = 'active'; canvas.dataset.shaderErrors = '0'; archive.append(canvas);
     scene = new T.Scene(); camera = new T.PerspectiveCamera(36, 1, .1, 20); camera.position.z = 6;
     group = new T.Group(); scene.add(group);
-    const mesh = crystalMesh(design), geometry = new T.BufferGeometry(); geometry.setAttribute('position', new T.Float32BufferAttribute(mesh.positions, 3)); geometry.setAttribute('color', new T.Float32BufferAttribute(mesh.colors, 3)); geometry.computeVertexNormals();
+    const geometry = new T.BufferGeometry(); coreGeometry=geometry; resources.add(geometry);
     const material = new T.ShaderMaterial({ vertexColors: true, transparent: true, side: T.DoubleSide,
       vertexShader: 'varying vec3 tint; varying vec3 norm; varying vec3 eye; void main(){ tint=color; vec4 p=modelViewMatrix*vec4(position,1.0); norm=normalize(normalMatrix*normal); eye=normalize(-p.xyz); gl_Position=projectionMatrix*p; }',
       fragmentShader: 'varying vec3 tint; varying vec3 norm; varying vec3 eye; void main(){ float f=pow(1.0-abs(dot(normalize(norm),normalize(eye))),2.0); vec3 moon=mix(vec3(.70,.63,.84),vec3(.86,.90,.94),f); float shine=pow(max(0.0,dot(reflect(-normalize(eye),normalize(norm)),normalize(vec3(-.5,.8,1.0)))),12.0); vec3 metal=tint*(.65+.35*abs(norm.y)) + moon*(f*1.25+shine*.85); gl_FragColor=vec4(metal,.98); }' });
-    group.add(new T.Mesh(geometry, material)); resources.add(geometry); resources.add(material);
+    coreMesh=new T.Mesh(geometry,material);group.add(coreMesh);resources.add(material);
     // A translucent, additive expanded faceted shell: no opaque quad/postprocess.
     const haloMaterial = new T.ShaderMaterial({ transparent: true, depthWrite: false, side: T.BackSide, blending: T.AdditiveBlending,
       vertexShader: 'varying vec3 n; varying vec3 e; void main(){ vec4 p=modelViewMatrix*vec4(position*1.14,1.0); n=normalize(normalMatrix*normal); e=normalize(-p.xyz); gl_Position=projectionMatrix*p; }',
       fragmentShader: 'varying vec3 n; varying vec3 e; void main(){ float rim=pow(1.0-abs(dot(normalize(n),normalize(e))),2.0); gl_FragColor=vec4(vec3(.58,.70,1.0),rim*.42); }' });
-    group.add(new T.Mesh(geometry, haloMaterial)); resources.add(haloMaterial);
+    haloMesh=new T.Mesh(geometry,haloMaterial);group.add(haloMesh);resources.add(haloMaterial);rebuildEdition();
     // Procedural soft aura, not postprocessed bloom. Two triangles, no asset fetch.
     const auraTile = doc?.createElement?.('canvas'); const auraContext = auraTile?.getContext?.('2d');
     if (T.CanvasTexture && auraContext?.createRadialGradient) {

@@ -1,3 +1,4 @@
+import { presentEdition } from './edition-view.js';
 import { createCinemaTracker, wordBatch, runePose, ambientSigils, decorativePoints, validSourceLogin } from './cinematic.js';
 import { createRelic3D, ringSummary } from './relic3d.js';
 import { meterProgress } from './claim-meter.js';
@@ -88,6 +89,7 @@ if (channel) connectOverlay({ url: `${location.protocol === 'https:' ? 'wss' : '
 
 let lastReduced = motion.matches, lastHidden = document.hidden;
 function frame() {
+  presentEdition(archiveNode);
   frameId=null;if(document.hidden||document.body.dataset.connection==='suspended')return;
   if (motion.matches !== lastReduced || document.hidden !== lastHidden) {
     lastReduced = motion.matches; lastHidden = document.hidden; relic3d?.wake();
