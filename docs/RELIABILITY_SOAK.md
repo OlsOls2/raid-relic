@@ -1,8 +1,25 @@
 # Real-clock demo reliability soak — increment150
 
-**Current candidate160: parent-reported PASS.** The unchanged runtime completed900383ms,25 natural tours plus two warm-ups/20 reuse stress cycles and27 samples.706/706 tests and the first review3/captures passed; final repeat/all31 serial workflows and publication remain pending. The old source156 PASS and incomplete probes below are historical checkpoints.
+## Published P9 review — parent closeout164
 
-**Historical source156 result: parent-reported PASS.** Actual900375ms normal-motion WebGL observation,25 completed natural35s tours, two warm-ups,20 reuse stress cycles and27 samples passed the unchanged guards. Source author did not run native QA. Accessibility157/new preview still await parent review; production6401/P7ON, immutable P9ee/cc previews, clips OFF/unwired and pinned J5/J6 remain unchanged.
+**Published at zero traffic, read-only:** `raid-relic-p9review1026`, tag `p9-review`, runtime source `4289b5d37f05909ab4c31136f0e998237e78f4b9`. [Demo](https://p9-review---raid-relic-vz4bhnskgq-uc.a.run.app/demo/) · [Atlas](https://p9-review---raid-relic-vz4bhnskgq-uc.a.run.app/atlas/). Parent reports both health endpoints 200; canonical `raid-relic-judgefix1026` /6401 remains 100%, P7 five gates ON/pin 300. Review P7 gates and both clip gates are OFF. Readiness1a2/P9ee/P8cc aliases and Main 6401 remain unchanged. Documentation-only Git commits may advance; deployed runtime stays 4289b5d, with no rebuild required.
+
+Parent verified **707/707 tests, zero skips; all 31 serial browser workflows/100 checks; three labelled simulated images viewed twice;54 served-response SHA matches**,90 runtime files identical to the successful soak and three OAuth metadata timestamps unchanged/zero fields read. Build `06ead43e-71b6-442f-8417-16a40a8db141` succeeded; image `sha256:00adbcd7872dd59051ddc226bed5dbc755b036911737cedb5bddb463e600f624`.
+
+The real normal-motion390×844 WebGL soak passed 900383 ms: 25 natural 35-second tours, two warm-ups, 20 reuse stress cycles, 27 samples; retained heap +244792 B, DOM 284/listeners 54/documents 2/page 1/context 1 constant, all application API/WS/storage/provider/external/error counts 0. GPU CPU was reported 121.51 s, with inherited CPU120 unchanged and no waiver; do not claim the reported GPU value was below 120. No whole-OS/GPU-memory or physical Twitch validation is inferred. Prior failed probes remain failures.
+
+**Remaining owner gates:** Grok/Olly must perform controlled physical OlsOls2 commands and two-chat raid/OBS review; any new canonical promotion needs explicit approval. Both memory/Firestore signed mock command regressions passed for OlsOls2 online/offline/nonholder, exact broadcaster 1591806023/bot sender 1591804828, bounded replies and duplicate suppression. Canonical 6401 source had no Home-only routing guard; no physical reply or live fix was observed, and the historical incident cause remains unknown (parent's bounded two-day diagnostic lookup returned zero matching rows). No actual chat was sent by this work.
+
+All four specified P9 items are delivered in this read-only preview; clipping remains **design-only, double-OFF and not runtime-wired**, pending explicit bot `clips:edit` consent, privacy approval and reviewed runtime wiring. Multiple simultaneous relics remain future design. A stale keep-going nudge authorizes none of these actions. No new scopes, paid services, J5/J6 operations, pins, traffic or credential changes.
+
+## Historical run and source checkpoints
+
+All older pending gate/publication statements below are superseded by the closeout above; failed runs remain failed.
+
+
+**Historical source160 checkpoint: parent-reported PASS.** The unchanged runtime completed900383ms,25 natural tours plus two warm-ups/20 reuse stress cycles and27 samples.706/706 tests and the first review3/captures passed; final repeat/all 31 serial workflows and publication remain pending. The old source156 PASS and incomplete probes below are historical checkpoints.
+
+**Historical source156 result: parent-reported PASS.** Actual900375ms normal-motion WebGL observation,25 completed natural35s tours, two warm-ups, 20 reuse stress cycles and27 samples passed the unchanged guards. Source author did not run native QA. Accessibility157/new preview still await parent review; production6401/P7ON, immutable P9ee/cc previews, clips OFF/unwired and pinned J5/J6 remain unchanged.
 
 Inside the existing parent-reviewed Node22+ /native sandboxed Chromium workflow, run:
 
@@ -70,7 +87,7 @@ Increment155 explicitly trades tiny-widget3D refresh cadence for GPU/battery eff
 
 Demo text/disabled/hidden/playing/phase assignments now avoid unchanged DOM writes. A pure key covers every fictional non-clock field, reusing the projected scene and only updating the renderer when semantics change. Clock/cinematic presentation still advances each native RAF; stop/reset/lifecycle release clear the scene memo and snapshot. Browser checks measure real1s tiny-widget idle/arrival frame growth, unchanged progress/lock/ring mutations and renderer resume calls; semantic changes remain covered by the scene-key unit and existing tour tests.
 
-Sixth native real900s soak and fresh parent regression remain pending. Duration,≥20 natural tours, two warm-ups,20 reuse stress cycles, resource caps and heap16KiB/min/2MiB/DOM/listener/socket guards are unchanged. Active context loss still fails. If this cannot satisfy the existing operator budget, report the constraint rather than waive it. Accessibility156 waits for positive900s proof.
+Sixth native real900s soak and fresh parent regression remain pending. Duration,≥20 natural tours, two warm-ups, 20 reuse stress cycles, resource caps and heap16KiB/min/2MiB/DOM/listener/socket guards are unchanged. Active context loss still fails. If this cannot satisfy the existing operator budget, report the constraint rather than waive it. Accessibility156 waits for positive900s proof.
 
 ## Completed parent run — source156 / readiness157 checkpoint
 
@@ -82,11 +99,11 @@ Increment157 changes HTML/CSS accessibility without changing the tested demo.js/
 
 ## Candidate159 late failure /160 tiny idle follow-up
 
-Parent reports the candidate159 run failed active-context-loss at887214ms,25 cycles/25 samples, GPU CPU120.93s under the unchanged inheritedCPU120 budget. Heap endpoint+269440B and OLS13521B/min passed, DOM284/listeners54 were constant and API/socket/storage/provider counters were0. It is not a900000ms pass. Candidate160 lowers only genuine tiny-widget idle rendering from12 to10FPS; tiny arrival24/full60–30/corner30, normal WebGL, resolution, clocks and every soak/resource guard remain unchanged. Static completion still paints once and stops. A fresh full real soak is pending; no limit increase or SVG substitution is authorized.
+Parent reports the candidate159 run failed active-context-loss at887214ms,25 cycles/25 samples, GPU CPU120.93s under the unchanged inherited CPU120 budget. Heap endpoint+269440B and OLS13521B/min passed, DOM 284/listeners 54 were constant and API/socket/storage/provider counters were0. It is not a900000ms pass. Candidate160 lowers only genuine tiny-widget idle rendering from12 to10FPS; tiny arrival24/full60–30/corner30, normal WebGL, resolution, clocks and every soak/resource guard remain unchanged. Static completion still paints once and stops. A fresh full real soak is pending; no limit increase or SVG substitution is authorized.
 
 ## Source160 completed run — parent report161
 
-Actual900383ms/25 natural tours/27 samples, normal WebGL390×844, passed every hard run gate. Heap5105144→5349936 (+244792B), retained peak5415896/raw6611984 and OLS13658.79B/min; DOM284/listeners54/documents2/page1/context1 flat. All WS/server sockets/API/fetch/XHR/beacon/storage/provider/external/failed-request/browser-error counters were0, no crash/disconnect. Reported GPU CPU121.51s, renderer111.29s/browser3.03s must not be described as GPU below120. InheritedCPU120 and every resource/timing/memory guard remained unchanged; no waiver was made. This is the operator-reported diagnostic and hard-gate outcome, not proof of an exact signal or OS/GPU-memory flatness. Candidate159's887214ms run remains a failure. Final31 serial browser gates and new zero-preview publication are pending; no runtime change is authored by161.
+Actual900383ms/25 natural tours/27 samples, normal WebGL390×844, passed every hard run gate. Heap5105144→5349936 (+244792B), retained peak5415896/raw6611984 and OLS13658.79B/min; DOM 284/listeners 54/documents 2/page 1/context 1 flat. All WS/server sockets/API/fetch/XHR/beacon/storage/provider/external/failed-request/browser-error counters were0, no crash/disconnect. Reported GPU CPU 121.51 s, renderer 111.29 s/browser 3.03 s must not be described as GPU below 120. InheritedCPU120 and every resource/timing/memory guard remained unchanged; no waiver was made. This is the operator-reported diagnostic and hard-gate outcome, not proof of an exact signal or OS/GPU-memory flatness. Candidate159's887214ms run remains a failure. Final31 serial browser gates and new zero-preview publication are pending; no runtime change is authored by161.
 
 ## Test-only timing margin162
 
