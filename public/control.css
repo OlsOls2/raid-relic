@@ -1,7 +1,144 @@
-main{max-width:900px}h1{max-width:none;font-size:clamp(30px,5vw,48px)}section{margin:36px 0}dl{display:grid;grid-template-columns:minmax(90px,1fr) minmax(0,3fr);gap:10px 24px;padding:20px 0;border-block:1px solid var(--slate)}dt{color:var(--amber)}dd{margin:0;overflow-wrap:anywhere;white-space:pre-wrap}.actions{display:flex;gap:12px;flex-wrap:wrap}#result{min-height:3em;color:var(--amber)}button{max-width:100%}
-label[for=raid-target]{display:block;margin:16px 0 8px}select{font:inherit;max-width:100%;padding:8px;color:var(--moon);background:var(--slate);border:1px solid #8092a9}select:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+main {
+  max-width: 900px;
+}
+h1 {
+  max-width: none;
+  font-size: clamp(30px, 5vw, 48px);
+}
+section {
+  margin: 36px 0;
+}
+dl {
+  display: grid;
+  grid-template-columns: minmax(90px, 1fr) minmax(0, 3fr);
+  gap: 10px 24px;
+  padding: 20px 0;
+  border-block: 1px solid var(--slate);
+}
+dt {
+  color: var(--amber);
+}
+dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+#result {
+  min-height: 3em;
+  color: var(--amber);
+}
+button {
+  max-width: 100%;
+}
+label[for='raid-target'] {
+  display: block;
+  margin: 16px 0 8px;
+}
+select {
+  font: inherit;
+  max-width: 100%;
+  padding: 8px;
+  color: var(--moon);
+  background: var(--slate);
+  border: 1px solid #8092a9;
+}
+select:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 4px;
+}
 
-.status-lights{display:flex;flex-wrap:wrap;gap:12px;border-block:1px solid #52617a;padding:16px 0}.status-lights p{margin:0;font-size:14px;flex:1 1 180px}.status-lights p:before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:#dba95c;margin-right:8px}.status-lights [data-state=ready]:before{background:#bde4cb;box-shadow:0 0 6px #bde4cb66}.status-lights [data-state=offline]:before{background:#8090a5}.send-off{font-size:22px;min-height:64px;padding:16px 28px;background:#e6bb70;color:#101d30;border-color:#fff0cb;font-weight:600}.send-off:hover{background:#f3cf90}#keeper-summary{font-size:18px;color:#e3e8ef}#ledger[hidden]{display:none}
+.status-lights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  border-block: 1px solid #52617a;
+  padding: 16px 0;
+}
+.status-lights p {
+  margin: 0;
+  font-size: 14px;
+  flex: 1 1 180px;
+}
+.status-lights p:before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #dba95c;
+  margin-right: 8px;
+}
+.status-lights [data-state='ready']:before {
+  background: #bde4cb;
+  box-shadow: 0 0 6px #bde4cb66;
+}
+.status-lights [data-state='offline']:before {
+  background: #8090a5;
+}
+.send-off {
+  font-size: 22px;
+  min-height: 64px;
+  padding: 16px 28px;
+  background: #e6bb70;
+  color: #101d30;
+  border-color: #fff0cb;
+  font-weight: 600;
+}
+.send-off:hover {
+  background: #f3cf90;
+}
+#keeper-summary {
+  font-size: 18px;
+  color: #e3e8ef;
+}
+#ledger[hidden] {
+  display: none;
+}
 
 /* Keep real ready-state decisions above secondary setup/recovery at720px. */
-header{padding-top:12px;padding-bottom:12px}main{padding-top:12px}main>h1{margin:8px 0 10px;font-size:clamp(27px,4vw,38px)}main>p{margin:8px 0}.status-lights{padding:10px 0}#result{min-height:0;margin:8px 0}#keeper-summary{margin:10px 0}main>section:first-of-type{margin:16px 0 28px}main>section:first-of-type h2{margin:8px 0;font-size:26px}main>section:first-of-type p{margin:8px 0;font-size:14px}label[for=raid-target]{margin:10px 0 6px}.send-off{margin-top:10px}
+header {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+main {
+  padding-top: 12px;
+}
+main > h1 {
+  margin: 8px 0 10px;
+  font-size: clamp(27px, 4vw, 38px);
+}
+main > p {
+  margin: 8px 0;
+}
+.status-lights {
+  padding: 10px 0;
+}
+#result {
+  min-height: 0;
+  margin: 8px 0;
+}
+#keeper-summary {
+  margin: 10px 0;
+}
+main > section:first-of-type {
+  margin: 16px 0 28px;
+}
+main > section:first-of-type h2 {
+  margin: 8px 0;
+  font-size: 26px;
+}
+main > section:first-of-type p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+label[for='raid-target'] {
+  margin: 10px 0 6px;
+}
+.send-off {
+  margin-top: 10px;
+}

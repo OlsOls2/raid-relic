@@ -1,1 +1,103 @@
-:root{color-scheme:dark;background:#101d30;color:#dce4ed;font:16px/1.6 system-ui,sans-serif}*{box-sizing:border-box}body{margin:0}main{max-width:1248px;margin:auto;padding:28px 24px 56px}h1{font:clamp(36px,6vw,64px)/1.1 Georgia,serif;font-weight:400;margin:20px 0}a,.eyebrow,#status{color:#e6bb70}.eyebrow{letter-spacing:.1em;font-size:13px;text-transform:uppercase}.actions{display:flex;flex-wrap:wrap;gap:10px}button{font:inherit;padding:8px 14px;color:#dce4ed;border:1px solid #9486b7;background:#26394f;cursor:pointer}button:disabled{opacity:.5;cursor:default}button:focus-visible,a:focus-visible{outline:2px solid #e6bb70;outline-offset:3px}figure{margin:22px 0;min-width:0}#card{display:block;width:100%;height:auto;border:1px solid #9486b7}#card[hidden]{display:none}#route{padding-left:24px}#route li{padding:8px 0;border-bottom:1px solid #9486b733;overflow-wrap:anywhere}.note{max-width:85ch;color:#b5a9d4}#simulator{color:#101d30;background:#e6bb70;font-weight:800;padding:8px}p{max-width:90ch}@media(max-width:480px){main{padding:20px 16px}button{font-size:14px}#summary{overflow-wrap:anywhere}}
+:root {
+  color-scheme: dark;
+  background: #101d30;
+  color: #dce4ed;
+  font:
+    16px/1.6 system-ui,
+    sans-serif;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 1248px;
+  margin: auto;
+  padding: 28px 24px 56px;
+}
+h1 {
+  font:
+    clamp(36px, 6vw, 64px)/1.1 Georgia,
+    serif;
+  font-weight: 400;
+  margin: 20px 0;
+}
+a,
+.eyebrow,
+#status {
+  color: #e6bb70;
+}
+.eyebrow {
+  letter-spacing: 0.1em;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+button {
+  font: inherit;
+  padding: 8px 14px;
+  color: #dce4ed;
+  border: 1px solid #9486b7;
+  background: #26394f;
+  cursor: pointer;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #e6bb70;
+  outline-offset: 3px;
+}
+figure {
+  margin: 22px 0;
+  min-width: 0;
+}
+#card {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #9486b7;
+}
+#card[hidden] {
+  display: none;
+}
+#route {
+  padding-left: 24px;
+}
+#route li {
+  padding: 8px 0;
+  border-bottom: 1px solid #9486b733;
+  overflow-wrap: anywhere;
+}
+.note {
+  max-width: 85ch;
+  color: #b5a9d4;
+}
+#simulator {
+  color: #101d30;
+  background: #e6bb70;
+  font-weight: 800;
+  padding: 8px;
+}
+p {
+  max-width: 90ch;
+}
+@media (max-width: 480px) {
+  main {
+    padding: 20px 16px;
+  }
+  button {
+    font-size: 14px;
+  }
+  #summary {
+    overflow-wrap: anywhere;
+  }
+}

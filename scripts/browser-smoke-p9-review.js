@@ -1,20 +1,332 @@
 // Original-thread, local signed fixture only. Native35s presentation; no production traffic.
-import assert from 'node:assert/strict';import{mkdir,writeFile}from'node:fs/promises';import{createJudges,JUDGES_ORIGIN as origin}from'../test-support/judges.js';
-const checks=[],images=new Map();let judges,browser,page,stage='setup',failureCategory=null,passed=false,external=0,errors=0,diagnostic={};
-async function paint(){await page.evaluate(()=>document.fonts.ready);await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));}
-async function capture(name){if(process.env.P9_REVIEW_CAPTURE!=='1')return;await paint();assert.ok(await page.locator('body').innerText().then(t=>/SIMULATOR|SIMULATED DEMO/.test(t)));const bytes=await page.screenshot({fullPage:false});assert.ok(bytes.length<=524288);images.set(name,bytes);}
-async function png(download,expected){assert.equal(download.suggestedFilename(),expected);const parts=[];let size=0;for await(const b of await download.createReadStream()){size+=b.length;assert.ok(size<=524288);parts.push(b);}const bytes=Buffer.concat(parts);assert.deepEqual([...bytes.subarray(0,8)],[137,80,78,71,13,10,26,10]);assert.equal(bytes.readUInt32BE(16),1200);assert.equal(bytes.readUInt32BE(20),630);await download.delete();}
-try{
- judges=await createJudges({intent:true,env:{}});await judges.seedReviewJourney();const providerBaseline=judges.auditCounts().providerCalls;await judges.listen();const{chromium}=await import('playwright');browser=await chromium.launch({executablePath:'/snap/bin/chromium',headless:true,chromiumSandbox:true});const context=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block',acceptDownloads:true,reducedMotion:'no-preference'});
- await context.route('**/*',r=>{if(new URL(r.request().url()).origin!==origin){external++;return r.abort();}return r.continue();});await context.addInitScript(()=>{if(!location.pathname.startsWith('/demo'))return;window.__reviewIO=0;const no=()=>{window.__reviewIO++;throw Error('Local demo IO forbidden');};window.fetch=no;window.XMLHttpRequest=no;window.WebSocket=no;window.EventSource=no;navigator.sendBeacon=no;for(const m of['setItem','removeItem','clear'])Storage.prototype[m]=no;});page=await context.newPage();page.on('pageerror',()=>errors++);page.setDefaultTimeout(15000);
- stage='initial-holder-and-layout';await page.goto(origin+'/demo/');assert.ok(await page.locator('#demo-download').isDisabled());assert.match(await page.locator('#demo-holder').innerText(),/No fictional holder/);assert.equal(await page.locator('#demo-lock').innerText(),'Manual controls are ready. Send Off starts a new run only before departure or after completion; Reset starts over.');assert.equal(await page.locator('#demo-send-reason').textContent(),await page.locator('#demo-send').getAttribute('title'));assert.equal(await page.locator('#demo-streak').innerText(),'SIMULATED streak: 0 consecutive fictional bindings');for(const width of[320,375,390,768,1280]){await page.setViewportSize({width,height:844});await paint();assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));const label=page.locator('.edition-label');if(await label.count())assert.ok(await label.evaluate(n=>parseFloat(getComputedStyle(n).fontSize)>=13));}await page.setViewportSize({width:390,height:844});
- stage='one-primary-natural-tour';await page.locator('#demo-tour').focus();await page.keyboard.press('Enter');assert.ok(await page.locator('#demo-tour').isDisabled());assert.equal(await page.locator('#demo-tour').innerText(),'Playing tour…');assert.equal(await page.locator('#demo-send').getAttribute('aria-describedby'),'demo-send-reason');assert.match(await page.locator('#demo-send').getAttribute('title'),/Press Pause/);assert.equal(await page.locator('#demo-send-reason').textContent(),await page.locator('#demo-send').getAttribute('title'));assert.equal(await page.locator('#demo-lock').innerText(),'Controls locked during the tour. Press Pause to take over.');assert.equal(await page.evaluate(()=>document.activeElement.id),'demo-pause');await page.keyboard.press('Space');assert.ok(await page.locator('#demo-offer').isEnabled());assert.equal(await page.locator('#demo-lock').innerText(),'Tour paused. Manual controls are unlocked; using them takes over. Resume continues the tour.');assert.equal(await page.locator('#demo-send-reason').textContent(),await page.locator('#demo-send').getAttribute('title'));await page.keyboard.press('Space');await page.locator('canvas.relic3d').waitFor({state:'visible'});
- await page.locator('canvas.relic3d').evaluate(c=>{window.__finalColored=0;c.setAttribute('data-pixel-probe','');const check=()=>{if(document.body.dataset.demoPlaying!=='false')return;const g=c.getContext('webgl2'),p=new Uint8Array(c.width*c.height*4);g.readPixels(0,0,c.width,c.height,g.RGBA,g.UNSIGNED_BYTE,p);for(let i=0;i<p.length;i+=4)if(p[i+3]&&Math.max(p[i],p[i+1],p[i+2])>20)window.__finalColored++;c.removeAttribute('data-pixel-probe');c.removeEventListener('relic3d-frame',check);};c.addEventListener('relic3d-frame',check);});
- await page.waitForFunction(()=>document.body.dataset.demoClock==='35000'&&document.body.dataset.demoPlaying==='false',null,{timeout:45000});assert.equal(await page.locator('#demo-rings').innerText(),'Simulated rings: 1');assert.equal(await page.locator('#demo-streak').innerText(),'SIMULATED streak: 1 consecutive fictional binding');assert.ok(await page.locator('#demo-download').isEnabled());assert.equal(await page.getByRole('button',{name:'Replay tour',exact:true}).count(),1);assert.equal(await page.locator('#demo-tour').innerText(),'Replay tour');assert.ok(await page.locator('#demo-pause').isDisabled());
- const frame=await page.locator('canvas.relic3d').getAttribute('data-frames');await page.waitForTimeout(250);diagnostic=await page.locator('canvas.relic3d').evaluate(c=>({frames:Number(c.dataset.frames),bands:Number(c.dataset.bands),frameScheduled:c.dataset.frameScheduled==='true',colored:window.__finalColored,canvasCount:document.querySelectorAll('canvas.relic3d').length}));assert.equal(String(diagnostic.frames),frame);assert.equal(diagnostic.frameScheduled,false);assert.equal(diagnostic.bands,2);assert.equal(diagnostic.canvasCount,1);assert.ok(diagnostic.colored>5);assert.ok(await page.locator('canvas.relic3d').isVisible());await page.locator('#demo-tour').scrollIntoViewIfNeeded();await capture('review-demo.png');
- stage='fictional-held-clean-veto';await page.locator('#demo-held').click();assert.match(await page.locator('#demo-mark-held').innerText(),/spoiler/);assert.doesNotMatch(await page.locator('#demo-mark-approved').innerText(),/spoiler/);await page.locator('#demo-review-wait').click();await page.locator('#demo-clean').click();assert.match(await page.locator('#demo-mark-approved').innerText(),/moon/);const quota=await page.locator('#demo-mark-budget').innerText();await page.locator('#demo-veto').click();assert.equal(await page.locator('#demo-mark-approved').innerText(),'');assert.equal(await page.locator('#demo-mark-budget').innerText(),quota);await page.locator('#demo-safety-title').scrollIntoViewIfNeeded();await capture('review-safety.png');assert.match(quota,/used: 2\/5/);await page.locator('#demo-veto').click();assert.equal(await page.locator('#demo-mark-held').innerText(),'');assert.equal(await page.locator('#demo-mark-approved').innerText(),'');assert.equal(await page.locator('#demo-mark-budget').innerText(),quota);assert.doesNotMatch(await page.locator('#demo-art').innerText(),/spoiler/);assert.equal(await page.locator('canvas.relic3d').getAttribute('data-sprites'),'0');
- const demoDownload=page.waitForEvent('download');await page.locator('#demo-download').click();await png(await demoDownload,'raid-relic-demo-ring-1.png');await page.locator('#demo-send').click();await page.locator('#demo-source-chat button').click();await page.locator('#demo-raid').click();await page.locator('#demo-host-chat button').click();assert.equal(await page.locator('#demo-streak').innerText(),'SIMULATED streak: 2 consecutive fictional bindings');const secondDemo=page.waitForEvent('download');await page.locator('#demo-download').click();await png(await secondDemo,'raid-relic-demo-ring-2.png');await page.locator('#demo-tour').click();assert.equal(await page.locator('#demo-rings').innerText(),'Simulated rings: 0');assert.ok(await page.locator('#demo-download').isDisabled());await page.locator('#demo-reset').click();assert.match(await page.locator('#demo-streak').innerText(),/streak: 0/);await page.locator('#demo-send').click();await page.locator('#demo-raid').click();await page.locator('#demo-lapse').click();assert.match(await page.locator('#demo-streak').innerText(),/streak: 0/);assert.match(await page.locator('#demo-notice').innerText(),/window closed/);assert.equal(await page.evaluate(()=>window.__reviewIO),0);checks.push({name:'Native35s single-primary tour, completed static GL pixels/no RAF, fictional streak/holder/card and held-clean-veto quota',passed:true});
- stage='atlas-legacy-and-filenames';await page.goto(origin+'/atlas/');await page.locator('#map-stops .map-stop-select').nth(2).waitFor();const legacy=page.locator('.score-badge[data-badge="Chain of 3"]').first();await legacy.locator('summary').click();assert.match(await legacy.innerText(),/Failed-window history was not recorded.*not proof of an unbroken streak/s);assert.equal(await page.locator('.score-badge[data-badge="Unbroken streak · 3 hand-offs"][data-earned=true]').count(),0);for(const [n,login]of[[1,'olsols2'],[2,'raidrelichq']]){const d=page.waitForEvent('download');await page.getByRole('button',{name:'Download ring card Stop '+n,exact:true}).click();await png(await d,`raid-relic-stop-${n}-${login}.png`);}await page.setViewportSize({width:390,height:844});await legacy.scrollIntoViewIfNeeded();await capture('review-atlas.png');checks.push({name:'Actual signed fixture stops: legacy chain is not tracked streak; exact distinct per-stop keeper PNG filenames',passed:true});
- stage='reduced-svg-and-reset';await page.emulateMedia({reducedMotion:'reduce'});await page.goto(origin+'/demo/');await page.locator('#demo-send').click();await page.locator('#demo-source-chat button').click();await page.locator('#demo-raid').click();await page.locator('#demo-host-chat button').click();assert.equal(await page.locator('canvas.relic3d').count(),0);assert.ok(await page.locator('.crystal').evaluate(n=>n.complete&&n.naturalWidth>0&&getComputedStyle(n).visibility!=='hidden'));assert.ok(await page.locator('#demo-download').isEnabled());await page.locator('#demo-reset').click();assert.ok(await page.locator('#demo-download').isDisabled());assert.equal(await page.evaluate(()=>window.__reviewIO),0);assert.equal(external,0);assert.equal(errors,0);assert.equal(judges.auditCounts().providerCalls,providerBaseline);checks.push({name:'Reduced-motion original SVG, holder gating/reset and zero demo IO/provider effects',passed:true});passed=true;stage='complete';
-}catch(e){failureCategory=['AssertionError','TimeoutError','TypeError','SyntaxError'].includes(e?.name)?e.name:'browser-or-fixture';}
-finally{await browser?.close().catch(()=>{});await judges?.close().catch(()=>{});await mkdir('artifacts',{recursive:true});for(const[name,b]of images)await writeFile('artifacts/'+name,b);const report=JSON.stringify({passed,stage,failureCategory,checks,diagnostic,external,browserErrors:errors,captures:[...images.keys()]});assert.ok(Buffer.byteLength(report)<=65536);await writeFile('artifacts/p9-review-browser-results.json',report);}if(!passed)process.exitCode=1;
+import assert from 'node:assert/strict';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { createJudges, JUDGES_ORIGIN as origin } from '../test-support/judges.js';
+const checks = [],
+  images = new Map();
+let judges,
+  browser,
+  page,
+  stage = 'setup',
+  failureCategory = null,
+  passed = false,
+  external = 0,
+  errors = 0,
+  diagnostic = {};
+async function paint() {
+  await page.evaluate(() => document.fonts.ready);
+  await page.evaluate(
+    () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))),
+  );
+}
+async function capture(name) {
+  if (process.env.P9_REVIEW_CAPTURE !== '1') return;
+  await paint();
+  assert.ok(
+    await page
+      .locator('body')
+      .innerText()
+      .then((t) => /SIMULATOR|SIMULATED DEMO/.test(t)),
+  );
+  const bytes = await page.screenshot({ fullPage: false });
+  assert.ok(bytes.length <= 524288);
+  images.set(name, bytes);
+}
+async function png(download, expected) {
+  assert.equal(download.suggestedFilename(), expected);
+  const parts = [];
+  let size = 0;
+  for await (const b of await download.createReadStream()) {
+    size += b.length;
+    assert.ok(size <= 524288);
+    parts.push(b);
+  }
+  const bytes = Buffer.concat(parts);
+  assert.deepEqual([...bytes.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+  assert.equal(bytes.readUInt32BE(16), 1200);
+  assert.equal(bytes.readUInt32BE(20), 630);
+  await download.delete();
+}
+try {
+  judges = await createJudges({ intent: true, env: {} });
+  await judges.seedReviewJourney();
+  const providerBaseline = judges.auditCounts().providerCalls;
+  await judges.listen();
+  const { chromium } = await import('playwright');
+  browser = await chromium.launch({
+    executablePath: '/snap/bin/chromium',
+    headless: true,
+    chromiumSandbox: true,
+  });
+  const context = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    serviceWorkers: 'block',
+    acceptDownloads: true,
+    reducedMotion: 'no-preference',
+  });
+  await context.route('**/*', (r) => {
+    if (new URL(r.request().url()).origin !== origin) {
+      external++;
+      return r.abort();
+    }
+    return r.continue();
+  });
+  await context.addInitScript(() => {
+    if (!location.pathname.startsWith('/demo')) return;
+    window.__reviewIO = 0;
+    const no = () => {
+      window.__reviewIO++;
+      throw Error('Local demo IO forbidden');
+    };
+    window.fetch = no;
+    window.XMLHttpRequest = no;
+    window.WebSocket = no;
+    window.EventSource = no;
+    navigator.sendBeacon = no;
+    for (const m of ['setItem', 'removeItem', 'clear']) Storage.prototype[m] = no;
+  });
+  page = await context.newPage();
+  page.on('pageerror', () => errors++);
+  page.setDefaultTimeout(15000);
+  stage = 'initial-holder-and-layout';
+  await page.goto(origin + '/demo/');
+  assert.ok(await page.locator('#demo-download').isDisabled());
+  assert.match(await page.locator('#demo-holder').innerText(), /No holder/);
+  assert.equal(
+    await page.locator('#demo-lock').innerText(),
+    'Manual controls are ready. Send Off starts a new run only before departure or after completion; Reset starts over.',
+  );
+  assert.equal(
+    await page.locator('#demo-send-reason').textContent(),
+    await page.locator('#demo-send').getAttribute('title'),
+  );
+  assert.equal(await page.locator('#demo-streak').innerText(), 'Streak: 0 consecutive bindings');
+  for (const width of [320, 375, 390, 768, 1280]) {
+    await page.setViewportSize({ width, height: 844 });
+    await paint();
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+    const label = page.locator('.edition-label');
+    if (await label.count())
+      assert.ok(await label.evaluate((n) => parseFloat(getComputedStyle(n).fontSize) >= 13));
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  stage = 'one-primary-natural-tour';
+  await page.locator('#demo-tour').focus();
+  await page.keyboard.press('Enter');
+  assert.ok(await page.locator('#demo-tour').isDisabled());
+  assert.equal(await page.locator('#demo-tour').innerText(), 'Playing tour…');
+  assert.equal(
+    await page.locator('#demo-send').getAttribute('aria-describedby'),
+    'demo-send-reason',
+  );
+  assert.match(await page.locator('#demo-send').getAttribute('title'), /Press Pause/);
+  assert.equal(
+    await page.locator('#demo-send-reason').textContent(),
+    await page.locator('#demo-send').getAttribute('title'),
+  );
+  assert.equal(
+    await page.locator('#demo-lock').innerText(),
+    'Controls locked during the tour. Press Pause to take over.',
+  );
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'demo-pause');
+  await page.keyboard.press('Space');
+  assert.ok(await page.locator('#demo-offer').isEnabled());
+  assert.equal(
+    await page.locator('#demo-lock').innerText(),
+    'Tour paused. Manual controls are unlocked; using them takes over. Resume continues the tour.',
+  );
+  assert.equal(
+    await page.locator('#demo-send-reason').textContent(),
+    await page.locator('#demo-send').getAttribute('title'),
+  );
+  await page.keyboard.press('Space');
+  await page.locator('canvas.relic3d').waitFor({ state: 'visible' });
+  await page.locator('canvas.relic3d').evaluate((c) => {
+    window.__finalColored = 0;
+    c.setAttribute('data-pixel-probe', '');
+    const check = () => {
+      if (document.body.dataset.demoPlaying !== 'false') return;
+      const g = c.getContext('webgl2'),
+        p = new Uint8Array(c.width * c.height * 4);
+      g.readPixels(0, 0, c.width, c.height, g.RGBA, g.UNSIGNED_BYTE, p);
+      for (let i = 0; i < p.length; i += 4)
+        if (p[i + 3] && Math.max(p[i], p[i + 1], p[i + 2]) > 20) window.__finalColored++;
+      c.removeAttribute('data-pixel-probe');
+      c.removeEventListener('relic3d-frame', check);
+    };
+    c.addEventListener('relic3d-frame', check);
+  });
+  await page.waitForFunction(
+    () =>
+      document.body.dataset.demoClock === '35000' && document.body.dataset.demoPlaying === 'false',
+    null,
+    { timeout: 45000 },
+  );
+  assert.equal(await page.locator('#demo-rings').innerText(), 'Rings: 1');
+  assert.equal(await page.locator('#demo-streak').innerText(), 'Streak: 1 consecutive binding');
+  assert.ok(await page.locator('#demo-download').isEnabled());
+  assert.equal(await page.getByRole('button', { name: 'Replay tour', exact: true }).count(), 1);
+  assert.equal(await page.locator('#demo-tour').innerText(), 'Replay tour');
+  assert.ok(await page.locator('#demo-pause').isDisabled());
+  const frame = await page.locator('canvas.relic3d').getAttribute('data-frames');
+  await page.waitForTimeout(250);
+  diagnostic = await page.locator('canvas.relic3d').evaluate((c) => ({
+    frames: Number(c.dataset.frames),
+    bands: Number(c.dataset.bands),
+    frameScheduled: c.dataset.frameScheduled === 'true',
+    colored: window.__finalColored,
+    canvasCount: document.querySelectorAll('canvas.relic3d').length,
+  }));
+  assert.equal(String(diagnostic.frames), frame);
+  assert.equal(diagnostic.frameScheduled, false);
+  assert.equal(diagnostic.bands, 2);
+  assert.equal(diagnostic.canvasCount, 1);
+  assert.ok(diagnostic.colored > 5);
+  assert.ok(await page.locator('canvas.relic3d').isVisible());
+  await page.locator('#demo-tour').scrollIntoViewIfNeeded();
+  await capture('review-demo.png');
+  stage = 'held-mark';
+  await page.locator('#demo-held').click();
+  assert.match(await page.locator('#demo-mark-held').innerText(), /spoiler/);
+  assert.doesNotMatch(await page.locator('#demo-mark-approved').innerText(), /spoiler/);
+  stage = 'clean-mark';
+  await page.locator('#demo-review-wait').click();
+  await page.locator('#demo-clean').click();
+  assert.match(await page.locator('#demo-mark-approved').innerText(), /moon/);
+  const quota = await page.locator('#demo-mark-budget').innerText();
+  stage = 'approved-veto';
+  await page.locator('#demo-veto').click();
+  assert.equal(await page.locator('#demo-mark-approved').innerText(), '');
+  assert.equal(await page.locator('#demo-mark-budget').innerText(), quota);
+  await page.locator('#demo-safety-title').scrollIntoViewIfNeeded();
+  await capture('review-safety.png');
+  assert.match(quota, /used: 2\/5/);
+  stage = 'held-veto';
+  await page.locator('#demo-veto').click();
+  assert.equal(await page.locator('#demo-mark-held').innerText(), '');
+  assert.equal(await page.locator('#demo-mark-approved').innerText(), '');
+  assert.equal(await page.locator('#demo-mark-budget').innerText(), quota);
+  assert.doesNotMatch(await page.locator('#demo-art').innerText(), /spoiler/);
+  assert.equal(await page.locator('canvas.relic3d').getAttribute('data-sprites'), '0');
+  stage = 'ring1-download';
+  const demoDownload = page.waitForEvent('download');
+  await page.locator('#demo-download').click();
+  await png(await demoDownload, 'raid-relic-demo-ring-1.png');
+  stage = 'second-binding';
+  await page.locator('#demo-send').click();
+  await page.locator('#demo-source-chat button').click();
+  await page.locator('#demo-raid').click();
+  await page.locator('#demo-host-chat button').click();
+  assert.equal(await page.locator('#demo-streak').innerText(), 'Streak: 2 consecutive bindings');
+  stage = 'ring2-download';
+  const secondDemo = page.waitForEvent('download');
+  await page.locator('#demo-download').click();
+  await png(await secondDemo, 'raid-relic-demo-ring-2.png');
+  stage = 'replay-reset';
+  await page.locator('#demo-tour').click();
+  assert.equal(await page.locator('#demo-rings').innerText(), 'Rings: 0');
+  assert.ok(await page.locator('#demo-download').isDisabled());
+  await page.locator('#demo-reset').click();
+  assert.equal(await page.locator('#demo-streak').innerText(), 'Streak: 0 consecutive bindings');
+  stage = 'lapse-reset';
+  await page.locator('#demo-send').click();
+  await page.locator('#demo-raid').click();
+  await page.locator('#demo-lapse').click();
+  assert.equal(await page.locator('#demo-streak').innerText(), 'Streak: 0 consecutive bindings');
+  assert.match(await page.locator('#demo-notice').innerText(), /window closed/);
+  assert.equal(await page.evaluate(() => window.__reviewIO), 0);
+  checks.push({
+    name: 'Native35s single-primary tour, completed static GL pixels/no RAF, fictional streak/holder/card and held-clean-veto quota',
+    passed: true,
+  });
+  stage = 'atlas-legacy-and-filenames';
+  await page.goto(origin + '/atlas/');
+  await page.locator('#map-stops .map-stop-select').nth(2).waitFor();
+  const legacy = page.locator('.score-badge[data-badge="Chain of 3"]').first();
+  await legacy.locator('summary').click();
+  assert.match(
+    await legacy.innerText(),
+    /Failed-window history was not recorded.*not proof of an unbroken streak/s,
+  );
+  assert.equal(
+    await page
+      .locator('.score-badge[data-badge="Unbroken streak · 3 hand-offs"][data-earned=true]')
+      .count(),
+    0,
+  );
+  for (const [n, login] of [
+    [1, 'olsols2'],
+    [2, 'raidrelichq'],
+  ]) {
+    const d = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Download ring card Stop ' + n, exact: true }).click();
+    await png(await d, `raid-relic-stop-${n}-${login}.png`);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  await legacy.scrollIntoViewIfNeeded();
+  await capture('review-atlas.png');
+  checks.push({
+    name: 'Actual signed fixture stops: legacy chain is not tracked streak; exact distinct per-stop keeper PNG filenames',
+    passed: true,
+  });
+  stage = 'reduced-svg-and-reset';
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto(origin + '/demo/');
+  await page.locator('#demo-send').click();
+  await page.locator('#demo-source-chat button').click();
+  await page.locator('#demo-raid').click();
+  await page.locator('#demo-host-chat button').click();
+  assert.equal(await page.locator('canvas.relic3d').count(), 0);
+  assert.ok(
+    await page
+      .locator('.crystal')
+      .evaluate(
+        (n) => n.complete && n.naturalWidth > 0 && getComputedStyle(n).visibility !== 'hidden',
+      ),
+  );
+  assert.ok(await page.locator('#demo-download').isEnabled());
+  await page.locator('#demo-reset').click();
+  assert.ok(await page.locator('#demo-download').isDisabled());
+  assert.equal(await page.evaluate(() => window.__reviewIO), 0);
+  assert.equal(external, 0);
+  assert.equal(errors, 0);
+  assert.equal(judges.auditCounts().providerCalls, providerBaseline);
+  checks.push({
+    name: 'Reduced-motion original SVG, holder gating/reset and zero demo IO/provider effects',
+    passed: true,
+  });
+  passed = true;
+  stage = 'complete';
+} catch (e) {
+  // Publish only a bounded source line, never the stack or assertion payload.
+  const match =
+    typeof e?.stack === 'string'
+      ? e.stack.slice(0, 8192).match(/browser-smoke-p9-review[.]js:(\d{1,6})(?::\d+)?/)
+      : null;
+  if (match) {
+    const assertionLine = Number(match[1]);
+    if (Number.isSafeInteger(assertionLine) && assertionLine > 0 && assertionLine <= 100000)
+      diagnostic.assertionLine = assertionLine;
+  }
+  failureCategory = ['AssertionError', 'TimeoutError', 'TypeError', 'SyntaxError'].includes(e?.name)
+    ? e.name
+    : 'browser-or-fixture';
+} finally {
+  await browser?.close().catch(() => {});
+  await judges?.close().catch(() => {});
+  await mkdir('artifacts', { recursive: true });
+  for (const [name, b] of images) await writeFile('artifacts/' + name, b);
+  const report = JSON.stringify({
+    passed,
+    stage,
+    failureCategory,
+    checks,
+    diagnostic,
+    external,
+    browserErrors: errors,
+    captures: [...images.keys()],
+  });
+  assert.ok(Buffer.byteLength(report) <= 65536);
+  await writeFile('artifacts/p9-review-browser-results.json', report);
+}
+if (!passed) process.exitCode = 1;

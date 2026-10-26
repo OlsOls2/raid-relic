@@ -1,19 +1,282 @@
 // LOCAL SIMULATOR only. Signed mock claims through both actual adapters are unit-covered.
-import assert from 'node:assert/strict';import{createServer}from'node:http';import{mkdir,writeFile}from'node:fs/promises';
-import{streakFixture,winHop,openHop,HOME,OTHER}from'../test-support/streak-fixture.js';import{attachOverlaySockets}from'../src/overlay-sockets.js';
-const origin='http://127.0.0.1:5191';let browser,server,sockets,stage='setup',failed=false,failureCategory=null,diagnostic=null;const checks=[],images=new Map(),captures=[];
-async function paint(page){await page.bringToFront();await page.evaluate(()=>document.fonts.ready);await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));}
-async function capture(page,name){if(process.env.P9_CAPTURE!=='1')return;await paint(page);assert.ok(await page.locator('#p9-simulator-label').isVisible());const bytes=await page.screenshot({fullPage:false});assert.ok(bytes.length<=512*1024);images.set(name,bytes);}
-async function atlasCapture(page){if(process.env.P9_CAPTURE!=='1')return;const old=page.viewportSize();try{await page.setViewportSize({width:1280,height:1600});await paint(page);const selectors=['.score-badge[data-badge="Unbroken streak · 3 hand-offs"][data-earned="true"]','#scores-status','button[aria-label="Download ring card Stop 3"]'];const top=await page.evaluate(selectors=>Math.min(...selectors.map(s=>document.querySelector(s).getBoundingClientRect().top+scrollY)),selectors);await page.evaluate(top=>scrollTo(0,Math.max(0,top-48)),top);await paint(page);diagnostic=await page.evaluate(selectors=>{const boxes=selectors.map(s=>document.querySelector(s).getBoundingClientRect()),finite=n=>Number.isFinite(n)?Math.max(-1000000,Math.min(1000000,Math.round(n*100)/100)):null,minTop=Math.min(...boxes.map(b=>b.top)),maxBottom=Math.max(...boxes.map(b=>b.bottom));return{width:innerWidth,height:innerHeight,minTop:finite(minTop),maxBottom:finite(maxBottom),span:finite(maxBottom-minTop),inside:boxes.every(b=>b.width>0&&b.top>=32&&b.bottom<=innerHeight&&b.left>=0&&b.right<=innerWidth)};},selectors);assert.equal(diagnostic.inside,true);await capture(page,'p9-atlas-streak.png');}finally{await page.setViewportSize(old);}}
-try{stage='fixture-private-https';const f=await streakFixture('memory',true);stage='public-loopback-server';server=createServer(f.runtime.handler);sockets=attachOverlaySockets(server,f.runtime.overlayFeeds,{origins:[origin],allowRead:f.runtime.allowPublicRead});await new Promise((r,j)=>{server.once('error',j);server.listen(5191,'127.0.0.1',r);});stage='browser-launch';const{chromium}=await import('playwright');browser=await chromium.launch({executablePath:'/snap/bin/chromium',headless:true,chromiumSandbox:true});const c=await browser.newContext({viewport:{width:1280,height:800},serviceWorkers:'block',reducedMotion:'reduce'});await c.route('**/*',r=>new URL(r.request().url()).origin===origin?r.continue():r.abort());await c.routeWebSocket('**/*',r=>new URL(r.url()).origin===origin.replace('http:','ws:')?r.connectToServer():r.close());let errors=0;// Fixture-only permanent capture label; no application styles or content are masked.
- await c.addInitScript(()=>document.addEventListener('DOMContentLoaded',()=>{const n=document.createElement('aside');n.id='p9-simulator-label';n.textContent='SIMULATOR · local signed mocks · no real Twitch';n.style.cssText='position:fixed;top:0;left:8px;z-index:1000;background:#e6bb70;color:#101d30;font:700 12px system-ui;padding:4px';document.body.prepend(n);},{once:true}));const page=await c.newPage();page.on('pageerror',()=>errors++);
- stage='legacy-unknown';await page.goto(origin+'/atlas/');await page.locator('#scores-status').filter({hasText:'not tracked for earlier hand-offs'}).waitFor();assert.equal(await page.locator('.score-badge[data-badge="Unbroken streak · 3 hand-offs"]').count(),0);
- for(let i=1;i<=3;i++){stage='actual-claim-'+i;await winHop(f);await page.locator('#scores-refresh').click();await page.locator('#scores-status').filter({hasText:`Streak ${i} · best ${i}`}).waitFor();}
- stage='badge-and-stop-proof';assert.equal(await page.locator('.score-badge[data-badge="Unbroken streak · 3 hand-offs"][data-earned="true"]').count(),1);await page.locator('#map-refresh').click();await page.locator('#map-stops .map-stop-select').filter({hasText:'streak 3'}).waitFor();for(const width of[1280,375]){await page.setViewportSize({width,height:800});await page.evaluate(()=>document.fonts.ready);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.equal(await page.getByRole('button',{name:'Download ring card Stop 3',exact:true}).count(),1);}await atlasCapture(page);checks.push({name:'SIMULATOR actual three signed completed bindings show known streak and recipient badge; Atlas375/1280/card controls retained',passed:true});
- stage='verified-arrival-no-anticipated-win';const h=await openHop(f);await page.goto(origin+'/overlay/'+h.to);await page.waitForFunction(()=>document.body.dataset.connection==='connected');await page.locator('#lineage[data-streak="3"]').waitFor();assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current,3);
- if(process.env.P9_CAPTURE==='1'){const old=page.viewportSize();try{await page.setViewportSize({width:1280,height:800});await paint(page);await page.locator('.crystal').evaluate(async n=>{await n.decode();if(!n.naturalWidth||!n.naturalHeight)throw Error('Undecoded');});assert.equal(await page.locator('canvas.relic3d').evaluateAll(nodes=>nodes.every(n=>n.hidden&&getComputedStyle(n).display==='none'&&n.getBoundingClientRect().width===0)),true);assert.ok(await page.locator('.crystal').isVisible());assert.match(await page.locator('#lineage').innerText(),/Streak 3/);await capture(page,'p9-overlay-streak.png');}finally{await page.setViewportSize(old);}}
- stage='expired-read-only';const root=await f.runtime.state.getKeeperRegistry();const priorStatus=await f.request(`/control/${h.from}/status`,'GET',{cookie:f.cookies[h.from]});assert.equal(priorStatus.status,200);const csrf=JSON.parse(priorStatus.body).csrf;f.advance(root.pendingHop.endsAt-f.now());assert.equal(JSON.parse((await f.request('/api/scores')).body).streak.current,0);assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current,3);
- // The next legitimate request retires the old verified window before replacing it.
- const sent=await f.control(h.from,`send:${h.to}`,{},{csrf});assert.equal(sent.status,200);assert.equal(JSON.parse(sent.body).status,'accepted');f.advance();await f.raid(h.from,h.to,1);await f.chat(h.from,h.from,'!offer');await f.chat(h.to,h.to,'!accept');await page.locator('#lineage[data-streak="1"]').waitFor();assert.equal((await f.runtime.state.getKeeperRegistry()).streak.best,3);
- stage='corner-known-counter';await page.setViewportSize({width:160,height:160});await page.goto(origin+'/overlay/'+h.to+'?corner=1');await page.waitForFunction(()=>document.body.dataset.connection==='connected');await page.locator('#compact-count').filter({hasText:'S1'}).waitFor();await page.evaluate(()=>document.fonts.ready);assert.equal(await page.locator('#compact-count').evaluate(n=>{const b=n.getBoundingClientRect();return b.left>=0&&b.right<=160&&b.top>=0&&b.bottom<=160&&document.documentElement.scrollWidth<=160&&document.documentElement.scrollHeight<=160;}),true);assert.ok(await page.locator('.crystal').isVisible());assert.equal(errors,0);checks.push({name:'SIMULATOR verified arrival never anticipates a win, expired GET projects lapse without writes, next successful claim resets to1/corner160 stays bounded',passed:true});await c.close();
-}catch(e){failed=true;failureCategory=['AssertionError','TimeoutError','TypeError'].includes(e.name)?e.name:'browser-or-fixture';}finally{await browser?.close().catch(()=>{});sockets?.close();server?.closeAllConnections();if(server?.listening)await new Promise(r=>server.close(r));await mkdir('artifacts',{recursive:true});for(const[name,bytes]of images){await writeFile('artifacts/'+name,bytes);captures.push(name);}await writeFile('artifacts/streaks-browser-results.json',JSON.stringify({passed:!failed,stage,failureCategory,checks,captures,diagnostic},null,2));}if(failed)process.exitCode=1;
+import assert from 'node:assert/strict';
+import { createServer } from 'node:http';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { streakFixture, winHop, openHop, HOME, OTHER } from '../test-support/streak-fixture.js';
+import { attachOverlaySockets } from '../src/overlay-sockets.js';
+const origin = 'http://127.0.0.1:5191';
+let browser,
+  server,
+  sockets,
+  stage = 'setup',
+  failed = false,
+  failureCategory = null,
+  diagnostic = null;
+const checks = [],
+  images = new Map(),
+  captures = [];
+async function paint(page) {
+  await page.bringToFront();
+  await page.evaluate(() => document.fonts.ready);
+  await page.evaluate(
+    () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))),
+  );
+}
+async function capture(page, name) {
+  if (process.env.P9_CAPTURE !== '1') return;
+  await paint(page);
+  assert.ok(await page.locator('#p9-simulator-label').isVisible());
+  const bytes = await page.screenshot({ fullPage: false });
+  assert.ok(bytes.length <= 512 * 1024);
+  images.set(name, bytes);
+}
+async function atlasCapture(page) {
+  if (process.env.P9_CAPTURE !== '1') return;
+  const old = page.viewportSize();
+  try {
+    await page.setViewportSize({ width: 1280, height: 1600 });
+    await paint(page);
+    const selectors = [
+      '.score-badge[data-badge="Unbroken streak · 3 hand-offs"][data-earned="true"]',
+      '#scores-status',
+      'button[aria-label="Download ring card Stop 3"]',
+    ];
+    const top = await page.evaluate(
+      (selectors) =>
+        Math.min(
+          ...selectors.map((s) => document.querySelector(s).getBoundingClientRect().top + scrollY),
+        ),
+      selectors,
+    );
+    await page.evaluate((top) => scrollTo(0, Math.max(0, top - 48)), top);
+    await paint(page);
+    diagnostic = await page.evaluate((selectors) => {
+      const boxes = selectors.map((s) => document.querySelector(s).getBoundingClientRect()),
+        finite = (n) =>
+          Number.isFinite(n)
+            ? Math.max(-1000000, Math.min(1000000, Math.round(n * 100) / 100))
+            : null,
+        minTop = Math.min(...boxes.map((b) => b.top)),
+        maxBottom = Math.max(...boxes.map((b) => b.bottom));
+      return {
+        width: innerWidth,
+        height: innerHeight,
+        minTop: finite(minTop),
+        maxBottom: finite(maxBottom),
+        span: finite(maxBottom - minTop),
+        inside: boxes.every(
+          (b) =>
+            b.width > 0 &&
+            b.top >= 32 &&
+            b.bottom <= innerHeight &&
+            b.left >= 0 &&
+            b.right <= innerWidth,
+        ),
+      };
+    }, selectors);
+    assert.equal(diagnostic.inside, true);
+    await capture(page, 'p9-atlas-streak.png');
+  } finally {
+    await page.setViewportSize(old);
+  }
+}
+try {
+  stage = 'fixture-private-https';
+  const f = await streakFixture('memory', true);
+  stage = 'public-loopback-server';
+  server = createServer(f.runtime.handler);
+  sockets = attachOverlaySockets(server, f.runtime.overlayFeeds, {
+    origins: [origin],
+    allowRead: f.runtime.allowPublicRead,
+  });
+  await new Promise((r, j) => {
+    server.once('error', j);
+    server.listen(5191, '127.0.0.1', r);
+  });
+  stage = 'browser-launch';
+  const { chromium } = await import('playwright');
+  browser = await chromium.launch({
+    executablePath: '/snap/bin/chromium',
+    headless: true,
+    chromiumSandbox: true,
+  });
+  const c = await browser.newContext({
+    viewport: { width: 1280, height: 800 },
+    serviceWorkers: 'block',
+    reducedMotion: 'reduce',
+  });
+  await c.route('**/*', (r) =>
+    new URL(r.request().url()).origin === origin ? r.continue() : r.abort(),
+  );
+  await c.routeWebSocket('**/*', (r) =>
+    new URL(r.url()).origin === origin.replace('http:', 'ws:') ? r.connectToServer() : r.close(),
+  );
+  let errors = 0; // Fixture-only permanent capture label; no application styles or content are masked.
+  await c.addInitScript(() =>
+    document.addEventListener(
+      'DOMContentLoaded',
+      () => {
+        const n = document.createElement('aside');
+        n.id = 'p9-simulator-label';
+        n.textContent = 'SIMULATOR · local signed mocks · no real Twitch';
+        n.style.cssText =
+          'position:fixed;top:0;left:8px;z-index:1000;background:#e6bb70;color:#101d30;font:700 12px system-ui;padding:4px';
+        document.body.prepend(n);
+      },
+      { once: true },
+    ),
+  );
+  const page = await c.newPage();
+  page.on('pageerror', () => errors++);
+  stage = 'legacy-unknown';
+  await page.goto(origin + '/atlas/');
+  await page
+    .locator('#scores-status')
+    .filter({ hasText: 'not tracked for earlier hand-offs' })
+    .waitFor();
+  assert.equal(
+    await page.locator('.score-badge[data-badge="Unbroken streak · 3 hand-offs"]').count(),
+    0,
+  );
+  for (let i = 1; i <= 3; i++) {
+    stage = 'actual-claim-' + i;
+    await winHop(f);
+    await page.locator('#scores-refresh').click();
+    await page
+      .locator('#scores-status')
+      .filter({ hasText: `Streak ${i} · best ${i}` })
+      .waitFor();
+  }
+  stage = 'badge-and-stop-proof';
+  assert.equal(
+    await page
+      .locator('.score-badge[data-badge="Unbroken streak · 3 hand-offs"][data-earned="true"]')
+      .count(),
+    1,
+  );
+  await page.locator('#map-refresh').click();
+  await page.locator('#map-stops .map-stop-select').filter({ hasText: 'streak 3' }).waitFor();
+  for (const width of [1280, 375]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.evaluate(() => document.fonts.ready);
+    assert.equal(
+      await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+      true,
+    );
+    assert.equal(
+      await page.getByRole('button', { name: 'Download ring card Stop 3', exact: true }).count(),
+      1,
+    );
+  }
+  await atlasCapture(page);
+  checks.push({
+    name: 'SIMULATOR actual three signed completed bindings show known streak and recipient badge; Atlas375/1280/card controls retained',
+    passed: true,
+  });
+  stage = 'verified-arrival-no-anticipated-win';
+  const h = await openHop(f);
+  await page.goto(origin + '/overlay/' + h.to);
+  await page.waitForFunction(() => document.body.dataset.connection === 'connected');
+  await page.locator('#lineage[data-streak="3"]').waitFor();
+  assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current, 3);
+  if (process.env.P9_CAPTURE === '1') {
+    const old = page.viewportSize();
+    try {
+      await page.setViewportSize({ width: 1280, height: 800 });
+      await paint(page);
+      await page.locator('.crystal').evaluate(async (n) => {
+        await n.decode();
+        if (!n.naturalWidth || !n.naturalHeight) throw Error('Undecoded');
+      });
+      assert.equal(
+        await page
+          .locator('canvas.relic3d')
+          .evaluateAll((nodes) =>
+            nodes.every(
+              (n) =>
+                n.hidden &&
+                getComputedStyle(n).display === 'none' &&
+                n.getBoundingClientRect().width === 0,
+            ),
+          ),
+        true,
+      );
+      assert.ok(await page.locator('.crystal').isVisible());
+      assert.match(await page.locator('#lineage').innerText(), /Streak 3/);
+      await capture(page, 'p9-overlay-streak.png');
+    } finally {
+      await page.setViewportSize(old);
+    }
+  }
+  stage = 'expired-read-only';
+  const root = await f.runtime.state.getKeeperRegistry();
+  const priorStatus = await f.request(`/control/${h.from}/status`, 'GET', {
+    cookie: f.cookies[h.from],
+  });
+  assert.equal(priorStatus.status, 200);
+  const csrf = JSON.parse(priorStatus.body).csrf;
+  f.advance(root.pendingHop.endsAt - f.now());
+  assert.equal(JSON.parse((await f.request('/api/scores')).body).streak.current, 0);
+  assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current, 3);
+  // The next legitimate request retires the old verified window before replacing it.
+  const sent = await f.control(h.from, `send:${h.to}`, {}, { csrf });
+  assert.equal(sent.status, 200);
+  assert.equal(JSON.parse(sent.body).status, 'accepted');
+  f.advance();
+  await f.raid(h.from, h.to, 1);
+  await f.chat(h.from, h.from, '!offer');
+  await f.chat(h.to, h.to, '!accept');
+  await page.locator('#lineage[data-streak="1"]').waitFor();
+  assert.equal((await f.runtime.state.getKeeperRegistry()).streak.best, 3);
+  stage = 'corner-known-counter';
+  await page.setViewportSize({ width: 160, height: 160 });
+  await page.goto(origin + '/overlay/' + h.to + '?corner=1');
+  await page.waitForFunction(() => document.body.dataset.connection === 'connected');
+  await page.locator('#compact-count').filter({ hasText: 'S1' }).waitFor();
+  await page.evaluate(() => document.fonts.ready);
+  assert.equal(
+    await page.locator('#compact-count').evaluate((n) => {
+      const b = n.getBoundingClientRect();
+      return (
+        b.left >= 0 &&
+        b.right <= 160 &&
+        b.top >= 0 &&
+        b.bottom <= 160 &&
+        document.documentElement.scrollWidth <= 160 &&
+        document.documentElement.scrollHeight <= 160
+      );
+    }),
+    true,
+  );
+  assert.ok(await page.locator('.crystal').isVisible());
+  assert.equal(errors, 0);
+  checks.push({
+    name: 'SIMULATOR verified arrival never anticipates a win, expired GET projects lapse without writes, next successful claim resets to1/corner160 stays bounded',
+    passed: true,
+  });
+  await c.close();
+} catch (e) {
+  failed = true;
+  failureCategory = ['AssertionError', 'TimeoutError', 'TypeError'].includes(e.name)
+    ? e.name
+    : 'browser-or-fixture';
+} finally {
+  await browser?.close().catch(() => {});
+  sockets?.close();
+  server?.closeAllConnections();
+  if (server?.listening) await new Promise((r) => server.close(r));
+  await mkdir('artifacts', { recursive: true });
+  for (const [name, bytes] of images) {
+    await writeFile('artifacts/' + name, bytes);
+    captures.push(name);
+  }
+  await writeFile(
+    'artifacts/streaks-browser-results.json',
+    JSON.stringify(
+      { passed: !failed, stage, failureCategory, checks, captures, diagnostic },
+      null,
+      2,
+    ),
+  );
+}
+if (failed) process.exitCode = 1;

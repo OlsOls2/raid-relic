@@ -1,0 +1,7 @@
+node_modules/
+public/vendor/
+public/fonts/
+.codex-evidence/
+artifacts/
+package-lock.json
+docs/media/

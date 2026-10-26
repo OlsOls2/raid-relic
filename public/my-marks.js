@@ -1,38 +1,110 @@
+const keeperName = (id) =>
+  ({ 1591805230: '@raidrelichq', 1591806023: '@olsols2' })[id] ?? 'Unknown Keeper';
 // Fragment is never sent to the server. Remove it from this history entry
 // immediately; keep only transient memory and a POST body, never storage/logs.
 let capability = location.hash.slice(1);
 history.replaceState(null, '', '/my-marks');
-const list = document.getElementById('matches'), status = document.getElementById('status'), next = document.getElementById('next');
+const list = document.getElementById('matches'),
+  status = document.getElementById('status'),
+  next = document.getElementById('next');
 const nameInput = document.getElementById('self-login');
 let provenLogin = '';
-let offset = 0, generation = 0, controller;
-function clear() { generation++; controller?.abort(); list.replaceChildren(); next.hidden = true; }
+let offset = 0,
+  generation = 0,
+  controller;
+function clear() {
+  generation++;
+  controller?.abort();
+  list.replaceChildren();
+  next.hidden = true;
+}
 async function load(start = 0) {
-  clear(); const current = generation; controller = new AbortController(); const active = controller; const timer = setTimeout(() => active.abort(), 8000);
+  clear();
+  const current = generation;
+  controller = new AbortController();
+  const active = controller;
+  const timer = setTimeout(() => active.abort(), 8000);
   status.textContent = 'Reading fresh shared history…';
   try {
     if (!capability) throw Error();
-    const response = await fetch('/api/my-marks', { method: 'POST', cache: 'no-store', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ capability, offset: start, limit: 20, ...(nameInput.value ? { login: nameInput.value } : {}) }), signal: active.signal });
-    if (!response.ok) throw Error(); const data = await response.json(); if (generation !== current) return;
+    const response = await fetch('/api/my-marks', {
+      method: 'POST',
+      cache: 'no-store',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        capability,
+        offset: start,
+        limit: 20,
+        ...(nameInput.value ? { login: nameInput.value } : {}),
+      }),
+      signal: active.signal,
+    });
+    if (!response.ok) throw Error();
+    const data = await response.json();
+    if (generation !== current) return;
     if (typeof data.login !== 'string' || !/^[a-z0-9_]{1,25}$/.test(data.login)) throw Error();
-    provenLogin = data.login; if (!nameInput.value) nameInput.value = provenLogin;
+    provenLogin = data.login;
+    if (!nameInput.value) nameInput.value = provenLogin;
     document.getElementById('simulator').hidden = data.mode !== 'simulator';
     status.textContent = `@${data.login}: ${data.total} retained approved entries. Shared link, not identity proof.`;
     for (const match of data.matches) {
-      const item = document.createElement('li'), text = document.createElement('span'), image = document.createElement('img'), link = document.createElement('a');
-      text.textContent = match.text; image.alt = 'Approved original rune'; image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(match.runeSvg)}`;
-      link.textContent = `Ring ${match.ringIndex}: channel ${match.from} to ${match.to}`; link.href = `/stops/${match.stopId}`;
-      item.append(image, text, link); list.append(item);
+      const item = document.createElement('li'),
+        text = document.createElement('span'),
+        image = document.createElement('img'),
+        link = document.createElement('a');
+      text.textContent = match.text;
+      image.alt = 'Approved original rune';
+      image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(match.runeSvg)}`;
+      link.textContent = `Ring ${match.ringIndex}: ${keeperName(match.from)} to ${keeperName(match.to)}`;
+      link.href = `/stops/${match.stopId}`;
+      item.append(image, text, link);
+      list.append(item);
     }
-    offset = data.nextOffset; next.hidden = offset === null;
-  } catch { if (generation === current) { list.replaceChildren(); status.textContent = 'Shared history unavailable or expired. Previous content hidden; request a fresh link in original chat.'; } }
-  finally { clearTimeout(timer); }
+    offset = data.nextOffset;
+    next.hidden = offset === null;
+  } catch {
+    if (generation === current) {
+      list.replaceChildren();
+      status.textContent =
+        'Shared history unavailable or expired. Previous content hidden; request a fresh link in original chat.';
+    }
+  } finally {
+    clearTimeout(timer);
+  }
 }
-nameInput.oninput = () => { clear(); status.textContent = 'Previous content hidden. Only the capability-proven self-login can be used.'; };
-document.getElementById('name-filter').onsubmit = event => { event.preventDefault(); load(); };
-next.onclick = () => { if (offset !== null) load(offset); };
+nameInput.oninput = () => {
+  clear();
+  status.textContent =
+    'Previous content hidden. Only the capability-proven self-login can be used.';
+};
+document.getElementById('name-filter').onsubmit = (event) => {
+  event.preventDefault();
+  load();
+};
+next.onclick = () => {
+  if (offset !== null) load(offset);
+};
 document.getElementById('refresh').onclick = () => load();
-document.getElementById('clear').onclick = () => { capability = ''; provenLogin = ''; nameInput.value = ''; clear(); status.textContent = 'Link cleared from this tab.'; };
-addEventListener('pagehide', () => { capability = ''; provenLogin = ''; nameInput.value = ''; clear(); });
-addEventListener('pageshow', event => { if (event.persisted) { capability = ''; provenLogin = ''; nameInput.value = ''; clear(); status.textContent = 'Link cleared on navigation. Open a fresh shared link.'; } });
+document.getElementById('clear').onclick = () => {
+  capability = '';
+  provenLogin = '';
+  nameInput.value = '';
+  clear();
+  status.textContent = 'Link cleared from this tab.';
+};
+addEventListener('pagehide', () => {
+  capability = '';
+  provenLogin = '';
+  nameInput.value = '';
+  clear();
+});
+addEventListener('pageshow', (event) => {
+  if (event.persisted) {
+    capability = '';
+    provenLogin = '';
+    nameInput.value = '';
+    clear();
+    status.textContent = 'Link cleared on navigation. Open a fresh shared link.';
+  }
+});
 load();

@@ -1,10 +1,120 @@
-import {hash} from './crypto.js';
-const key=h=>h&&typeof h.eventId==='string'?hash('streak-v1:'+h.eventId):null;
-const time=n=>Number.isSafeInteger(n)&&n>=0;
-function valid(s){return s?.version===1&&time(s.since)&&time(s.lastAt)&&s.lastAt>=s.since&&Number.isInteger(s.current)&&s.current>=0&&s.current<=16&&Number.isInteger(s.best)&&s.best>=s.current&&s.best<=16&&(!s.active||(typeof s.active.key==='string'&&/^[a-f0-9]{64}$/.test(s.active.key)&&time(s.active.endsAt)));}
+import { hash } from './crypto.js';
+const key = (h) => (h && typeof h.eventId === 'string' ? hash('streak-v1:' + h.eventId) : null);
+const time = (n) => Number.isSafeInteger(n) && n >= 0;
+function valid(s) {
+  return (
+    s?.version === 1 &&
+    time(s.since) &&
+    time(s.lastAt) &&
+    s.lastAt >= s.since &&
+    Number.isInteger(s.current) &&
+    s.current >= 0 &&
+    s.current <= 16 &&
+    Number.isInteger(s.best) &&
+    s.best >= s.current &&
+    s.best <= 16 &&
+    (!s.active ||
+      (typeof s.active.key === 'string' &&
+        /^[a-f0-9]{64}$/.test(s.active.key) &&
+        time(s.active.endsAt)))
+  );
+}
 // All helpers mutate only the caller's transaction-local cloned registry.
-export function observeStreak(r,now,enabled){if(!enabled||!r.streak)return;if(!valid(r.streak)||!time(now)||now<r.streak.lastAt){delete r.streak;return;}const s=r.streak,h=r.pendingHop;if((s.active&&key(h)!==s.active.key)||(h?.finalized&&s.lastStop&&hash(h.eventId)!==s.lastStop)){delete r.streak;return;}if(s.active&&key(h)===s.active.key&&!h.finalized&&(h.cancelled||now>=s.active.endsAt)){s.current=0;s.lastLapse={hop:s.active.key,at:now,reason:h.cancelled&&h.cancelReason!=='window-ended'?'policy':'window-ended'};delete s.active;}s.lastAt=now;}
-export function beginStreak(r,now,enabled){if(!enabled)return;const h=r.pendingHop;if(!h||h.verified!==true||h.finalized||h.cancelled||!time(h.startedAt)||!time(h.endsAt)||h.endsAt<=now||h.startedAt>now)return;observeStreak(r,now,true);if(!r.streak)r.streak={version:1,current:0,best:0,since:now,lastAt:now};r.streak.active={key:key(h),endsAt:h.endsAt};}
-export function completeStreak(r,stop,now,enabled){if(!enabled)return;observeStreak(r,now,true);const s=r.streak,h=r.pendingHop;if(!valid(s)||!s.active||s.active.key!==key(h)||s.lastStop===stop.stopId||s.current>=16||stop.claimedAt!==now||now>=s.active.endsAt||! /^[a-f0-9]{64}$/.test(stop.stopId)||stop.ringIndex<1||stop.ringIndex>16||(s.lastRing!==undefined&&stop.ringIndex!==s.lastRing+1))return;s.current++;s.best=Math.max(s.best,s.current);s.lastStop=stop.stopId;s.lastRing=stop.ringIndex;s.lastAt=now;delete s.active;stop.streakCount=s.current;stop.streakSince=s.since;}
-export function streakView(r,now){const s=r?.streak;if(!valid(s)||!time(now)||now<s.lastAt)return{version:1,known:false,current:null,best:null,since:null};const h=r.pendingHop,lapsed=s.active&&key(h)===s.active.key&&!h.finalized&&(h.cancelled||now>=s.active.endsAt);return{version:1,known:true,current:lapsed?0:s.current,best:s.best,since:s.since};}
-export function stopStreak(s){return Number.isInteger(s?.streakCount)&&s.streakCount>=1&&s.streakCount<=Math.min(16,s.ringIndex)&&time(s.streakSince)&&s.streakSince<=s.claimedAt?{streakCount:s.streakCount,streakSince:s.streakSince}:{};}
+export function observeStreak(r, now, enabled) {
+  if (!enabled || !r.streak) return;
+  if (!valid(r.streak) || !time(now) || now < r.streak.lastAt) {
+    delete r.streak;
+    return;
+  }
+  const s = r.streak,
+    h = r.pendingHop;
+  if (
+    (s.active && key(h) !== s.active.key) ||
+    (h?.finalized && s.lastStop && hash(h.eventId) !== s.lastStop)
+  ) {
+    delete r.streak;
+    return;
+  }
+  if (
+    s.active &&
+    key(h) === s.active.key &&
+    !h.finalized &&
+    (h.cancelled || now >= s.active.endsAt)
+  ) {
+    s.current = 0;
+    s.lastLapse = {
+      hop: s.active.key,
+      at: now,
+      reason: h.cancelled && h.cancelReason !== 'window-ended' ? 'policy' : 'window-ended',
+    };
+    delete s.active;
+  }
+  s.lastAt = now;
+}
+export function beginStreak(r, now, enabled) {
+  if (!enabled) return;
+  const h = r.pendingHop;
+  if (
+    !h ||
+    h.verified !== true ||
+    h.finalized ||
+    h.cancelled ||
+    !time(h.startedAt) ||
+    !time(h.endsAt) ||
+    h.endsAt <= now ||
+    h.startedAt > now
+  )
+    return;
+  observeStreak(r, now, true);
+  if (!r.streak) r.streak = { version: 1, current: 0, best: 0, since: now, lastAt: now };
+  r.streak.active = { key: key(h), endsAt: h.endsAt };
+}
+export function completeStreak(r, stop, now, enabled) {
+  if (!enabled) return;
+  observeStreak(r, now, true);
+  const s = r.streak,
+    h = r.pendingHop;
+  if (
+    !valid(s) ||
+    !s.active ||
+    s.active.key !== key(h) ||
+    s.lastStop === stop.stopId ||
+    s.current >= 16 ||
+    stop.claimedAt !== now ||
+    now >= s.active.endsAt ||
+    !/^[a-f0-9]{64}$/.test(stop.stopId) ||
+    stop.ringIndex < 1 ||
+    stop.ringIndex > 16 ||
+    (s.lastRing !== undefined && stop.ringIndex !== s.lastRing + 1)
+  )
+    return;
+  s.current++;
+  s.best = Math.max(s.best, s.current);
+  s.lastStop = stop.stopId;
+  s.lastRing = stop.ringIndex;
+  s.lastAt = now;
+  delete s.active;
+  stop.streakCount = s.current;
+  stop.streakSince = s.since;
+}
+export function streakView(r, now) {
+  const s = r?.streak;
+  if (!valid(s) || !time(now) || now < s.lastAt)
+    return { version: 1, known: false, current: null, best: null, since: null };
+  const h = r.pendingHop,
+    lapsed =
+      s.active &&
+      key(h) === s.active.key &&
+      !h.finalized &&
+      (h.cancelled || now >= s.active.endsAt);
+  return { version: 1, known: true, current: lapsed ? 0 : s.current, best: s.best, since: s.since };
+}
+export function stopStreak(s) {
+  return Number.isInteger(s?.streakCount) &&
+    s.streakCount >= 1 &&
+    s.streakCount <= Math.min(16, s.ringIndex) &&
+    time(s.streakSince) &&
+    s.streakSince <= s.claimedAt
+    ? { streakCount: s.streakCount, streakSince: s.streakSince }
+    : {};
+}

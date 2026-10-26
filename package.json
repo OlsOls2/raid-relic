@@ -4,7 +4,26 @@
   "private": true,
   "type": "module",
   "license": "MIT",
-  "engines": { "node": ">=22" },
-  "scripts": { "start": "node src/server.js", "judges": "node scripts/judges.js --simulator", "test": "node --test", "release:files": "node scripts/release-files.js" },
-  "dependencies": { "@google-cloud/firestore": "^9.4.0", "ws": "8.22.0" }
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "judges": "node scripts/judges.js --simulator",
+    "test": "npm run evidence:verify && node --test",
+    "release:files": "node scripts/release-files.js",
+    "format": "prettier --write \"{src,public,scripts,test,test-support}/**/*.js\"",
+    "format:check": "prettier --check \"{src,public,scripts,test,test-support}/**/*.js\"",
+    "evidence:verify": "node scripts/verify-evidence.js && node scripts/update-evidence-summary.js --check",
+    "evidence:sanitize": "node scripts/sanitize-evidence.js",
+    "evidence:summary": "node scripts/update-evidence-summary.js",
+    "quality:update": "node scripts/update-quality-record.js"
+  },
+  "dependencies": {
+    "@google-cloud/firestore": "^9.4.0",
+    "ws": "8.22.0"
+  },
+  "devDependencies": {
+    "prettier": "3.9.10"
+  }
 }

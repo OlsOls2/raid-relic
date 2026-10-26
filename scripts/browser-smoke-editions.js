@@ -1,46 +1,448 @@
 // LOCAL SIMULATOR only. Actual default-sandbox WebGL and independent SVG fallback.
 import assert from 'node:assert/strict';
-import {mkdir,writeFile} from 'node:fs/promises';
-import {createJudges,JUDGES_ORIGIN as origin} from '../test-support/judges.js';
-const judges=await createJudges({intent:true,env:{}});let browser,page,failed=false,stage='startup';const checks=[],images=new Map(),captures=[],fallbackProofs=[];
-async function paintCommit(page){await page.bringToFront();await page.evaluate(()=>document.fonts.ready);await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));}
-async function capture(name){if(process.env.P8_CAPTURE!=='1')return;await paintCommit(page);const bytes=await page.screenshot({fullPage:false});assert.ok(bytes.length<=512*1024);images.set(name,bytes);}
-async function action(page,action){const result=await page.evaluate(async action=>{const r=await fetch('/api/judges/action',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action})});return r.status;},action);assert.equal(result,200);}
-async function pixels(page){return page.locator('canvas.relic3d').evaluate(c=>new Promise(resolve=>{const timer=setTimeout(()=>resolve(false),5000);c.setAttribute('data-pixel-probe','');c.addEventListener('relic3d-frame',()=>{clearTimeout(timer);c.removeAttribute('data-pixel-probe');const gl=c.getContext('webgl2'),a=new Uint8Array(c.width*c.height*4);gl.readPixels(0,0,c.width,c.height,gl.RGBA,gl.UNSIGNED_BYTE,a);const corners=[3,(c.width-1)*4+3,(c.height-1)*c.width*4+3,a.length-1];resolve(corners.every(i=>a[i]===0)&&a.some((v,i)=>i%4===3&&v>0));},{once:true});}));}
-
-async function decodedCrystal(page){return page.locator('.crystal').evaluate(async image=>{try{await image.decode();}catch{return false;}if(!image.complete||image.naturalWidth<=0||image.naturalHeight<=0)return false;const c=document.createElement('canvas');c.width=120;c.height=160;const ctx=c.getContext('2d');ctx.drawImage(image,0,0,120,160);const a=ctx.getImageData(0,0,120,160).data;let painted=0,colored=0;for(let i=0;i<a.length;i+=4){if(a[i+3]>0)painted++;if(a[i+3]>0&&(a[i]!==a[i+1]||a[i+1]!==a[i+2]))colored++;}return painted>500&&colored>100;});}
-async function recordFallback(page,error){
- const errorKind=error?(['TypeError','TimeoutError','Error'].includes(error.name)?error.name:'Other'):null;
- let proof={};try{proof=await page.evaluate(()=>{
-  const number=n=>Number.isFinite(n)?Math.max(-1000000,Math.min(1000000,Math.round(n*100)/100)):null;
-  const image=document.querySelector('.crystal'),b=image?.getBoundingClientRect(),s=image?getComputedStyle(image):null,canvases=[...document.querySelectorAll('canvas.relic3d')],canvas=canvases[0],box=canvas?.getBoundingClientRect();
-  return{svgNaturalWidth:image?.naturalWidth??0,svgNaturalHeight:image?.naturalHeight??0,svgBoxX:number(b?.x),svgBoxY:number(b?.y),svgBoxW:number(b?.width),svgBoxH:number(b?.height),svgOpacity:number(Number(s?.opacity)),svgVisible:Boolean(image&&!image.hidden&&s.display!=='none'&&s.visibility!=='hidden'&&Number(s.opacity)>0&&b.width>0&&b.height>0),canvasHidden:canvases.every(c=>c.hidden),canvasDisplayNone:canvases.every(c=>getComputedStyle(c).display==='none'),canvasBoxWidth:number(box?.width??0),canvasCount:Math.min(2,canvases.length),editionNodeCount:Math.min(4,document.querySelectorAll('.edition-label').length),contextLost:canvas?.dataset.contextStatus==='lost',frames:number(Number(canvas?.dataset.frames??0))};
- });}catch{}
- fallbackProofs.push({stage,errorKind,...proof});if(fallbackProofs.length>8)fallbackProofs.shift();return proof;
+import { mkdir, writeFile } from 'node:fs/promises';
+import { createJudges, JUDGES_ORIGIN as origin } from '../test-support/judges.js';
+const judges = await createJudges({ intent: true, env: {} });
+let browser,
+  page,
+  failed = false,
+  stage = 'startup';
+const checks = [],
+  images = new Map(),
+  captures = [],
+  fallbackProofs = [];
+async function paintCommit(page) {
+  await page.bringToFront();
+  await page.evaluate(() => document.fonts.ready);
+  await page.evaluate(
+    () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+  );
 }
-async function fallbackPaint(page,prefix='fallback'){
- try{
-  stage=prefix+'-canvas-wait';await recordFallback(page);
-  await page.waitForFunction(loss=>[...document.querySelectorAll('canvas.relic3d')].every(c=>c.hidden&&getComputedStyle(c).display==='none'&&(!loss||c.dataset.contextStatus==='lost')),prefix==='loss');
-  stage=prefix+'-decode';await recordFallback(page);assert.ok(await decodedCrystal(page));
-  stage=prefix+'-paint';await recordFallback(page);await paintCommit(page);
-  const proof=await recordFallback(page);assert.ok(proof.svgVisible&&proof.svgNaturalWidth>0&&proof.svgNaturalHeight>0&&proof.canvasHidden&&proof.canvasDisplayNone&&proof.canvasBoxWidth===0&&proof.canvasCount<=1);
- }catch(error){await recordFallback(page,error);throw error;}
+async function capture(name) {
+  if (process.env.P8_CAPTURE !== '1') return;
+  await paintCommit(page);
+  const bytes = await page.screenshot({ fullPage: false });
+  assert.ok(bytes.length <= 512 * 1024);
+  images.set(name, bytes);
+}
+async function action(page, action) {
+  const result = await page.evaluate(async (action) => {
+    const r = await fetch('/api/judges/action', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ action }),
+    });
+    return r.status;
+  }, action);
+  assert.equal(result, 200);
+}
+async function pixels(page) {
+  return page.locator('canvas.relic3d').evaluate(
+    (c) =>
+      new Promise((resolve) => {
+        const timer = setTimeout(() => resolve(false), 5000);
+        c.setAttribute('data-pixel-probe', '');
+        c.addEventListener(
+          'relic3d-frame',
+          () => {
+            clearTimeout(timer);
+            c.removeAttribute('data-pixel-probe');
+            const gl = c.getContext('webgl2'),
+              a = new Uint8Array(c.width * c.height * 4);
+            gl.readPixels(0, 0, c.width, c.height, gl.RGBA, gl.UNSIGNED_BYTE, a);
+            const corners = [
+              3,
+              (c.width - 1) * 4 + 3,
+              (c.height - 1) * c.width * 4 + 3,
+              a.length - 1,
+            ];
+            resolve(corners.every((i) => a[i] === 0) && a.some((v, i) => i % 4 === 3 && v > 0));
+          },
+          { once: true },
+        );
+      }),
+  );
 }
 
-try{
- await judges.listen();const {chromium}=await import('playwright');browser=await chromium.launch({executablePath:'/snap/bin/chromium',chromiumSandbox:true,headless:true});
- const context=await browser.newContext({viewport:{width:1280,height:720},serviceWorkers:'block'});await context.route('**/*',r=>new URL(r.request().url()).origin===origin?r.continue():r.abort());
- // Fixture-only wall date, no production clock override or new API.
- await context.addInitScript(()=>{const Native=Date;class Fixed extends Native{constructor(...args){super(...(args.length?args:['2026-10-26T12:00:00Z']));}static now(){return Native.parse('2026-10-26T12:00:00Z');}}window.Date=Fixed;});
- page=await context.newPage();await page.goto(origin+'/atlas/');await action(page,'setup');await action(page,'send');
- const overlay=await context.newPage();await overlay.goto(origin+'/overlay/1591806023');await overlay.bringToFront();await overlay.waitForFunction(()=>document.body.dataset.connection==='connected');await overlay.locator('canvas.relic3d').waitFor({state:'visible'});await action(page,'raid');
- stage='actual-gpu-edition';await overlay.locator('canvas.relic3d[data-edition="twitchcon-2026"]').waitFor({state:'visible'});await overlay.waitForFunction(()=>document.querySelector('canvas.relic3d').dataset.particlesVisible==='true');assert.equal(await overlay.locator('canvas.relic3d').count(),1);assert.equal(await overlay.locator('canvas.relic3d').getAttribute('data-core-count'),'1');assert.equal(await overlay.locator('canvas.relic3d').getAttribute('data-facets'),'8');assert.equal(await overlay.locator('canvas.relic3d').getAttribute('data-particles'),'64');assert.ok(Number(await overlay.locator('canvas.relic3d').getAttribute('data-triangles'))<20000);assert.ok(await pixels(overlay));assert.equal(await overlay.locator('.edition-label').isVisible(),true);page=overlay;await capture('edition-overlay.png');
- stage='actual-claim-no-new-relic';await action(page,'offer');await action(page,'accept');const score=await page.evaluate(async()=>{const r=await fetch('/api/scores');return r.json();});assert.equal(score.rings,1);assert.ok(score.channels.some(r=>r.badges.includes('Carried during TwitchCon 2026 edition')));checks.push({name:'SIMULATOR actual one-core eight-facet GPU/64 dust/transparent pixels; only actual signed fixture claim adds one ring/edition evidence',passed:true});
- stage='real-context-loss-fallback';await page.locator('canvas.relic3d').evaluate(c=>{const gl=c.getContext('webgl2'),ext=gl.getExtension('WEBGL_lose_context');if(!ext)throw Error('Context loss unavailable');ext.loseContext();});await fallbackPaint(page,'loss');stage='reduced-svg-mobile';await page.setViewportSize({width:390,height:800});await page.emulateMedia({reducedMotion:'reduce'});await page.locator('.crystal').waitFor({state:'visible'});assert.equal(await page.locator('.archive').getAttribute('data-edition'),'twitchcon-2026');assert.equal(await page.locator('.crystal').getAttribute('src'),'/edition-crystal/twitchcon-2026.svg');await fallbackPaint(page,'mobile');assert.equal(await page.locator('canvas.relic3d').getAttribute('data-particles-visible'),'false');assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await capture('edition-mobile.png');
- await page.setViewportSize({width:160,height:160});await page.goto(origin+'/overlay/1591806023?corner=1');await page.locator('.crystal').waitFor({state:'visible'});await fallbackPaint(page,'corner');assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=160&&document.documentElement.scrollHeight<=160),true);
- stage='atlas-demo-and-base-boundaries';await page.setViewportSize({width:1280,height:800});await page.goto(origin+'/atlas/');await page.locator('#atlas-relic[data-edition="twitchcon-2026"]').waitFor();await page.locator('#atlas-relic').scrollIntoViewIfNeeded();assert.equal(await page.locator('.edition-label').count(),1);assert.equal(await page.locator('.atlas-relic-figure .edition-label').count(),1);assert.match(await page.locator('.edition-label').textContent(),/Unofficial fan edition; not affiliated with or endorsed by Twitch\/TwitchCon/);assert.equal(await page.locator('.atlas-relic-figure .edition-label').evaluate(n=>{const label=n.getBoundingClientRect(),hero=document.querySelector('#atlas-relic').getBoundingClientRect();return Math.abs((label.left+label.right)/2-(hero.left+hero.right)/2)<2&&label.top>=hero.bottom;}),true);const earned=page.locator('.score-badge[data-badge="Carried during TwitchCon 2026 edition"]').first();await earned.waitFor();assert.equal(await earned.getAttribute('data-earned'),'true');assert.match(await page.locator('.edition-disclaimer').first().textContent(),/Unofficial fan edition/);const official=page.locator('.score-badge[data-badge="Carried during TwitchCon San Diego 2026"]').first();assert.equal(await official.getAttribute('data-earned'),'false');assert.match(await official.locator('summary').textContent(),/Event-days badge.*13–15 Nov/);await capture('edition-atlas.png');for(const width of [375,390]){await page.setViewportSize({width,height:800});await paintCommit(page);assert.equal(await page.locator('.edition-label').count(),1);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.equal(await page.locator('.atlas-relic-figure .edition-label').evaluate(n=>{const b=n.getBoundingClientRect(),hero=document.querySelector('#atlas-relic').getBoundingClientRect();return b.left>=0&&b.right<=innerWidth&&b.top>=hero.bottom&&Math.abs((b.left+b.right)/2-(hero.left+hero.right)/2)<2;}),true);}const icon=await page.request.get(origin+'/favicon.ico');assert.equal(icon.status(),200);assert.match(icon.headers()['content-type'],/image\/svg\+xml/);await page.goto(origin+'/demo');await page.locator('#demo-banner').waitFor();assert.equal(await page.locator('#demo-art').getAttribute('data-edition'),'twitchcon-2026');assert.equal(await page.locator('#demo-rings').textContent(),'Simulated rings: 0');
- const boundaries=await page.evaluate(async()=>{const {selectEdition}=await import('/editions.js');return[selectEdition(Date.parse('2026-10-22T23:59:59Z')),selectEdition(Date.parse('2026-12-01T00:00:00Z'))];});assert.deepEqual(boundaries,[null,null]);checks.push({name:'SIMULATOR reducedSVG390/corner160/Atlas/demo cosmetics; base at both configured boundaries without API writes',passed:true});await context.close();
- stage='forced-no-webgl-decode';const noGL=await browser.newContext({viewport:{width:390,height:800},serviceWorkers:'block'});await noGL.route('**/*',r=>new URL(r.request().url()).origin===origin?r.continue():r.abort());await noGL.addInitScript(()=>{const get=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(type,...args){return /^webgl/.test(type)?null:get.call(this,type,...args);};const Native=Date;window.Date=class extends Native{constructor(...args){super(...(args.length?args:['2026-10-26T12:00:00Z']));}static now(){return Native.parse('2026-10-26T12:00:00Z');}};});const fallback=await noGL.newPage();await fallback.goto(origin+'/overlay/1591806023');await fallback.locator('.archive[data-edition="twitchcon-2026"]').waitFor();await fallbackPaint(fallback,'no-gl');await noGL.close();
- stage='rendered-base-before-after';for(const instant of ['2026-10-22T23:59:59Z','2026-12-01T00:00:00Z']){const base=await browser.newContext({viewport:{width:390,height:800},reducedMotion:'reduce',serviceWorkers:'block'});await base.route('**/*',r=>new URL(r.request().url()).origin===origin?r.continue():r.abort());await base.addInitScript(instant=>{const Native=Date;window.Date=class extends Native{constructor(...args){super(...(args.length?args:[instant]));}static now(){return Native.parse(instant);}};},instant);const b=await base.newPage();await b.goto(origin+'/demo');assert.equal(await b.locator('#demo-art').getAttribute('data-edition'),'base');assert.equal(await b.locator('#demo-art .crystal').getAttribute('src'),'/crystal.svg');await fallbackPaint(b,'base');assert.equal(await b.locator('.edition-label').count(),0);assert.equal(await b.locator('#demo-rings').textContent(),'Simulated rings: 0');await base.close();}checks.push({name:'SIMULATOR rendered BASE SVG before start and at exclusive end, no edition label/history invented',passed:true});
-}catch(error){failed=true;if(!fallbackProofs.at(-1)?.errorKind)await recordFallback(page,error);}finally{await browser?.close().catch(()=>{});await judges.close();await mkdir('artifacts',{recursive:true});for(const[n,b]of images){await writeFile('artifacts/'+n,b);captures.push(n);}await writeFile('artifacts/editions-browser-results.json',JSON.stringify({simulator:true,passed:!failed,stage,failureCategory:failed?'assertion-or-browser':null,checks,captures,fallbackProofs},null,2));}if(failed)process.exitCode=1;
+async function decodedCrystal(page) {
+  return page.locator('.crystal').evaluate(async (image) => {
+    try {
+      await image.decode();
+    } catch {
+      return false;
+    }
+    if (!image.complete || image.naturalWidth <= 0 || image.naturalHeight <= 0) return false;
+    const c = document.createElement('canvas');
+    c.width = 120;
+    c.height = 160;
+    const ctx = c.getContext('2d');
+    ctx.drawImage(image, 0, 0, 120, 160);
+    const a = ctx.getImageData(0, 0, 120, 160).data;
+    let painted = 0,
+      colored = 0;
+    for (let i = 0; i < a.length; i += 4) {
+      if (a[i + 3] > 0) painted++;
+      if (a[i + 3] > 0 && (a[i] !== a[i + 1] || a[i + 1] !== a[i + 2])) colored++;
+    }
+    return painted > 500 && colored > 100;
+  });
+}
+async function recordFallback(page, error) {
+  const errorKind = error
+    ? ['TypeError', 'TimeoutError', 'Error'].includes(error.name)
+      ? error.name
+      : 'Other'
+    : null;
+  let proof = {};
+  try {
+    proof = await page.evaluate(() => {
+      const number = (n) =>
+        Number.isFinite(n)
+          ? Math.max(-1000000, Math.min(1000000, Math.round(n * 100) / 100))
+          : null;
+      const image = document.querySelector('.crystal'),
+        b = image?.getBoundingClientRect(),
+        s = image ? getComputedStyle(image) : null,
+        canvases = [...document.querySelectorAll('canvas.relic3d')],
+        canvas = canvases[0],
+        box = canvas?.getBoundingClientRect();
+      return {
+        svgNaturalWidth: image?.naturalWidth ?? 0,
+        svgNaturalHeight: image?.naturalHeight ?? 0,
+        svgBoxX: number(b?.x),
+        svgBoxY: number(b?.y),
+        svgBoxW: number(b?.width),
+        svgBoxH: number(b?.height),
+        svgOpacity: number(Number(s?.opacity)),
+        svgVisible: Boolean(
+          image &&
+          !image.hidden &&
+          s.display !== 'none' &&
+          s.visibility !== 'hidden' &&
+          Number(s.opacity) > 0 &&
+          b.width > 0 &&
+          b.height > 0,
+        ),
+        canvasHidden: canvases.every((c) => c.hidden),
+        canvasDisplayNone: canvases.every((c) => getComputedStyle(c).display === 'none'),
+        canvasBoxWidth: number(box?.width ?? 0),
+        canvasCount: Math.min(2, canvases.length),
+        editionNodeCount: Math.min(4, document.querySelectorAll('.edition-label').length),
+        contextLost: canvas?.dataset.contextStatus === 'lost',
+        frames: number(Number(canvas?.dataset.frames ?? 0)),
+      };
+    });
+  } catch {}
+  fallbackProofs.push({ stage, errorKind, ...proof });
+  if (fallbackProofs.length > 8) fallbackProofs.shift();
+  return proof;
+}
+async function fallbackPaint(page, prefix = 'fallback') {
+  try {
+    stage = prefix + '-canvas-wait';
+    await recordFallback(page);
+    await page.waitForFunction(
+      (loss) =>
+        [...document.querySelectorAll('canvas.relic3d')].every(
+          (c) =>
+            c.hidden &&
+            getComputedStyle(c).display === 'none' &&
+            (!loss || c.dataset.contextStatus === 'lost'),
+        ),
+      prefix === 'loss',
+    );
+    stage = prefix + '-decode';
+    await recordFallback(page);
+    assert.ok(await decodedCrystal(page));
+    stage = prefix + '-paint';
+    await recordFallback(page);
+    await paintCommit(page);
+    const proof = await recordFallback(page);
+    assert.ok(
+      proof.svgVisible &&
+        proof.svgNaturalWidth > 0 &&
+        proof.svgNaturalHeight > 0 &&
+        proof.canvasHidden &&
+        proof.canvasDisplayNone &&
+        proof.canvasBoxWidth === 0 &&
+        proof.canvasCount <= 1,
+    );
+  } catch (error) {
+    await recordFallback(page, error);
+    throw error;
+  }
+}
+
+try {
+  await judges.listen();
+  const { chromium } = await import('playwright');
+  browser = await chromium.launch({
+    executablePath: '/snap/bin/chromium',
+    chromiumSandbox: true,
+    headless: true,
+  });
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 720 },
+    serviceWorkers: 'block',
+  });
+  await context.route('**/*', (r) =>
+    new URL(r.request().url()).origin === origin ? r.continue() : r.abort(),
+  );
+  // Fixture-only wall date, no production clock override or new API.
+  await context.addInitScript(() => {
+    const Native = Date;
+    class Fixed extends Native {
+      constructor(...args) {
+        super(...(args.length ? args : ['2026-10-26T12:00:00Z']));
+      }
+      static now() {
+        return Native.parse('2026-10-26T12:00:00Z');
+      }
+    }
+    window.Date = Fixed;
+  });
+  page = await context.newPage();
+  await page.goto(origin + '/atlas/');
+  await action(page, 'setup');
+  await action(page, 'send');
+  const overlay = await context.newPage();
+  await overlay.goto(origin + '/overlay/1591806023');
+  await overlay.bringToFront();
+  await overlay.waitForFunction(() => document.body.dataset.connection === 'connected');
+  await overlay.locator('canvas.relic3d').waitFor({ state: 'visible' });
+  await action(page, 'raid');
+  stage = 'actual-gpu-edition';
+  await overlay
+    .locator('canvas.relic3d[data-edition="twitchcon-2026"]')
+    .waitFor({ state: 'visible' });
+  await overlay.waitForFunction(
+    () => document.querySelector('canvas.relic3d').dataset.particlesVisible === 'true',
+  );
+  assert.equal(await overlay.locator('canvas.relic3d').count(), 1);
+  assert.equal(await overlay.locator('canvas.relic3d').getAttribute('data-core-count'), '1');
+  assert.equal(await overlay.locator('canvas.relic3d').getAttribute('data-facets'), '8');
+  assert.equal(await overlay.locator('canvas.relic3d').getAttribute('data-particles'), '64');
+  assert.ok(Number(await overlay.locator('canvas.relic3d').getAttribute('data-triangles')) < 20000);
+  assert.ok(await pixels(overlay));
+  assert.equal(await overlay.locator('.edition-label').isVisible(), true);
+  page = overlay;
+  await capture('edition-overlay.png');
+  stage = 'actual-claim-no-new-relic';
+  await action(page, 'offer');
+  await action(page, 'accept');
+  const score = await page.evaluate(async () => {
+    const r = await fetch('/api/scores');
+    return r.json();
+  });
+  assert.equal(score.rings, 1);
+  assert.ok(score.channels.some((r) => r.badges.includes('Carried during TwitchCon 2026 edition')));
+  checks.push({
+    name: 'SIMULATOR actual one-core eight-facet GPU/64 dust/transparent pixels; only actual signed fixture claim adds one ring/edition evidence',
+    passed: true,
+  });
+  stage = 'real-context-loss-fallback';
+  await page.locator('canvas.relic3d').evaluate((c) => {
+    const gl = c.getContext('webgl2'),
+      ext = gl.getExtension('WEBGL_lose_context');
+    if (!ext) throw Error('Context loss unavailable');
+    ext.loseContext();
+  });
+  await fallbackPaint(page, 'loss');
+  stage = 'reduced-svg-mobile';
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.locator('.crystal').waitFor({ state: 'visible' });
+  assert.equal(await page.locator('.archive').getAttribute('data-edition'), 'twitchcon-2026');
+  assert.equal(
+    await page.locator('.crystal').getAttribute('src'),
+    '/edition-crystal/twitchcon-2026.svg',
+  );
+  await fallbackPaint(page, 'mobile');
+  assert.equal(
+    await page.locator('canvas.relic3d').getAttribute('data-particles-visible'),
+    'false',
+  );
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+  await capture('edition-mobile.png');
+  await page.setViewportSize({ width: 160, height: 160 });
+  await page.goto(origin + '/overlay/1591806023?corner=1');
+  await page.locator('.crystal').waitFor({ state: 'visible' });
+  await fallbackPaint(page, 'corner');
+  assert.equal(
+    await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth <= 160 && document.documentElement.scrollHeight <= 160,
+    ),
+    true,
+  );
+  stage = 'atlas-demo-and-base-boundaries';
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto(origin + '/atlas/');
+  await page.locator('#atlas-relic[data-edition="twitchcon-2026"]').waitFor();
+  await page.locator('#atlas-relic').scrollIntoViewIfNeeded();
+  assert.equal(await page.locator('.edition-label').count(), 1);
+  assert.equal(await page.locator('.atlas-relic-figure .edition-label').count(), 1);
+  assert.match(
+    await page.locator('footer .edition-disclaimer').textContent(),
+    /Unofficial fan edition; not affiliated with or endorsed by Twitch\/TwitchCon/,
+  );
+  assert.equal(
+    await page.locator('.atlas-relic-figure .edition-label').evaluate((n) => {
+      const label = n.getBoundingClientRect(),
+        hero = document.querySelector('#atlas-relic').getBoundingClientRect();
+      return (
+        Math.abs((label.left + label.right) / 2 - (hero.left + hero.right) / 2) < 2 &&
+        label.top >= hero.bottom
+      );
+    }),
+    true,
+  );
+  const earned = page
+    .locator('.score-badge[data-badge="Carried during TwitchCon 2026 edition"]')
+    .first();
+  await earned.waitFor();
+  assert.equal(await earned.getAttribute('data-earned'), 'true');
+  assert.equal(await page.locator('.edition-disclaimer').count(), 1);
+  assert.match(
+    await page.locator('footer .edition-disclaimer').textContent(),
+    /Unofficial fan edition/,
+  );
+  const official = page
+    .locator('.score-badge[data-badge="Carried during TwitchCon San Diego 2026"]')
+    .first();
+  assert.equal(await official.getAttribute('data-earned'), 'false');
+  assert.match(await official.locator('summary').textContent(), /Event-days badge.*13–15 Nov/);
+  await capture('edition-atlas.png');
+  for (const width of [375, 390]) {
+    await page.setViewportSize({ width, height: 800 });
+    await paintCommit(page);
+    assert.equal(await page.locator('.edition-label').count(), 1);
+    assert.equal(
+      await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+      true,
+    );
+    assert.equal(
+      await page.locator('.atlas-relic-figure .edition-label').evaluate((n) => {
+        const b = n.getBoundingClientRect(),
+          hero = document.querySelector('#atlas-relic').getBoundingClientRect();
+        return (
+          b.left >= 0 &&
+          b.right <= innerWidth &&
+          b.top >= hero.bottom &&
+          Math.abs((b.left + b.right) / 2 - (hero.left + hero.right) / 2) < 2
+        );
+      }),
+      true,
+    );
+  }
+  const icon = await page.request.get(origin + '/favicon.ico');
+  assert.equal(icon.status(), 200);
+  assert.match(icon.headers()['content-type'], /image\/svg\+xml/);
+  await page.goto(origin + '/demo');
+  await page.locator('#demo-banner').waitFor();
+  assert.equal(await page.locator('#demo-art').getAttribute('data-edition'), 'twitchcon-2026');
+  assert.equal(await page.locator('#demo-rings').textContent(), 'Rings: 0');
+  const boundaries = await page.evaluate(async () => {
+    const { selectEdition } = await import('/editions.js');
+    return [
+      selectEdition(Date.parse('2026-10-22T23:59:59Z')),
+      selectEdition(Date.parse('2026-12-01T00:00:00Z')),
+    ];
+  });
+  assert.deepEqual(boundaries, [null, null]);
+  checks.push({
+    name: 'SIMULATOR reducedSVG390/corner160/Atlas/demo cosmetics; base at both configured boundaries without API writes',
+    passed: true,
+  });
+  await context.close();
+  stage = 'forced-no-webgl-decode';
+  const noGL = await browser.newContext({
+    viewport: { width: 390, height: 800 },
+    serviceWorkers: 'block',
+  });
+  await noGL.route('**/*', (r) =>
+    new URL(r.request().url()).origin === origin ? r.continue() : r.abort(),
+  );
+  await noGL.addInitScript(() => {
+    const get = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (type, ...args) {
+      return /^webgl/.test(type) ? null : get.call(this, type, ...args);
+    };
+    const Native = Date;
+    window.Date = class extends Native {
+      constructor(...args) {
+        super(...(args.length ? args : ['2026-10-26T12:00:00Z']));
+      }
+      static now() {
+        return Native.parse('2026-10-26T12:00:00Z');
+      }
+    };
+  });
+  const fallback = await noGL.newPage();
+  await fallback.goto(origin + '/overlay/1591806023');
+  await fallback.locator('.archive[data-edition="twitchcon-2026"]').waitFor();
+  await fallbackPaint(fallback, 'no-gl');
+  await noGL.close();
+  stage = 'rendered-base-before-after';
+  for (const instant of ['2026-10-22T23:59:59Z', '2026-12-01T00:00:00Z']) {
+    const base = await browser.newContext({
+      viewport: { width: 390, height: 800 },
+      reducedMotion: 'reduce',
+      serviceWorkers: 'block',
+    });
+    await base.route('**/*', (r) =>
+      new URL(r.request().url()).origin === origin ? r.continue() : r.abort(),
+    );
+    await base.addInitScript((instant) => {
+      const Native = Date;
+      window.Date = class extends Native {
+        constructor(...args) {
+          super(...(args.length ? args : [instant]));
+        }
+        static now() {
+          return Native.parse(instant);
+        }
+      };
+    }, instant);
+    const b = await base.newPage();
+    await b.goto(origin + '/demo');
+    assert.equal(await b.locator('#demo-art').getAttribute('data-edition'), 'base');
+    assert.equal(await b.locator('#demo-art .crystal').getAttribute('src'), '/crystal.svg');
+    await fallbackPaint(b, 'base');
+    assert.equal(await b.locator('.edition-label').count(), 0);
+    assert.equal(await b.locator('#demo-rings').textContent(), 'Rings: 0');
+    await base.close();
+  }
+  checks.push({
+    name: 'SIMULATOR rendered BASE SVG before start and at exclusive end, no edition label/history invented',
+    passed: true,
+  });
+} catch (error) {
+  failed = true;
+  if (!fallbackProofs.at(-1)?.errorKind) await recordFallback(page, error);
+} finally {
+  await browser?.close().catch(() => {});
+  await judges.close();
+  await mkdir('artifacts', { recursive: true });
+  for (const [n, b] of images) {
+    await writeFile('artifacts/' + n, b);
+    captures.push(n);
+  }
+  await writeFile(
+    'artifacts/editions-browser-results.json',
+    JSON.stringify(
+      {
+        simulator: true,
+        passed: !failed,
+        stage,
+        failureCategory: failed ? 'assertion-or-browser' : null,
+        checks,
+        captures,
+        fallbackProofs,
+      },
+      null,
+      2,
+    ),
+  );
+}
+if (failed) process.exitCode = 1;

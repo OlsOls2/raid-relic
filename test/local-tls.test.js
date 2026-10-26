@@ -13,6 +13,8 @@ test('local-only test TLS generates valid localhost material and deletes its own
     assert.equal(certificate.checkHost('localhost'), 'localhost');
     assert.equal(certificate.checkIP('127.0.0.1'), '127.0.0.1');
     assert.equal((await stat(fixture.directory)).mode & 0o777, 0o700);
-  } finally { await fixture.cleanup(); }
+  } finally {
+    await fixture.cleanup();
+  }
   await assert.rejects(stat(fixture.directory), { code: 'ENOENT' });
 });

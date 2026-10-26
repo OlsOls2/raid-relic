@@ -1,55 +1,511 @@
-import {downloadStopCard} from './ring-card-client.js';
+import { downloadStopCard } from './ring-card-client.js';
 import { editionImageURL } from './editions.js';
 import { presentEdition } from './edition-view.js';
 // One bounded fetch, local historical playback. No provider or live-state authority.
-const exact=(v,keys)=>v&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).sort().join(',')===keys.split(',').sort().join(',');
-const id=v=>typeof v==='string'&&/^\d{1,32}$/.test(v), stop=v=>typeof v==='string'&&/^[a-f0-9]{64}$/.test(v);
-export function validJourney(v){
- if(!exact(v,'version,coverage,nodes,hops,mode')||v.version!==1||!['live','simulator'].includes(v.mode)||typeof v.coverage!=='string'||v.coverage.length>160||!Array.isArray(v.nodes)||v.nodes.length>4||!Array.isArray(v.hops)||v.hops.length>16)return false;
- const ids=new Set();for(const n of v.nodes){if(!exact(n,'id,label')||!id(n.id)||ids.has(n.id)||typeof n.label!=='string'||!(/^@[a-z0-9_]{1,25}$/.test(n.label)||n.label===`Channel ${n.id}`))return false;ids.add(n.id);}
- const seen=new Set();let at=-1;for(let i=0;i<v.hops.length;i++){const h=v.hops[i];if(!exact(Object.fromEntries(Object.entries(h).filter(([k])=>!['streakCount','streakSince'].includes(k))),'stopId,from,to,claimedAt,ringIndex,raidSize')||((h.streakCount!==undefined||h.streakSince!==undefined)&&(!Number.isInteger(h.streakCount)||h.streakCount<1||h.streakCount>Math.min(16,h.ringIndex)||!Number.isSafeInteger(h.streakSince)||h.streakSince<0||h.streakSince>h.claimedAt))||!stop(h.stopId)||seen.has(h.stopId)||!ids.has(h.from)||!ids.has(h.to)||h.from===h.to||h.ringIndex!==i+1||!Number.isSafeInteger(h.claimedAt)||h.claimedAt<0||h.claimedAt<at||!Number.isInteger(h.raidSize)||h.raidSize<0||h.raidSize>1000000||(i&&v.hops[i-1].to!==h.from))return false;seen.add(h.stopId);at=h.claimedAt;}return true;
+const exact = (v, keys) =>
+  v &&
+  typeof v === 'object' &&
+  !Array.isArray(v) &&
+  Object.keys(v).sort().join(',') === keys.split(',').sort().join(',');
+const id = (v) => typeof v === 'string' && /^\d{1,32}$/.test(v),
+  stop = (v) => typeof v === 'string' && /^[a-f0-9]{64}$/.test(v);
+export function validJourney(v) {
+  if (
+    !exact(v, 'version,coverage,nodes,hops,mode') ||
+    v.version !== 1 ||
+    !['live', 'simulator'].includes(v.mode) ||
+    typeof v.coverage !== 'string' ||
+    v.coverage.length > 160 ||
+    !Array.isArray(v.nodes) ||
+    v.nodes.length > 4 ||
+    !Array.isArray(v.hops) ||
+    v.hops.length > 16
+  )
+    return false;
+  const ids = new Set();
+  for (const n of v.nodes) {
+    if (
+      !exact(n, 'id,label') ||
+      !id(n.id) ||
+      ids.has(n.id) ||
+      typeof n.label !== 'string' ||
+      !(/^@[a-z0-9_]{1,25}$/.test(n.label) || n.label === `Channel ${n.id}`)
+    )
+      return false;
+    ids.add(n.id);
+  }
+  const seen = new Set();
+  let at = -1;
+  for (let i = 0; i < v.hops.length; i++) {
+    const h = v.hops[i];
+    if (
+      !exact(
+        Object.fromEntries(
+          Object.entries(h).filter(([k]) => !['streakCount', 'streakSince'].includes(k)),
+        ),
+        'stopId,from,to,claimedAt,ringIndex,raidSize',
+      ) ||
+      ((h.streakCount !== undefined || h.streakSince !== undefined) &&
+        (!Number.isInteger(h.streakCount) ||
+          h.streakCount < 1 ||
+          h.streakCount > Math.min(16, h.ringIndex) ||
+          !Number.isSafeInteger(h.streakSince) ||
+          h.streakSince < 0 ||
+          h.streakSince > h.claimedAt)) ||
+      !stop(h.stopId) ||
+      seen.has(h.stopId) ||
+      !ids.has(h.from) ||
+      !ids.has(h.to) ||
+      h.from === h.to ||
+      h.ringIndex !== i + 1 ||
+      !Number.isSafeInteger(h.claimedAt) ||
+      h.claimedAt < 0 ||
+      h.claimedAt < at ||
+      !Number.isInteger(h.raidSize) ||
+      h.raidSize < 0 ||
+      h.raidSize > 1000000 ||
+      (i && v.hops[i - 1].to !== h.from)
+    )
+      return false;
+    seen.add(h.stopId);
+    at = h.claimedAt;
+  }
+  return true;
 }
-export function selection(search,embed=false){const p=new URLSearchParams(search);if([...p].some(([k,v])=>p.getAll(k).length!==1||(k==='t'?!stop(v):!(embed&&k==='play'&&v==='1'))))throw Error('selection');return{stopId:p.get('t'),play:p.get('play')==='1'};}
-export const raiderCount=n=>`${n} ${n===1?'raider':'raiders'}`;
-export const raidWidth=n=>Math.min(8,Math.max(2,2+6*Math.log1p(n)/Math.log1p(1000000)));
-export function nodePosition(index,count,width=900,height=440){if(count===2)return{x:width*(index===0?.2:.8),y:height*(index===0?.30:.64)};const a=-Math.PI/2+2*Math.PI*index/Math.max(1,count);return{x:width/2+width*.30*Math.cos(a),y:height*.44+height*.27*Math.sin(a)};}
-export function curve(a,b,index){const dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1,offset=24+index*10;return{a,b,c:{x:(a.x+b.x)/2-dy/len*offset,y:(a.y+b.y)/2+dx/len*offset}};}
-export function curvePoint({a,b,c},t){return{x:(1-t)**2*a.x+2*(1-t)*t*c.x+t*t*b.x,y:(1-t)**2*a.y+2*(1-t)*t*c.y+t*t*b.y};}
-const NS='http://www.w3.org/2000/svg';
-const svg=(tag,attrs={})=>{const n=document.createElementNS(NS,tag);for(const[k,v]of Object.entries(attrs))n.setAttribute(k,String(v));return n;};
-if(typeof document!=='undefined'&&document.querySelector('#journey-map')){
- const root=document.querySelector('#journey-map'),stage=document.querySelector('#map-svg'),status=document.querySelector('#map-status'),range=document.querySelector('#map-range'),caption=document.querySelector('#map-caption'),list=document.querySelector('#map-stops'),play=document.querySelector('#map-play'),restart=document.querySelector('#map-restart'),refresh=document.querySelector('#map-refresh'),share=document.querySelector('#map-share');
- const embed=document.body.classList.contains('journey-embed'),motion=matchMedia('(prefers-reduced-motion: reduce)');let data=null,geometry=[],paths=[],comet=null,mini=null,bands=null,controller=null,generation=0,raf=0,playing=false,last=0,lastDraw=0,value=0,layoutWidth=0,layoutHeight=440;
- function pause(){playing=false;cancelAnimationFrame(raf);raf=0;play.textContent='Replay journey';root.dataset.playing='false';last=0;}
- function clear(){pause();data=null;geometry=[];paths=[];stage.replaceChildren();list.replaceChildren();caption.textContent='No recorded stops';for(const n of[play,restart,range,share])n.disabled=true;range.value=0;root.dataset.rings='0';}
- function writeURL(push=false){if(!data)return;const h=data.hops[Math.ceil(value)-1];const u=new URL(location.pathname,location.origin);if(h)u.searchParams.set('t',h.stopId);history[push?'pushState':'replaceState'](null,'',u);}
- function draw(v){if(!data)return;const edition=presentEdition(root,Date.now(),{label:embed});const image=mini?.querySelector('image');if(image&&root.dataset.miniEdition!==(edition?.id??'base')){root.dataset.miniEdition=edition?.id??'base';image.setAttribute('href',editionImageURL(edition)??'/crystal.svg');}value=Math.max(0,Math.min(data.hops.length,Number(v)||0));range.value=String(value);const reached=Math.floor(value+1e-8),i=Math.min(data.hops.length-1,Math.max(0,Math.ceil(value)-1)),t=value===0?0:value-i,h=data.hops[i];
-  paths.forEach((p,j)=>{p.classList.toggle('map-selected',j===i);p.setAttribute('aria-current',j===i?'step':'false');});
-  bands.replaceChildren();for(let r=0;r<reached;r++)bands.append(svg('ellipse',{cx:0,cy:(r%4-1.5)*4,rx:19+Math.floor(r/4)*3,ry:7+Math.floor(r/4)*2,class:'map-growth-band'}));
-  root.dataset.rings=String(reached);if(h){const p=curvePoint(geometry[i],t),tail=curvePoint(geometry[i],Math.max(0,t-.12));comet.setAttribute('transform',`translate(${p.x} ${p.y})`);comet.dataset.x=String(p.x);comet.dataset.y=String(p.y);comet.hidden=false;comet.setAttribute('visibility','visible');const trail=stage.querySelector('.map-comet-tail');trail.setAttribute('d',`M${tail.x},${tail.y} Q${(tail.x+p.x)/2},${(tail.y+p.y)/2} ${p.x},${p.y}`);mini.setAttribute('transform',`translate(${layoutWidth/2} ${layoutHeight-48})`);caption.textContent=value===0?'Origin — before first recorded completion':`${reached} recorded ${reached===1?'ring':'rings'} · ${data.nodes.find(n=>n.id===h.from).label} to ${data.nodes.find(n=>n.id===h.to).label} · ${raiderCount(h.raidSize)} · ${new Date(h.claimedAt).toLocaleString()}`;}else caption.textContent='No completed journeys yet. No route has been invented.';
-  range.setAttribute('aria-valuetext',caption.textContent);share.disabled=!h||value===0;
- }
- function frame(time){raf=0;if(!playing||document.hidden||motion.matches||!data)return;if(!last)last=time;if(time-lastDraw>=1000/30){const delta=Math.min(100,time-last);last=time;draw(value+delta/2200);lastDraw=time;}if(value>=data.hops.length){pause();return;}raf=requestAnimationFrame(frame);}
- function start(){if(!data?.hops.length||motion.matches||document.hidden)return;if(value>=data.hops.length)draw(0);playing=true;root.dataset.playing='true';play.textContent='Pause replay';last=0;raf=requestAnimationFrame(frame);}
- function build(relist=true){layoutWidth=Math.max(260,Math.round(stage.getBoundingClientRect().width));layoutHeight=layoutWidth<600?360:440;stage.setAttribute('viewBox',`0 0 ${layoutWidth} ${layoutHeight}`);stage.style.height=`${layoutHeight}px`;stage.replaceChildren();paths=[];if(relist)list.replaceChildren();const positions=new Map(data.nodes.map((n,i)=>[n.id,nodePosition(i,data.nodes.length,layoutWidth,layoutHeight)]));geometry=data.hops.map((h,i)=>curve(positions.get(h.from),positions.get(h.to),i));
-  for(let i=0;i<geometry.length;i++){const {a,b,c}=geometry[i],h=data.hops[i],path=svg('path',{d:`M${a.x},${a.y} Q${c.x},${c.y} ${b.x},${b.y}`,'stroke-width':raidWidth(h.raidSize),class:'map-hop',tabindex:'0',role:'button','aria-label':`Stop ${i+1}: ${data.nodes.find(n=>n.id===h.from).label} to ${data.nodes.find(n=>n.id===h.to).label}, ${raiderCount(h.raidSize)}`});const select=()=>{pause();draw(i+1);writeURL(true);};path.addEventListener('click',select);path.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select();}});const hit=svg('path',{d:path.getAttribute('d'),class:'map-hit','aria-hidden':'true'});hit.addEventListener('click',select);stage.append(hit,path);paths.push(path);
-   if(relist){const li=document.createElement('li'),button=document.createElement('button');button.className='map-stop-select';button.textContent=`${data.nodes.find(n=>n.id===h.from).label} → ${data.nodes.find(n=>n.id===h.to).label} · ${raiderCount(h.raidSize)}${h.streakCount===undefined?(data.hops.some(n=>n.streakCount!==undefined)?' · streak not tracked':''):` · streak ${h.streakCount}`}`;button.addEventListener('click',select);li.append(button);if(!embed){const download=document.createElement('button');download.type='button';download.textContent='Download ring card · Stop '+h.ringIndex;download.setAttribute('aria-label','Download ring card Stop '+h.ringIndex);const own=data;download.onclick=async()=>{if(download.disabled)return;download.disabled=true;status.textContent='Preparing fresh recorded ring card…';try{await downloadStopCard(h,own.nodes.find(n=>n.id===h.to).label,{signal:controller?.signal,current:()=>data===own});if(data===own)status.textContent='Ring card downloaded. Saved downloads cannot be recalled after erasure.';}catch{if(data===own)status.textContent='Ring card unavailable; refresh the retained journey and try again.';}finally{if(data===own)download.disabled=false;}};li.append(download);}list.append(li);}}
-  for(const n of data.nodes){const p=positions.get(n.id),g=svg('g'),dot=svg('circle',{cx:p.x,cy:p.y,r:12,class:'map-node'}),text=svg('text',{x:p.x,y:p.y+36,'text-anchor':'middle',class:'map-node-label'});text.textContent=n.label;text.style.fontSize=layoutWidth<600?'16px':'20px';if(n.label.length>16){text.setAttribute('textLength',String(Math.min(240,layoutWidth*.36)));text.setAttribute('lengthAdjust','spacingAndGlyphs');}g.append(dot,text);stage.append(g);}
-  stage.append(svg('path',{class:'map-comet-tail'}));comet=svg('g',{class:'map-comet'});comet.append(svg('circle',{r:9}),svg('circle',{r:4,class:'map-comet-core'}));stage.append(comet);
-  root.dataset.miniEdition='';mini=svg('g',{class:'map-mini'});mini.append(svg('image',{href:'/crystal.svg',x:-22,y:-32,width:44,height:64,class:'map-mini-crystal'}));bands=svg('g',{class:'map-bands'});mini.append(bands);stage.append(mini);
-  if(!data.hops.length){comet.setAttribute('visibility','hidden');mini.setAttribute('visibility','hidden');stage.querySelector('.map-comet-tail').setAttribute('visibility','hidden');}
-  range.max=String(data.hops.length);for(const n of[play,restart,range])n.disabled=!data.hops.length;
- }
- async function load(){const epoch=++generation;controller?.abort();controller=new AbortController();const own=controller;clear();status.textContent='';refresh.disabled=true;root.setAttribute('aria-busy','true');let timeout;const deadline=new Promise((_,reject)=>{timeout=setTimeout(()=>{own.abort();reject(Error('deadline'));},8000);});
-  try{const chosen=selection(location.search,embed),response=await Promise.race([fetch('/api/journey-map',{signal:own.signal,cache:'no-store',credentials:'omit'}),deadline]);if(!response.ok)throw Error();const raw=await Promise.race([response.text(),deadline]);if(raw.length>32768)throw Error();const v=JSON.parse(raw);if(!validJourney(v))throw Error();if(epoch!==generation)return;data=v;
-   if(v.mode==='simulator'){document.title='SIMULATOR · Recorded journey replay';let label=document.querySelector('#map-simulator')??document.querySelector('#simulator');if(!label){label=document.createElement('aside');label.id='map-simulator';document.body.prepend(label);}label.hidden=false;label.textContent='SIMULATOR · recorded test journey';}
-   build();const index=v.hops.findIndex(h=>h.stopId===chosen.stopId);draw(index<0?0:index+1);status.textContent=chosen.stopId&&index<0?'Stop not available.':v.hops.length?'Retained recorded journeys only.':'No completed journeys yet. No route has been invented.';if(chosen.play&&!chosen.stopId)start();
-  }catch{if(epoch===generation){clear();status.textContent='Journey unavailable or invalid selection. Previous route cleared; refresh to try again.';}}
-  finally{clearTimeout(timeout);if(epoch===generation){refresh.disabled=false;root.setAttribute('aria-busy','false');}}
- }
- play.addEventListener('click',()=>playing?pause():start());restart.addEventListener('click',()=>{pause();draw(0);writeURL();});range.addEventListener('input',()=>{pause();draw(range.value);writeURL();});range.addEventListener('change',()=>writeURL());refresh.addEventListener('click',load);
- share.addEventListener('click',async()=>{const h=data?.hops[Math.ceil(value)-1];if(!h)return;const u=new URL('/atlas/',location.origin);u.searchParams.set('t',h.stopId);try{await navigator.clipboard.writeText(u.href);status.textContent='Public recorded stop link copied.';}catch{status.textContent='Copy unavailable. The address bar contains the selected public stop.';}});
- addEventListener('popstate',()=>{pause();try{const chosen=selection(location.search,embed),i=data?.hops.findIndex(h=>h.stopId===chosen.stopId)??-1;draw(i<0?0:i+1);status.textContent=chosen.stopId&&i<0?'Stop not available.':'';}catch{clear();status.textContent='Invalid stop selection.';}});
- const resize=new ResizeObserver(()=>{if(data&&Math.abs(stage.getBoundingClientRect().width-layoutWidth)>1){build(false);draw(value);}});resize.observe(stage);
- document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();});motion.addEventListener?.('change',()=>{if(motion.matches)pause();});addEventListener('pagehide',()=>{generation++;controller?.abort();resize.disconnect();clear();});addEventListener('pageshow',e=>{if(e.persisted){resize.observe(stage);load();}});load();
+export function selection(search, embed = false) {
+  const p = new URLSearchParams(search);
+  if (
+    [...p].some(
+      ([k, v]) =>
+        p.getAll(k).length !== 1 || (k === 't' ? !stop(v) : !(embed && k === 'play' && v === '1')),
+    )
+  )
+    throw Error('selection');
+  return { stopId: p.get('t'), play: p.get('play') === '1' };
+}
+export const raiderCount = (n) => `${n} ${n === 1 ? 'raider' : 'raiders'}`;
+export const raidWidth = (n) =>
+  Math.min(8, Math.max(2, 2 + (6 * Math.log1p(n)) / Math.log1p(1000000)));
+export function nodePosition(index, count, width = 900, height = 440) {
+  if (count === 2)
+    return { x: width * (index === 0 ? 0.2 : 0.8), y: height * (index === 0 ? 0.3 : 0.64) };
+  const a = -Math.PI / 2 + (2 * Math.PI * index) / Math.max(1, count);
+  return {
+    x: width / 2 + width * 0.3 * Math.cos(a),
+    y: height * 0.44 + height * 0.27 * Math.sin(a),
+  };
+}
+export function curve(a, b, index) {
+  const dx = b.x - a.x,
+    dy = b.y - a.y,
+    len = Math.hypot(dx, dy) || 1,
+    offset = 24 + index * 10;
+  return {
+    a,
+    b,
+    c: { x: (a.x + b.x) / 2 - (dy / len) * offset, y: (a.y + b.y) / 2 + (dx / len) * offset },
+  };
+}
+export function curvePoint({ a, b, c }, t) {
+  return {
+    x: (1 - t) ** 2 * a.x + 2 * (1 - t) * t * c.x + t * t * b.x,
+    y: (1 - t) ** 2 * a.y + 2 * (1 - t) * t * c.y + t * t * b.y,
+  };
+}
+const NS = 'http://www.w3.org/2000/svg';
+const svg = (tag, attrs = {}) => {
+  const n = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, String(v));
+  return n;
+};
+if (typeof document !== 'undefined' && document.querySelector('#journey-map')) {
+  const root = document.querySelector('#journey-map'),
+    stage = document.querySelector('#map-svg'),
+    status = document.querySelector('#map-status'),
+    range = document.querySelector('#map-range'),
+    caption = document.querySelector('#map-caption'),
+    list = document.querySelector('#map-stops'),
+    play = document.querySelector('#map-play'),
+    restart = document.querySelector('#map-restart'),
+    refresh = document.querySelector('#map-refresh'),
+    share = document.querySelector('#map-share');
+  const embed = document.body.classList.contains('journey-embed'),
+    motion = matchMedia('(prefers-reduced-motion: reduce)');
+  let data = null,
+    geometry = [],
+    paths = [],
+    comet = null,
+    mini = null,
+    bands = null,
+    controller = null,
+    generation = 0,
+    raf = 0,
+    playing = false,
+    last = 0,
+    lastDraw = 0,
+    value = 0,
+    layoutWidth = 0,
+    layoutHeight = 440;
+  function pause() {
+    playing = false;
+    cancelAnimationFrame(raf);
+    raf = 0;
+    play.textContent = 'Replay journey';
+    root.dataset.playing = 'false';
+    last = 0;
+  }
+  function clear() {
+    pause();
+    data = null;
+    geometry = [];
+    paths = [];
+    stage.replaceChildren();
+    list.replaceChildren();
+    caption.textContent = 'No recorded stops';
+    for (const n of [play, restart, range, share]) n.disabled = true;
+    range.value = 0;
+    root.dataset.rings = '0';
+  }
+  function writeURL(push = false) {
+    if (!data) return;
+    const h = data.hops[Math.ceil(value) - 1];
+    const u = new URL(location.pathname, location.origin);
+    if (h) u.searchParams.set('t', h.stopId);
+    history[push ? 'pushState' : 'replaceState'](null, '', u);
+  }
+  function draw(v) {
+    if (!data) return;
+    const edition = presentEdition(root, Date.now(), { label: embed });
+    const image = mini?.querySelector('image');
+    if (image && root.dataset.miniEdition !== (edition?.id ?? 'base')) {
+      root.dataset.miniEdition = edition?.id ?? 'base';
+      image.setAttribute('href', editionImageURL(edition) ?? '/crystal.svg');
+    }
+    value = Math.max(0, Math.min(data.hops.length, Number(v) || 0));
+    range.value = String(value);
+    const reached = Math.floor(value + 1e-8),
+      i = Math.min(data.hops.length - 1, Math.max(0, Math.ceil(value) - 1)),
+      t = value === 0 ? 0 : value - i,
+      h = data.hops[i];
+    paths.forEach((p, j) => {
+      p.classList.toggle('map-selected', j === i);
+      p.setAttribute('aria-current', j === i ? 'step' : 'false');
+    });
+    bands.replaceChildren();
+    for (let r = 0; r < reached; r++)
+      bands.append(
+        svg('ellipse', {
+          cx: 0,
+          cy: ((r % 4) - 1.5) * 4,
+          rx: 19 + Math.floor(r / 4) * 3,
+          ry: 7 + Math.floor(r / 4) * 2,
+          class: 'map-growth-band',
+        }),
+      );
+    root.dataset.rings = String(reached);
+    if (h) {
+      const p = curvePoint(geometry[i], t),
+        tail = curvePoint(geometry[i], Math.max(0, t - 0.12));
+      comet.setAttribute('transform', `translate(${p.x} ${p.y})`);
+      comet.dataset.x = String(p.x);
+      comet.dataset.y = String(p.y);
+      comet.hidden = false;
+      comet.setAttribute('visibility', 'visible');
+      const trail = stage.querySelector('.map-comet-tail');
+      trail.setAttribute(
+        'd',
+        `M${tail.x},${tail.y} Q${(tail.x + p.x) / 2},${(tail.y + p.y) / 2} ${p.x},${p.y}`,
+      );
+      mini.setAttribute('transform', `translate(${layoutWidth / 2} ${layoutHeight - 48})`);
+      caption.textContent =
+        value === 0
+          ? 'Origin — before first recorded completion'
+          : `${reached} recorded ${reached === 1 ? 'ring' : 'rings'} · ${data.nodes.find((n) => n.id === h.from).label} to ${data.nodes.find((n) => n.id === h.to).label} · ${raiderCount(h.raidSize)} · ${new Date(h.claimedAt).toLocaleString('en-GB', { timeZone: 'UTC', dateStyle: 'medium', timeStyle: 'short' }) + ' UTC'}`;
+    } else caption.textContent = 'No completed journeys yet. No route has been invented.';
+    range.setAttribute('aria-valuetext', caption.textContent);
+    share.disabled = !h || value === 0;
+  }
+  function frame(time) {
+    raf = 0;
+    if (!playing || document.hidden || motion.matches || !data) return;
+    if (!last) last = time;
+    if (time - lastDraw >= 1000 / 30) {
+      const delta = Math.min(100, time - last);
+      last = time;
+      draw(value + delta / 2200);
+      lastDraw = time;
+    }
+    if (value >= data.hops.length) {
+      pause();
+      return;
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  function start() {
+    if (!data?.hops.length || motion.matches || document.hidden) return;
+    if (value >= data.hops.length) draw(0);
+    playing = true;
+    root.dataset.playing = 'true';
+    play.textContent = 'Pause replay';
+    last = 0;
+    raf = requestAnimationFrame(frame);
+  }
+  function build(relist = true) {
+    layoutWidth = Math.max(260, Math.round(stage.getBoundingClientRect().width));
+    layoutHeight = layoutWidth < 600 ? 360 : 440;
+    stage.setAttribute('viewBox', `0 0 ${layoutWidth} ${layoutHeight}`);
+    stage.style.height = `${layoutHeight}px`;
+    stage.replaceChildren();
+    paths = [];
+    if (relist) list.replaceChildren();
+    const positions = new Map(
+      data.nodes.map((n, i) => [
+        n.id,
+        nodePosition(i, data.nodes.length, layoutWidth, layoutHeight),
+      ]),
+    );
+    geometry = data.hops.map((h, i) => curve(positions.get(h.from), positions.get(h.to), i));
+    for (let i = 0; i < geometry.length; i++) {
+      const { a, b, c } = geometry[i],
+        h = data.hops[i],
+        path = svg('path', {
+          d: `M${a.x},${a.y} Q${c.x},${c.y} ${b.x},${b.y}`,
+          'stroke-width': raidWidth(h.raidSize),
+          class: 'map-hop',
+          tabindex: '0',
+          role: 'button',
+          'aria-label': `Stop ${i + 1}: ${data.nodes.find((n) => n.id === h.from).label} to ${data.nodes.find((n) => n.id === h.to).label}, ${raiderCount(h.raidSize)}`,
+        });
+      const select = () => {
+        pause();
+        draw(i + 1);
+        writeURL(true);
+      };
+      path.addEventListener('click', select);
+      path.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          select();
+        }
+      });
+      const hit = svg('path', {
+        d: path.getAttribute('d'),
+        class: 'map-hit',
+        'aria-hidden': 'true',
+      });
+      hit.addEventListener('click', select);
+      stage.append(hit, path);
+      paths.push(path);
+      if (relist) {
+        const li = document.createElement('li'),
+          button = document.createElement('button');
+        button.className = 'map-stop-select';
+        button.textContent = `${data.nodes.find((n) => n.id === h.from).label} → ${data.nodes.find((n) => n.id === h.to).label} · ${raiderCount(h.raidSize)}${h.streakCount === undefined ? (data.hops.some((n) => n.streakCount !== undefined) ? ' · streak not tracked' : '') : ` · streak ${h.streakCount}`}`;
+        button.addEventListener('click', select);
+        li.append(button);
+        if (!embed) {
+          const download = document.createElement('button');
+          download.type = 'button';
+          download.textContent = 'Download ring card · Stop ' + h.ringIndex;
+          download.setAttribute('aria-label', 'Download ring card Stop ' + h.ringIndex);
+          const own = data;
+          download.onclick = async () => {
+            if (download.disabled) return;
+            download.disabled = true;
+            status.textContent = 'Preparing fresh recorded ring card…';
+            try {
+              await downloadStopCard(h, own.nodes.find((n) => n.id === h.to).label, {
+                signal: controller?.signal,
+                current: () => data === own,
+              });
+              if (data === own)
+                status.textContent =
+                  'Ring card downloaded. Saved downloads cannot be recalled after erasure.';
+            } catch {
+              if (data === own)
+                status.textContent =
+                  'Ring card unavailable; refresh the retained journey and try again.';
+            } finally {
+              if (data === own) download.disabled = false;
+            }
+          };
+          li.append(download);
+        }
+        list.append(li);
+      }
+    }
+    for (const n of data.nodes) {
+      const p = positions.get(n.id),
+        g = svg('g'),
+        dot = svg('circle', { cx: p.x, cy: p.y, r: 12, class: 'map-node' }),
+        text = svg('text', {
+          x: p.x,
+          y: p.y + 36,
+          'text-anchor': 'middle',
+          class: 'map-node-label',
+        });
+      text.textContent = n.label;
+      text.style.fontSize = layoutWidth < 600 ? '16px' : '20px';
+      if (n.label.length > 16) {
+        text.setAttribute('textLength', String(Math.min(240, layoutWidth * 0.36)));
+        text.setAttribute('lengthAdjust', 'spacingAndGlyphs');
+      }
+      g.append(dot, text);
+      stage.append(g);
+    }
+    stage.append(svg('path', { class: 'map-comet-tail' }));
+    comet = svg('g', { class: 'map-comet' });
+    comet.append(svg('circle', { r: 9 }), svg('circle', { r: 4, class: 'map-comet-core' }));
+    stage.append(comet);
+    root.dataset.miniEdition = '';
+    mini = svg('g', { class: 'map-mini' });
+    mini.append(
+      svg('image', {
+        href: '/crystal.svg',
+        x: -22,
+        y: -32,
+        width: 44,
+        height: 64,
+        class: 'map-mini-crystal',
+      }),
+    );
+    bands = svg('g', { class: 'map-bands' });
+    mini.append(bands);
+    stage.append(mini);
+    if (!data.hops.length) {
+      comet.setAttribute('visibility', 'hidden');
+      mini.setAttribute('visibility', 'hidden');
+      stage.querySelector('.map-comet-tail').setAttribute('visibility', 'hidden');
+    }
+    range.max = String(data.hops.length);
+    for (const n of [play, restart, range]) n.disabled = !data.hops.length;
+  }
+  async function load() {
+    const epoch = ++generation;
+    controller?.abort();
+    controller = new AbortController();
+    const own = controller;
+    clear();
+    status.textContent = '';
+    refresh.disabled = true;
+    root.setAttribute('aria-busy', 'true');
+    let timeout;
+    const deadline = new Promise((_, reject) => {
+      timeout = setTimeout(() => {
+        own.abort();
+        reject(Error('deadline'));
+      }, 8000);
+    });
+    try {
+      const chosen = selection(location.search, embed),
+        response = await Promise.race([
+          fetch('/api/journey-map', { signal: own.signal, cache: 'no-store', credentials: 'omit' }),
+          deadline,
+        ]);
+      if (!response.ok) throw Error();
+      const raw = await Promise.race([response.text(), deadline]);
+      if (raw.length > 32768) throw Error();
+      const v = JSON.parse(raw);
+      if (!validJourney(v)) throw Error();
+      if (epoch !== generation) return;
+      data = v;
+      if (v.mode === 'simulator') {
+        document.title = 'SIMULATOR · Recorded journey replay';
+        let label =
+          document.querySelector('#map-simulator') ?? document.querySelector('#simulator');
+        if (!label) {
+          label = document.createElement('aside');
+          label.id = 'map-simulator';
+          document.body.prepend(label);
+        }
+        label.hidden = false;
+        label.textContent = 'SIMULATOR · recorded test journey';
+      }
+      build();
+      const index = v.hops.findIndex((h) => h.stopId === chosen.stopId);
+      draw(index < 0 ? 0 : index + 1);
+      status.textContent =
+        chosen.stopId && index < 0
+          ? 'Stop not available.'
+          : v.hops.length
+            ? 'Retained recorded journeys only.'
+            : 'No completed journeys yet. No route has been invented.';
+      if (chosen.play && !chosen.stopId) start();
+    } catch {
+      if (epoch === generation) {
+        clear();
+        status.textContent =
+          'Journey unavailable or invalid selection. Previous route cleared; refresh to try again.';
+      }
+    } finally {
+      clearTimeout(timeout);
+      if (epoch === generation) {
+        refresh.disabled = false;
+        root.setAttribute('aria-busy', 'false');
+      }
+    }
+  }
+  play.addEventListener('click', () => (playing ? pause() : start()));
+  restart.addEventListener('click', () => {
+    pause();
+    draw(0);
+    writeURL();
+  });
+  range.addEventListener('input', () => {
+    pause();
+    draw(range.value);
+    writeURL();
+  });
+  range.addEventListener('change', () => writeURL());
+  refresh.addEventListener('click', load);
+  share.addEventListener('click', async () => {
+    const h = data?.hops[Math.ceil(value) - 1];
+    if (!h) return;
+    const u = new URL('/atlas/', location.origin);
+    u.searchParams.set('t', h.stopId);
+    try {
+      await navigator.clipboard.writeText(u.href);
+      status.textContent = 'Public recorded stop link copied.';
+    } catch {
+      status.textContent = 'Copy unavailable. The address bar contains the selected public stop.';
+    }
+  });
+  addEventListener('popstate', () => {
+    pause();
+    try {
+      const chosen = selection(location.search, embed),
+        i = data?.hops.findIndex((h) => h.stopId === chosen.stopId) ?? -1;
+      draw(i < 0 ? 0 : i + 1);
+      status.textContent = chosen.stopId && i < 0 ? 'Stop not available.' : '';
+    } catch {
+      clear();
+      status.textContent = 'Invalid stop selection.';
+    }
+  });
+  const resize = new ResizeObserver(() => {
+    if (data && Math.abs(stage.getBoundingClientRect().width - layoutWidth) > 1) {
+      build(false);
+      draw(value);
+    }
+  });
+  resize.observe(stage);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) pause();
+  });
+  motion.addEventListener?.('change', () => {
+    if (motion.matches) pause();
+  });
+  addEventListener('pagehide', () => {
+    generation++;
+    controller?.abort();
+    resize.disconnect();
+    clear();
+  });
+  addEventListener('pageshow', (e) => {
+    if (e.persisted) {
+      resize.observe(stage);
+      load();
+    }
+  });
+  load();
 }

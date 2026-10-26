@@ -1,1 +1,48 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Raid Relic · Private owner Forge</title><link rel="stylesheet" href="/forge.css"><script type="module" src="/forge-owner.js"></script><link rel="icon" type="image/svg+xml" href="/favicon.svg"></head><body><main><a href="/forge">Public template preview</a><p id="simulator" hidden>SIMULATOR · MOCK PROVIDER ONLY</p><h1>Private owner Forge</h1><p>This optional provider action is off by default. It can incur charges with gpt-4.1-mini. Separate prior owner approval, both Chronicle cost gates and a secret key binding are required. Your submitted description would be sent to input moderation and the model; do not include personal data. No chat, marks, account IDs or tokens are sent. Output is schema-validated and moderated.</p><p>Only one persisted attempt for your latest completed received stop. Timeout/crash/error consumes it; no automatic retry. A preview never changes the live relic, handshake, holder or ring count.</p><form id="owner-form" autocomplete="off"><label for="description">Description (up to240 Unicode characters)</label><textarea id="description" rows="3" maxlength="480" disabled></textarea><label><input id="acknowledge" type="checkbox" disabled> I have separate owner approval and acknowledge provider upload and possible charges.</label><button id="generate" disabled>Request one paid Forge attempt</button></form><p id="status" role="status" aria-live="polite">Reading private feature status…</p><img id="preview-image" width="480" height="420" alt="Private Forge configuration preview, not applied" hidden><pre id="design-json" tabindex="0"></pre><button id="download" disabled>Download design JSON</button></main></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Raid Relic · Private owner Forge</title>
+    <link rel="stylesheet" href="/forge.css" />
+    <script type="module" src="/forge-owner.js"></script>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <main>
+      <a href="/forge">Public template preview</a>
+      <p id="simulator" hidden>SIMULATOR · MOCK PROVIDER ONLY</p>
+      <h1>Private owner Forge</h1>
+      <p>
+        This optional provider action is off by default. It can incur charges with gpt-4.1-mini.
+        Separate prior owner approval, both Chronicle cost gates and a secret key binding are
+        required. Your submitted description would be sent to input moderation and the model; do not
+        include personal data. No chat, marks, account IDs or tokens are sent. Output is
+        schema-validated and moderated.
+      </p>
+      <p>
+        Only one persisted attempt for your latest completed received stop. Timeout/crash/error
+        consumes it; no automatic retry. A preview never changes the live relic, handshake, holder
+        or ring count.
+      </p>
+      <form id="owner-form" autocomplete="off">
+        <label for="description">Description (up to240 Unicode characters)</label
+        ><textarea id="description" rows="3" maxlength="480" disabled></textarea
+        ><label
+          ><input id="acknowledge" type="checkbox" disabled /> I have separate owner approval and
+          acknowledge provider upload and possible charges.</label
+        ><button id="generate" disabled>Request one paid Forge attempt</button>
+      </form>
+      <p id="status" role="status" aria-live="polite">Reading private feature status…</p>
+      <img
+        id="preview-image"
+        width="480"
+        height="420"
+        alt="Private Forge configuration preview, not applied"
+        hidden
+      />
+      <pre id="design-json" tabindex="0"></pre>
+      <button id="download" disabled>Download design JSON</button>
+    </main>
+  </body>
+</html>

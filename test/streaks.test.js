@@ -1,37 +1,194 @@
-import test from 'node:test';import assert from 'node:assert/strict';
-import {streakFixture,winHop,openHop,HOME,OTHER} from '../test-support/streak-fixture.js';
-import {beginStreak,completeStreak,observeStreak,streakView} from '../src/streaks.js';
-import {validSnapshot} from '../public/overlay-client.js';
-import {validScores} from '../public/scoreboard.js';
-for(const kind of['memory','firestore']){
- test(`${kind}: streaks start unknown, three actual verified two-chat completions count once and recipient earns badge`,async()=>{
-  const f=await streakFixture(kind);let scores=JSON.parse((await f.request('/api/scores')).body);assert.equal(scores.streak.known,false);assert.ok(validScores(scores));
-  for(let i=1;i<=3;i++){const h=await winHop(f),r=await f.runtime.state.getKeeperRegistry();assert.equal(r.streak.current,i);const view=await f.runtime.state.getPublicJourney();assert.equal(view.stops.at(-1).streakCount,i);await f.chat(h.to,h.to,'!accept',{messageId:'already-'+i});await f.chat(h.to,h.to,'!accept',{messageId:'already-'+i});assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current,i);for(const host of[HOME,OTHER]){const s=await f.runtime.overlayFeeds[host].snapshot();assert.ok(validSnapshot(s));assert.equal(s.streak.current,i);}}
-  scores=JSON.parse((await f.request('/api/scores')).body);assert.ok(validScores(scores));assert.equal(scores.streak.best,3);assert.ok(scores.channels.find(c=>c.channelId===OTHER).badges.includes('Unbroken streak · 3 hand-offs'));assert.ok(!scores.channels.find(c=>c.channelId===HOME).badges.includes('Unbroken streak · 3 hand-offs'));
- });
- test(`${kind}: expired covered hop reads zero without writes; next reserve records lapse before replacement then next win is one`,async()=>{
-  const f=await streakFixture(kind);await winHop(f);const h=await openHop(f);const before=await f.runtime.state.getKeeperRegistry();const priorStatus=await f.request(`/control/${h.from}/status`,'GET',{cookie:f.cookies[h.from]});assert.equal(priorStatus.status,200);const csrf=JSON.parse(priorStatus.body).csrf;f.advance(before.pendingHop.endsAt-f.now());const writes=f.db?.writes.length;
-  const s=JSON.parse((await f.request('/api/scores')).body);assert.equal(s.streak.current,0);assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current,1);if(f.db)assert.equal(f.db.writes.length,writes);
-  // Reuse this session's valid pre-expiry CSRF: an extra status GET at the frozen
-  // timestamp would itself retire the intent before the POST (same-ms watermark).
-  const sent=await f.control(h.from,`send:${h.to}`,{},{csrf});assert.equal(sent.status,200);const outcome=JSON.parse(sent.body);assert.equal(outcome.status,'accepted',JSON.stringify({stage:'replacement-send',httpStatus:sent.status,accepted:outcome.status==='accepted'}));let r=await f.runtime.state.getKeeperRegistry();assert.equal(r.streak.current,0);assert.equal(r.streak.lastLapse.reason,'window-ended');assert.equal(r.send.status,'accepted');assert.equal(r.pendingHop.verified,false);f.advance();await f.raid(h.from,h.to,1);r=await f.runtime.state.getKeeperRegistry();assert.equal(r.pendingHop.verified,true);assert.notEqual(r.pendingHop.eventId,before.pendingHop.eventId);assert.ok(r.streak.active);await f.chat(h.from,h.from,'!offer');await f.chat(h.to,h.to,'!accept');r=await f.runtime.state.getKeeperRegistry();assert.equal(r.streak.current,1);assert.equal(r.streak.best,1);
- });
- test(`${kind}: policy-cancelled verified hop breaks, but ordinary forget and unverified request do not count`,async()=>{
-  const f=await streakFixture(kind);await winHop(f);const count=(await f.runtime.state.getKeeperRegistry()).streak.current;await f.chat(OTHER,'811','!relic forgetme');assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current,count);
-  const h=await openHop(f);await f.chat(h.to,h.to,'!relic pause');const r=await f.runtime.state.getKeeperRegistry();assert.equal(r.pendingHop.cancelled,true);assert.equal(r.streak.current,0);assert.equal(r.streak.lastLapse.reason,'policy');
- });
- test(`${kind}: gate off creates no tracker or stop fields and preserves legacy projection`,async()=>{const f=await streakFixture(kind,false);await winHop(f);assert.equal((await f.runtime.state.getKeeperRegistry()).streak,undefined);assert.equal((await f.runtime.state.getPublicJourney()).stops[0].streakCount,undefined);assert.equal(JSON.parse((await f.request('/api/scores')).body).streak,undefined);});
- test(`${kind}: legitimate retired source with early offer does not break new coverage`,async()=>{const f=await streakFixture(kind);await f.control(HOME,`send:${OTHER}`);await f.chat(HOME,'811','!offer');f.advance(66204);const sentAt=f.now();f.advance();await f.signed('stream.offline',{broadcaster_user_id:HOME},HOME);f.advance();await f.signed('channel.raid',{from_broadcaster_user_id:HOME,to_broadcaster_user_id:OTHER,viewers:1},OTHER,{to_broadcaster_user_id:OTHER},{sentAt});assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current,0);await f.chat(OTHER,'812','!accept');assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current,1);});
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { streakFixture, winHop, openHop, HOME, OTHER } from '../test-support/streak-fixture.js';
+import { beginStreak, completeStreak, observeStreak, streakView } from '../src/streaks.js';
+import { validSnapshot } from '../public/overlay-client.js';
+import { validScores } from '../public/scoreboard.js';
+for (const kind of ['memory', 'firestore']) {
+  test(`${kind}: streaks start unknown, three actual verified two-chat completions count once and recipient earns badge`, async () => {
+    const f = await streakFixture(kind);
+    let scores = JSON.parse((await f.request('/api/scores')).body);
+    assert.equal(scores.streak.known, false);
+    assert.ok(validScores(scores));
+    for (let i = 1; i <= 3; i++) {
+      const h = await winHop(f),
+        r = await f.runtime.state.getKeeperRegistry();
+      assert.equal(r.streak.current, i);
+      const view = await f.runtime.state.getPublicJourney();
+      assert.equal(view.stops.at(-1).streakCount, i);
+      await f.chat(h.to, h.to, '!accept', { messageId: 'already-' + i });
+      await f.chat(h.to, h.to, '!accept', { messageId: 'already-' + i });
+      assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current, i);
+      for (const host of [HOME, OTHER]) {
+        const s = await f.runtime.overlayFeeds[host].snapshot();
+        assert.ok(validSnapshot(s));
+        assert.equal(s.streak.current, i);
+      }
+    }
+    scores = JSON.parse((await f.request('/api/scores')).body);
+    assert.ok(validScores(scores));
+    assert.equal(scores.streak.best, 3);
+    assert.ok(
+      scores.channels
+        .find((c) => c.channelId === OTHER)
+        .badges.includes('Unbroken streak · 3 hand-offs'),
+    );
+    assert.ok(
+      !scores.channels
+        .find((c) => c.channelId === HOME)
+        .badges.includes('Unbroken streak · 3 hand-offs'),
+    );
+  });
+  test(`${kind}: expired covered hop reads zero without writes; next reserve records lapse before replacement then next win is one`, async () => {
+    const f = await streakFixture(kind);
+    await winHop(f);
+    const h = await openHop(f);
+    const before = await f.runtime.state.getKeeperRegistry();
+    const priorStatus = await f.request(`/control/${h.from}/status`, 'GET', {
+      cookie: f.cookies[h.from],
+    });
+    assert.equal(priorStatus.status, 200);
+    const csrf = JSON.parse(priorStatus.body).csrf;
+    f.advance(before.pendingHop.endsAt - f.now());
+    const writes = f.db?.writes.length;
+    const s = JSON.parse((await f.request('/api/scores')).body);
+    assert.equal(s.streak.current, 0);
+    assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current, 1);
+    if (f.db) assert.equal(f.db.writes.length, writes);
+    // Reuse this session's valid pre-expiry CSRF: an extra status GET at the frozen
+    // timestamp would itself retire the intent before the POST (same-ms watermark).
+    const sent = await f.control(h.from, `send:${h.to}`, {}, { csrf });
+    assert.equal(sent.status, 200);
+    const outcome = JSON.parse(sent.body);
+    assert.equal(
+      outcome.status,
+      'accepted',
+      JSON.stringify({
+        stage: 'replacement-send',
+        httpStatus: sent.status,
+        accepted: outcome.status === 'accepted',
+      }),
+    );
+    let r = await f.runtime.state.getKeeperRegistry();
+    assert.equal(r.streak.current, 0);
+    assert.equal(r.streak.lastLapse.reason, 'window-ended');
+    assert.equal(r.send.status, 'accepted');
+    assert.equal(r.pendingHop.verified, false);
+    f.advance();
+    await f.raid(h.from, h.to, 1);
+    r = await f.runtime.state.getKeeperRegistry();
+    assert.equal(r.pendingHop.verified, true);
+    assert.notEqual(r.pendingHop.eventId, before.pendingHop.eventId);
+    assert.ok(r.streak.active);
+    await f.chat(h.from, h.from, '!offer');
+    await f.chat(h.to, h.to, '!accept');
+    r = await f.runtime.state.getKeeperRegistry();
+    assert.equal(r.streak.current, 1);
+    assert.equal(r.streak.best, 1);
+  });
+  test(`${kind}: policy-cancelled verified hop breaks, but ordinary forget and unverified request do not count`, async () => {
+    const f = await streakFixture(kind);
+    await winHop(f);
+    const count = (await f.runtime.state.getKeeperRegistry()).streak.current;
+    await f.chat(OTHER, '811', '!relic forgetme');
+    assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current, count);
+    const h = await openHop(f);
+    await f.chat(h.to, h.to, '!relic pause');
+    const r = await f.runtime.state.getKeeperRegistry();
+    assert.equal(r.pendingHop.cancelled, true);
+    assert.equal(r.streak.current, 0);
+    assert.equal(r.streak.lastLapse.reason, 'policy');
+  });
+  test(`${kind}: gate off creates no tracker or stop fields and preserves legacy projection`, async () => {
+    const f = await streakFixture(kind, false);
+    await winHop(f);
+    assert.equal((await f.runtime.state.getKeeperRegistry()).streak, undefined);
+    assert.equal((await f.runtime.state.getPublicJourney()).stops[0].streakCount, undefined);
+    assert.equal(JSON.parse((await f.request('/api/scores')).body).streak, undefined);
+  });
+  test(`${kind}: legitimate retired source with early offer does not break new coverage`, async () => {
+    const f = await streakFixture(kind);
+    await f.control(HOME, `send:${OTHER}`);
+    await f.chat(HOME, '811', '!offer');
+    f.advance(66204);
+    const sentAt = f.now();
+    f.advance();
+    await f.signed('stream.offline', { broadcaster_user_id: HOME }, HOME);
+    f.advance();
+    await f.signed(
+      'channel.raid',
+      { from_broadcaster_user_id: HOME, to_broadcaster_user_id: OTHER, viewers: 1 },
+      OTHER,
+      { to_broadcaster_user_id: OTHER },
+      { sentAt },
+    );
+    assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current, 0);
+    await f.chat(OTHER, '812', '!accept');
+    assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current, 1);
+  });
 }
-test('legacy completed records never backfill; exact new receipt, clock rewind, expiry boundary and cap fail closed',()=>{
- const r={pendingHop:{eventId:'new',verified:true,startedAt:100,endsAt:180100}};assert.equal(streakView(r,100).known,false);beginStreak(r,100,true);const stop={stopId:'a'.repeat(64),claimedAt:101,ringIndex:8};completeStreak(r,stop,101,true);assert.equal(stop.streakCount,1);assert.equal(r.streak.current,1);completeStreak(r,stop,101,true);assert.equal(r.streak.current,1);assert.equal(streakView(r,99).known,false);
- r.pendingHop={eventId:'next',verified:true,startedAt:200,endsAt:180200};beginStreak(r,200,true);assert.equal(streakView(r,180199).current,1);assert.equal(streakView(r,180200).current,0);observeStreak(r,180200,true);assert.equal(r.streak.current,0);assert.equal(r.streak.best,1);assert.equal(r.streak.lastLapse.reason,'window-ended');
- r.streak.current=r.streak.best=16;r.streak.active={key:'a'.repeat(64),endsAt:200000};const cap={stopId:'b'.repeat(64),claimedAt:180201,ringIndex:16};completeStreak(r,cap,180201,true);assert.equal(cap.streakCount,undefined);
+test('legacy completed records never backfill; exact new receipt, clock rewind, expiry boundary and cap fail closed', () => {
+  const r = { pendingHop: { eventId: 'new', verified: true, startedAt: 100, endsAt: 180100 } };
+  assert.equal(streakView(r, 100).known, false);
+  beginStreak(r, 100, true);
+  const stop = { stopId: 'a'.repeat(64), claimedAt: 101, ringIndex: 8 };
+  completeStreak(r, stop, 101, true);
+  assert.equal(stop.streakCount, 1);
+  assert.equal(r.streak.current, 1);
+  completeStreak(r, stop, 101, true);
+  assert.equal(r.streak.current, 1);
+  assert.equal(streakView(r, 99).known, false);
+  r.pendingHop = { eventId: 'next', verified: true, startedAt: 200, endsAt: 180200 };
+  beginStreak(r, 200, true);
+  assert.equal(streakView(r, 180199).current, 1);
+  assert.equal(streakView(r, 180200).current, 0);
+  observeStreak(r, 180200, true);
+  assert.equal(r.streak.current, 0);
+  assert.equal(r.streak.best, 1);
+  assert.equal(r.streak.lastLapse.reason, 'window-ended');
+  r.streak.current = r.streak.best = 16;
+  r.streak.active = { key: 'a'.repeat(64), endsAt: 200000 };
+  const cap = { stopId: 'b'.repeat(64), claimedAt: 180201, ringIndex: 16 };
+  completeStreak(r, cap, 180201, true);
+  assert.equal(cap.streakCount, undefined);
 });
 
-test('seven legacy completed stops stay unknown and cannot earn the forward-only badge',async()=>{
- const{scoreboard}=await import('../src/scoreboard.js');const stops=Array.from({length:7},(_,i)=>({stopId:String(i).padStart(64,'a'),eventId:'legacy-'+i,from:i%2?OTHER:HOME,to:i%2?HOME:OTHER,claimedAt:1000+i,ringIndex:i+1,raidSize:1,marks:[]}));const value=scoreboard({stops},{holderId:OTHER,originated:true},{players:[]},{channels:[HOME,OTHER],logins:{raidrelichq:HOME,olsols2:OTHER},streakEnabled:true},2000);assert.equal(value.streak.known,false);assert.ok(value.channels.every(r=>!r.badges.includes('Unbroken streak · 3 hand-offs')));
+test('seven legacy completed stops stay unknown and cannot earn the forward-only badge', async () => {
+  const { scoreboard } = await import('../src/scoreboard.js');
+  const stops = Array.from({ length: 7 }, (_, i) => ({
+    stopId: String(i).padStart(64, 'a'),
+    eventId: 'legacy-' + i,
+    from: i % 2 ? OTHER : HOME,
+    to: i % 2 ? HOME : OTHER,
+    claimedAt: 1000 + i,
+    ringIndex: i + 1,
+    raidSize: 1,
+    marks: [],
+  }));
+  const value = scoreboard(
+    { stops },
+    { holderId: OTHER, originated: true },
+    { players: [] },
+    { channels: [HOME, OTHER], logins: { raidrelichq: HOME, olsols2: OTHER }, streakEnabled: true },
+    2000,
+  );
+  assert.equal(value.streak.known, false);
+  assert.ok(value.channels.every((r) => !r.badges.includes('Unbroken streak · 3 hand-offs')));
 });
-for(const kind of['memory','firestore'])test(`${kind}: accepted-only requests and duplicate receipt callbacks never count as wins`,async()=>{
- const f=await streakFixture(kind);await f.control(HOME,`send:${OTHER}`);assert.equal((await f.runtime.state.getKeeperRegistry()).streak,undefined);await f.chat(HOME,'811','!offer');assert.equal((await f.runtime.state.getKeeperRegistry()).streak,undefined);f.advance();await f.raid();assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current,0);await f.raid();assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current,0);await f.chat(OTHER,'812','!accept');assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current,1);await f.raid();assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current,1);
-});
+for (const kind of ['memory', 'firestore'])
+  test(`${kind}: accepted-only requests and duplicate receipt callbacks never count as wins`, async () => {
+    const f = await streakFixture(kind);
+    await f.control(HOME, `send:${OTHER}`);
+    assert.equal((await f.runtime.state.getKeeperRegistry()).streak, undefined);
+    await f.chat(HOME, '811', '!offer');
+    assert.equal((await f.runtime.state.getKeeperRegistry()).streak, undefined);
+    f.advance();
+    await f.raid();
+    assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current, 0);
+    await f.raid();
+    assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current, 0);
+    await f.chat(OTHER, '812', '!accept');
+    assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current, 1);
+    await f.raid();
+    assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current, 1);
+  });

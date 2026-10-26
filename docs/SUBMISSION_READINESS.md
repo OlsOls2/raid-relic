@@ -1,3 +1,5 @@
+> Current Tier1 source168: [quality record](QUALITY.md) is the count authority; previous 720/31/100 is operator-reported Part1 proof, not fresh Tier1 QA. Evidence secondary omission/rescan, lockfile update, authored formatter, full native32 workflows/captures and zero preview remain operator gates. No canonical promotion or later feature work is authorized. Older dated checkpoints below are historical.
+
 # Submission readiness — increment149
 
 ## Published P9 review — parent closeout164

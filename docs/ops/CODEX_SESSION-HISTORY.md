@@ -1,0 +1,31 @@
+# Historical notes — not current delivery authority
+
+# Raid Relic original Codex session
+
+Session ID: **01a1705c-a87d-7143-80f6-021e47b78ced**. Sole code/docs author: Codex, always in this saved thread, no forks, new threads or delegation. Resume from the repository:
+
+```sh
+codex resume 01a1705c-a87d-7143-80f6-021e47b78ced
+```
+
+Do not let a new default session substitute for this ID. `CODEX_HOME=/home/ubuntu/.codex` and machine `open-claw-vnic` are historical session-location metadata, not permission to read auth/session directories. Do not read credentials. Work on main for the current docs-only handoff; preserve the all-revision/source-feature freeze in AGENTS.md. Never fork this session or create a new branch.
+
+## Evidence scope and cutoff
+
+Curated `.codex-evidence/run-NNN.jsonl` records and `SESSION_ID` are publishable. Raw `.codex-evidence/rollout-backups/rollout-…-01a1705c-a87d-7143-80f6-021e47b78ced.jsonl` snapshots stay LOCAL/ignored; never force-add raw rollouts, encrypted content, auth or secrets. The exporter accepts only an explicit fixed owned snapshot in that directory. It does not search Codex/auth directories or read active session files.
+
+The real fixed post042 selected export is **committed**, not pending: parent committed/pushed `b6ae4b9` before fade `d392a0c` and decorative echo `d8eecf4`. It contains870 selected entries through2026-10-25T06:29:41.733Z, transcript SHA256 `58183847ddd17274efecac534fa78d7f086e7197740f21fe26268cad5a216dca`, with43 CLI log digests. Twenty credential-looking items were omitted/disclosed without assuming their credential status; the strong-key scanner found none. Raw15.8MB stays local ignored; selected2.5MB Markdown and manifest were committed. Codex did not read the actual raw backup or run that export.
+
+After **run047 completes**, parent will refresh the scanned owned fixed backup and run the existing exporter to refresh the selected transcript/manifest through047 and the latest curated CLI logs. Codex must not read the backup or generate this refresh. Its future entry count, cutoff and hashes are unknown until generated/reviewed; the committed manifest is the authoritative current snapshot. See [CODEX_EVIDENCE.md](../../docs/CODEX_EVIDENCE.md).
+
+The two approved output files are `.codex-evidence/EXPORTED_TRANSCRIPT.md` and `EXPORT_MANIFEST.json`. The manifest records the selected snapshot SHA/bytes, session, last timestamped-record cutoff, event counts, omission/truncation counts, export SHA and curated CLI-run digests. That fixed cutoff is the claim—not future messages, later parent actions, active-file completeness or the export invocation itself. Private system/developer/bootstrap instructions, reasoning, opaque encrypted fields, media and unselected native metadata are omitted. Long items have disclosed bounds. It is a readable sanitized selected transcript, **not raw-complete evidence**. Parent reviews the generated files before committing them.
+
+Historical feature-branch proof reported by parent: evidence `b6ae4b9` → fade `d392a0c` → resonance `d8eecf4` committed/pushed in that order on `feature/raid-relic-coulds`, alongside recap `c63ec31` and Forge `523d772`. Parent verified312/312 host tests, zero skips; seven sandboxed browser workflows/33 checks PASS (Atlas13,pilot8,judges3,recap3,Forge2,fade2,resonance2); audit0/release55/diff pass. Parent viewed stable reduced-motion fade captures (same canonical moon rune/count1, dim after3) and decorative echo outline with rune still dim. All are labelled local SIMULATOR, not actual Shared Chat/Twitch/physical OBS/AI proof. Historical sandbox312/307pass/five socket skips remains accurate for that environment.
+
+CURRENT main/deployment facts supersede older source freezes: parent fast-forward merged/pushed Coulds+046 docs to main `15e427eca81bcbf7c78a78191d668ee7642e1b96`, then deployed Coulds `raid-relic-00005-rey`/0% at https://coulds---raid-relic-vz4bhnskgq-uc.a.run.app . Build0be349f9-6d62-4bdf-a785-c206bed1f044/image SHA25653dc32c5ea650d0287e9d23f089c896e1e689d1cebeac6e63f0fb745bed570d8. Canonical00003/sourcefd05 stays100%; Shoulds00004/source0723 stays0%. Paid gatesOFF, existing env/three secret references/resources preserved except new revision's origin settings/RELEASE_COMMIT. No IAM/services/keys created.
+
+Parent verified Ready/health15e/liveValidated:false,22 assets parity, protected controls/Forge401, judges404, unsigned webhook403 before mutation, read-only Atlas/recap/SVG, pure template Forge POST with no DB/provider work, both live-mode waiting HTTP/WSS snapshots (closed); no newly claimed live search. No actual consent/bootstrap/Twitch API/chat/raid/AI or fake seed.312/312 host tests/seven browser flows33 checks/audit0/release55 remain local proof, not real Twitch/OBS validation.
+
+All cloud revisions/source features now frozen until owner test; docs-only exception on main in this same original thread, no new branch, delegation or Codex commit/cloud/provider/credential action. Later docs/evidence commits do not change deployed15e or authorize redeploy; parent will prove55 release files unchanged separately. Current committed evidence manifest remains authoritative until parent refreshes the scanned fixed backup/export through047 after this run. No Codex raw/auth read/export and no prediction of future entry count/cutoff/hash.
+
+Current09:20 local continuation: existing feature/raid-relic-polish from27d5876, SAME original session01a1705c-a87d-7143-80f6-021e47b78ced, no fork/delegation/new branch. Signed public self-share capabilities, persistent known-ban policy/gated ingestion, exact-generation never-dispatched cancellation and existing picker/audio discoverability are local only. Productiond529/both0%tags/cloud/providerAPI/credentials frozen; no live test. Official tokenless ban docs alone checked (channel:moderate, unchanged default scopes). Parent handles review/commits/push. Current committed evidence manifest defines the actual snapshot cutoff and omissions; no inference that these new turns/code are in that older export. Codex has not read raw rollouts/auth/evidence transcripts or refreshed an export. Future parent refresh must use a separately scanned fixed snapshot, never an active self-referential file; do not predict counts/hash/cutoff.

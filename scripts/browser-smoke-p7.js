@@ -2,26 +2,285 @@
 import assert from 'node:assert/strict';
 import { createServer } from 'node:https';
 import { createServer as createHTTPServer } from 'node:http';
-import { mkdir,writeFile } from 'node:fs/promises';
-import { pilotFixture,HOME,OTHER,BOT } from '../test-support/pilot-fixture.js';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';
 import { P7_SCOPES } from '../src/p7-scopes.js';
 import { createLocalTLS } from '../test-support/local-tls.js';
-const origin='https://localhost:5191';let active,server,browser,tls,page,failed=false,stage='setup';const checks=[],captures=[],images=new Map(),calls=[],errors=[];
-async function ready(on){const f=await pilotFixture('firestore',{origin,extraBotScopes:on?P7_SCOPES:[],chronicleEnv:on?{P7_BOT_ACTIONS_ENABLED:'true',P7_ANNOUNCEMENTS_ENABLED:'true',P7_PIN_ENABLED:'true',P7_SHOUTOUTS_ENABLED:'true',P7_ALLOW_PIN_REPLACE:'true'}:{},p7HTTP:async(url,options={})=>{calls.push({url,...options});if(url.endsWith('/token'))return{status:200,data:{access_token:'synthetic-local-p7-app',token_type:'bearer',expires_in:3600}};if(url.includes('/moderation/channels?'))return{status:200,data:{data:[{broadcaster_id:HOME},{broadcaster_id:OTHER}],pagination:{}}};assert.equal(options.headers.Authorization,'Bearer synthetic-local-p7-app');return{status:204,data:null};}});for(const id of[BOT,HOME,OTHER])await f.login(id,{p7:on&&id===BOT});for(const id of[HOME,OTHER]){await f.control(id,'bootstrap');f.advance();await f.control(id,'keep');f.advance();}return f;}
-async function complete(){await active.control(HOME,`send:${OTHER}`);active.advance();await active.raid(HOME,OTHER,1);await active.chat(HOME,'811','!offer');await active.chat(OTHER,'812','!accept');}
-try{active=await ready(false);tls=await createLocalTLS();server=createServer(tls.options,(req,res)=>{res.setHeader('x-raid-relic-mode','simulator');active.runtime.handler(req,res);});await new Promise((r,j)=>{server.once('error',j);server.listen(5191,'127.0.0.1',r);});const{chromium}=await import('playwright');browser=await chromium.launch({executablePath:'/snap/bin/chromium',chromiumSandbox:true,headless:true});const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width:1280,height:800},serviceWorkers:'block'});await context.route('**/*',r=>new URL(r.request().url()).origin===origin?r.continue():r.abort());await context.routeWebSocket('**/*',r=>r.close());await context.addInitScript(()=>{window.__copiedStart=null;Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async text=>{window.__copiedStart=text;}}});addEventListener('DOMContentLoaded',()=>{const n=document.createElement('aside');n.textContent='SIMULATOR · optional actions mocked, no Twitch consent';n.style.cssText='position:fixed;top:0;left:0;z-index:100;background:#101d30;color:#e6bb70';document.body.prepend(n);document.title='SIMULATOR · P7';});});await context.addCookies([{name:'__Host-rr_control_'+HOME,value:active.cookies[HOME].split('=')[1],url:origin,httpOnly:true,secure:true,sameSite:'Lax'}]);page=await context.newPage();page.on('pageerror',e=>errors.push(['TypeError','SyntaxError'].includes(e.name)?e.name:'other'));
- stage='off-control';await page.goto(origin+'/control/'+HOME);await page.locator('#keeper-summary').filter({hasText:'Relic Keeper:'}).waitFor();assert.equal(await page.locator('#p7-consent-link').getAttribute('href'),origin+'/oauth/bot/start?features=p7');assert.equal(await page.locator('#p7-consent-url').inputValue(),origin+'/oauth/bot/start?features=p7');assert.match(await page.locator('#p7-setup').textContent(),/4 ADDITIONAL permissions \+ 3 existing baseline = 7 total/);const beforeCopy=active.calls.length;let starts=0;page.on('request',r=>{if(new URL(r.url()).pathname==='/oauth/bot/start')starts++;});await page.locator('#p7-copy').click();assert.equal(await page.evaluate(()=>window.__copiedStart),origin+'/oauth/bot/start?features=p7');assert.equal(active.calls.length,beforeCopy);assert.equal(starts,0);assert.match(await page.locator('#p7-gates').textContent(),/MASTER: OFF/);assert.match(await page.locator('#p7-setup').textContent(),/Off by default/);assert.equal(await page.locator('.status-lights p').count(),3);await page.locator('#p7-setup').scrollIntoViewIfNeeded();if(process.env.P7_CAPTURE==='1'){const b=await page.screenshot({fullPage:false});assert.ok(b.length<=512*1024);images.set('p7-controls.png',b);}await complete();assert.equal(calls.length,0);assert.equal((await active.runtime.state.getPublicJourney()).rings,1);checks.push({name:'SIMULATOR off defaults: three core lights/optional consent link, real mock claim and zero optional calls',passed:true});
- stage='explicit-mock-consent-and-actions';active=await ready(true);await complete();const actions=calls.filter(c=>c.url.includes('/helix/chat/'));assert.equal(actions.length,3);assert.equal(JSON.parse(actions.find(c=>c.url.includes('/announcements?')).body).for_source_only,true);assert.equal(actions.find(c=>c.url.includes('/pins?')).method,'PUT');assert.equal((await active.runtime.state.getPrivateP7(OTHER)).rows.filter(r=>r.status==='sent').length,3);const count=calls.length;await active.chat(OTHER,'812','!accept');assert.equal(calls.length,count);assert.equal(errors.length,0);checks.push({name:'SIMULATOR explicit fake bot consent, moderator both rooms, APP204 actions after two known completion replies; no replay',passed:true});
- stage='http-local-simulator-copy';await context.close();server.closeAllConnections();await new Promise(r=>server.close(r));
- const localOrigin='http://localhost:5191',local=await pilotFixture('memory',{origin:localOrigin});for(const id of [BOT,HOME,OTHER])await local.login(id);
- server=createHTTPServer(local.runtime.handler);await new Promise((r,j)=>{server.once('error',j);server.listen(5191,'127.0.0.1',r);});
- const localContext=await browser.newContext({viewport:{width:1280,height:800},serviceWorkers:'block'});
- await localContext.route('**/*',r=>new URL(r.request().url()).origin===localOrigin?r.continue():r.abort());
- await localContext.addInitScript(()=>{window.__copiedStart=null;Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async text=>{window.__copiedStart=text;}}});});
- const cookie=local.cookies[HOME].split(';')[0],split=cookie.indexOf('=');await localContext.addCookies([{name:cookie.slice(0,split),value:cookie.slice(split+1),url:localOrigin,httpOnly:true,sameSite:'Lax'}]);
- page=await localContext.newPage();await page.goto(localOrigin+'/control/'+HOME);await page.locator('#p7-copy').waitFor();await page.waitForFunction(()=>!document.getElementById('p7-copy').disabled);
- assert.equal(await page.locator('#p7-consent-url').inputValue(),localOrigin+'/oauth/bot/start?features=p7');const before=local.calls.length;let oauthRequests=0;page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/oauth/'))oauthRequests++;});
- await page.locator('#p7-copy').click();assert.equal(await page.evaluate(()=>window.__copiedStart),localOrigin+'/oauth/bot/start?features=p7');assert.equal(oauthRequests,0);assert.equal(local.calls.length,before);assert.ok(await page.locator('#simulator').isVisible());await localContext.close();
- checks.push({name:'HTTP localhost5191 Simulator copies only own APP start URL with no OAuth navigation/provider calls',passed:true});
-
-}catch{failed=true;}finally{await browser?.close().catch(()=>{});server?.closeAllConnections();if(server?.listening)await new Promise(r=>server.close(r));await tls?.cleanup();await mkdir('artifacts',{recursive:true});for(const[n,b]of images){await writeFile(`artifacts/${n}`,b);captures.push(n);}await writeFile('artifacts/p7-browser-results.json',JSON.stringify({simulator:true,passed:!failed,stage,failureCategory:failed?'assertion-or-browser':null,errors,checks,captures},null,2));}if(failed)process.exitCode=1;
+const origin = 'https://localhost:5191';
+let active,
+  server,
+  browser,
+  tls,
+  page,
+  failed = false,
+  stage = 'setup';
+const checks = [],
+  captures = [],
+  images = new Map(),
+  calls = [],
+  errors = [];
+async function ready(on) {
+  const f = await pilotFixture('firestore', {
+    origin,
+    extraBotScopes: on ? P7_SCOPES : [],
+    chronicleEnv: on
+      ? {
+          P7_BOT_ACTIONS_ENABLED: 'true',
+          P7_ANNOUNCEMENTS_ENABLED: 'true',
+          P7_PIN_ENABLED: 'true',
+          P7_SHOUTOUTS_ENABLED: 'true',
+          P7_ALLOW_PIN_REPLACE: 'true',
+        }
+      : {},
+    p7HTTP: async (url, options = {}) => {
+      calls.push({ url, ...options });
+      if (url.endsWith('/token'))
+        return {
+          status: 200,
+          data: { access_token: 'synthetic-local-p7-app', token_type: 'bearer', expires_in: 3600 },
+        };
+      if (url.includes('/moderation/channels?'))
+        return {
+          status: 200,
+          data: { data: [{ broadcaster_id: HOME }, { broadcaster_id: OTHER }], pagination: {} },
+        };
+      assert.equal(options.headers.Authorization, 'Bearer synthetic-local-p7-app');
+      return { status: 204, data: null };
+    },
+  });
+  for (const id of [BOT, HOME, OTHER]) await f.login(id, { p7: on && id === BOT });
+  for (const id of [HOME, OTHER]) {
+    await f.control(id, 'bootstrap');
+    f.advance();
+    await f.control(id, 'keep');
+    f.advance();
+  }
+  return f;
+}
+async function complete() {
+  await active.control(HOME, `send:${OTHER}`);
+  active.advance();
+  await active.raid(HOME, OTHER, 1);
+  await active.chat(HOME, '811', '!offer');
+  await active.chat(OTHER, '812', '!accept');
+}
+try {
+  active = await ready(false);
+  tls = await createLocalTLS();
+  server = createServer(tls.options, (req, res) => {
+    res.setHeader('x-raid-relic-mode', 'simulator');
+    active.runtime.handler(req, res);
+  });
+  await new Promise((r, j) => {
+    server.once('error', j);
+    server.listen(5191, '127.0.0.1', r);
+  });
+  const { chromium } = await import('playwright');
+  browser = await chromium.launch({
+    executablePath: '/snap/bin/chromium',
+    chromiumSandbox: true,
+    headless: true,
+  });
+  const context = await browser.newContext({
+    ignoreHTTPSErrors: true,
+    viewport: { width: 1280, height: 800 },
+    serviceWorkers: 'block',
+  });
+  await context.route('**/*', (r) =>
+    new URL(r.request().url()).origin === origin ? r.continue() : r.abort(),
+  );
+  await context.routeWebSocket('**/*', (r) => r.close());
+  await context.addInitScript(() => {
+    window.__copiedStart = null;
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: async (text) => {
+          window.__copiedStart = text;
+        },
+      },
+    });
+    addEventListener('DOMContentLoaded', () => {
+      const n = document.createElement('aside');
+      n.textContent = 'SIMULATOR · optional actions mocked, no Twitch consent';
+      n.style.cssText = 'position:fixed;top:0;left:0;z-index:100;background:#101d30;color:#e6bb70';
+      document.body.prepend(n);
+      document.title = 'SIMULATOR · P7';
+    });
+  });
+  await context.addCookies([
+    {
+      name: '__Host-rr_control_' + HOME,
+      value: active.cookies[HOME].split('=')[1],
+      url: origin,
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Lax',
+    },
+  ]);
+  page = await context.newPage();
+  page.on('pageerror', (e) =>
+    errors.push(['TypeError', 'SyntaxError'].includes(e.name) ? e.name : 'other'),
+  );
+  stage = 'off-control';
+  await page.goto(origin + '/control/' + HOME);
+  await page.locator('#keeper-summary').filter({ hasText: 'Relic Keeper:' }).waitFor();
+  assert.equal(
+    await page.locator('#p7-consent-link').getAttribute('href'),
+    origin + '/oauth/bot/start?features=p7',
+  );
+  assert.equal(
+    await page.locator('#p7-consent-url').inputValue(),
+    origin + '/oauth/bot/start?features=p7',
+  );
+  assert.match(
+    await page.locator('#p7-setup').textContent(),
+    /4 ADDITIONAL permissions \+ 3 existing baseline = 7 total/,
+  );
+  const beforeCopy = active.calls.length;
+  let starts = 0;
+  page.on('request', (r) => {
+    if (new URL(r.url()).pathname === '/oauth/bot/start') starts++;
+  });
+  await page.locator('#p7-copy').click();
+  assert.equal(
+    await page.evaluate(() => window.__copiedStart),
+    origin + '/oauth/bot/start?features=p7',
+  );
+  assert.equal(active.calls.length, beforeCopy);
+  assert.equal(starts, 0);
+  assert.match(await page.locator('#p7-gates').textContent(), /MASTER: OFF/);
+  assert.match(await page.locator('#p7-setup').textContent(), /Off by default/);
+  assert.equal(await page.locator('.status-lights p').count(), 3);
+  await page.locator('#p7-setup').scrollIntoViewIfNeeded();
+  if (process.env.P7_CAPTURE === '1') {
+    const b = await page.screenshot({ fullPage: false });
+    assert.ok(b.length <= 512 * 1024);
+    images.set('p7-controls.png', b);
+  }
+  await complete();
+  assert.equal(calls.length, 0);
+  assert.equal((await active.runtime.state.getPublicJourney()).rings, 1);
+  checks.push({
+    name: 'SIMULATOR off defaults: three core lights/optional consent link, real mock claim and zero optional calls',
+    passed: true,
+  });
+  stage = 'explicit-mock-consent-and-actions';
+  active = await ready(true);
+  await complete();
+  const actions = calls.filter((c) => c.url.includes('/helix/chat/'));
+  assert.equal(actions.length, 3);
+  assert.equal(
+    JSON.parse(actions.find((c) => c.url.includes('/announcements?')).body).for_source_only,
+    true,
+  );
+  assert.equal(actions.find((c) => c.url.includes('/pins?')).method, 'PUT');
+  assert.equal(
+    (await active.runtime.state.getPrivateP7(OTHER)).rows.filter((r) => r.status === 'sent').length,
+    3,
+  );
+  const count = calls.length;
+  await active.chat(OTHER, '812', '!accept');
+  assert.equal(calls.length, count);
+  assert.equal(errors.length, 0);
+  checks.push({
+    name: 'SIMULATOR explicit fake bot consent, moderator both rooms, APP204 actions after two known completion replies; no replay',
+    passed: true,
+  });
+  stage = 'http-local-simulator-copy';
+  await context.close();
+  server.closeAllConnections();
+  await new Promise((r) => server.close(r));
+  const localOrigin = 'http://localhost:5191',
+    local = await pilotFixture('memory', { origin: localOrigin });
+  for (const id of [BOT, HOME, OTHER]) await local.login(id);
+  server = createHTTPServer(local.runtime.handler);
+  await new Promise((r, j) => {
+    server.once('error', j);
+    server.listen(5191, '127.0.0.1', r);
+  });
+  const localContext = await browser.newContext({
+    viewport: { width: 1280, height: 800 },
+    serviceWorkers: 'block',
+  });
+  await localContext.route('**/*', (r) =>
+    new URL(r.request().url()).origin === localOrigin ? r.continue() : r.abort(),
+  );
+  await localContext.addInitScript(() => {
+    window.__copiedStart = null;
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: async (text) => {
+          window.__copiedStart = text;
+        },
+      },
+    });
+  });
+  const cookie = local.cookies[HOME].split(';')[0],
+    split = cookie.indexOf('=');
+  await localContext.addCookies([
+    {
+      name: cookie.slice(0, split),
+      value: cookie.slice(split + 1),
+      url: localOrigin,
+      httpOnly: true,
+      sameSite: 'Lax',
+    },
+  ]);
+  page = await localContext.newPage();
+  await page.goto(localOrigin + '/control/' + HOME);
+  await page.locator('#p7-copy').waitFor();
+  await page.waitForFunction(() => !document.getElementById('p7-copy').disabled);
+  assert.equal(
+    await page.locator('#p7-consent-url').inputValue(),
+    localOrigin + '/oauth/bot/start?features=p7',
+  );
+  const before = local.calls.length;
+  let oauthRequests = 0;
+  page.on('request', (r) => {
+    if (new URL(r.url()).pathname.startsWith('/oauth/')) oauthRequests++;
+  });
+  await page.locator('#p7-copy').click();
+  assert.equal(
+    await page.evaluate(() => window.__copiedStart),
+    localOrigin + '/oauth/bot/start?features=p7',
+  );
+  assert.equal(oauthRequests, 0);
+  assert.equal(local.calls.length, before);
+  assert.ok(await page.locator('#simulator').isVisible());
+  await localContext.close();
+  checks.push({
+    name: 'HTTP localhost5191 Simulator copies only own APP start URL with no OAuth navigation/provider calls',
+    passed: true,
+  });
+} catch {
+  failed = true;
+} finally {
+  await browser?.close().catch(() => {});
+  server?.closeAllConnections();
+  if (server?.listening) await new Promise((r) => server.close(r));
+  await tls?.cleanup();
+  await mkdir('artifacts', { recursive: true });
+  for (const [n, b] of images) {
+    await writeFile(`artifacts/${n}`, b);
+    captures.push(n);
+  }
+  await writeFile(
+    'artifacts/p7-browser-results.json',
+    JSON.stringify(
+      {
+        simulator: true,
+        passed: !failed,
+        stage,
+        failureCategory: failed ? 'assertion-or-browser' : null,
+        errors,
+        checks,
+        captures,
+      },
+      null,
+      2,
+    ),
+  );
+}
+if (failed) process.exitCode = 1;

@@ -1,45 +1,687 @@
 // LOCAL SIMULATOR ONLY. Fixed real15-minute observation; no virtual clocks or duration override.
-import {mkdir,writeFile} from 'node:fs/promises';
-import {performance} from 'node:perf_hooks';
-import {createJudges,JUDGES_ORIGIN as origin} from '../test-support/judges.js';
-import {analyseDemoSoak,DEMO_SOAK_MS,closedSoakError,browserCpuSummary,partialDemoSoak} from '../test-support/demo-soak-metrics.js';
-const MAX_RUNTIME_MS=1000000,MAX_REPORT_BYTES=65536;
-let judges,browser,context,page,cdp,browserCDP,stage='setup',failureCategory=null,failureName=null,passed=false,deadlineTimer,finished=false;
-const samples=[],checks=[],sockets=new Set();let steadyStart=null,cycles=0,warmupCycles=0,stressCycles=0,requests=0,requestsAtWarmup=0,externalRequests=0,apiRequests=0,failedRequests=0,browserErrors=0,wsCreated=0,wsOpen=0,wsOpenMax=0,serverSocketSteadyMax=0,webglFramesObserved=false;
-let lastIO={},lastLifecycle={},lastFrame={},tourStartedAt=null,pageCrashed=false,browserDisconnected=false,processMetricsSamples=0,processMetricFailures=0,lastTourRealElapsedMs=0;
-let cpu={maxRendererCpuSeconds:0,maxGpuCpuSeconds:0,maxBrowserCpuSeconds:0};
-async function processMetrics(strict=true){try{const value=await bounded(browserCDP.send('SystemInfo.getProcessInfo'),strict?8000:2000),out=browserCpuSummary(value.processInfo);for(const key of Object.keys(cpu))cpu[key]=Math.max(cpu[key],out[key]);processMetricsSamples++;return out;}catch{processMetricFailures++;if(strict)throw Object.assign(Error(),{category:'process-metrics-unavailable'});return cpu;}}
-async function frameDiagnostic(){try{if(page&&!page.isClosed())lastFrame=await bounded(page.evaluate(()=>{const n=document.querySelector('canvas.relic3d'),a=document.querySelector('#demo-art'),number=v=>Number.isFinite(Number(v))?Math.max(0,Math.min(999999999,Number(v))):0;const life=window.__demoSoakLifecycle;if(life)life.maxCanvasCount=Math.max(life.maxCanvasCount,document.querySelectorAll('canvas.relic3d').length);return{lastDemoClockMs:number(document.body.dataset.demoClock),lastPlaying:document.body.dataset.demoPlaying==='true',lastPhaseCode:['idle','streak','impact','unfurl','settled'].indexOf(a?.dataset.phase)+1,lastWebglFrames:number(n?.dataset.frames),smallWidgetMsaaDisabled:n?.dataset.antialiasRequested==='false',lastBufferWidth:number(n?.width),lastBufferHeight:number(n?.height),lastProjectionAspect:number(n?.dataset.projectionAspect),lastContextStatusCode:n?.dataset.contextStatus==='active'?1:n?.dataset.contextStatus==='lost'?2:0,contextLostEvents:number(life?.contextLostEvents),activeContextLostEvents:number(life?.activeContextLostEvents),contextRestoredEvents:number(life?.contextRestoredEvents),maxCanvasCount:number(life?.maxCanvasCount)};}),2000);}catch{} }
+import { mkdir, writeFile } from 'node:fs/promises';
+import { performance } from 'node:perf_hooks';
+import { createJudges, JUDGES_ORIGIN as origin } from '../test-support/judges.js';
+import {
+  analyseDemoSoak,
+  DEMO_SOAK_MS,
+  closedSoakError,
+  browserCpuSummary,
+  partialDemoSoak,
+} from '../test-support/demo-soak-metrics.js';
+const MAX_RUNTIME_MS = 1000000,
+  MAX_REPORT_BYTES = 65536;
+let judges,
+  browser,
+  context,
+  page,
+  cdp,
+  browserCDP,
+  stage = 'setup',
+  failureCategory = null,
+  failureName = null,
+  passed = false,
+  deadlineTimer,
+  finished = false;
+const samples = [],
+  checks = [],
+  sockets = new Set();
+let steadyStart = null,
+  cycles = 0,
+  warmupCycles = 0,
+  stressCycles = 0,
+  requests = 0,
+  requestsAtWarmup = 0,
+  externalRequests = 0,
+  apiRequests = 0,
+  failedRequests = 0,
+  browserErrors = 0,
+  wsCreated = 0,
+  wsOpen = 0,
+  wsOpenMax = 0,
+  serverSocketSteadyMax = 0,
+  webglFramesObserved = false;
+let lastIO = {},
+  lastLifecycle = {},
+  lastFrame = {},
+  tourStartedAt = null,
+  pageCrashed = false,
+  browserDisconnected = false,
+  processMetricsSamples = 0,
+  processMetricFailures = 0,
+  lastTourRealElapsedMs = 0;
+let cpu = { maxRendererCpuSeconds: 0, maxGpuCpuSeconds: 0, maxBrowserCpuSeconds: 0 };
+async function processMetrics(strict = true) {
+  try {
+    const value = await bounded(browserCDP.send('SystemInfo.getProcessInfo'), strict ? 8000 : 2000),
+      out = browserCpuSummary(value.processInfo);
+    for (const key of Object.keys(cpu)) cpu[key] = Math.max(cpu[key], out[key]);
+    processMetricsSamples++;
+    return out;
+  } catch {
+    processMetricFailures++;
+    if (strict) throw Object.assign(Error(), { category: 'process-metrics-unavailable' });
+    return cpu;
+  }
+}
+async function frameDiagnostic() {
+  try {
+    if (page && !page.isClosed())
+      lastFrame = await bounded(
+        page.evaluate(() => {
+          const n = document.querySelector('canvas.relic3d'),
+            a = document.querySelector('#demo-art'),
+            number = (v) =>
+              Number.isFinite(Number(v)) ? Math.max(0, Math.min(999999999, Number(v))) : 0;
+          const life = window.__demoSoakLifecycle;
+          if (life)
+            life.maxCanvasCount = Math.max(
+              life.maxCanvasCount,
+              document.querySelectorAll('canvas.relic3d').length,
+            );
+          return {
+            lastDemoClockMs: number(document.body.dataset.demoClock),
+            lastPlaying: document.body.dataset.demoPlaying === 'true',
+            lastPhaseCode:
+              ['idle', 'streak', 'impact', 'unfurl', 'settled'].indexOf(a?.dataset.phase) + 1,
+            lastWebglFrames: number(n?.dataset.frames),
+            smallWidgetMsaaDisabled: n?.dataset.antialiasRequested === 'false',
+            lastBufferWidth: number(n?.width),
+            lastBufferHeight: number(n?.height),
+            lastProjectionAspect: number(n?.dataset.projectionAspect),
+            lastContextStatusCode:
+              n?.dataset.contextStatus === 'active'
+                ? 1
+                : n?.dataset.contextStatus === 'lost'
+                  ? 2
+                  : 0,
+            contextLostEvents: number(life?.contextLostEvents),
+            activeContextLostEvents: number(life?.activeContextLostEvents),
+            contextRestoredEvents: number(life?.contextRestoredEvents),
+            maxCanvasCount: number(life?.maxCanvasCount),
+          };
+        }),
+        2000,
+      );
+  } catch {}
+}
 
-let soak={durationMs:DEMO_SOAK_MS,observedMs:0,actualWallClock:true,passed:false};
-const requireGate=(ok,category)=>{if(!ok)throw Object.assign(Error('Closed soak failure'),{category});};
-async function bounded(promise,ms=8000){let t;try{return await Promise.race([promise,new Promise((_,reject)=>{t=setTimeout(()=>reject(Object.assign(Error(),{category:'operation-timeout'})),ms);})]);}finally{clearTimeout(t);}}
-async function paint(){await page.evaluate(()=>document.fonts.ready);await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));}
-async function reset(){await page.locator('#demo-reset').click();await paint();const state=await page.evaluate(()=>({clock:Number(document.body.dataset.demoClock),playing:document.body.dataset.demoPlaying==='true',rings:document.getElementById('demo-rings').textContent==='Simulated rings: 0',canvases:document.querySelectorAll('canvas.relic3d').length,hiddenCanvasCount:[...document.querySelectorAll('canvas.relic3d')].filter(c=>c.hidden&&getComputedStyle(c).display==='none'&&c.getBoundingClientRect().width===0).length,bands:document.querySelectorAll('#demo-bands span').length,svgVisible:(()=>{const n=document.querySelector('.crystal'),s=getComputedStyle(n),b=n.getBoundingClientRect();return n.complete&&n.naturalWidth>0&&!n.hidden&&s.display!=='none'&&s.visibility!=='hidden'&&Number(s.opacity)>0&&b.width>0&&b.height>0;})()}));requireGate(state.clock===0&&!state.playing&&state.rings&&state.canvases<=1&&state.hiddenCanvasCount===state.canvases&&state.bands===0&&state.svgVisible,'reset-or-fallback');const frames=await page.locator('canvas.relic3d').getAttribute('data-frames');await paint();requireGate(await page.locator('canvas.relic3d').getAttribute('data-frames')===frames,'reset-or-fallback');}
-async function beginTour(){tourStartedAt=performance.now();await page.bringToFront();await page.locator('#demo-tour').click();await page.waitForFunction(()=>document.body.dataset.demoPlaying==='true',null,{timeout:8000,polling:100});await page.waitForFunction(()=>{const nodes=document.querySelectorAll('canvas.relic3d');window.__demoSoakLifecycle.maxCanvasCount=Math.max(window.__demoSoakLifecycle.maxCanvasCount,nodes.length);const r=document.querySelector('#demo-art').getBoundingClientRect(),scale=Math.min(1,480/Math.max(r.width,r.height)),w=Math.max(1,Math.round(r.width*scale)),h=Math.max(1,Math.round(r.height*scale));return nodes.length===1&&!nodes[0].hidden&&getComputedStyle(nodes[0]).display!=='none'&&Number(nodes[0].dataset.frames)>0&&nodes[0].width===w&&nodes[0].height===h&&w>h&&Number(nodes[0].dataset.projectionAspect)===w/h&&nodes[0].dataset.antialiasRequested==='false'&&(nodes[0].getContext('webgl2')||nodes[0].getContext('webgl')).getContextAttributes().antialias===false;},null,{timeout:8000,polling:100});requireGate(await page.evaluate(()=>{const c=document.querySelector('canvas.relic3d');if(!window.__demoReuseCanvas)window.__demoReuseCanvas=c;return c===window.__demoReuseCanvas;}),'socket-or-context-growth');}
-async function completed(){requireGate(await page.evaluate(()=>document.querySelector('canvas.relic3d')===window.__demoReuseCanvas),'socket-or-context-growth');await frameDiagnostic();await page.waitForFunction(()=>document.body.dataset.demoPlaying==='false'&&document.body.dataset.demoClock==='35000',null,{timeout:45000,polling:500});requireGate(await page.locator('#demo-rings').innerText()==='Simulated rings: 1','tour-incomplete');requireGate(await page.locator('#demo-tour').innerText()==='Replay tour'&&await page.locator('#demo-tour').isEnabled(),'tour-incomplete');const frozen=await page.locator('canvas.relic3d').getAttribute('data-frames');await paint();await page.waitForTimeout(100);requireGate(await page.locator('canvas.relic3d').isVisible()&&await page.locator('canvas.relic3d').getAttribute('data-frames')===frozen&&await page.locator('canvas.relic3d').getAttribute('data-bands')==='2','tour-incomplete');}
-async function cdpMetric(command){try{return await bounded(cdp.send(command));}catch{throw Object.assign(Error(),{category:'cdp-unavailable'});}}
-async function sample(){requireGate(samples.length<100,'sample-limit');const raw=await cdpMetric('Performance.getMetrics');const before=raw.metrics.find(m=>m.name==='JSHeapUsedSize')?.value;requireGate(Number.isFinite(before),'cdp-unavailable');await cdpMetric('HeapProfiler.collectGarbage');const [metrics,dom]=await Promise.all([cdpMetric('Performance.getMetrics'),cdpMetric('Memory.getDOMCounters')]);const retained=metrics.metrics.find(m=>m.name==='JSHeapUsedSize')?.value;const open=await bounded(new Promise((resolve,reject)=>judges.server.getConnections((e,n)=>e?reject(e):resolve(n))));serverSocketSteadyMax=Math.max(serverSocketSteadyMax,open,sockets.size);
- const row={atMs:Math.round(performance.now()-steadyStart),heapUsedBeforeGC:before,heapRetained:retained,nodes:dom.nodes,listeners:dom.jsEventListeners,documents:dom.documents,openSockets:open,pages:context.pages().length,contexts:browser.contexts().length,canvases:await page.locator('canvas.relic3d').count(),activeCanvases:await page.locator('canvas.relic3d').evaluateAll(nodes=>nodes.filter(c=>!c.hidden||getComputedStyle(c).display!=='none'||c.getBoundingClientRect().width!==0).length)};requireGate(Object.values(row).every(v=>Number.isFinite(v)&&v>=0&&v<1e9),'cdp-unavailable');Object.assign(row,await processMetrics());samples.push(row);}
-async function isolation(){const io=await page.evaluate(()=>({...window.__demoSoakIO}));requireGate(Object.keys(io).sort().join(',')==='beaconCalls,eventSourceConstructed,fetchCalls,storageWrites,wsConstructed,xhrConstructed'&&Object.values(io).every(n=>Number.isInteger(n)&&n>=0),'unexpected-io');lastIO=io;lastLifecycle=await page.evaluate(()=>({...window.__demoSoakLifecycle}));requireGate(lastLifecycle.activeContextLostEvents===0,'active-context-loss');const local=judges.auditCounts();requireGate(local.providerCalls===0&&local.websocketClients===0,'unexpected-io');requireGate(Object.values(io).every(n=>n===0)&&wsCreated===0&&wsOpen===0&&externalRequests===0&&apiRequests===0&&failedRequests===0&&browserErrors===0,'unexpected-io');return io;}
-try{
- const expired=new Promise((_,reject)=>{deadlineTimer=setTimeout(()=>reject(Object.assign(Error(),{category:'wall-timeout'})),MAX_RUNTIME_MS);});
- await Promise.race([(async()=>{
-  judges=await createJudges({intent:true,env:{}});judges.server.on('connection',s=>{sockets.add(s);s.once('close',()=>sockets.delete(s));});await judges.listen();
-  stage='browser-launch';const {chromium}=await import('playwright');browser=await chromium.launch({executablePath:'/snap/bin/chromium',chromiumSandbox:true,headless:true});browser.on('disconnected',()=>{if(!finished)browserDisconnected=true;});browserCDP=await browser.newBrowserCDPSession();await processMetrics();context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'no-preference',serviceWorkers:'block'});
-  await context.route('**/*',route=>{const u=new URL(route.request().url());requests++;if(u.origin!==origin){externalRequests++;return route.abort();}if(u.pathname.startsWith('/api/')||!['GET','HEAD'].includes(route.request().method())){apiRequests++;return route.abort();}return route.continue();});
-  await context.addInitScript(()=>{const io={fetchCalls:0,xhrConstructed:0,beaconCalls:0,eventSourceConstructed:0,wsConstructed:0,storageWrites:0};window.__demoSoakIO=io;window.__demoSoakLifecycle={contextLostEvents:0,activeContextLostEvents:0,contextRestoredEvents:0,maxCanvasCount:0};document.addEventListener('webglcontextlost',event=>{const v=window.__demoSoakLifecycle;v.contextLostEvents++;if(event.target.isConnected&&event.target.dataset.disposed!=='true'&&document.body?.dataset.demoPlaying==='true')v.activeContextLostEvents++;},true);document.addEventListener('webglcontextrestored',()=>window.__demoSoakLifecycle.contextRestoredEvents++,true);const no=key=>function(){io[key]++;throw Error('Demo IO forbidden');};window.fetch=no('fetchCalls');window.XMLHttpRequest=no('xhrConstructed');window.WebSocket=no('wsConstructed');window.EventSource=no('eventSourceConstructed');navigator.sendBeacon=no('beaconCalls');for(const method of['setItem','removeItem','clear'])Storage.prototype[method]=no('storageWrites');});
-  page=await context.newPage();page.setDefaultTimeout(8000);page.on('crash',()=>{pageCrashed=true;});page.on('pageerror',()=>browserErrors++);page.on('requestfailed',()=>failedRequests++);cdp=await context.newCDPSession(page);await bounded(cdp.send('Performance.enable'));await bounded(cdp.send('Network.enable'));cdp.on('Network.webSocketCreated',()=>{wsCreated++;wsOpen++;wsOpenMax=Math.max(wsOpenMax,wsOpen);});cdp.on('Network.webSocketClosed',()=>{wsOpen=Math.max(0,wsOpen-1);});
-  stage='static-demo';const response=await page.goto(origin+'/demo/',{timeout:15000});requireGate(response?.status()===200,'demo-unavailable');requireGate((await response.allHeaders())['content-security-policy']?.includes("connect-src 'none'"),'demo-isolation');await page.locator('#demo-banner').waitFor();await paint();
-  stage='visible-context-reuse-stress';for(let i=0;i<20;i++){await beginTour();await page.waitForFunction(()=>{const nodes=document.querySelectorAll('canvas.relic3d');window.__demoSoakLifecycle.maxCanvasCount=Math.max(window.__demoSoakLifecycle.maxCanvasCount,nodes.length);return nodes.length===1&&!nodes[0].hidden&&Number(nodes[0].dataset.frames)>0;},null,{timeout:8000,polling:100});const reused=await page.evaluate(()=>{const c=document.querySelector('canvas.relic3d');if(!window.__demoReuseCanvas)window.__demoReuseCanvas=c;return c===window.__demoReuseCanvas;});requireGate(reused,'socket-or-context-growth');await reset();stressCycles++;}await isolation();
-  stage='permanent-reduced-release';await page.emulateMedia({reducedMotion:'reduce'});await paint();requireGate(await page.locator('canvas.relic3d').count()===0,'reset-or-fallback');await page.evaluate(()=>{window.__demoReuseCanvas=null;});await page.emulateMedia({reducedMotion:'no-preference'});
-  stage='warmup';for(let i=0;i<2;i++){await beginTour();await page.waitForFunction(()=>{const c=document.querySelector('canvas.relic3d');window.__demoSoakLifecycle.maxCanvasCount=Math.max(window.__demoSoakLifecycle.maxCanvasCount,document.querySelectorAll('canvas.relic3d').length);return c&&!c.hidden&&getComputedStyle(c).display!=='none'&&Number(c.dataset.frames)>0;},null,{timeout:12000,polling:100});webglFramesObserved=true;await completed();warmupCycles++;await reset();}
-  soak.rendererReuse=true;await isolation();requestsAtWarmup=requests;steadyStart=performance.now();stage='steady-observation';await sample();
-  while(performance.now()-steadyStart<DEMO_SOAK_MS){requireGate(!finished,'wall-timeout');const remaining=DEMO_SOAK_MS-(performance.now()-steadyStart);await beginTour();if(remaining<37000){await page.waitForTimeout(Math.ceil(remaining));const isComplete=await page.evaluate(()=>document.body.dataset.demoPlaying==='false'&&document.body.dataset.demoClock==='35000');if(isComplete){await completed();cycles++;}await reset();break;}await completed();cycles++;await reset();await isolation();requireGate(requests===requestsAtWarmup,'steady-network-request');await sample();}
-  stage='final-reset-analysis';await reset();await sample();const io=await isolation(),analysis=analyseDemoSoak(samples),observedMs=Math.round(performance.now()-steadyStart);
-  soak={...soak,...analysis,...io,observedMs,sampleCount:samples.length,cycles,warmupCycles,webglFramesObserved,wsCreated,wsOpenMax,externalRequests,apiRequests,failedRequests,browserErrors,serverSocketSteadyMax,steadyRequests:requests-requestsAtWarmup};
-  requireGate(observedMs>=DEMO_SOAK_MS&&cycles>=20&&warmupCycles===2&&webglFramesObserved,'insufficient-real-observation');requireGate(analysis.heapPassed,'heap-growth');requireGate(analysis.domPassed,'dom-growth');requireGate(analysis.isolationPassed&&serverSocketSteadyMax===0&&requests===requestsAtWarmup,'socket-or-context-growth');soak.passed=true;checks.push({name:'SIMULATED DEMO real900s steady natural35s tours; bounded retained heap/DOM and zero sockets/API/storage/provider traffic',passed:true});passed=true;stage='complete';
- })(),expired]);
-}catch(error){lastTourRealElapsedMs=tourStartedAt===null?0:Math.round(performance.now()-tourStartedAt);failureName=closedSoakError(error);failureCategory=['operation-timeout','process-metrics-unavailable','active-context-loss','cdp-unavailable','wall-timeout','reset-or-fallback','tour-incomplete','sample-limit','unexpected-io','demo-unavailable','demo-isolation','steady-network-request','insufficient-real-observation','heap-growth','dom-growth','socket-or-context-growth'].includes(error.category)?error.category:pageCrashed?'page-crashed':browserDisconnected?'browser-disconnected':failureName==='TimeoutError'?'browser-timeout':failureName==='TargetClosedError'?'target-closed':failureName==='ProtocolError'?'protocol-error':stage==='browser-launch'?'browser-unavailable':'assertion-or-browser';if(steadyStart!==null)soak.observedMs=Math.round(performance.now()-steadyStart);}
-finally{finished=true;if(!failureCategory)lastTourRealElapsedMs=tourStartedAt===null?0:Math.round(performance.now()-tourStartedAt);clearTimeout(deadlineTimer);await frameDiagnostic();await processMetrics(false);if(steadyStart!==null)soak={...soak,...partialDemoSoak(samples,performance.now()-steadyStart,cycles)};await bounded(context?.close().catch(()=>{}),5000).catch(()=>{});await bounded(browser?.close().catch(()=>{}),5000).catch(()=>{});await bounded(judges?.close(),5000).catch(()=>{});for(const socket of sockets)socket.destroy();sockets.clear();soak={...soak,...lastIO,...lastLifecycle,...lastFrame,...cpu,pageCrashed,browserDisconnected,processMetricsSamples,processMetricFailures,lastTourRealElapsedMs,wsCreated,wsOpenMax,externalRequests,apiRequests,failedRequests,browserErrors,serverSocketSteadyMax,steadyRequests:steadyStart===null?0:requests-requestsAtWarmup,fixtureProviderCalls:judges?.auditCounts().providerCalls??0};soak.sampleCount=samples.length;soak.cycles=cycles;soak.warmupCycles=warmupCycles;soak.stressCycles=stressCycles;soak.actualWallClock=true;soak.passed=passed;const report={passed,stage,failureCategory,failureName,checks,soak,samples};let text=JSON.stringify(report);if(Buffer.byteLength(text)>MAX_REPORT_BYTES){passed=false;failureCategory='report-limit';text=JSON.stringify({passed:false,stage,failureCategory,checks:[],soak:{durationMs:DEMO_SOAK_MS,actualWallClock:true,passed:false},samples:[]});}await mkdir('artifacts',{recursive:true});await writeFile('artifacts/demo-soak-browser-results.json',text);}
-if(!passed)process.exitCode=1;
+let soak = { durationMs: DEMO_SOAK_MS, observedMs: 0, actualWallClock: true, passed: false };
+const requireGate = (ok, category) => {
+  if (!ok) throw Object.assign(Error('Closed soak failure'), { category });
+};
+async function bounded(promise, ms = 8000) {
+  let t;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise((_, reject) => {
+        t = setTimeout(() => reject(Object.assign(Error(), { category: 'operation-timeout' })), ms);
+      }),
+    ]);
+  } finally {
+    clearTimeout(t);
+  }
+}
+async function paint() {
+  await page.evaluate(() => document.fonts.ready);
+  await page.evaluate(
+    () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))),
+  );
+}
+async function reset() {
+  await page.locator('#demo-reset').click();
+  await paint();
+  const state = await page.evaluate(() => ({
+    clock: Number(document.body.dataset.demoClock),
+    playing: document.body.dataset.demoPlaying === 'true',
+    rings: document.getElementById('demo-rings').textContent === 'Rings: 0',
+    canvases: document.querySelectorAll('canvas.relic3d').length,
+    hiddenCanvasCount: [...document.querySelectorAll('canvas.relic3d')].filter(
+      (c) =>
+        c.hidden && getComputedStyle(c).display === 'none' && c.getBoundingClientRect().width === 0,
+    ).length,
+    bands: document.querySelectorAll('#demo-bands span').length,
+    svgVisible: (() => {
+      const n = document.querySelector('.crystal'),
+        s = getComputedStyle(n),
+        b = n.getBoundingClientRect();
+      return (
+        n.complete &&
+        n.naturalWidth > 0 &&
+        !n.hidden &&
+        s.display !== 'none' &&
+        s.visibility !== 'hidden' &&
+        Number(s.opacity) > 0 &&
+        b.width > 0 &&
+        b.height > 0
+      );
+    })(),
+  }));
+  requireGate(
+    state.clock === 0 &&
+      !state.playing &&
+      state.rings &&
+      state.canvases <= 1 &&
+      state.hiddenCanvasCount === state.canvases &&
+      state.bands === 0 &&
+      state.svgVisible,
+    'reset-or-fallback',
+  );
+  const frames = await page.locator('canvas.relic3d').getAttribute('data-frames');
+  await paint();
+  requireGate(
+    (await page.locator('canvas.relic3d').getAttribute('data-frames')) === frames,
+    'reset-or-fallback',
+  );
+}
+async function beginTour() {
+  tourStartedAt = performance.now();
+  await page.bringToFront();
+  await page.locator('#demo-tour').click();
+  await page.waitForFunction(() => document.body.dataset.demoPlaying === 'true', null, {
+    timeout: 8000,
+    polling: 100,
+  });
+  await page.waitForFunction(
+    () => {
+      const nodes = document.querySelectorAll('canvas.relic3d');
+      window.__demoSoakLifecycle.maxCanvasCount = Math.max(
+        window.__demoSoakLifecycle.maxCanvasCount,
+        nodes.length,
+      );
+      const r = document.querySelector('#demo-art').getBoundingClientRect(),
+        scale = Math.min(1, 480 / Math.max(r.width, r.height)),
+        w = Math.max(1, Math.round(r.width * scale)),
+        h = Math.max(1, Math.round(r.height * scale));
+      return (
+        nodes.length === 1 &&
+        !nodes[0].hidden &&
+        getComputedStyle(nodes[0]).display !== 'none' &&
+        Number(nodes[0].dataset.frames) > 0 &&
+        nodes[0].width === w &&
+        nodes[0].height === h &&
+        w > h &&
+        Number(nodes[0].dataset.projectionAspect) === w / h &&
+        nodes[0].dataset.antialiasRequested === 'false' &&
+        (nodes[0].getContext('webgl2') || nodes[0].getContext('webgl')).getContextAttributes()
+          .antialias === false
+      );
+    },
+    null,
+    { timeout: 8000, polling: 100 },
+  );
+  requireGate(
+    await page.evaluate(() => {
+      const c = document.querySelector('canvas.relic3d');
+      if (!window.__demoReuseCanvas) window.__demoReuseCanvas = c;
+      return c === window.__demoReuseCanvas;
+    }),
+    'socket-or-context-growth',
+  );
+}
+async function completed() {
+  requireGate(
+    await page.evaluate(
+      () => document.querySelector('canvas.relic3d') === window.__demoReuseCanvas,
+    ),
+    'socket-or-context-growth',
+  );
+  await frameDiagnostic();
+  await page.waitForFunction(
+    () =>
+      document.body.dataset.demoPlaying === 'false' && document.body.dataset.demoClock === '35000',
+    null,
+    { timeout: 45000, polling: 500 },
+  );
+  requireGate((await page.locator('#demo-rings').innerText()) === 'Rings: 1', 'tour-incomplete');
+  requireGate(
+    (await page.locator('#demo-tour').innerText()) === 'Replay tour' &&
+      (await page.locator('#demo-tour').isEnabled()),
+    'tour-incomplete',
+  );
+  const frozen = await page.locator('canvas.relic3d').getAttribute('data-frames');
+  await paint();
+  await page.waitForTimeout(100);
+  requireGate(
+    (await page.locator('canvas.relic3d').isVisible()) &&
+      (await page.locator('canvas.relic3d').getAttribute('data-frames')) === frozen &&
+      (await page.locator('canvas.relic3d').getAttribute('data-bands')) === '2',
+    'tour-incomplete',
+  );
+}
+async function cdpMetric(command) {
+  try {
+    return await bounded(cdp.send(command));
+  } catch {
+    throw Object.assign(Error(), { category: 'cdp-unavailable' });
+  }
+}
+async function sample() {
+  requireGate(samples.length < 100, 'sample-limit');
+  const raw = await cdpMetric('Performance.getMetrics');
+  const before = raw.metrics.find((m) => m.name === 'JSHeapUsedSize')?.value;
+  requireGate(Number.isFinite(before), 'cdp-unavailable');
+  await cdpMetric('HeapProfiler.collectGarbage');
+  const [metrics, dom] = await Promise.all([
+    cdpMetric('Performance.getMetrics'),
+    cdpMetric('Memory.getDOMCounters'),
+  ]);
+  const retained = metrics.metrics.find((m) => m.name === 'JSHeapUsedSize')?.value;
+  const open = await bounded(
+    new Promise((resolve, reject) =>
+      judges.server.getConnections((e, n) => (e ? reject(e) : resolve(n))),
+    ),
+  );
+  serverSocketSteadyMax = Math.max(serverSocketSteadyMax, open, sockets.size);
+  const row = {
+    atMs: Math.round(performance.now() - steadyStart),
+    heapUsedBeforeGC: before,
+    heapRetained: retained,
+    nodes: dom.nodes,
+    listeners: dom.jsEventListeners,
+    documents: dom.documents,
+    openSockets: open,
+    pages: context.pages().length,
+    contexts: browser.contexts().length,
+    canvases: await page.locator('canvas.relic3d').count(),
+    activeCanvases: await page
+      .locator('canvas.relic3d')
+      .evaluateAll(
+        (nodes) =>
+          nodes.filter(
+            (c) =>
+              !c.hidden ||
+              getComputedStyle(c).display !== 'none' ||
+              c.getBoundingClientRect().width !== 0,
+          ).length,
+      ),
+  };
+  requireGate(
+    Object.values(row).every((v) => Number.isFinite(v) && v >= 0 && v < 1e9),
+    'cdp-unavailable',
+  );
+  Object.assign(row, await processMetrics());
+  samples.push(row);
+}
+async function isolation() {
+  const io = await page.evaluate(() => ({ ...window.__demoSoakIO }));
+  requireGate(
+    Object.keys(io).sort().join(',') ===
+      'beaconCalls,eventSourceConstructed,fetchCalls,storageWrites,wsConstructed,xhrConstructed' &&
+      Object.values(io).every((n) => Number.isInteger(n) && n >= 0),
+    'unexpected-io',
+  );
+  lastIO = io;
+  lastLifecycle = await page.evaluate(() => ({ ...window.__demoSoakLifecycle }));
+  requireGate(lastLifecycle.activeContextLostEvents === 0, 'active-context-loss');
+  const local = judges.auditCounts();
+  requireGate(local.providerCalls === 0 && local.websocketClients === 0, 'unexpected-io');
+  requireGate(
+    Object.values(io).every((n) => n === 0) &&
+      wsCreated === 0 &&
+      wsOpen === 0 &&
+      externalRequests === 0 &&
+      apiRequests === 0 &&
+      failedRequests === 0 &&
+      browserErrors === 0,
+    'unexpected-io',
+  );
+  return io;
+}
+try {
+  const expired = new Promise((_, reject) => {
+    deadlineTimer = setTimeout(
+      () => reject(Object.assign(Error(), { category: 'wall-timeout' })),
+      MAX_RUNTIME_MS,
+    );
+  });
+  await Promise.race([
+    (async () => {
+      judges = await createJudges({ intent: true, env: {} });
+      judges.server.on('connection', (s) => {
+        sockets.add(s);
+        s.once('close', () => sockets.delete(s));
+      });
+      await judges.listen();
+      stage = 'browser-launch';
+      const { chromium } = await import('playwright');
+      browser = await chromium.launch({
+        executablePath: '/snap/bin/chromium',
+        chromiumSandbox: true,
+        headless: true,
+      });
+      browser.on('disconnected', () => {
+        if (!finished) browserDisconnected = true;
+      });
+      browserCDP = await browser.newBrowserCDPSession();
+      await processMetrics();
+      context = await browser.newContext({
+        viewport: { width: 390, height: 844 },
+        reducedMotion: 'no-preference',
+        serviceWorkers: 'block',
+      });
+      await context.route('**/*', (route) => {
+        const u = new URL(route.request().url());
+        requests++;
+        if (u.origin !== origin) {
+          externalRequests++;
+          return route.abort();
+        }
+        if (u.pathname.startsWith('/api/') || !['GET', 'HEAD'].includes(route.request().method())) {
+          apiRequests++;
+          return route.abort();
+        }
+        return route.continue();
+      });
+      await context.addInitScript(() => {
+        const io = {
+          fetchCalls: 0,
+          xhrConstructed: 0,
+          beaconCalls: 0,
+          eventSourceConstructed: 0,
+          wsConstructed: 0,
+          storageWrites: 0,
+        };
+        window.__demoSoakIO = io;
+        window.__demoSoakLifecycle = {
+          contextLostEvents: 0,
+          activeContextLostEvents: 0,
+          contextRestoredEvents: 0,
+          maxCanvasCount: 0,
+        };
+        document.addEventListener(
+          'webglcontextlost',
+          (event) => {
+            const v = window.__demoSoakLifecycle;
+            v.contextLostEvents++;
+            if (
+              event.target.isConnected &&
+              event.target.dataset.disposed !== 'true' &&
+              document.body?.dataset.demoPlaying === 'true'
+            )
+              v.activeContextLostEvents++;
+          },
+          true,
+        );
+        document.addEventListener(
+          'webglcontextrestored',
+          () => window.__demoSoakLifecycle.contextRestoredEvents++,
+          true,
+        );
+        const no = (key) =>
+          function () {
+            io[key]++;
+            throw Error('Demo IO forbidden');
+          };
+        window.fetch = no('fetchCalls');
+        window.XMLHttpRequest = no('xhrConstructed');
+        window.WebSocket = no('wsConstructed');
+        window.EventSource = no('eventSourceConstructed');
+        navigator.sendBeacon = no('beaconCalls');
+        for (const method of ['setItem', 'removeItem', 'clear'])
+          Storage.prototype[method] = no('storageWrites');
+      });
+      page = await context.newPage();
+      page.setDefaultTimeout(8000);
+      page.on('crash', () => {
+        pageCrashed = true;
+      });
+      page.on('pageerror', () => browserErrors++);
+      page.on('requestfailed', () => failedRequests++);
+      cdp = await context.newCDPSession(page);
+      await bounded(cdp.send('Performance.enable'));
+      await bounded(cdp.send('Network.enable'));
+      cdp.on('Network.webSocketCreated', () => {
+        wsCreated++;
+        wsOpen++;
+        wsOpenMax = Math.max(wsOpenMax, wsOpen);
+      });
+      cdp.on('Network.webSocketClosed', () => {
+        wsOpen = Math.max(0, wsOpen - 1);
+      });
+      stage = 'static-demo';
+      const response = await page.goto(origin + '/demo/', { timeout: 15000 });
+      requireGate(response?.status() === 200, 'demo-unavailable');
+      requireGate(
+        (await response.allHeaders())['content-security-policy']?.includes("connect-src 'none'"),
+        'demo-isolation',
+      );
+      await page.locator('#demo-banner').waitFor();
+      await paint();
+      stage = 'visible-context-reuse-stress';
+      for (let i = 0; i < 20; i++) {
+        await beginTour();
+        await page.waitForFunction(
+          () => {
+            const nodes = document.querySelectorAll('canvas.relic3d');
+            window.__demoSoakLifecycle.maxCanvasCount = Math.max(
+              window.__demoSoakLifecycle.maxCanvasCount,
+              nodes.length,
+            );
+            return nodes.length === 1 && !nodes[0].hidden && Number(nodes[0].dataset.frames) > 0;
+          },
+          null,
+          { timeout: 8000, polling: 100 },
+        );
+        const reused = await page.evaluate(() => {
+          const c = document.querySelector('canvas.relic3d');
+          if (!window.__demoReuseCanvas) window.__demoReuseCanvas = c;
+          return c === window.__demoReuseCanvas;
+        });
+        requireGate(reused, 'socket-or-context-growth');
+        await reset();
+        stressCycles++;
+      }
+      await isolation();
+      stage = 'permanent-reduced-release';
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await paint();
+      requireGate((await page.locator('canvas.relic3d').count()) === 0, 'reset-or-fallback');
+      await page.evaluate(() => {
+        window.__demoReuseCanvas = null;
+      });
+      await page.emulateMedia({ reducedMotion: 'no-preference' });
+      stage = 'warmup';
+      for (let i = 0; i < 2; i++) {
+        await beginTour();
+        await page.waitForFunction(
+          () => {
+            const c = document.querySelector('canvas.relic3d');
+            window.__demoSoakLifecycle.maxCanvasCount = Math.max(
+              window.__demoSoakLifecycle.maxCanvasCount,
+              document.querySelectorAll('canvas.relic3d').length,
+            );
+            return (
+              c &&
+              !c.hidden &&
+              getComputedStyle(c).display !== 'none' &&
+              Number(c.dataset.frames) > 0
+            );
+          },
+          null,
+          { timeout: 12000, polling: 100 },
+        );
+        webglFramesObserved = true;
+        await completed();
+        warmupCycles++;
+        await reset();
+      }
+      soak.rendererReuse = true;
+      await isolation();
+      requestsAtWarmup = requests;
+      steadyStart = performance.now();
+      stage = 'steady-observation';
+      await sample();
+      while (performance.now() - steadyStart < DEMO_SOAK_MS) {
+        requireGate(!finished, 'wall-timeout');
+        const remaining = DEMO_SOAK_MS - (performance.now() - steadyStart);
+        await beginTour();
+        if (remaining < 37000) {
+          await page.waitForTimeout(Math.ceil(remaining));
+          const isComplete = await page.evaluate(
+            () =>
+              document.body.dataset.demoPlaying === 'false' &&
+              document.body.dataset.demoClock === '35000',
+          );
+          if (isComplete) {
+            await completed();
+            cycles++;
+          }
+          await reset();
+          break;
+        }
+        await completed();
+        cycles++;
+        await reset();
+        await isolation();
+        requireGate(requests === requestsAtWarmup, 'steady-network-request');
+        await sample();
+      }
+      stage = 'final-reset-analysis';
+      await reset();
+      await sample();
+      const io = await isolation(),
+        analysis = analyseDemoSoak(samples),
+        observedMs = Math.round(performance.now() - steadyStart);
+      soak = {
+        ...soak,
+        ...analysis,
+        ...io,
+        observedMs,
+        sampleCount: samples.length,
+        cycles,
+        warmupCycles,
+        webglFramesObserved,
+        wsCreated,
+        wsOpenMax,
+        externalRequests,
+        apiRequests,
+        failedRequests,
+        browserErrors,
+        serverSocketSteadyMax,
+        steadyRequests: requests - requestsAtWarmup,
+      };
+      requireGate(
+        observedMs >= DEMO_SOAK_MS && cycles >= 20 && warmupCycles === 2 && webglFramesObserved,
+        'insufficient-real-observation',
+      );
+      requireGate(analysis.heapPassed, 'heap-growth');
+      requireGate(analysis.domPassed, 'dom-growth');
+      requireGate(
+        analysis.isolationPassed && serverSocketSteadyMax === 0 && requests === requestsAtWarmup,
+        'socket-or-context-growth',
+      );
+      soak.passed = true;
+      checks.push({
+        name: 'SIMULATED DEMO real900s steady natural35s tours; bounded retained heap/DOM and zero sockets/API/storage/provider traffic',
+        passed: true,
+      });
+      passed = true;
+      stage = 'complete';
+    })(),
+    expired,
+  ]);
+} catch (error) {
+  lastTourRealElapsedMs =
+    tourStartedAt === null ? 0 : Math.round(performance.now() - tourStartedAt);
+  failureName = closedSoakError(error);
+  failureCategory = [
+    'operation-timeout',
+    'process-metrics-unavailable',
+    'active-context-loss',
+    'cdp-unavailable',
+    'wall-timeout',
+    'reset-or-fallback',
+    'tour-incomplete',
+    'sample-limit',
+    'unexpected-io',
+    'demo-unavailable',
+    'demo-isolation',
+    'steady-network-request',
+    'insufficient-real-observation',
+    'heap-growth',
+    'dom-growth',
+    'socket-or-context-growth',
+  ].includes(error.category)
+    ? error.category
+    : pageCrashed
+      ? 'page-crashed'
+      : browserDisconnected
+        ? 'browser-disconnected'
+        : failureName === 'TimeoutError'
+          ? 'browser-timeout'
+          : failureName === 'TargetClosedError'
+            ? 'target-closed'
+            : failureName === 'ProtocolError'
+              ? 'protocol-error'
+              : stage === 'browser-launch'
+                ? 'browser-unavailable'
+                : 'assertion-or-browser';
+  if (steadyStart !== null) soak.observedMs = Math.round(performance.now() - steadyStart);
+} finally {
+  finished = true;
+  if (!failureCategory)
+    lastTourRealElapsedMs =
+      tourStartedAt === null ? 0 : Math.round(performance.now() - tourStartedAt);
+  clearTimeout(deadlineTimer);
+  await frameDiagnostic();
+  await processMetrics(false);
+  if (steadyStart !== null)
+    soak = { ...soak, ...partialDemoSoak(samples, performance.now() - steadyStart, cycles) };
+  await bounded(
+    context?.close().catch(() => {}),
+    5000,
+  ).catch(() => {});
+  await bounded(
+    browser?.close().catch(() => {}),
+    5000,
+  ).catch(() => {});
+  await bounded(judges?.close(), 5000).catch(() => {});
+  for (const socket of sockets) socket.destroy();
+  sockets.clear();
+  soak = {
+    ...soak,
+    ...lastIO,
+    ...lastLifecycle,
+    ...lastFrame,
+    ...cpu,
+    pageCrashed,
+    browserDisconnected,
+    processMetricsSamples,
+    processMetricFailures,
+    lastTourRealElapsedMs,
+    wsCreated,
+    wsOpenMax,
+    externalRequests,
+    apiRequests,
+    failedRequests,
+    browserErrors,
+    serverSocketSteadyMax,
+    steadyRequests: steadyStart === null ? 0 : requests - requestsAtWarmup,
+    fixtureProviderCalls: judges?.auditCounts().providerCalls ?? 0,
+  };
+  soak.sampleCount = samples.length;
+  soak.cycles = cycles;
+  soak.warmupCycles = warmupCycles;
+  soak.stressCycles = stressCycles;
+  soak.actualWallClock = true;
+  soak.passed = passed;
+  const report = { passed, stage, failureCategory, failureName, checks, soak, samples };
+  let text = JSON.stringify(report);
+  if (Buffer.byteLength(text) > MAX_REPORT_BYTES) {
+    passed = false;
+    failureCategory = 'report-limit';
+    text = JSON.stringify({
+      passed: false,
+      stage,
+      failureCategory,
+      checks: [],
+      soak: { durationMs: DEMO_SOAK_MS, actualWallClock: true, passed: false },
+      samples: [],
+    });
+  }
+  await mkdir('artifacts', { recursive: true });
+  await writeFile('artifacts/demo-soak-browser-results.json', text);
+}
+if (!passed) process.exitCode = 1;
