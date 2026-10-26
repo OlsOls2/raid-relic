@@ -24,7 +24,7 @@ Last parent-reported ee baseline:685/685 zero skips,29 local browser workflows/9
 
 Parent previously reviewed **seven scanner matches**, all the same public Twitch client ID, and reported **zero unresolved secret findings**. This is attributed historical review, not “zero scanner findings” or a guarantee of no secret anywhere. Parent must rerun redacted gitleaks8.30 over all refs and the candidate after review. Codex did not read secret files, ignored raw logs, credentials, Secret Manager, ADC, OAuth records or rewrite Git history. A newly identified credential would block release; never print its value or silently ignore an entire rule.
 
-## Current readiness checkpoint — parent report, increment157
+## Historical readiness checkpoint — parent report, increment157
 
 Parent reports source156 passed699/699 tests, zero skips, all29 serial browser workflows/94 checks and the real normal-motion390×844 WebGL soak:900375ms,25 completed natural35s tours, two warm-ups,20 reuse stress cycles,27 samples. Retained heap5038332→5266932 (+228600B), raw peak6558564, retained peak5319288, OLS8811.35B/min (<16384). DOM257/listeners48/documents2/page1/context1 stayed constant; API/WS/fetch/XHR/beacon/storage/provider/external/failed-request/browser-error/server-socket counts were0. GPU CPU119.81s, renderer106.48s/browser2.88s stayed inside unchanged limits. These measurements do not establish whole-OS/GPU memory stability or physical Twitch effects.
 
@@ -35,3 +35,11 @@ Earlier incomplete probes remain failed historical observations, detailed in [th
 - Parent then publishes one **new**, read-only zero-traffic readiness preview; candidate [demo](https://readiness---raid-relic-vz4bhnskgq-uc.a.run.app/demo/) is not yet published. Existing P9ee/cc previews and canonical6401/P7ON stay unchanged. Grok approval is required for any later canonical promotion.
 
 J5 pinned24f29c0 checker/job and J6 baseline pins/protected cleanup/dry-run policy remain immutable. No scheduler/config/credential operation is authorized. Hosting costs are not guaranteed zero. Multiple simultaneous relics and active clipping remain future work; clips stay double-OFF and unwired, with no new consent or default scopes.
+
+## Current candidate160 (not published)
+
+Prior readiness1a2a1b7/tagreadiness is already published at immutable zero traffic; canonical6401/Main, P9ee/P8cc and J5/J6 remain unchanged. Current candidate160 implements the [eight-point P9 review](P9_REVIEW_POINTS.md), with parent-reported706/706 unit tests, zero skips, both adapter OTHER command proofs, three initial review checks passed and three labelled simulated captures viewed good. Physical Twitch replies are not observed; no historical incident cause or speculative sender fix is claimed.
+
+Fresh real-soak PASS on this unchanged runtime:900383ms,25 natural35-second tours plus two warm-ups/20 stress cycles,27 samples; retained heap5105144→5349936 (+244792B), peak5415896/raw6611984, OLS13658.79B/min. DOM284/listeners54/documents2/page1/context1 remained flat, all socket/API/fetch/XHR/beacon/storage/provider/external/failed-request/browser-error counters were0. GPU CPU was reported121.51s (renderer111.29s/browser3.03s), so do not assert GPU<120. Inherited CPU120 and all other limits were unchanged with no waiver; all actual hard run gates passed. The887214ms candidate159 run remains FAILED historical evidence. No whole-OS/GPU-memory or physical Twitch proof follows.
+
+Final repeat review and the full31 serial workflow gate remain pending. Parent then reviews/commits and publishes one separate read-only/P7-OFF zero tag, planned p9-review /raid-relic-p9review1026; no new build/deployment or canonical promotion has occurred. Clips stay double-OFF/unwired with no consent/scope changes.

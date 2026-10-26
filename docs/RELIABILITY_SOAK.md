@@ -1,6 +1,8 @@
 # Real-clock demo reliability soak — increment150
 
-**Current result: parent-reported PASS for source156.** Actual900375ms normal-motion WebGL observation,25 completed natural35s tours, two warm-ups,20 reuse stress cycles and27 samples passed the unchanged guards. Source author did not run native QA. Accessibility157/new preview still await parent review; production6401/P7ON, immutable P9ee/cc previews, clips OFF/unwired and pinned J5/J6 remain unchanged.
+**Current candidate160: parent-reported PASS.** The unchanged runtime completed900383ms,25 natural tours plus two warm-ups/20 reuse stress cycles and27 samples.706/706 tests and the first review3/captures passed; final repeat/all31 serial workflows and publication remain pending. The old source156 PASS and incomplete probes below are historical checkpoints.
+
+**Historical source156 result: parent-reported PASS.** Actual900375ms normal-motion WebGL observation,25 completed natural35s tours, two warm-ups,20 reuse stress cycles and27 samples passed the unchanged guards. Source author did not run native QA. Accessibility157/new preview still await parent review; production6401/P7ON, immutable P9ee/cc previews, clips OFF/unwired and pinned J5/J6 remain unchanged.
 
 Inside the existing parent-reviewed Node22+ /native sandboxed Chromium workflow, run:
 
@@ -77,3 +79,15 @@ Parent reports699/699 zero-skip tests, all29 serial workflows/94 checks and a co
 Run heavy soak and subsecond cinematic probes **separately**. A parallel cohort missed a short flash; same-source sequential WebGL/SVG checks and all29 serial flows passed, so no production animation fix is inferred. The pass uses actual tiny-widget24/12FPS, full60/30, corner30; tiny no-MSAA, DPR1 physical rectangular buffer, visible scene reuse and permanent lifecycle disposal. No fake clock or raised limits were used.
 
 Increment157 changes HTML/CSS accessibility without changing the tested demo.js/demo-state.js/relic3d.js/cinematic.js or demo art dimensions. Parent must verify these fingerprints and new accessibility gates. Any later soak-sensitive JS/lifecycle/dimension change requires another real run. New readiness preview is not yet published; canonical and immutable previews remain unchanged.
+
+## Candidate159 late failure /160 tiny idle follow-up
+
+Parent reports the candidate159 run failed active-context-loss at887214ms,25 cycles/25 samples, GPU CPU120.93s under the unchanged inheritedCPU120 budget. Heap endpoint+269440B and OLS13521B/min passed, DOM284/listeners54 were constant and API/socket/storage/provider counters were0. It is not a900000ms pass. Candidate160 lowers only genuine tiny-widget idle rendering from12 to10FPS; tiny arrival24/full60–30/corner30, normal WebGL, resolution, clocks and every soak/resource guard remain unchanged. Static completion still paints once and stops. A fresh full real soak is pending; no limit increase or SVG substitution is authorized.
+
+## Source160 completed run — parent report161
+
+Actual900383ms/25 natural tours/27 samples, normal WebGL390×844, passed every hard run gate. Heap5105144→5349936 (+244792B), retained peak5415896/raw6611984 and OLS13658.79B/min; DOM284/listeners54/documents2/page1/context1 flat. All WS/server sockets/API/fetch/XHR/beacon/storage/provider/external/failed-request/browser-error counters were0, no crash/disconnect. Reported GPU CPU121.51s, renderer111.29s/browser3.03s must not be described as GPU below120. InheritedCPU120 and every resource/timing/memory guard remained unchanged; no waiver was made. This is the operator-reported diagnostic and hard-gate outcome, not proof of an exact signal or OS/GPU-memory flatness. Candidate159's887214ms run remains a failure. Final31 serial browser gates and new zero-preview publication are pending; no runtime change is authored by161.
+
+## Test-only timing margin162
+
+The cinematic browser gate retains two positive flash samples, now3200/3350ms after receipt rather than3200/3600ms. Native transport, GPU and locator work could consume the former second sample's100ms headroom; this is not a production flash change. Both actual WebGL/SVG visibility/opacity assertions and the3200ms capture remain. A pure fresh-host test pins3600/3699ms positive and3700ms zero flash with shock still active. Run short phase probes serially and separately from heavy soak. No application/renderer/state/CSS/profile or real-soak code changes; source160's parent-reported900383ms proof remains applicable. Final31-flow gate/publication are still pending.
