@@ -18,7 +18,7 @@ export const EVENT_BADGE='Carried during TwitchCon San Diego 2026';
 export function badgeDescription(name) {
   if(name==='Unbroken streak · 3 hand-offs')return 'Received the relic after three consecutive tracked successful bindings, without a known verified-window lapse. Earlier hand-offs are not tracked.';
   const edition=EDITION_CONFIG.find(e=>e.badgeLabel===name);if(edition)return 'Recorded carrying during the cosmetic '+edition.name+' edition, '+editionWindowLabel(edition)+'. This does not prove conference attendance. '+FAN_DISCLAIMER;
-  const meanings={'First Keeper':'The first Keeper of this recorded journey.','24h Keeper':'Held the relic for at least 24 hours of recorded time.','Chain of 3':'Carried the relic on the third or later raid in an unbroken chain.',[EVENT_BADGE]:'Event-days badge: recorded holding during San Diego, 13–15 Nov 2026; not proof of conference attendance.'};
+  const meanings={'First Keeper':'The first Keeper of this recorded journey.','24h Keeper':'Held the relic for at least 24 hours of recorded time.','Chain of 3':'Legacy journey badge: carried the relic on the third or later recorded hand-off. Failed-window history was not recorded; this is not proof of an unbroken streak.',[EVENT_BADGE]:'Event-days badge: recorded holding during San Diego, 13–15 Nov 2026; not proof of conference attendance.'};
   if(/^Ring (1|5|10)$/.test(name))return `Carried the relic on recorded raid ${name.slice(5)}, creating that growth ring.`;
   return Object.hasOwn(meanings,name)?meanings[name]:'';
 }
