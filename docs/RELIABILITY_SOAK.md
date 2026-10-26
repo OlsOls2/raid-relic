@@ -1,6 +1,6 @@
 # Real-clock demo reliability soak — increment150
 
-**Not yet run by the source author.** Parent native isolated execution is required. The source author's network-namespace workflow remains unavailable; no15-minute result is invented. Accessibility156 waits for the first real soak result. Production6401/P7ON, immutable P9ee/cc previews, clips OFF/unwired and pinned J5/J6 remain unchanged.
+**Current result: parent-reported PASS for source156.** Actual900375ms normal-motion WebGL observation,25 completed natural35s tours, two warm-ups,20 reuse stress cycles and27 samples passed the unchanged guards. Source author did not run native QA. Accessibility157/new preview still await parent review; production6401/P7ON, immutable P9ee/cc previews, clips OFF/unwired and pinned J5/J6 remain unchanged.
 
 Inside the existing parent-reviewed Node22+ /native sandboxed Chromium workflow, run:
 
@@ -69,3 +69,11 @@ Increment155 explicitly trades tiny-widget3D refresh cadence for GPU/battery eff
 Demo text/disabled/hidden/playing/phase assignments now avoid unchanged DOM writes. A pure key covers every fictional non-clock field, reusing the projected scene and only updating the renderer when semantics change. Clock/cinematic presentation still advances each native RAF; stop/reset/lifecycle release clear the scene memo and snapshot. Browser checks measure real1s tiny-widget idle/arrival frame growth, unchanged progress/lock/ring mutations and renderer resume calls; semantic changes remain covered by the scene-key unit and existing tour tests.
 
 Sixth native real900s soak and fresh parent regression remain pending. Duration,≥20 natural tours, two warm-ups,20 reuse stress cycles, resource caps and heap16KiB/min/2MiB/DOM/listener/socket guards are unchanged. Active context loss still fails. If this cannot satisfy the existing operator budget, report the constraint rather than waive it. Accessibility156 waits for positive900s proof.
+
+## Completed parent run — source156 / readiness157 checkpoint
+
+Parent reports699/699 zero-skip tests, all29 serial workflows/94 checks and a completed900375ms soak. Retained JS heap5038332→5266932 (+228600B), raw sample peak6558564, retained peak5319288 and OLS8811.35B/min passed the predefined guards. DOM257/listeners48/documents2/page1/context1 remained constant. All demo API/WS/fetch/XHR/beacon/storage/provider/external/failed-request/browser-error/server-socket counters were0. GPU CPU119.81s, renderer106.48s/browser2.88s remained inside unchanged CPU120 and other resource caps. This is bounded JS/DOM/socket proof, not whole-OS RSS, GPU-memory or physical Twitch validation. Earlier incomplete probes above remain failures, not retroactive passes. The initial syntax-only failure before observation supplied no soak data.
+
+Run heavy soak and subsecond cinematic probes **separately**. A parallel cohort missed a short flash; same-source sequential WebGL/SVG checks and all29 serial flows passed, so no production animation fix is inferred. The pass uses actual tiny-widget24/12FPS, full60/30, corner30; tiny no-MSAA, DPR1 physical rectangular buffer, visible scene reuse and permanent lifecycle disposal. No fake clock or raised limits were used.
+
+Increment157 changes HTML/CSS accessibility without changing the tested demo.js/demo-state.js/relic3d.js/cinematic.js or demo art dimensions. Parent must verify these fingerprints and new accessibility gates. Any later soak-sensitive JS/lifecycle/dimension change requires another real run. New readiness preview is not yet published; canonical and immutable previews remain unchanged.

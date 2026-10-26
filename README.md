@@ -4,9 +4,11 @@ An original, evolving relic travels between Twitch communities: a verified raid 
 
 ## Judge in 60 seconds
 
-1. Open the **[P9 browser demo](https://p9-stretch---raid-relic-vz4bhnskgq-uc.a.run.app/demo/)**. No Twitch login, installation or credentials are needed. Press **Autoplay 35-second tour**.
+1. Open the **[Readiness review demo](https://readiness---raid-relic-vz4bhnskgq-uc.a.run.app/demo/)** (operator publishes after final gates). No Twitch login, installation or credentials are needed. Press **Autoplay 35-second tour**.
 2. Pause to take over, or Reset → Send Off → offer early → simulate receipt → accept. Tab/Enter operate the controls; reduced motion uses static presentation. Download a zero-ring **SIMULATED DEMO** PNG if you like.
-3. Open the **[P9 Atlas](https://p9-stretch---raid-relic-vz4bhnskgq-uc.a.run.app/atlas/)** for recorded stops, configured Keepers, badges, local replay and per-stop ring cards. Reading never opts a viewer into public scores.
+3. Open the **[Readiness review Atlas](https://readiness---raid-relic-vz4bhnskgq-uc.a.run.app/atlas/)** (publication pending) for recorded stops, configured Keepers, badges, local replay and per-stop ring cards. Reading never opts a viewer into public scores.
+
+Until publication, the immutable prior [P9ee demo](https://p9-stretch---raid-relic-vz4bhnskgq-uc.a.run.app/demo/) and [P9ee Atlas](https://p9-stretch---raid-relic-vz4bhnskgq-uc.a.run.app/atlas/) remain available. The planned new revision is `raid-relic-ready1026`, tag `readiness`, zero traffic/read-only/P7 OFF; it has not been deployed.
 
 The permanently labelled demo starts with fictional Keepers and zero rings. It runs only in browser memory: **no API, socket, provider or storage writes** (`connect-src 'none'`). The Atlas is separate and reads retained public records.
 
@@ -77,7 +79,7 @@ All original app code and docs were authored in the single original session **`0
 
 Reviews caught seconds-versus-milliseconds guards, swallowed4xx diagnostics, an unused chat sender, zero-opacity fusion and a vendor inline canvas style covering its SVG fallback. Grok/Olly reported physical P5 success; that is not proof of all newer features. [Curated Codex account](docs/CODEX_USAGE.md) · [session/evidence limits](CODEX_SESSION.md).
 
-**Last parent-verified ee baseline:**685/685 tests, zero skips;29 browser workflows/94 checks;four viewed labelled simulation images;54 HTTP-response SHA matches and unchanged three OAuth metadata timestamps (zero fields read). This is historical proof before readiness changes. Fresh regression, a **real fifteen-minute wall-clock soak** (increments150–155) and accessibility review (156) are pending. [Judge guide](docs/JUDGES_QUICKSTART.md).
+**Last parent-verified ee baseline:**685/685 tests, zero skips;29 browser workflows/94 checks;four viewed labelled simulation images;54 HTTP-response SHA matches and unchanged three OAuth metadata timestamps (zero fields read). This is historical proof before readiness changes. Parent verified readiness source156:699/699 tests, zero skips, and all29 browser workflows/94 checks serially. The **real fifteen-minute wall-clock soak** passed:900375ms,25 natural tours,27 samples, retained heap +228600B /8811.35B per minute, constant DOM/listeners and zero demo API/socket/storage/provider traffic. These are local simulated browser measurements, not physical Twitch proof. Parent additionally reports source157701/701 zero skips and the accessibility capture run:3 checks passed, all three labelled simulated landing/demo/Atlas images viewed good. The non-capture run exposed concurrent test-click racing;158 serializes those actions. The final full30-flow gate and readiness publication remain pending; no all30 pass or new deployment is claimed. [Judge guide](docs/JUDGES_QUICKSTART.md).
 
 ## Local development and what's next
 

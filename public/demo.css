@@ -6,3 +6,8 @@
 @media(max-width:650px){.demo-layout{display:block}.demo-layout>div:first-child{display:contents}.demo-visual{position:sticky;top:var(--demo-banner-height,100px);z-index:10;background:#101d30;max-height:min(35vh,220px);padding:2px 0}.demo-visual .archive{height:min(24vh,165px)}.demo-visual #demo-rings{font-size:18px;margin:2px 0}.demo-visual .crystal{width:82px}#demo-sigils{bottom:12px;font-size:20px}.demo-visual #demo-bands{inset:12% 30%}}
 
 @media(max-width:650px){.demo-visual .archive{height:min(18vh,135px)}}
+
+/* Keyboard access without changing the tested art dimensions or animation clock. */
+.skip-link{position:absolute;top:0;left:12px;transform:translateY(-150%);z-index:50;padding:12px;background:#101d30;color:#e6bb70}.skip-link:focus{transform:none}
+a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,main:focus-visible{outline:3px solid #e6bb70;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}

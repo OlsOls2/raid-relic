@@ -1,3 +1,5 @@
+> CURRENT157: parent reports source156699/699 zero skips,29 serial workflows94 checks and real900375ms/25-tour normal-WebGL soak PASS. HTML/CSS accessibility/first-impression and native QA script only; preserve tested demo/state/renderer/cinematic JS and art dimensions. Accessibility157/new zero-preview pending parent QA, no promotion. No Git/cloud/provider/credentials/delegation or pinned J5/J6 changes.
+
 > CURRENT155: genuine tiny-widget24/12FPS (full60/30, corner30 unchanged), demo semantic scene memo and unchanged DOM-write suppression only. Fifth parent soak failed at389302ms, not a pass; sixth real900s proof pending. No cap/timing/memory waiver or context-loss ignore. Accessibility156 waits. No Git/cloud/provider/credentials/delegation or pinned J5/J6 changes.
 
 > CURRENT154: initial small-widget (valid CSS min axis≤160px) no-MSAA profile matching corners; larger/unknown initial bounds retain AA request. No context recreation on resize, frame/motion/timing/resource waiver. Parent fourth soak stopped at248622ms; fifth real900s proof pending, accessibility155 waits. No Git/cloud/provider/credentials/delegation or pinned J5/J6 changes.

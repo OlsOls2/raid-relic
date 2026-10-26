@@ -22,3 +22,9 @@ h1{overflow-wrap:normal;word-break:normal;hyphens:none}
 .atlas-relic-figure{margin:0;width:min(100%,320px);min-width:0;display:flex;flex-direction:column;align-items:center;justify-self:center;max-width:100%}.atlas-relic-figure>.edition-label{width:min(100%,320px);text-align:center}
 
 .edition-disclaimer{display:block;max-width:38ch;font:11px/1.5 system-ui;color:#bbc6d7;margin-top:4px}
+
+/* Consistent keyboard access across links, native disclosure and replay inputs. */
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,main:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+nav>a{min-height:24px;display:inline-flex;align-items:center}.skip-link{z-index:50}
+@media(max-width:380px){header{flex-wrap:wrap}.ledger-heading{flex-wrap:wrap}.keeper-leaderboard{grid-template-columns:minmax(0,1fr)}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
