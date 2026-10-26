@@ -9,7 +9,7 @@ test('health reports validated release and foundation readiness without claiming
   for (const length of [40, 64]) {
     const commit = 'a'.repeat(length);
     const response = await createApp({ releaseCommit: commit }).dispatch({ method: 'GET', path: '/health' });
-    assert.deepEqual(JSON.parse(response.body), { status: 'ok', releaseCommit: commit, phase: 'foundation', readiness: 'not-ready-for-raids' });
+    assert.deepEqual(JSON.parse(response.body), { status: 'ok', releaseCommit: commit, phase: 'foundation', readiness: 'not-ready-for-raids', mode:'live' });
   }
   assert.equal(validateReleaseCommit(undefined), null);
   assert.throws(() => validateReleaseCommit(undefined, { required: true }));

@@ -3,7 +3,8 @@ import { hash } from './crypto.js';
 import { INITIAL_HOME } from './lifecycle.js';
 export const SCORE_LIMITS = Object.freeze({ players: 128, bytes: 65536, top: 20 });
 export const TWITCHCON = Object.freeze({ label: 'TwitchCon San Diego 2026', source: 'https://www.twitchcon.com/san-diego-2026/', checked: '2026-10-25', startsAt: Date.parse('2026-11-13T08:00:00Z'), endsAt: Date.parse('2026-11-16T08:00:00Z') });
-export const isScoreCommand = chat => ['scores-on','scores-off','top','badges'].includes(chat?.markAction?.type);
+export const isReplyCommand=chat=>Boolean(chat?.markAction&&typeof chat.messageId==='string'&&!chat.isBot&&!chat.copied);
+export const isScoreCommand = chat => isReplyCommand(chat)&&!['offer','accept','mymarks'].includes(chat.markAction.type);
 const login = value => typeof value === 'string' && /^[a-z0-9_]{1,25}$/.test(value);
 const actorKey = id => hash(`score-actor-v1:${id}`);
 const link = hop => hash(`score-hop-v1:${hop?.intentId ?? hop?.eventId}`);
@@ -14,45 +15,47 @@ export function retainedScores(scores, channels, marks) {
     && !Object.keys(channels).some(host => [...(channels[host]?.blockedUserIds ?? []), ...(marks[host]?.blocked ?? [])].some(id => actorKey(id) === p.key))) };
 }
 // Private bounded consent/aggregate document. No raw actor IDs or chat text.
-export function reduceScores(previous, { channels, marks, chat, now, vote, completion, hop }) {
-  const doc = structuredClone(previous ?? { version: 1, players: [], receipts: [] });
-  const action = chat?.markAction?.type, key = chat && actorKey(chat.chatterId);
-  doc.receipts = doc.receipts.filter(r => r.until > now);
-  doc.players = retainedScores(doc,channels,marks).players.filter(p => !(action === 'forgetme' && p.key === key));
-  let message = null;
-  const scoreCommand = isScoreCommand(chat);
-  const request = scoreCommand ? hash(JSON.stringify(['score-command-v1',chat.broadcasterId,chat.chatterId,chat.messageId])) : null;
-  // Withdrawal is an erasure, never contingent on reply/receipt capacity or pause.
-  if (action === 'scores-off' && !doc.receipts.some(r=>r.key===request) && !chat.isBot && !chat.copied && channels[chat.broadcasterId] && /^\d{1,32}$/.test(chat.chatterId)) doc.players = doc.players.filter(p => p.key !== key);
-  if (scoreCommand && !chat.isBot && !chat.copied && channels[chat.broadcasterId]?.online && allowed(chat.broadcasterId, channels, marks, chat.chatterId)) {
-    if (action !== 'scores-off' && !doc.receipts.some(r => r.key === request) && doc.receipts.length >= 128) message = 'Score requests are busy. No consent change was accepted. Use !relic forgetme to erase retained content and scores.';
-    if (!doc.receipts.some(r => r.key === request) && doc.receipts.length < 128) {
-      const rate = hash(`score-rate-v1:${chat.broadcasterId}:${chat.chatterId}:${action==='scores-off'?'erase':'read'}`);
-      const limited = doc.receipts.some(r => r.rate === rate && r.at + 30000 > now);
-      // Minimal original-message receipts survive erasure and rate rejection for ten minutes.
-      doc.receipts.push({ key: request, until: now + 600000, ...(limited ? {} : { rate, at: now }) });
-      if (action === 'scores-off') { doc.players = doc.players.filter(p => p.key !== key); message = limited ? null : 'Public scores off. Your score name, participation count and links have been erased.'; }
-      else if (!limited && action === 'scores-on') {
-        if (!login(chat.chatterLogin)) message = 'Scores need your verified Twitch login. No public score was created.';
-        else {
-          let row = doc.players.find(p => p.key === key);
-          if (!row && doc.players.length >= 128) message = 'The public score register is full. Your claims still work; no score was created.';
-          else { if (!row) { row = { key, login: chat.chatterLogin, channels: [], joined: 0, since: now }; doc.players.push(row); }
-            // A verified rename updates this self-consented row, never rekeys history.
-            row.login = chat.chatterLogin; if (!row.channels.length) row.channels.push(chat.broadcasterId);
-            message = `@${row.login}: public scores on for future completed claims. Anyone can see this name and count. Use !relic scores off to erase them.`;
-          }
-        }
-      } else if (!limited && ['top','badges'].includes(action)) message = action;
-    }
+export function reduceScores(previous, { channels, marks, chat, now, vote, completion, hop, acknowledged=false }) {
+ const doc=structuredClone(previous??{version:1,players:[],receipts:[]}),action=chat?.markAction?.type,key=chat&&actorKey(chat.chatterId),host=chat?.broadcasterId;
+ doc.receipts=doc.receipts.filter(r=>r.until>now);doc.players=retainedScores(doc,channels,marks).players.filter(p=>!(action==='forgetme'&&p.key===key));
+ const command=isReplyCommand(chat),request=command?hash(JSON.stringify(['score-command-v1',host,chat.chatterId,chat.messageId])):null,duplicate=doc.receipts.some(r=>r.key===request);
+ // Erasure always precedes reply budgets, including offline/full/spam cases.
+ if(action==='scores-off'&&!duplicate&&!chat.isBot&&!chat.copied&&channels[host])doc.players=doc.players.filter(p=>p.key!==key);
+ let message=null,reason='not-command';
+ const safe=command&&channels[host]?.optedIn&&!channels[host].banned&&marks[host]?.context?.optedIn&&!channels[host].blockedUserIds?.includes(chat.chatterId)&&!marks[host].blocked?.includes(chat.chatterId)&&!marks[host].context?.blockedUserIds?.includes(chat.chatterId);
+ if(command){reason=safe?'queued':'policy-blocked';if(duplicate)reason='duplicate';else if(!safe)reason='policy-blocked';else if(acknowledged)reason='handled';else if(doc.receipts.length>=128)reason='capacity';else{
+  const rate=hash(`command-rate-v2:${host}:${chat.chatterId}:${action}`),notice=hash(`command-notice-v2:${host}:${chat.chatterId}`),limited=doc.receipts.some(r=>r.rate===rate&&r.at+10000>now);
+  const r={key:request,until:now+600000,...(!limited?{rate,at:now}:{})};doc.receipts.push(r);
+  let consentMessage=null;if(action==='scores-on'&&!limited){
+    if(!channels[host].online||!allowed(host,channels,marks,chat.chatterId))consentMessage='Scores on requires this opted-in Keeper to be live and unpaused. Reading the ledger does not opt you in.';
+    else if(!login(chat.chatterLogin))consentMessage='Scores need your verified Twitch login. No public score was created.';
+    else{let row=doc.players.find(p=>p.key===key);if(!row&&doc.players.length>=128)consentMessage='The public score register is full. Your claims still work; no score was created.';else{if(!row){row={key,login:chat.chatterLogin,channels:[],joined:0,since:now};doc.players.push(row);}row.login=chat.chatterLogin;if(!row.channels.length)row.channels.push(host);consentMessage=`@${row.login}: public scores on for future completed claims. Anyone can see this name and count. Use !relic scores off to erase them.`;}}
+
   }
-  if (vote) { const row = doc.players.find(p => p.key === actorKey(vote)); if (row && row.since <= now) row.vote = link(hop); }
-  if (completion) for (const row of doc.players) {
-    if (row.vote === completion.link && completion.actors.some(id => actorKey(id) === row.key)) { row.joined++; delete row.vote; }
+  if(!doc.replyBudget||now>=doc.replyBudget.at+60000)doc.replyBudget={at:now,total:0,channels:{}};
+  const budget=doc.replyBudget;
+  if(now<budget.at||budget.total>=40||(budget.channels[host]??0)>=20)reason='budget';
+  else if(limited&&doc.receipts.some(x=>x.notice===notice&&x.noticeUntil>now))reason='cooldown-quiet';
+  else{
+   budget.total++;budget.channels[host]=(budget.channels[host]??0)+1;
+   if(limited){r.notice=notice;r.noticeUntil=now+10000;message='Please wait ten seconds before repeating that command.';reason='cooldown';}
+   else if(action==='scores-off')message='Public scores off. Your score name, participation count and links have been erased.';
+   else if(action==='scores-on')message=consentMessage;
+   else if(['top','badges'].includes(action))message=action;
+   else if(['offer','accept'].includes(action))message=hop&&!hop.cancelled&&!hop.finalized&&now<hop.endsAt?'That vote was not counted. Check the ritual, chat role and deadline.':'No active verified claim is available here. Begin a new Send Off with the Keeper.';
+   else if(action==='forgetme')message='Your retained marks, shared links and public scores were erased. Stream quota and cooldown are not refunded.';
+   else if(action==='mymarks')message='Mark-history link not queued. Use your own verified login and wait one minute between requests. Shared links are public to anyone who receives them.';
+   else if(['approve','block','veto-last','pause'].includes(action)&&chat.chatterId!==host&&!chat.isModerator)message='Only this broadcaster or an authorized moderator can use that command.';
+   else if(action==='mark')message=channels[host].online&&!channels[host].paused&&marks[host]?.context?.holdsRelic?'Mark request processed under the stream quota and cooldown. Only moderator-approved marks become public.':'Marks require a live, unpaused Keeper holding the relic. Nothing pending is public.';
+   else if(action==='send')message='Send Off request checked. The Keeper uses private control to process an eligible queued request; never repeat an unknown dispatch.';
+   else if(action==='help')message='Raid Relic: !mark word, !offer, !accept, !relic mymarks, !relic top, !relic badges, !relic scores on/off, !relic forgetme. Keeper setup and Send Off use private controls.';
+   else message='Keeper command checked. Refresh your private control for the authoritative result; role and stream safety rules still apply.';
   }
-  // Metadata exhaustion must never abort a game transfer. Opt-ins are refused first.
-  if (Buffer.byteLength(JSON.stringify(doc)) > SCORE_LIMITS.bytes) throw Error('Score capacity invariant');
-  return { doc, message };
+ }}
+ if(vote){const row=doc.players.find(p=>p.key===actorKey(vote));if(row&&row.since<=now)row.vote=link(hop);}
+ if(completion)for(const row of doc.players)if(row.vote===completion.link&&completion.actors.some(id=>actorKey(id)===row.key)){row.joined++;delete row.vote;}
+ if(Buffer.byteLength(JSON.stringify(doc))>SCORE_LIMITS.bytes)throw Error('Score capacity invariant');
+ return{doc,message,reason};
 }
 export const scoreCompletion = (hop, actors) => ({ link: link(hop), actors });
 // Public projection is an explicit whitelist; history is bounded, never an all-time claim.
@@ -86,11 +89,14 @@ export function scoreMessage(kind, view, host) {
 }
 
 export function scoreAckDocument(previous, chat, message, channel, marks, now) {
-  const clean = ackDocument(previous, null, null, channel, marks, now);
+  const read=true; // This outbox delivers status only, never game authority.
+  const policyChannel=read?{...channel,online:true,paused:false,blockedUserIds:[]}:channel,policyMarks=read?{...marks,paused:false,blocked:[]}:marks;
+  const previousRows=structuredClone(previous??{rows:[]});if(['forgetme','scores-off'].includes(chat?.markAction?.type))for(const row of previousRows.rows)if(row.status==='queued'&&(row.consentKey===actorKey(chat.chatterId)||row.actorKey===hash(`${chat.broadcasterId}:${chat.chatterId}`))){row.status='cancelled';delete row.message;delete row.actorKey;delete row.consentKey;}
+  const clean = ackDocument(previousRows, null, null, policyChannel, policyMarks, now);
   if (clean.rows.length >= 128 && !clean.rows.some(r=>r.key===ackKey(chat))) return clean;
-  const doc = ackDocument(clean, chat, message, channel, marks, now, now);
+  const ownChat={...chat,markAction:{type:'top'}};const doc = ackDocument(clean, ownChat, message, policyChannel, policyMarks, now, now);
   const row = doc.rows.find(r=>r.key===ackKey(chat));
-  if (row?.status==='queued') { row.scoreKind=chat.markAction.type; if(row.scoreKind==='scores-on' && row.message.startsWith('@')) { row.consentKey=actorKey(chat.chatterId); row.message='Public score consent updated.'; } if(['top','badges'].includes(row.scoreKind)) row.message='Read public score summary.'; }
+  if (row?.status==='queued') { row.scoreKind=chat.markAction.type;row.readSummary=['top','badges'].includes(row.scoreKind)&&message?.startsWith(row.scoreKind==='top'?'Recorded Keepers:':'Keeper badges:'); if(row.scoreKind==='scores-on' && row.message.startsWith('@')) { row.consentKey=actorKey(chat.chatterId); row.message='Public score consent updated.'; } if(['top','badges'].includes(row.scoreKind)&&message===undefined)row.message='Read public score summary.'; }
   // Bounded score metadata is separate from the gameplay ACK register.
   if (Buffer.byteLength(JSON.stringify(doc))>65536) { if(row?.status==='queued'){ row.status='cancelled';delete row.message;delete row.actorKey;delete row.consentKey; } }
   return doc;
@@ -99,9 +105,12 @@ export function scoreAckMutation(previous, op, channel, marks, now, scores, line
   const doc=structuredClone(previous??{rows:[]}), row=doc.rows.find(r=>r.key===op.key);
   if(op.type==='claim'&&row?.status==='queued') {
     if(row.consentKey) { const consent=scores?.players.find(p=>p.key===row.consentKey); if(!consent) {row.status='cancelled';delete row.message;delete row.actorKey;} else row.message=`@${consent.login}: public scores on for future completed claims. Anyone can see this name and count. Use !relic scores off to erase them.`; }
-    if(['top','badges'].includes(row.scoreKind)) row.message=scoreMessage(row.scoreKind,scoreboard(lineage,registry,scores,config,now),host);
+    if(row.readSummary===true||(row.readSummary===undefined&&['top','badges'].includes(row.scoreKind))) row.message=scoreMessage(row.scoreKind,scoreboard(lineage,registry,scores,config,now),host);
   }
-  const next=ackStep(doc,op,channel,marks,now);
-  for(const r of next.doc.rows) if(r.status!=='queued'){delete r.consentKey;delete r.scoreKind;}
+  const read=Boolean(row);
+  if(op.type==='claim'&&row?.status==='queued'&&[...(channel?.blockedUserIds??[]),...(marks?.blocked??[]),...(marks?.context?.blockedUserIds??[])].some(id=>hash(`${host}:${id}`)===row.actorKey)){row.status='cancelled';delete row.message;delete row.actorKey;delete row.consentKey;}
+  const next=ackStep(doc,op,read?{...channel,online:true,paused:false,blockedUserIds:[]}:channel,read?{...marks,paused:false,blocked:[]}:marks,now);
+  if(next.result){next.result.kind=row?.scoreKind;next.result.reason=row?.message?.startsWith('Please wait')?'cooldown':'normal';}
+  for(const r of next.doc.rows) if(r.status!=='queued'){delete r.consentKey;delete r.scoreKind;delete r.readSummary;}
   return next;
 }

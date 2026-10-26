@@ -26,7 +26,7 @@ const ambient = Array.from({ length: 6 }, (_, i) => {
   const svg = document.createElementNS(ns, 'svg'); svg.setAttribute('viewBox','0 0 64 64'); svg.classList.add('p31-decorative'); svg.dataset.decorative = 'true'; svg.setAttribute('aria-hidden','true'); svg.hidden = true; svg.setAttribute('hidden','');
   const polygon = document.createElementNS(ns,'polygon'); polygon.setAttribute('points',decorativePoints(i)); svg.append(polygon); archiveNode.append(svg); return svg;
 });
-const sourceCaption = document.createElement('p'); sourceCaption.className = 'p31-source'; sourceCaption.hidden = true; archiveNode.append(sourceCaption);
+const sourceCaption = document.createElement('p'); sourceCaption.className = 'p31-source'; sourceCaption.hidden = true; archiveNode.after(sourceCaption);
 function clearCinema() { for (const node of [...Object.values(effects), ...words, ...ambient, sourceCaption]) { node.hidden = true; if (node.classList.contains('p3-word')) node.textContent = ''; if (node.classList.contains('p31-decorative')) node.setAttribute('hidden',''); } sourceCaption.textContent = ''; archiveNode.dataset.ambientCount = '0'; archiveNode.dataset.charge = 'false'; archiveNode.style.setProperty('--charge-level', '0'); archiveNode.style.setProperty('--charge-alpha', '0'); archiveNode.dataset.fusionPending = 'false'; archiveNode.style.setProperty('--p3-shake', '0px'); }
 
 const soundButton = document.querySelector('#sound-toggle');
@@ -57,7 +57,7 @@ function render(snapshot) {
   runes.replaceChildren();
   document.querySelector('#charge').style.width = '0%';
   if (!snapshot) { count.textContent = 'No current state'; document.querySelector('#compact-count').textContent = 'No current state'; return; }
-  document.querySelector('#simulator').hidden = snapshot.mode !== 'simulator';
+  document.querySelector('#simulator').textContent=snapshot.mode==='simulator'?'SIMULATOR · local test data':'';document.querySelector('#simulator').hidden = snapshot.mode !== 'simulator';
   const simulated = snapshot.mode === 'simulator';
   const messages = { incoming: 'The relic arrives… bind it with two chats', ready: 'Bound by two chats', paused: 'The Keeper has paused the ritual', waiting: snapshot.movedToLogin ? `The relic has moved on to @${snapshot.movedToLogin}` : 'The relic stirs… awaiting a Keeper', unavailable: 'The relic is out of sight…' };
   state.textContent = snapshot.claimMeter?.awaitingRaid ? 'The relic stirs… waiting for Twitch to confirm the raid' : messages[snapshot.status];
@@ -76,15 +76,19 @@ function render(snapshot) {
     runes.append(image);
   });
 }
+let frameId=null;
 if (channel) connectOverlay({ url: `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/${channel}`, render,
   status(value) {
+    document.body.dataset.connection=value;
+    if(value==='suspended'){cancelAnimationFrame(frameId);frameId=null;count.textContent='Paused to save resources';document.querySelector('#compact-count').textContent='Focus to resume';}else if(frameId===null&&!document.hidden&&document.body.dataset.connection!=='suspended')frameId=requestAnimationFrame(frame);
     document.body.classList.toggle('disconnected', value !== 'connected');
-    if (value !== 'connected') document.querySelector('#compact-status').textContent = value === 'stale' ? 'State stale' : 'Reconnecting…';
-    if (value !== 'connected') state.textContent = { connecting: 'Connecting to relic state…', reconnecting: 'Connection lost; reconnecting…', stale: 'State stale; reconnecting…' }[value];
+    if (value !== 'connected') document.querySelector('#compact-status').textContent = value==='suspended'?'Paused · focus to resume':value === 'stale' ? 'State stale' : 'Reconnecting…';
+    if (value !== 'connected') state.textContent = { connecting: 'Connecting to relic state…', reconnecting: 'Connection lost; reconnecting…', stale: 'State stale; reconnecting…', suspended:'Paused to save resources—focus/interact to reconnect' }[value];
   } });
 
 let lastReduced = motion.matches, lastHidden = document.hidden;
 function frame() {
+  frameId=null;if(document.hidden||document.body.dataset.connection==='suspended')return;
   if (motion.matches !== lastReduced || document.hidden !== lastHidden) {
     lastReduced = motion.matches; lastHidden = document.hidden; relic3d?.wake();
   }
@@ -174,6 +178,6 @@ function frame() {
     ? hop.completed ? '' : `${current.mode === 'simulator' ? 'App-local ritual' : 'Ritual'} · ${Math.max(0, Math.ceil((hop.endsAt - time) / 1000))}s · offer ${hop.offers}/${hop.threshold} · accept ${hop.accepts}/${hop.threshold}` : '';
   document.querySelector('#compact-handoff').textContent = hop && time < hop.endsAt
     ? hop.completed ? (current.movedToLogin ? '' : 'Bound by two chats') : `${current.mode === 'simulator' ? 'Local ' : ''}${Math.max(0, Math.ceil((hop.endsAt - time) / 1000))}s · O${hop.offers}/${hop.threshold} A${hop.accepts}/${hop.threshold}` : '';
-  requestAnimationFrame(frame);
+  frameId=requestAnimationFrame(frame);
 }
-requestAnimationFrame(frame);
+if(frameId===null&&!document.hidden&&document.body.dataset.connection!=='suspended')frameId=requestAnimationFrame(frame);

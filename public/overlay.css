@@ -113,3 +113,9 @@ body:not(.corner) #handoff:empty{display:none}
 .p3-fusion:before{content:"";position:absolute;pointer-events:none;left:50%;top:50%;width:310px;height:310px;transform:translate(-50%,-50%) rotate(18deg);background:conic-gradient(from 0deg,transparent 0deg 35deg,#fff4dbaa 44deg,transparent 53deg 125deg,#ffe6aaaa 134deg,transparent 143deg 215deg,#fff4dbaa 224deg,transparent 233deg 305deg,#ffe6aaaa 314deg,transparent 323deg);mask-image:radial-gradient(circle,#000 12%,transparent 68%);opacity:var(--fusion-glow,0)}
 .corner .p3-fusion:after,.corner .p3-fusion:before{width:90px;height:90px}
 @media(prefers-reduced-motion:reduce){.p3-fusion:after,.p3-fusion:before{display:none}}
+
+/* Caption is a separate row below the complete orbit, never over a rune. */
+.p31-source{position:static;bottom:auto;margin:10px auto 4px!important;min-height:24px}.corner .p31-source{position:absolute;top:111px;bottom:auto;left:0;width:160px;min-height:0;font:7.5px/9px system-ui;margin:0!important}.corner .charge-track{top:109px}.corner .compact-state{top:122px;font-size:8px;line-height:10px}
+
+/* Voting corner: artwork ends at98px; caption, status and meter own separate rows. */
+.corner.voting .charge-track{top:100px}.corner.voting .p31-source{top:102px}.corner.voting .compact-state{top:113px}

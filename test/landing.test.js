@@ -44,14 +44,18 @@ for(const kind of ['memory','firestore']){
   assert.equal((await f.runtime.state.getPrivateClaimAcks(OTHER)).rows.filter(r=>r.status==='sent').length,2);
   const root=await f.runtime.state.getKeeperRegistry();assert.equal(root.holderId,HOME);assert.equal(root.pendingHop.offers,undefined);assert.equal(root.pendingHop.accepts,undefined);assert.equal((await f.runtime.state.getPublicJourney()).rings,0);
  });
- test(`${kind}: closed replies reject bot, copied, forgotten, blocked and wrong chat-side actors`,async()=>{
+ test(`${kind}: closed claim replies reject unsafe actors; forgotten/wrong-side commands get status without votes`,async()=>{
   const f=await setup(kind);await f.control(HOME,`send:${OTHER}`);f.advance();await f.raid(HOME,OTHER,2);
   await f.chat(HOME,'811','!relic forgetme');await f.runtime.state.setChannelPolicy(OTHER,{banned:false,blockedUserIds:['812']},f.now());
   const end=(await f.runtime.state.getKeeperRegistry()).pendingHop.endsAt;f.advance(end-f.now()+27000);
   const n=f.calls.filter(c=>c.url.endsWith('/chat/messages')).length;
   await f.chat(HOME,'811','!offer');await f.chat(OTHER,'812','!accept');await f.chat(OTHER,BOT,'!accept');await f.chat(HOME,'813','!accept');await f.chat(OTHER,'814','!offer');
   await f.signed('channel.chat.message',{broadcaster_user_id:OTHER,chatter_user_id:OTHER,message_id:'copied-late',source_broadcaster_user_id:HOME,source_message_id:'00000000-0000-4000-8000-000000000001',message:{text:'!accept',fragments:[]}},OTHER,{broadcaster_user_id:OTHER,user_id:BOT});
-  assert.equal(f.calls.filter(c=>c.url.endsWith('/chat/messages')).length,n);assert.equal((await f.runtime.state.getPublicJourney()).rings,0);
+  const extra=f.calls.filter(c=>c.url.endsWith('/chat/messages')).slice(n).map(c=>JSON.parse(c.body));
+  assert.deepEqual(extra.map(c=>c.broadcaster_id),[HOME,HOME,OTHER]);
+  assert.ok(extra.every(c=>c.message==='No active verified claim is available here. Begin a new Send Off with the Keeper.'));
+  assert.equal((await f.runtime.state.getPublicJourney()).rings,0);
+  for(const host of [HOME,OTHER]){const rows=await f.runtime.state.getPrivateClaimAcks(host);assert.ok(!rows.rows.some(r=>r.status==='sent'));}
  });
 }
 test('new clock schemas are closed; legacy90 remains valid and landing cannot pretend to await raid',()=>{

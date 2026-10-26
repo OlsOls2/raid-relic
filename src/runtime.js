@@ -3,7 +3,7 @@ import { createMarkShares, createShareReplies } from './my-marks.js';
 import { createForge } from './forge.js';
 import { randomUUID } from 'node:crypto';
 import { createChronicle } from './chronicle.js';
-import { createClaimAcks } from './claim-ack.js';
+import { createClaimAcks, createBotReplyQueue } from './claim-ack.js';
 import { createApp } from './app.js';
 import { createMemoryState } from './state.js';
 import { createMemoryAuthStore, createFirestoreStore } from './store.js';
@@ -60,7 +60,7 @@ export async function createRuntime(env, { firestoreClient, transport, chronicle
   const sendOff = oauth ? createSendOff({ state, oauth, clientId: env.TWITCH_CLIENT_ID, streamerId: env.TWITCH_STREAMER_ID, transport, now }) : undefined;
   const shares = oauth ? createMarkShares({ key: env.TOKEN_ENCRYPTION_KEY, channels: keeperIds, origin: new URL(env.OAUTH_REDIRECT_URI).origin, now }) : undefined;
   let replies; const bots = {};
-  let pilot, claimAcks, scoreAcks, p7; const sends = {}; const subscriptionManagers = {};
+  let pilot, claimAcks, scoreAcks, p7;const replySchedule=createBotReplyQueue(); const sends = {}; const subscriptionManagers = {};
   if (raidPilot) {
     for (const id of keeperIds) {
       const scoped = { accessToken: (role, options) => role === 'streamer' ? oauth.accessTokenForKeeper(id, options) : oauth.accessToken(role, options) };
@@ -70,9 +70,9 @@ export async function createRuntime(env, { firestoreClient, transport, chronicle
       subscriptionManagers[id] = createSubscriptionManager({ oauth: scoped, bot: channelBot, clientId: env.TWITCH_CLIENT_ID, clientSecret: env.TWITCH_CLIENT_SECRET, streamerId: id, transport });
       sends[id] = createSendOff({ state, oauth: scoped, clientId: env.TWITCH_CLIENT_ID, streamerId: id, transport, now, authorize: source => pilot.authorizeSend(source) });
     }
-    scoreAcks = createClaimAcks({ state: { claimAckStep: (...args) => state.scoreAckStep(...args) }, bots, now });
+    scoreAcks = createClaimAcks({ state: { claimAckStep: (...args) => state.scoreAckStep(...args) }, bots, now, commandReplies:true, schedule:replySchedule });
     p7=createP7({flags:p7Flags,state,oauth,clientId:env.TWITCH_CLIENT_ID,clientSecret:env.TWITCH_CLIENT_SECRET,botId:env.TWITCH_BOT_ID,keeperIds,logins:KEEPERS,transport:p7HTTP,now});
-    claimAcks = createClaimAcks({ state, bots, now, ...(p7.enabled?{p7}:{}) });
+    claimAcks = createClaimAcks({ state, bots, now, schedule:replySchedule, ...(p7.enabled?{p7}:{}) });
     const chronicle = createChronicle({ state, enabled: env.CHRONICLE_ENABLED === 'true', allowPaid: env.CHRONICLE_ALLOW_PAID === 'true',
       key: env.OPENAI_API_KEY, transport: chronicleHTTP, claimId: randomUUID });
     const forge = createForge({ state, enabled: env.CHRONICLE_ENABLED === 'true', allowPaid: env.CHRONICLE_ALLOW_PAID === 'true', key: env.OPENAI_API_KEY, transport: forgeHTTP, claimId: randomUUID, simulator });

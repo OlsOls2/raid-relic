@@ -1,0 +1,35 @@
+{
+  "mode": "HUMAN_INTENT_NOT_GCLOUD_SCHEMA",
+  "repository": "raid-relic",
+  "package": "app",
+  "minimumRecentVersionsToKeep": 5,
+  "deleteCandidates": "Only untagged images after parent review; never execute from this file",
+  "protect": [
+    "All active Cloud Run revision digests",
+    "All tagged images and rollback aliases",
+    "Every candidate/judging pinned digest",
+    "At least the five most recent versions"
+  ],
+  "preconditions": [
+    "Parent inspect current deployed/tagged references and existing Artifact Registry policy",
+    "Resolve every protected image to immutable digest",
+    "Review dry-run candidate list and obtain cleanup approval",
+    "Recheck references immediately before any separately authorized mutation"
+  ],
+  "freeze": "2026-10-31T18:00:00Z",
+  "judgingPin": "Prepare only after all final gates and owner acceptance; no v1 pin created now",
+  "deletionAuthorized": false,
+  "operatorReportedStatus": {
+    "at": "2026-10-26T00:03:00Z",
+    "atApproximate": true,
+    "appliedBy": "parent",
+    "policyFile": "ops/artifact-cleanup-dry-run.json",
+    "cleanupPolicyDryRun": true,
+    "rules": [
+      "delete-untagged-14d",
+      "keep-five-recent"
+    ],
+    "imagesDeleted": false,
+    "activeCleanupEnabled": false
+  }
+}

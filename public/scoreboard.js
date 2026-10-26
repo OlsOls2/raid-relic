@@ -27,7 +27,7 @@ async function loadScores() {
   clear();$('scores-refresh').disabled=true;$('keeper-scores').setAttribute('aria-busy','true');const timer=setTimeout(()=>active.abort(),8000);
   try {
     const r=await fetch('/api/scores',{cache:'no-store',signal:active.signal});if(!r.ok)throw Error();const v=await r.json();if(current!==generation)return;if(!validScores(v))throw Error();
-    $('score-preview').hidden=!v.previewReadOnly;if(v.mode==='simulator')$('simulator').hidden=false;
+    $('score-preview').textContent=v.previewReadOnly?'Read-only preview':'';$('score-preview').hidden=!v.previewReadOnly;if(v.mode==='simulator'){$('simulator').textContent='SIMULATOR · local test journey';$('simulator').hidden=false;}
     for(const [index,row] of v.channels.entries()){const li=node('li');li.hidden=index>=3;li.dataset.rank=String(index+1);const time=node('p',`${holdDuration(row.knownHoldSeconds)} time held · ${row.hopsCarried} ${row.hopsCarried === 1 ? 'raid' : 'raids'} carried`,'score-numbers');time.title=`${row.knownHoldSeconds.toLocaleString()} seconds time held`;time.setAttribute('aria-label',`${row.knownHoldSeconds} seconds time held; ${row.hopsCarried} ${row.hopsCarried===1?'raid':'raids'} carried`);li.append(node('h3',`${index+1}. ${row.login?'@'+row.login:'Channel '+row.channelId}`),time);
       const badges=node('ul',undefined,'score-badges');for(const b of row.badges)badges.append(badge(b,true));if(!row.badges.includes(EVENT_BADGE))badges.append(badge(EVENT_BADGE,false));li.append(badges);$('keeper-rows').append(li);}
     $('scores-all').hidden=v.channels.length<=3;

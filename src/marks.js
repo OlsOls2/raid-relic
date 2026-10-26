@@ -51,7 +51,7 @@ export function parseMarkCommand(text) {
   const approve = /^!relic approve (m[1-9]\d{0,8})$/.exec(text);
   if (approve) return { type: 'approve', markId: approve[1] };
   const block = /^!relic block (\d{1,32})$/.exec(text);
-  return block ? { type: 'block', userId: block[1] } : null;
+  return block ? { type: 'block', userId: block[1] } : /^!relic(?:\s|$)/.test(text) ? {type:'help'} : null;
 }
 
 export function isModerator(actor, host) {
@@ -90,7 +90,7 @@ export function reduceMark(previous, host, actor, action, now) {
   const doc = structuredClone(previous ?? empty());
   if (!userId(host) || actor?.broadcasterId !== host || !userId(actor.chatterId) || !Number.isFinite(now) || !action) return doc;
   doc.cooldowns = doc.cooldowns.filter(entry => now - entry.at < MARK_LIMITS.cooldownMs);
-  if (['scores-on','scores-off','top','badges'].includes(action.type)) return doc;
+  if (['scores-on','scores-off','top','badges','help'].includes(action.type)) return doc;
   if (action.type === 'forgetme') {
     if (doc.shares) doc.shares = doc.shares.filter(s => s.actor !== actor.chatterId);
     for (const session of doc.sessions) session.marks = session.marks.filter(mark => mark.userId !== actor.chatterId);

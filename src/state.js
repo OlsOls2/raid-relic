@@ -1,6 +1,6 @@
 import { enqueueP7, p7Mutation, cancelP7 } from './p7.js';
 import { journeyMap } from './journey-map.js';
-import { reduceScores, retainedScores, scoreboard, scoreMessage, isScoreCommand, scoreAckDocument, scoreAckMutation } from './scoreboard.js';
+import { reduceScores, retainedScores, scoreboard, scoreMessage, isScoreCommand, isReplyCommand, scoreAckDocument, scoreAckMutation } from './scoreboard.js';
 import { updatePresence, presenceKey, revokePresenceActor } from './presence.js';
 import { reserveShare, sharePage, shareStep } from './my-marks.js';
 import { echoCandidate, reduceEcho, echoView } from './resonance.js';
@@ -75,7 +75,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle, p7Enabled = fa
       let scoreNext;
       if (claiming) {
         const scoreChannels = Object.fromEntries(channels); if (transition) scoreChannels[host] = transition.channel;
-        scoreNext = reduceScores(scores, { channels: scoreChannels, marks: claiming.marks, chat, now, vote: claiming.scoreVote, completion: claiming.completedScore, hop: claiming.registry.pendingHop });
+        scoreNext = reduceScores(scores, { channels: scoreChannels, marks: claiming.marks, chat, now, vote: claiming.scoreVote, completion: claiming.completedScore, hop: claiming.registry.pendingHop, acknowledged:Boolean(proofSeen||claiming.acknowledgement||claiming.completedScore||(chat?.markAction?.type==='mymarks'&&share&&claiming.marks[host]?.shares?.some(row=>row.nonce===share.nonce&&row.status==='queued'))) });
         if (['top','badges'].includes(scoreNext.message)) scoreNext.message = scoreMessage(scoreNext.message, scoreboard(claiming.lineage, claiming.registry, scoreNext.doc, config, now), host);
 
       }
@@ -84,7 +84,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle, p7Enabled = fa
       if(config && (['forgetme','pause','opt-out','block'].includes(chat?.markAction?.type)||event?.type==='ban'))for(const target of config.channels){const c=target===host?transition.channel:channels.get(target),m=claiming.marks[target],d=ackDocs.get(target);ackUpdates.set(target,cancelCompletionNotices(ackDocument(ackUpdates.get(target)??d,chat,null,c,m,now)));}
       const completionAcks=[];let completionSkipped=0;
       if(claiming?.completedScore){const h=claiming.registry.pendingHop;for(const target of[h.from,h.to]){const value=completionAck(ackUpdates.get(target)??ackDocs.get(target),target,h.eventId,h.endsAt,now,h,Object.assign(Object.fromEntries(channels),transition?{[host]:transition.channel}:{}));ackUpdates.set(target,value.doc);if(value.key)completionAcks.push({host:target,key:value.key});else completionSkipped++;}}
-      const scoreAckNext = isScoreCommand(chat) ? scoreAckDocument(scoreAckDocs.get(host), chat, scoreNext?.message, transition?.channel, claiming?.marks[host], now) : null;
+      const scoreAckNext = isReplyCommand(chat) ? scoreAckDocument(scoreAckDocs.get(host), chat, scoreNext?.message, transition?.channel, claiming?.marks[host], now) : null;
       // No await between check and insertion: atomic within this process.
       if (pk && !proofSeen) seen.set(pk, now + 600000);
       for(const[target,doc]of ackUpdates)ackDocs.set(target,doc);
@@ -108,6 +108,7 @@ export function createMemoryState({ maxEvents = 10000, lifecycle, p7Enabled = fa
       if(p7Enabled&&(['forgetme','pause','opt-out','block','veto'].includes(chat?.markAction?.type)||event?.type==='ban'))for(const target of config.channels)if(p7Docs.has(target))p7Docs.set(target,cancelP7(p7Docs.get(target)));
       if (chat?.markAction?.type === 'forgetme' && chatReceipts.get(chat.broadcasterId)?.chatterId === chat.chatterId) chatReceipts.delete(chat.broadcasterId);
       if (chat && !chat.markAction) chatReceipts.set(chat.broadcasterId, { broadcasterId: chat.broadcasterId, chatterId: chat.chatterId, messageId: chat.messageId, receivedAt: now });
+      if(isReplyCommand(chat)&&!completionAcks.length&&!completionSkipped&&!sending?.result&&!(pk&&completionReceipts.has(pk)))return{status:'accepted',commandReply:{kind:chat.markAction.type,reason:scoreNext?.reason??'not-command'}};
       return (completionAcks.length||completionSkipped) ? {status:'accepted',completionAcks,completionSkipped} : (pk&&completionReceipts.has(pk)) ? {status:'accepted',completionAcks:completionReceipts.get(pk).rows} : observation ? (transition.channel.lifecycleAt === event.sentAt && transition.channel.lifecycleSource === 'helix-observation' ? 'applied' : 'no-change') : sending?.result ?? 'accepted';
     },
     getRitual(hostId) {

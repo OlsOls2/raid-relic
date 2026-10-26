@@ -15,7 +15,7 @@ for (const kind of ['memory', 'firestore']) {
   test(`${kind}: authenticated two-channel pilot completes mocked raid/claim/return with both feed updates and safe Atlas`, async () => {
     const f = await pilotFixture(kind); await ready(f); const r = f.runtime;
     assert.equal(f.subscriptions.length, 10); assert.ok(f.calls.every(c => !c.url.includes('/raids')));
-    const health = JSON.parse((await f.request('/health')).body); assert.equal(health.readiness, 'owner-test-ready'); assert.equal(health.liveValidated, false);
+    const health = JSON.parse((await f.request('/health')).body); assert.equal(health.phase,'live');assert.equal(health.mode,'simulator');assert.equal(Object.hasOwn(health,'liveValidated'),false);
     const updates = { [HOME]: [], [OTHER]: [] };
     for (const id of [HOME, OTHER]) r.overlayFeeds[id].subscribe(value => updates[id].push(value));
     await f.chat(HOME, '811', '!mark moon'); await f.chat(HOME, HOME, '!relic approve m1');

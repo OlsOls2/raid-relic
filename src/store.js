@@ -1,6 +1,6 @@
 import { enqueueP7, p7Mutation, cancelP7 } from './p7.js';
 import { journeyMap } from './journey-map.js';
-import { reduceScores, retainedScores, scoreboard, scoreMessage, isScoreCommand, scoreAckDocument, scoreAckMutation } from './scoreboard.js';
+import { reduceScores, retainedScores, scoreboard, scoreMessage, isScoreCommand, isReplyCommand, scoreAckDocument, scoreAckMutation } from './scoreboard.js';
 import { updatePresence, presenceKey, revokePresenceActor } from './presence.js';
 import { reserveShare, sharePage, shareStep } from './my-marks.js';
 import { echoCandidate, reduceEcho, echoView } from './resonance.js';
@@ -110,7 +110,7 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false } = {}) 
         const ackMap={};if(managed)for(const target of config.channels)ackMap[target]=(await tx.get(ref('claimAcks',target))).data();
         const ackRef=managed&&host?ref('claimAcks',host):null, ackDoc=ackMap[host];
         const p7Cancel={};if(p7Enabled&&managed&&(['forgetme','pause','opt-out','block','veto'].includes(chat?.markAction?.type)||event?.type==='ban'))for(const id of config.channels)p7Cancel[id]=(await tx.get(ref('p7Actions',id))).data();
-        const scoreAckRef = managed && isScoreCommand(chat) ? ref('scoreAcks', host) : null;
+        const scoreAckRef = managed && isReplyCommand(chat) ? ref('scoreAcks', host) : null;
         const scoreAckPrevious = scoreAckRef ? (await tx.get(scoreAckRef)).data() : null;
         const channel = channelMap[host];
         if (observation) {
@@ -136,8 +136,10 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false } = {}) 
           claiming = reduceClaims(sending.registry, channelMap, markMap, lineage, (proofSeen || ackSeen(ackDoc, chat, now)) ? null : chat, now, sentAt, presenceNext);
         }
         if (claiming && chat?.markAction?.type === 'mymarks') claiming.marks[host] = reserveShare(claiming.marks[host], claiming.lineage, chat, share, now);
+        let commandReply;
         if (claiming) {
-          const scoreNext = reduceScores(scores, { channels: channelMap, marks: claiming.marks, chat, now, vote: claiming.scoreVote, completion: claiming.completedScore, hop: claiming.registry.pendingHop });
+          const scoreNext = reduceScores(scores, { channels: channelMap, marks: claiming.marks, chat, now, vote: claiming.scoreVote, completion: claiming.completedScore, hop: claiming.registry.pendingHop, acknowledged:Boolean(proofSeen||claiming.acknowledgement||claiming.completedScore||(chat?.markAction?.type==='mymarks'&&share&&claiming.marks[host]?.shares?.some(row=>row.nonce===share.nonce&&row.status==='queued'))) });
+          if(isReplyCommand(chat))commandReply={kind:chat.markAction.type,reason:scoreNext.reason};
           if (['top','badges'].includes(scoreNext.message)) scoreNext.message = scoreMessage(scoreNext.message, scoreboard(claiming.lineage, claiming.registry, scoreNext.doc, config, now), host);
           if (scoreAckRef) tx.set(scoreAckRef, scoreAckDocument(scoreAckPrevious, chat, scoreNext.message, transition?.channel, claiming.marks[host], now));
           if (scores || scoreNext.doc.players.length || scoreNext.doc.receipts.length) tx.set(scoreRef, scoreNext.doc);
@@ -163,6 +165,7 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false } = {}) 
         }
         if (receipt && receipt.chatterId === chat?.chatterId) tx.delete(receiptRef);
         if (chat && !chat.markAction) tx.set(ref('chatReceipts', chat.broadcasterId), { messageId: chat.messageId, chatterId: chat.chatterId, receivedAt: now });
+        if(commandReply&&!completionAcks.length&&!completionSkipped&&!sending?.result&&!(proofSeen&&previousProof?.completionAcks))return{status:'accepted',commandReply};
         return (completionAcks.length||completionSkipped) ? {status:'accepted',completionAcks,completionSkipped} : (proofSeen&&previousProof?.completionAcks) ? {status:'accepted',completionAcks:previousProof.completionAcks} : observation ? (transition.channel.lifecycleAt === event.sentAt && transition.channel.lifecycleSource === 'helix-observation' ? 'applied' : 'no-change') : sending?.result ?? 'accepted';
       });
     },

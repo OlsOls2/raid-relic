@@ -23,8 +23,8 @@ async function load() {
     if (!response.ok) throw new Error('Unavailable'); const data = await response.json(); if (current !== generation) return;
     if (atlasRings(data.rings) === null) throw Error('Invalid rings');
     hero.update(data.rings);
-    $('simulator').hidden = data.mode !== 'simulator';
-    if (data.pilotEnabled) document.querySelector('.note').textContent = 'Owner-test raid pilot. Live validation remains pending. Only verified raid notifications and completed two-chat claims create this journey. Read only.'; $('rings').textContent = `${data.rings} completed growth rings`;
+    $('simulator').textContent=data.mode==='simulator'?'SIMULATOR · local test journey':'';$('simulator').hidden = data.mode !== 'simulator';
+    if (data.pilotEnabled) document.querySelector('.note').textContent = 'Only confirmed raids and completed two-chat bindings enter this recorded journey.'; $('rings').textContent = `${data.rings} completed growth rings`;
     $('status').textContent = data.total ? `Showing ${offset + 1}–${Math.min(offset + (stopId ? data.marks.length : data.stops.length), data.total)} of ${data.total}` : stopId ? 'No approved marks retained at this stop.' : 'No completed hops yet. The relic has no recorded journey. Refresh after a completed two-chat claim.';
     if (stopId) {
       $('title').textContent = `Stop ${data.stop.ringIndex}`; $('description').textContent = `Channel ${data.stop.from} to channel ${data.stop.to}. Claimed ${new Date(data.stop.claimedAt).toLocaleString()}. ${data.stop.raidSize} reported raid viewers.`;
@@ -61,7 +61,7 @@ async function search(searchOffset = 0) {
     const response = await fetch('/api/atlas/search', { method: 'POST', cache: 'no-store', signal: active.signal,
       headers: { 'content-type': 'application/json' }, body: JSON.stringify({ query, offset: searchOffset, limit: 20 }) });
     if (!response.ok) throw new Error(); const data = await response.json(); if (current !== searchGeneration) return;
-    $('simulator').hidden = data.mode !== 'simulator';
+    $('simulator').textContent=data.mode==='simulator'?'SIMULATOR · local test journey':'';$('simulator').hidden = data.mode !== 'simulator';
     $('search-status').textContent = data.matches.length ? `Shared text matches ${searchOffset + 1}–${searchOffset + data.matches.length} of ${data.total}. Not proof of personal ownership.` : data.total ? 'No further shared-text matches on this page.' : 'No approved shared-text matches at completed stops.';
     for (const match of data.matches) {
       const item = node('li'); const image = node('img'); image.alt = 'Approved shared mark rune'; image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(match.runeSvg)}`;

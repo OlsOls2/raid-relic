@@ -53,6 +53,7 @@ const assets = new Map([
   ['/overlay-client.js', ['overlay-client.js', 'text/javascript; charset=utf-8']],
   ['/crystal.svg', ['crystal.svg', 'image/svg+xml']],
 ]);
+const demoAssets=new Map([['/demo','demo.html'],['/demo/','demo.html'],['/demo.js','demo.js'],['/demo-state.js','demo-state.js'],['/demo.css','demo.css'],['/ritual-copy.js','ritual-copy.js']]);
 const header = (headers, name) => typeof headers[name] === 'string' ? headers[name] : '';
 const result = (status, body = '', type = 'text/plain; charset=utf-8') => ({ status, body, type });
 
@@ -65,8 +66,19 @@ export function createApp({ scoreAcks, claimAcks, secret, state = createMemorySt
   const spend = () => { const time = now(); credits = Math.min(publicBudget.burst, credits + Math.max(0, time - budgetAt) / 1000 * publicBudget.perSecond); budgetAt = time;
     if (credits < 1) return false; credits--; return true; };
   const release = validateReleaseCommit(releaseCommit);
+  const publicHTML=async file=>{const bytes=await readFile(new URL(`../public/${file}`,import.meta.url));return overlayFeed?.simulator?bytes.toString().replace(/<p([^>]*\bid="simulator"[^>]*)><\/p>/,(_,attrs)=>`<p${attrs.replace(/\s+hidden\b/,'')}>SIMULATOR · local test data</p>`):bytes;};
   // Pure request boundary for tests: rawBody is never reserialized before HMAC.
   async function dispatch({ method, path, headers = {}, rawBody = Buffer.alloc(0) }) {
+    const demoPath=path.split('?')[0];
+    if(demoAssets.has(demoPath)){
+      if(method!=='GET')return result(previewReadOnly?403:405,'Static demo is read only');
+      const file=demoAssets.get(demoPath),type=file.endsWith('.html')?'text/html; charset=utf-8':file.endsWith('.js')?'text/javascript; charset=utf-8':'text/css; charset=utf-8';
+      if(path.includes('?')&&!file.endsWith('.html'))return result(400,'Invalid static asset query');
+      return{...result(200,await readFile(new URL(`../public/${file}`,import.meta.url)),type),headers:{'cache-control':'public, max-age=3600','content-security-policy':"default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'self'"}};
+    }
+    if (method === 'GET' && path === '/health') {
+      return result(200, JSON.stringify({status:'ok',releaseCommit:release,phase:raidPilot?'live':'foundation',...(!raidPilot?{readiness:'not-ready-for-raids'}:{}),mode:overlayFeed?.simulator?'simulator':'live',...(previewReadOnly?{preview:'Read-only preview'}:{})}), 'application/json');
+    }
     // Preview shares live storage: deny before authentication, DB access or effects.
     if (previewReadOnly && (method !== 'GET' || path.startsWith('/control/') || path.startsWith('/oauth/') || path.split('?')[0] === '/auth/callback' || path.split('?')[0] === '/eventsub')) return { ...result(403, 'P5 read-only preview. Live chat commands are not enabled on canonical yet.'), headers: { 'cache-control': 'no-store' } };
     if ((path.startsWith('/control/') || path.startsWith('/api/') || path.split('?')[0] === '/auth/callback' || path.startsWith('/oauth/')) && !spend()) return result(429, 'Public request budget reached; retry later');
@@ -77,9 +89,6 @@ export function createApp({ scoreAcks, claimAcks, secret, state = createMemorySt
     if (path.startsWith('/oauth/') || (oauth && path.split('?')[0] === oauth.callbackPath)) {
       if (!oauth) return result(503, 'OAuth not configured');
       return oauth.route({ method, path, headers });
-    }
-    if (method === 'GET' && path === '/health') {
-      return result(200, JSON.stringify({ status: 'ok', ...(previewReadOnly ? { preview: 'P5 READ-ONLY PREVIEW; live Twitch chat commands not enabled on canonical yet' } : {}), releaseCommit: release, phase: raidPilot ? 'raid-pilot' : 'foundation', readiness: raidPilot ? 'owner-test-ready' : 'not-ready-for-raids', ...(raidPilot ? { liveValidated: false } : {}) }), 'application/json');
     }
     if (path.startsWith('/api/journey-map')) {
       if (path !== '/api/journey-map' || rawBody.length) return result(400, 'Invalid journey request');
@@ -93,7 +102,7 @@ export function createApp({ scoreAcks, claimAcks, secret, state = createMemorySt
       if (method !== 'GET') return result(405,'Read only');
       const embed=path.split('?')[0].replace(/\/$/,'')==='/atlas/embed', params=new URLSearchParams(path.split('?')[1] ?? '');
       if ([...params].some(([k,v])=>params.getAll(k).length!==1 || (k==='t' ? !/^[a-f0-9]{64}$/.test(v) : !(embed && k==='play' && v==='1')))) return result(400,'Invalid journey selection');
-      return {...result(200,await readFile(new URL(embed?'../public/journey-embed.html':'../public/atlas.html',import.meta.url)),'text/html; charset=utf-8'),headers:{'cache-control':'no-store'}};
+      return {...result(200,await publicHTML(embed?'journey-embed.html':'atlas.html'),'text/html; charset=utf-8'),headers:{'cache-control':'no-store'}};
     }
     if (path.startsWith('/api/scores')) {
       if (path !== '/api/scores' || rawBody.length) return result(400, 'Invalid score request');
@@ -171,7 +180,7 @@ export function createApp({ scoreAcks, claimAcks, secret, state = createMemorySt
     }
     if (/^\/stops\/[a-f0-9]{64}$/.test(path)) {
       if (method !== 'GET') return result(405, 'Read only');
-      return result(200, await readFile(new URL('../public/atlas.html', import.meta.url)), 'text/html; charset=utf-8');
+      return result(200, await publicHTML('atlas.html'), 'text/html; charset=utf-8');
     }
     if (path === '/api/journey') {
       if (method !== 'GET') return result(404, 'Read only');
@@ -188,11 +197,11 @@ export function createApp({ scoreAcks, claimAcks, secret, state = createMemorySt
       if ([...params].some(([key, value]) => !['corner', 'sound'].includes(key) || params.getAll(key).length !== 1
         || (key === 'corner' ? value !== '1' : !['0', '1'].includes(value)))) return result(400, 'Invalid query');
       if (feedPath[1]) return result(200, JSON.stringify(await selected.snapshot()), 'application/json');
-      return result(200, await readFile(new URL('../public/overlay-live.html', import.meta.url)), 'text/html; charset=utf-8');
+      return result(200, await publicHTML('overlay-live.html'), 'text/html; charset=utf-8');
     }
     if (method === 'GET' && assets.has(path)) {
       const [file, type] = assets.get(path);
-      const bytes = await readFile(new URL(`../public/${file}`, import.meta.url));
+      const bytes = file.endsWith('.html')?await publicHTML(file):await readFile(new URL(`../public/${file}`, import.meta.url));
       return result(200, bytes, type);
     }
     if (path !== '/eventsub') return result(404, 'Not found');
@@ -252,6 +261,7 @@ export function createApp({ scoreAcks, claimAcks, secret, state = createMemorySt
     }
     const share = chat?.markAction?.type === 'mymarks' && shares && !chat.isBot && !chat.copied && chat.chatterLogin && (!chat.markAction.login || chat.markAction.login === chat.chatterLogin) ? shares.issue(chat.broadcasterId, chat.chatterId, receivedAt, chat.chatterLogin) : undefined;
     const accepted = await state.accept({ share, id, now: receivedAt, sentAt, expiresAt: sentAt + REPLAY_WINDOW_MS, raid, chat, lifecycle });
+    if(accepted?.commandReply&&['capacity','budget','cooldown-quiet','policy-blocked'].includes(accepted.commandReply.reason)){const kind=['top','badges','help','scores-on','scores-off','offer','accept','mark','mymarks','forgetme','pause','keep','opt-out','approve','block','send','veto-last'].includes(accepted.commandReply.kind)?accepted.commandReply.kind:'other';try{console.warn(JSON.stringify({event:'command_reply',host:chat.broadcasterId,kind,outcome:'suppressed',reason:accepted.commandReply.reason,httpStatus:null}));}catch{}}
     if (accepted === 'full') return result(503, 'Event capacity reached');
     if(claimAcks&&Array.isArray(accepted?.completionAcks))for(const row of accepted.completionAcks.slice(0,2)){try{await claimAcks.process(row.host,row.key);}catch{}}
     if(accepted?.completionSkipped){try{console.warn(JSON.stringify({severity:'WARNING',event:'raid_relic_completion_ack_capacity',skipped:Math.min(2,accepted.completionSkipped)}));}catch{}}
@@ -259,7 +269,7 @@ export function createApp({ scoreAcks, claimAcks, secret, state = createMemorySt
     if (share && replies) {
       try { await replies.processPending(chat.broadcasterId, shareRequestHash(chat)); } catch { /* No sensitive diagnostics or post-response worker. */ }
     }
-    if (scoreAcks && chat && !chat.isBot && !chat.copied && ['scores-on','scores-off','top','badges'].includes(chat.markAction?.type)) { try { await scoreAcks.process(chat.broadcasterId, ackKey(chat)); } catch {} }
+    if (scoreAcks && chat && !chat.isBot && !chat.copied && Boolean(chat.markAction)) { try { await scoreAcks.process(chat.broadcasterId, ackKey(chat)); } catch {} }
     if (claimAcks && chat && !chat.isBot && !chat.copied && ['offer', 'accept'].includes(chat.markAction?.type)) {
       try { await claimAcks.process(chat.broadcasterId, ackKey(chat)); } catch {}
     }
@@ -268,7 +278,7 @@ export function createApp({ scoreAcks, claimAcks, secret, state = createMemorySt
 
   async function handler(req, res) {
     const send = ({ status, body, type, headers: extraHeaders }) => {
-      const headers = { ...extraHeaders, 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' };
+      const headers = { ...extraHeaders, 'cache-control': req.method==='GET'&&demoAssets.has(req.url.split('?')[0])&&extraHeaders?.['cache-control']==='public, max-age=3600'?'public, max-age=3600':'no-store', 'x-content-type-options': 'nosniff' };
       // 204 responses have no content or body framing headers.
       if (status === 204) {
         res.writeHead(status, headers);

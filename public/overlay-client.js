@@ -20,11 +20,12 @@ export function validSnapshot(value) {
 }
 
 export function connectOverlay({ url, render, status, WebSocketImpl = WebSocket, setTimer = setTimeout, clearTimer = clearTimeout,
-  windowEvents = globalThis.window, documentEvents = globalThis.document }) {
-  let socket = null, stopped = false, retry = null, watchdog = null, opening = null, backoff = 500, epoch = 0;
+  windowEvents = globalThis.window, documentEvents = globalThis.document, idleMs = 600000 }) {
+  let socket = null, stopped = false, retry = null, watchdog = null, opening = null, backoff = 500, epoch = 0, idle = null, suspended = Boolean(documentEvents?.hidden);
+  const idleDelay=Number.isFinite(idleMs)&&idleMs>0?Math.min(idleMs,600000):600000;
   const clear = () => { clearTimer(watchdog); clearTimer(opening); watchdog = opening = null; };
   function lost(own, kind = 'reconnecting') {
-    if (stopped || own !== epoch) return;
+    if (stopped || suspended || documentEvents?.hidden || own !== epoch) return;
     const old = socket; socket = null; epoch++; clear(); status(kind); render(null);
     try { old?.close(); } catch { /* Error/close delivery is not required for recovery. */ }
     if (retry !== null) return;
@@ -32,7 +33,7 @@ export function connectOverlay({ url, render, status, WebSocketImpl = WebSocket,
     retry = ticket; backoff = Math.min(backoff * 2, 10000);
   }
   function connect() {
-    if (stopped || socket) return;
+    if (stopped || suspended || documentEvents?.hidden || socket) return;
     const own = ++epoch; let revision = -1; status('connecting');
     opening = setTimer(() => lost(own, 'stale'), 8000); // socket AND first valid snapshot
     let active;
@@ -53,13 +54,20 @@ export function connectOverlay({ url, render, status, WebSocketImpl = WebSocket,
     active.onerror = () => lost(own);
     active.onclose = () => lost(own);
   }
-  const wake = () => {
-    if (stopped || socket || documentEvents?.hidden) return;
-    clearTimer(retry); retry = null; connect();
+  function suspend(){suspended=true;epoch++;clearTimer(idle);idle=null;clearTimer(retry);retry=null;clear();const old=socket;socket=null;render(null);status('suspended');try{old?.close();}catch{}}
+  function armIdle(){clearTimer(idle);idle=setTimer(suspend,idleDelay);}
+  const wake = event => {
+    if(stopped||documentEvents?.hidden)return;
+    // Only visibility/focus/trusted local interaction resets the human idle window.
+    if(event?.type==='online'){if(suspended)return;if(!socket){clearTimer(retry);retry=null;connect();}return;}
+    if(['pointerdown','keydown'].includes(event?.type)&&event.isTrusted!==true)return;if(event?.type==='focus'&&event.isTrusted===false)return;
+    suspended=false;armIdle();if(socket)return;clearTimer(retry);retry=null;connect();
   };
-  windowEvents?.addEventListener?.('online', wake); documentEvents?.addEventListener?.('visibilitychange', wake);
-  connect();
-  return () => { stopped = true; epoch++; clearTimer(retry); retry = null; clear(); const old = socket; socket = null;
-    windowEvents?.removeEventListener?.('online', wake); documentEvents?.removeEventListener?.('visibilitychange', wake);
+  const visibility=()=>documentEvents?.hidden?suspend():wake({type:'visibilitychange'});
+  windowEvents?.addEventListener?.('online',wake);windowEvents?.addEventListener?.('focus',wake);
+  documentEvents?.addEventListener?.('visibilitychange',visibility);documentEvents?.addEventListener?.('pointerdown',wake);documentEvents?.addEventListener?.('keydown',wake);
+  if(suspended){render(null);status('suspended');}else{armIdle();connect();}
+  return () => { stopped = true; epoch++; clearTimer(idle);idle=null;clearTimer(retry); retry = null; clear(); const old = socket; socket = null;
+    windowEvents?.removeEventListener?.('online', wake); windowEvents?.removeEventListener?.('focus',wake);documentEvents?.removeEventListener?.('visibilitychange',visibility);documentEvents?.removeEventListener?.('pointerdown',wake);documentEvents?.removeEventListener?.('keydown',wake);
     try { old?.close(); } catch {} };
 }

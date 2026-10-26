@@ -1,0 +1,12 @@
+[
+  {
+    "name": "delete-untagged-14d",
+    "action": { "type": "Delete" },
+    "condition": { "tagState": "untagged", "packageNamePrefixes": ["app"], "olderThan": "14d" }
+  },
+  {
+    "name": "keep-five-recent",
+    "action": { "type": "Keep" },
+    "mostRecentVersions": { "packageNamePrefixes": ["app"], "keepCount": 5 }
+  }
+]

@@ -1,3 +1,4 @@
+import { claimComplete } from '../public/ritual-copy.js';
 import { ChatSendError } from './bot.js';
 import { hash } from './crypto.js';
 export const ackKey = chat => hash(JSON.stringify(['claim-ack-v1', chat.broadcasterId, chat.chatterId, chat.messageId]));
@@ -30,17 +31,19 @@ export function ackStep(previous, op, channel, marks, now, completionAllowed = f
   if (op.type === 'finish' && row?.status === 'dispatching') row.status = op.sent ? 'sent' : 'unknown';
   return { doc, result };
 }
-export function createClaimAcks({ state, bots, now = Date.now, logger = line => console.warn(line), p7 }) {
+// One awaited in-process lane; gameplay jumps ahead of queued public reads.
+export function createBotReplyQueue(){let active=false;const high=[],low=[];const pump=()=>{if(active)return;const job=high.shift()??low.shift();if(!job)return;active=true;Promise.resolve().then(job.operation).then(job.resolve,job.reject).finally(()=>{active=false;pump();});};return(operation,priority=0)=>new Promise((resolve,reject)=>{const jobs=priority?low:high;if(jobs.length>=(priority?16:64)){reject(Error('Reply queue capacity'));return;}jobs.push({operation,resolve,reject});pump();});}
+export function createClaimAcks({ state, bots, now = Date.now, logger = line => console.warn(line), p7, commandReplies=false, schedule }) {
   let queue = Promise.resolve();
   return { process(host, key) {
-    const work = queue.then(async () => {
+    const execute=async () => {
       const row = await state.claimAckStep(host, { type: 'claim', key, ...(p7?.enabled?{p7:true}:{}) }, now()); if (!row) return;
       let sent = false,messageId=null; let diagnostic = { stage: 'response', httpStatus: 200, dropKind: null, isSent: true };
       try { const result=await bots[host].sendChat(row.message, { retryUnauthorized: false });messageId=result?.messageId;sent = true; } catch (error) { diagnostic = error instanceof ChatSendError ? error.diagnostic : { stage: 'unknown', httpStatus: null, dropKind: null, isSent: null }; }
       let actions;try { actions=await state.claimAckStep(host, { type: 'finish', key, sent, ...(p7?.enabled?{p7Finish:p7.config,messageId:messageId??null}:{}) }, now()); } catch {}
       if(p7?.enabled&&Array.isArray(actions?.p7Keys))for(const action of actions.p7Keys.slice(0,3)){try{await p7.process(host,action);}catch{}}
-      try { await logger(JSON.stringify({ severity: sent ? 'INFO' : 'WARNING', event: 'raid_relic_claim_ack', host, key, outcome: sent ? 'sent' : 'unknown', diagnostic })); } catch {}
-    }); queue = work.catch(() => {}); return work;
+      try { await logger(JSON.stringify(commandReplies?{severity:sent?'INFO':'WARNING',event:'command_reply',host,kind:['scores-on','scores-off','top','badges','help','offer','accept','forgetme','mymarks','mark','keep','pause','opt-out','approve','block','veto-last','send'].includes(row.kind)?row.kind:'other',outcome:sent?'sent':'unknown',reason:row.reason==='cooldown'?'cooldown':'normal',httpStatus:diagnostic.httpStatus??null}:{ severity: sent ? 'INFO' : 'WARNING', event: 'raid_relic_claim_ack', host, key, outcome: sent ? 'sent' : 'unknown', diagnostic })); } catch {}
+    };const work=queue.then(()=>schedule?schedule(execute,commandReplies?1:0):execute());queue=work.catch(()=>{});return work;
   } };
 }
 
@@ -51,7 +54,7 @@ export function completionAck(previous, host, eventId, deadline, now, hop, chann
   if (!doc.rows.some(r => r.key === key)) {
     if (doc.rows.length >= 128) return { doc, key: null };
     const names={'1591805230':'raidrelichq','1591806023':'olsols2'};
-    const row={ key, expiresAt:now+600000,status:'queued',message:`Claim complete: the relic transferred to ${names[hop?.to]?'@'+names[hop.to]:'its new Keeper'}; one new ring.`,ackUntil:now+30000,
+    const row={ key, expiresAt:now+600000,status:'queued',message:claimComplete(names[hop?.to]),ackUntil:now+30000,
       ...(hop?{completion:{eventId,from:hop.from,to:hop.to,sourceStreamId:hop.sourceStreamId,targetStreamId:hop.targetStreamId,raidSentAt:hop.raidSentAt,sourceConsentAt:channels?.[hop.from]?.consentAt,targetConsentAt:channels?.[hop.to]?.consentAt}}:{}) };
     doc.rows.push(row);
     if(Buffer.byteLength(JSON.stringify(doc))>65536){doc.rows.pop();return{doc,key:null};}
