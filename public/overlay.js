@@ -1,3 +1,4 @@
+import { keeperNames as networkNames } from './keeper-network.js';
 import { streakText } from './streak-view.js';
 import { presentEdition } from './edition-view.js';
 import {
@@ -237,7 +238,7 @@ function render(snapshot) {
       : 'The relic stirs… awaiting a Keeper',
     unavailable: 'The relic is out of sight…',
   };
-  const ownLogin = { 1591805230: 'raidrelichq', 1591806023: 'olsols2' }[channel];
+  const ownLogin = networkNames[channel];
   const idleHolder =
     snapshot.holderLogin &&
     !snapshot.handoff &&

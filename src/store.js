@@ -149,6 +149,9 @@ export function createFirestoreStore(
   { lifecycle, p7Enabled = false, reviewPolicy, wander } = {},
 ) {
   const config = lifecycleConfig(lifecycle);
+  const keeperNames = config?.logins
+    ? Object.fromEntries(Object.entries(config.logins).map(([login, id]) => [id, login]))
+    : undefined;
   reviewPolicy = trustedReviewPolicy(reviewPolicy);
   p7Enabled = Boolean(p7Enabled && config);
   const ref = (collection, key) => db.collection(collection).doc(hash(key));
@@ -328,6 +331,7 @@ export function createFirestoreStore(
             sentAt,
             presenceNext,
             config?.streakEnabled,
+            keeperNames,
           );
         }
         if (claiming && chat?.markAction?.type === 'mymarks')
@@ -343,6 +347,7 @@ export function createFirestoreStore(
         let commandReply;
         if (claiming) {
           const scoreNext = reduceScores(scores, {
+            names: keeperNames,
             channels: channelMap,
             marks: claiming.marks,
             chat,
@@ -439,6 +444,7 @@ export function createFirestoreStore(
               now,
               h,
               channelMap,
+              keeperNames,
             );
             ackUpdates.set(target, value.doc);
             if (value.key) completionAcks.push({ host: target, key: value.key });
@@ -687,11 +693,13 @@ export function createFirestoreStore(
             now,
             presenceMap,
             config?.streakEnabled,
+            keeperNames,
           );
           if (scores)
             tx.set(
               scoreRef,
               reduceScores(scores, {
+                names: keeperNames,
                 channels: channelMap,
                 marks: checked.marks,
                 chat: { ...actor, markAction: action },
@@ -899,11 +907,17 @@ export function createFirestoreStore(
           now,
           presenceMap,
           config?.streakEnabled,
+          keeperNames,
         );
         if (scores)
           tx.set(
             scoreRef,
-            reduceScores(scores, { channels: channelMap, marks: checked.marks, now }).doc,
+            reduceScores(scores, {
+              names: keeperNames,
+              channels: channelMap,
+              marks: checked.marks,
+              now,
+            }).doc,
           );
         for (const [key, doc] of Object.entries(presenceMap)) tx.set(ref('presence', key), doc);
         for (const [target, doc] of Object.entries(otherAcks))
@@ -979,16 +993,18 @@ export function createFirestoreStore(
         const lineage = (await tx.get(ref('lineage', 'single'))).data();
         const channel = (await tx.get(ref('streamChannels', host))).data();
         return {
-          ...(holderLoginView(registry) ? { holderLogin: holderLoginView(registry) } : {}),
+          ...(holderLoginView(registry, keeperNames)
+            ? { holderLogin: holderLoginView(registry, keeperNames) }
+            : {}),
           ...(wanderArrivalView(registry, lineage, host)
             ? { wanderArrival: wanderArrivalView(registry, lineage, host) }
             : {}),
           rings: lineage?.stops?.length ?? 0,
           ...(config?.streakEnabled ? { streak: streakView(registry, now) } : {}),
-          ...(movedToView(registry, lineage, host, channel)
-            ? { movedToLogin: movedToView(registry, lineage, host, channel) }
+          ...(movedToView(registry, lineage, host, channel, keeperNames)
+            ? { movedToLogin: movedToView(registry, lineage, host, channel, keeperNames) }
             : {}),
-          handoff: handoffView(registry, host, now, lineage),
+          handoff: handoffView(registry, host, now, lineage, keeperNames),
           claimMeter: claimMeterView(registry, host, now),
           ...(echoView(registry, host, now) ? { resonance: echoView(registry, host, now) } : {}),
         };

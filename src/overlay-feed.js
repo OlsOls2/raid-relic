@@ -1,8 +1,13 @@
+import { RECEIVING_KEEPERS } from './receiving.js';
 import { validStreak } from '../public/streak-view.js';
 import { validFlightText } from '../public/cinematic.js';
 import { validClaimMeter } from '../public/claim-meter.js';
 // One mutation queue for every configured feed. Never wrap a wrapped store.
-export function createOverlayHub(store, channels, { simulator = false, now = Date.now } = {}) {
+export function createOverlayHub(
+  store,
+  channels,
+  { simulator = false, now = Date.now, logins = RECEIVING_KEEPERS } = {},
+) {
   if (
     !channels.length ||
     channels.length > 4 ||
@@ -60,17 +65,14 @@ export function createOverlayHub(store, channels, { simulator = false, now = Dat
         throw Error('Invalid claim meter');
       if (
         journey.handoff?.sourceLogin !== undefined &&
-        !['raidrelichq', 'olsols2'].includes(journey.handoff.sourceLogin)
+        !Object.values(logins).includes(journey.handoff.sourceLogin)
       )
         throw Error('Invalid source Keeper');
-      if (
-        journey.holderLogin !== undefined &&
-        !['raidrelichq', 'olsols2'].includes(journey.holderLogin)
-      )
+      if (journey.holderLogin !== undefined && !Object.values(logins).includes(journey.holderLogin))
         throw Error('Invalid registry holder');
       if (
         journey.movedToLogin !== undefined &&
-        !['raidrelichq', 'olsols2'].includes(journey.movedToLogin)
+        !Object.values(logins).includes(journey.movedToLogin)
       )
         throw Error('Invalid holder');
       const incoming = journey.handoff?.role === 'host' && !journey.handoff.completed;

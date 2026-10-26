@@ -1,3 +1,4 @@
+import { RECEIVING_KEEPERS } from './receiving.js';
 import { streakView, stopStreak } from './streaks.js';
 import { selectEdition, editionBadgesForInterval } from '../public/editions.js';
 import { ackDocument, ackKey, ackStep } from './claim-ack.js';
@@ -58,6 +59,7 @@ export function reduceScores(
     registry,
     seekersEnabled = false,
     holderSince = null,
+    names = RECEIVING_KEEPERS,
   },
 ) {
   const doc = structuredClone(previous ?? { version: 1, players: [], receipts: [] }),
@@ -150,7 +152,7 @@ export function reduceScores(
                   ? 'Seeker queue on. Your configured channel may be suggested while live and eligible. !seek off to leave.'
                   : 'Seeker queue off. Opt in as a Keeper first, then !seek to join; !seek off to leave.';
         else if (action === 'where') {
-          const holder = { 1591805230: 'raidrelichq', 1591806023: 'olsols2' }[registry?.holderId];
+          const holder = names[registry?.holderId];
           message = holder
             ? `@${holder} holds the relic. Held since: ${Number.isSafeInteger(holderSince) && holderSince >= 0 ? new Date(holderSince).toISOString().slice(0, 19).replace('T', ' ') + ' UTC' : 'not recorded'}. Watch: https://twitch.tv/${holder} · https://raid-relic-760724762396.us-central1.run.app/keeper/${holder}`
             : 'The current relic holder is not recorded.';

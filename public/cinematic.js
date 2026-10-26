@@ -1,3 +1,4 @@
+import { keeperNames } from './keeper-network.js';
 import { validClaimMeter } from './claim-meter.js';
 // Pure receipt/claim-time presentation. No ownership mutation or Twitch timing.
 const emoji =
@@ -199,7 +200,7 @@ export function runePose(index, count, time, unfurl = 1) {
 }
 
 // Fixed local decorative geometry; never marks, viewer content or archive data.
-export const validSourceLogin = (value) => ['raidrelichq', 'olsols2'].includes(value);
+export const validSourceLogin = (value) => Object.values(keeperNames).includes(value);
 export function ambientSigils(snapshot, phase, reduced = false) {
   return !reduced &&
     phase.host &&

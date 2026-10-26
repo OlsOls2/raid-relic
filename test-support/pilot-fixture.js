@@ -17,8 +17,10 @@ export async function pilotFixture(
     forgeHTTP,
     origin = 'https://pilot.example',
     initialNow,
+    keepers = { [HOME]: 'raidrelichq', [OTHER]: 'olsols2' },
   } = {},
 ) {
+  const ids = Object.keys(keepers);
   const db = kind === 'firestore' ? fakeFirestore() : undefined;
   let time = initialNow ?? Date.parse('2026-10-25T12:00:00Z');
   if (!Number.isSafeInteger(time) || time < 0 || time > Date.now())
@@ -26,21 +28,17 @@ export async function pilotFixture(
   let seq = 0;
   let validationOverride = null;
   const secret = 'synthetic-pilot-hmac-secret';
-  const streams = new Map([
-    [
-      HOME,
-      { user_id: HOME, id: '9001', type: 'live', started_at: new Date(time - 10000).toISOString() },
-    ],
-    [
-      OTHER,
+  const streams = new Map(
+    ids.map((id, index) => [
+      id,
       {
-        user_id: OTHER,
-        id: '9002',
+        user_id: id,
+        id: String(9001 + index),
         type: 'live',
         started_at: new Date(time - 10000).toISOString(),
       },
-    ],
-  ]);
+    ]),
+  );
   const calls = [],
     subscriptions = [];
   const revoked = new Set();
@@ -110,10 +108,10 @@ export async function pilotFixture(
     if (u.pathname === '/helix/moderation/channels' && chronicleEnv.SEEKERS_ENABLED === 'true')
       return {
         status: 200,
-        data: { data: [HOME, OTHER].map((id) => ({ broadcaster_id: id })), pagination: {} },
+        data: { data: ids.map((id) => ({ broadcaster_id: id })), pagination: {} },
       };
     if (u.pathname.endsWith('/users')) {
-      const id = u.searchParams.get('login') === 'raidrelichq' ? HOME : OTHER;
+      const id = ids.find((id) => keepers[id] === u.searchParams.get('login'));
       return { status: 200, data: { data: [{ id, login: u.searchParams.get('login') }] } };
     }
     if (u.pathname === '/helix/chat/messages') {
@@ -122,7 +120,7 @@ export async function pilotFixture(
       const body = JSON.parse(options.body);
       assert.deepEqual(Object.keys(body).sort(), ['broadcaster_id', 'message', 'sender_id']);
       assert.equal(body.sender_id, BOT);
-      assert.ok([HOME, OTHER].includes(body.broadcaster_id));
+      assert.ok(ids.includes(body.broadcaster_id));
       assert.equal(typeof body.message, 'string');
       assert.ok(body.message.length <= 500);
       if (chatFailure === 'transport') throw Error('synthetic-token-sensitive-network-error');
@@ -162,7 +160,8 @@ export async function pilotFixture(
       GOOGLE_CLOUD_PROJECT: 'raid-relic-hackathon',
       OAUTH_ENABLED: 'true',
       RAID_PILOT_ENABLED: 'true',
-      KEEPER_CHANNEL_IDS: `${HOME},${OTHER}`,
+      KEEPER_CHANNEL_IDS: ids.join(','),
+      ...(ids.length !== 2 ? { PILOT_KEEPERS_JSON: JSON.stringify(keepers) } : {}),
       TWITCH_STREAMER_ID: HOME,
       TWITCH_BOT_ID: BOT,
       TWITCH_CLIENT_ID: 'public-client',

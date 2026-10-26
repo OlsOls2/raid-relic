@@ -89,3 +89,7 @@ Keeper, then pass unused ownership to an opted-in eligible Seeker. This is a typ
 **non-raid** transfer, not a raid, audience transfer or two-chat claim. It is off by
 default, adds no provider scope and needs a separately installed operator worker.
 See [Auto-wander](docs/WANDER.md) for the 72-hour / 12-hour policy and limits.
+
+### Configuring a third Keeper
+
+The operator-only `PILOT_KEEPERS_JSON` source path supports up to four configured Keepers; unset preserves the existing two. [Third Keeper setup](docs/THIRD_KEEPER.md) documents olsols3 admission, the exact app OAuth start route, canonical promotion-before-consent order, bot moderation, bootstrap and optional broadcasting. This source is awaiting native QA and owner review; it does not claim third-channel consent, live subscriptions or a published third-network candidate.

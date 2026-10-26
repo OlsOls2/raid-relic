@@ -67,12 +67,8 @@ export function createOAuth({
   if (
     !Array.isArray(keeperIds) ||
     !keeperIds.includes(streamerId) ||
-    keeperIds.length > 2 ||
+    keeperIds.length > 4 ||
     new Set(keeperIds).size !== keeperIds.length ||
-    (keeperIds.length > 1 &&
-      (streamerId !== '1591805230' ||
-        botId !== '1591804828' ||
-        !keeperIds.every((id) => ['1591805230', '1591806023'].includes(id)))) ||
     !keeperIds.every((id) => typeof id === 'string' && /^\d{1,32}$/.test(id) && id !== botId)
   )
     throw new Error('Explicit Keeper accounts required');

@@ -1,5 +1,6 @@
+import { keeperNames as networkNames } from './keeper-network.js';
 // Closed-vocabulary UI; never render upstream bodies, arbitrary messages or JSON.
-export const keeperNames = Object.freeze({ 1591805230: 'raidrelichq', 1591806023: 'olsols2' });
+export const keeperNames = networkNames;
 export function actionMessage(value, targetLogin) {
   const target =
     keeperNames[value?.diagnostic?.targetId] ??

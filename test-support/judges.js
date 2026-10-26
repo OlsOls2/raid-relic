@@ -21,6 +21,7 @@ const actions = [
   'reset',
 ];
 const assets = new Set([
+  '/keeper-network.js',
   '/receiving.js',
   '/keeper-card.js',
   '/streak-view.js',

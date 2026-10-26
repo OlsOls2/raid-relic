@@ -5,15 +5,21 @@ export const RECEIVING_KEEPERS = Object.freeze({
   1591805230: 'raidrelichq',
   1591806023: 'olsols2',
 });
-// Validates operator-owned mapping only; runtime admission remains the existing
-// pilot allowlist until a separately reviewed Keeper setup changes it.
+// Operator-owned mapping. No request parameter can expand this admission boundary.
 export function keeperNetwork(value = RECEIVING_KEEPERS) {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) throw Error('Keeper mapping');
+  if (
+    !value ||
+    typeof value !== 'object' ||
+    Array.isArray(value) ||
+    ![Object.prototype, null].includes(Object.getPrototypeOf(value))
+  )
+    throw Error('Keeper mapping');
   const pairs = Object.entries(value);
+  if (Object.getOwnPropertySymbols(value).length) throw Error('Keeper mapping');
   if (
     !pairs.length ||
     pairs.length > 4 ||
-    !pairs.every(([id, login]) => /^\d{1,32}$/.test(id) && /^[a-z0-9_]{1,25}$/.test(login)) ||
+    !pairs.every(([id, login]) => /^[1-9]\d{0,31}$/.test(id) && /^[a-z0-9_]{1,25}$/.test(login)) ||
     new Set(pairs.map(([, login]) => login)).size !== pairs.length
   )
     throw Error('Keeper mapping');
@@ -105,6 +111,7 @@ export function createReceiving({
   botId,
   transport,
   keepers = RECEIVING_KEEPERS,
+  streamerId = '1591805230',
   now = Date.now,
 }) {
   keepers = keeperNetwork(keepers);
@@ -181,7 +188,7 @@ export function createReceiving({
     }
   }
   async function grants(id) {
-    const role = id === ids[0] ? 'streamer' : `keeper:${id}`;
+    const role = id === streamerId ? 'streamer' : `keeper:${id}`;
     if (!(await store.getToken(role)) || (await store.getJob(id))?.ready !== true) return false;
     try {
       await oauth.readAccessToken(role);
@@ -260,4 +267,33 @@ export function createReceiving({
       if (!(await grants(target))) throw Error('Recipient grant unavailable');
     },
   };
+}
+
+// Explicit startup configuration only; existing two Keeper names cannot be rebound.
+export function configuredKeeperNetwork(raw, { home, bot } = {}) {
+  let value = RECEIVING_KEEPERS;
+  if (raw !== undefined) {
+    if (typeof raw !== 'string' || Buffer.byteLength(raw) > 1024) throw Error('Keeper mapping');
+    try {
+      value = JSON.parse(raw);
+    } catch {
+      throw Error('Keeper mapping');
+    }
+    // JSON.parse otherwise silently accepts duplicate property names.
+    const keys = raw.match(/"[^"\\]*"\s*:/g) ?? [];
+    if (keys.length !== Object.keys(value ?? {}).length) throw Error('Keeper mapping');
+  }
+  const names = keeperNetwork(value);
+  if (
+    home !== '1591805230' ||
+    bot !== '1591804828' ||
+    !Object.hasOwn(names, home) ||
+    Object.hasOwn(names, bot) ||
+    Object.values(names).some((login) =>
+      ['raidrelicbot', '__proto__', 'prototype', 'constructor'].includes(login),
+    ) ||
+    Object.entries(RECEIVING_KEEPERS).some(([id, login]) => names[id] !== login)
+  )
+    throw Error('Keeper mapping');
+  return names;
 }

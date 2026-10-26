@@ -9,6 +9,7 @@ import { httpTransport } from './oauth.js';
 
 export const KEEPERS = Object.freeze({ 1591805230: 'raidrelichq', 1591806023: 'olsols2' });
 export function createPilot({
+  keepers = KEEPERS,
   receiving,
   p7,
   replies,
@@ -25,7 +26,7 @@ export function createPilot({
   transport = httpTransport,
   logger = (line) => console.warn(line),
 }) {
-  const ids = Object.keys(KEEPERS);
+  const ids = Object.keys(keepers);
   const actions = (id) => [
     ...(chronicle ? ['chronicle'] : []),
     ...(receiving?.enabled ? ['seek-on', 'seek-off', 'seek-status'] : []),
@@ -36,7 +37,7 @@ export function createPilot({
     'opt-out',
     'process',
     ...(replies ? ['mark-links'] : []),
-    `send:${ids.find((other) => other !== id)}`,
+    ...ids.filter((other) => other !== id).map((other) => `send:${other}`),
   ];
   async function mutate(id, action) {
     const time = now();
@@ -70,8 +71,9 @@ export function createPilot({
         '. Refresh both channel statuses; do not retry accepted/unknown dispatches.',
     };
   }
-  async function readiness(id) {
-    const other = ids.find((candidate) => candidate !== id);
+  async function readiness(id, other = ids.find((candidate) => candidate !== id)) {
+    if (!ids.includes(id) || !ids.includes(other) || id === other)
+      throw Error('Both channels must be configured');
     if ((await store.getJob(id))?.ready !== true || (await store.getJob(other))?.ready !== true)
       throw new Error(
         'Both channels need five enabled subscriptions; Bootstrap / reconcile each channel again after callbacks verify',
@@ -93,20 +95,24 @@ export function createPilot({
       channels[key] = await state.getStreamStatus(key);
       marks[key] = await state.getPrivateMarks(key, { broadcasterId: key, chatterId: key });
     }
-    const target = ids.find((key) => key !== id);
-    const reason = reservationReason(
-      await state.getKeeperRegistry(),
-      channels,
-      marks,
-      { channels: ids, logins: Object.fromEntries(ids.map((key) => [KEEPERS[key], key])) },
-      { source: id, actor: id, login: KEEPERS[target], sentAt: now() },
-      now(),
-    );
+    const awaitRegistry = await state.getKeeperRegistry();
+    const reasons = ids
+      .filter((key) => key !== id)
+      .map((target) =>
+        reservationReason(
+          awaitRegistry,
+          channels,
+          marks,
+          { channels: ids, logins: Object.fromEntries(ids.map((key) => [keepers[key], key])) },
+          { source: id, actor: id, login: keepers[target], sentAt: now() },
+          now(),
+        ),
+      );
     return {
-      eligible: reason === null,
-      reason,
+      eligible: reasons.some((reason) => reason === null),
+      reason: reasons.some((reason) => reason === null) ? null : reasons[0],
       observedOnline: Object.fromEntries(
-        ids.map((key) => [KEEPERS[key], channels[key]?.online === true]),
+        ids.map((key) => [keepers[key], channels[key]?.online === true]),
       ),
     };
   }
@@ -224,7 +230,7 @@ export function createPilot({
     },
     actions,
     async authorizeSend(source, target) {
-      await readiness(source);
+      await readiness(source, target);
       if (target) await receiving?.authorize(source, target);
     },
     async cancelQueued(id, intentId, generation) {
@@ -266,7 +272,10 @@ export function createPilot({
             intentId = intent.id;
           }
           try {
-            await readiness(id);
+            const selected = action.startsWith('send:')
+              ? action.slice(5)
+              : (await state.getKeeperRegistry()).send?.targetId;
+            await readiness(id, selected);
           } catch (error) {
             return blocked(
               id,
@@ -277,7 +286,7 @@ export function createPilot({
           }
           if (action.startsWith('send:')) {
             const target = action.slice(5);
-            const reserved = await mutate(id, { type: 'send', login: KEEPERS[target] });
+            const reserved = await mutate(id, { type: 'send', login: keepers[target] });
             if (reserved?.status !== 'reserved')
               return blocked(id, reserved?.reason ?? 'reservation-unavailable');
             intentId = reserved.intentId;
@@ -346,7 +355,7 @@ export function createPilot({
           : await state.getKeeperCandidates(id),
         candidatesObservedAt: now(),
         mode: simulator ? 'simulator' : 'live',
-        account: KEEPERS[id],
+        account: keepers[id],
         online: channel?.online ?? false,
         optedIn: channel?.optedIn ?? false,
         paused: channel?.paused ?? false,
@@ -354,13 +363,13 @@ export function createPilot({
         bothReadiness: Object.fromEntries(
           await Promise.all(
             ids.map(async (keeper) => [
-              KEEPERS[keeper],
+              keepers[keeper],
               (await store.getJob(keeper))?.ready === true,
             ]),
           ),
         ),
         ownerStep:
-          'Wait for both readiness flags true; Bootstrap / reconcile pending channels after callback verification. Reconnect missing grants.',
+          'Wait for the selected source and target readiness flags; Bootstrap / reconcile pending channels after callback verification. Reconnect missing grants.',
         recovery:
           registry.send?.sourceId === id
             ? {
@@ -416,7 +425,7 @@ export function createPilot({
         holder: registry.holderId,
         subscriptions: await store.getJob(id),
         intent: registry.send?.sourceId === id ? registry.send.status : null,
-        handoff: handoffView(registry, id, now()),
+        handoff: handoffView(registry, id, now(), undefined, keepers),
       };
     },
   };

@@ -1,3 +1,4 @@
+import { RECEIVING_KEEPERS } from './receiving.js';
 import { stopStreak } from './streaks.js';
 import { chronicleView } from './chronicle.js';
 import { eligible } from './send-state.js';
@@ -45,7 +46,7 @@ export function atlasPage(lineage, { stopId, offset = 0, limit = 8 } = {}) {
     stops: stops.slice(offset, offset + limit).map(stopSummary),
   };
 }
-export function handoffView(registry, channel, now, lineage) {
+export function handoffView(registry, channel, now, lineage, names = RECEIVING_KEEPERS) {
   const hop = registry?.pendingHop;
   if (
     !hop ||
@@ -60,7 +61,7 @@ export function handoffView(registry, channel, now, lineage) {
     lineage?.stops?.find(
       (s) => s.eventId === hop.eventId && s.from === hop.from && s.to === hop.to,
     );
-  const sourceLogin = { 1591805230: 'raidrelichq', 1591806023: 'olsols2' }[hop.from];
+  const sourceLogin = names[hop.from];
   return {
     ...(sourceLogin ? { sourceLogin } : {}),
     ...(stop && Number.isFinite(stop.claimedAt) ? { completedAt: stop.claimedAt } : {}),
@@ -209,7 +210,7 @@ export function claimMeterView(registry, host, now) {
 }
 
 // Current holder identity is public channel identity, never a viewer lookup.
-export function movedToView(registry, lineage, host, channel) {
+export function movedToView(registry, lineage, host, channel, names = RECEIVING_KEEPERS) {
   const stop = lineage?.stops?.at(-1);
   return channel?.optedIn === true &&
     !channel.paused &&
@@ -217,13 +218,12 @@ export function movedToView(registry, lineage, host, channel) {
     stop?.from === host &&
     stop.to === registry?.holderId &&
     stop.to !== host
-    ? { 1591805230: 'raidrelichq', 1591806023: 'olsols2' }[stop.to]
+    ? names[stop.to]
     : undefined;
 }
 
 // Configured Keeper display only, taken from the registry rather than readiness.
-export function holderLoginView(registry) {
-  const names = { 1591805230: 'raidrelichq', 1591806023: 'olsols2' };
+export function holderLoginView(registry, names = RECEIVING_KEEPERS) {
   return Object.hasOwn(names, registry?.holderId) ? names[registry.holderId] : undefined;
 }
 

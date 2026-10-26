@@ -1,6 +1,6 @@
 import { wanderPolicy } from './wander-state.js';
 import { createWander } from './wander.js';
-import { createReceiving } from './receiving.js';
+import { createReceiving, configuredKeeperNetwork, RECEIVING_KEEPERS } from './receiving.js';
 import { markReviewPolicy } from './marks.js';
 import { createP7, p7Config } from './p7.js';
 import { createMarkShares, createShareReplies } from './my-marks.js';
@@ -13,7 +13,7 @@ import { createMemoryState } from './state.js';
 import { createMemoryAuthStore, createFirestoreStore } from './store.js';
 import { createOAuth, httpTransport } from './oauth.js';
 import { createBot } from './bot.js';
-import { createPilot, KEEPERS } from './pilot.js';
+import { createPilot } from './pilot.js';
 import { createOverlayHub } from './overlay-feed.js';
 import { validateReleaseCommit } from './release.js';
 import { createSubscriptionManager } from './subscriptions.js';
@@ -57,23 +57,37 @@ export async function createRuntime(
   const reviewPolicy = markReviewPolicy(env);
   let state;
   let store;
-  const keeperIds = env.KEEPER_CHANNEL_IDS
-    ? env.KEEPER_CHANNEL_IDS.split(',')
-    : [env.TWITCH_STREAMER_ID];
+  if (env.PILOT_KEEPERS_JSON !== undefined && !raidPilot)
+    throw Error('Keeper mapping requires the authorised pilot');
+  const keeperNames =
+    raidPilot || env.PILOT_KEEPERS_JSON !== undefined
+      ? configuredKeeperNetwork(env.PILOT_KEEPERS_JSON, {
+          home: env.TWITCH_STREAMER_ID,
+          bot: env.TWITCH_BOT_ID,
+        })
+      : RECEIVING_KEEPERS;
+  const keeperIds =
+    env.PILOT_KEEPERS_JSON !== undefined
+      ? Object.keys(keeperNames)
+      : env.KEEPER_CHANNEL_IDS
+        ? env.KEEPER_CHANNEL_IDS.split(',')
+        : [env.TWITCH_STREAMER_ID];
   if (
-    env.KEEPER_CHANNEL_IDS &&
-    (!keeperIds.every((id) => ['1591805230', '1591806023'].includes(id)) ||
-      env.TWITCH_STREAMER_ID !== '1591805230' ||
-      env.TWITCH_BOT_ID !== '1591804828')
+    new Set(keeperIds).size !== keeperIds.length ||
+    ((raidPilot || env.KEEPER_CHANNEL_IDS) &&
+      !keeperIds.every((id) => Object.hasOwn(keeperNames, id))) ||
+    (env.PILOT_KEEPERS_JSON !== undefined &&
+      env.KEEPER_CHANNEL_IDS &&
+      (env.KEEPER_CHANNEL_IDS.split(',').length !== keeperIds.length ||
+        !env.KEEPER_CHANNEL_IDS.split(',').every((id) => keeperIds.includes(id))))
   )
-    throw new Error('Keeper allowlist rejected');
+    throw Error('Keeper allowlist rejected');
   if (
     raidPilot &&
     (env.OAUTH_ENABLED !== 'true' ||
-      keeperIds.length !== 2 ||
-      !Object.keys(KEEPERS).every((id) => keeperIds.includes(id)))
+      !Object.keys(keeperNames).every((id) => keeperIds.includes(id)))
   )
-    throw new Error('Pilot needs both configured Keepers and OAuth controls');
+    throw Error('Pilot needs all configured Keepers and OAuth controls');
   if (
     raidPilot &&
     (new URL(env.OAUTH_REDIRECT_URI).pathname !== '/auth/callback' ||
@@ -91,7 +105,7 @@ export async function createRuntime(
           ...(raidPilot
             ? {
                 logins: Object.fromEntries(
-                  Object.entries(KEEPERS).map(([id, login]) => [login, id]),
+                  Object.entries(keeperNames).map(([id, login]) => [login, id]),
                 ),
               }
             : {}),
@@ -159,6 +173,8 @@ export async function createRuntime(
   } else if (production || env.OAUTH_ENABLED !== 'false')
     throw new Error('Select OAUTH_ENABLED explicitly; production requires OAuth configuration');
   const receiving = createReceiving({
+    keepers: keeperNames,
+    streamerId: env.TWITCH_STREAMER_ID,
     enabled: seekersEnabled && raidPilot,
     state,
     store,
@@ -181,6 +197,7 @@ export async function createRuntime(
     const hub = createOverlayHub(state, raidPilot ? keeperIds : [env.TWITCH_STREAMER_ID], {
       now,
       simulator,
+      logins: keeperNames,
     });
     overlayFeeds = hub.feeds;
     overlayFeed = overlayFeeds[env.TWITCH_STREAMER_ID];
@@ -262,7 +279,7 @@ export async function createRuntime(
       clientSecret: env.TWITCH_CLIENT_SECRET,
       botId: env.TWITCH_BOT_ID,
       keeperIds,
-      logins: KEEPERS,
+      logins: keeperNames,
       transport: p7HTTP,
       now,
     });
@@ -292,6 +309,7 @@ export async function createRuntime(
     });
     replies = createShareReplies({ state, shares, bots, now });
     pilot = createPilot({
+      keepers: keeperNames,
       receiving,
       p7,
       replies,
@@ -310,6 +328,7 @@ export async function createRuntime(
     oauth.control.bindPilot(pilot);
   }
   const wanderService = createWander({
+    keepers: keeperNames,
     policy: wander,
     key: env.TOKEN_ENCRYPTION_KEY,
     state,
@@ -322,6 +341,7 @@ export async function createRuntime(
   });
   return {
     ...createApp({
+      keeperNames,
       wander: wanderService,
       receiving,
       previewReadOnly,

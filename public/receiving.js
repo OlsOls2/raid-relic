@@ -1,6 +1,7 @@
+import { keeperNames } from './keeper-network.js';
 import { downloadKeeperCard } from './keeper-card.js';
 const root = document.getElementById('receiving');
-const configured = new Set(['raidrelichq', 'olsols2']);
+const configured = new Set(Object.values(keeperNames));
 const utc = (v) =>
   Number.isSafeInteger(v) && v >= 0
     ? new Date(v).toLocaleString('en-GB', {

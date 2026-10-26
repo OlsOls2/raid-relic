@@ -1,3 +1,4 @@
+import { keeperNames as networkNames } from './keeper-network.js';
 import { ringCardModel, ringCardPNG, saveRingCard } from './ring-card.js';
 export function keeperCardFilename(ring, login, orientation) {
   if (
@@ -99,7 +100,7 @@ export async function downloadKeeperCard(
     )
       throw Error('Changed stop');
     const exact = await read('/api/atlas/stops/' + recorded.stopId);
-    const names = { 1591805230: 'raidrelichq', 1591806023: 'olsols2' };
+    const names = networkNames;
     if (
       exact.mode !== value.mode ||
       names[exact.stop?.to] !== profile.login ||

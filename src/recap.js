@@ -1,5 +1,4 @@
-const keeperName = (id) =>
-  ({ 1591805230: '@raidrelichq', 1591806023: '@olsols2' })[id] ?? 'Unknown Keeper';
+import { RECEIVING_KEEPERS } from './receiving.js';
 import { normalizeMark, runeGeometry } from './marks.js';
 const escapeXML = (value) =>
   String(value).replace(
@@ -61,7 +60,7 @@ export function recapProjection(lineage) {
 }
 // All coordinates/attributes are constants or validated numbers. No supplied SVG,
 // mark text, URL, scripts, foreignObject, external assets or identity associations.
-export function recapSVG(view, { simulator = false } = {}) {
+export function recapSVG(view, { simulator = false, names = RECEIVING_KEEPERS } = {}) {
   if (
     !Array.isArray(view.route) ||
     view.route.length > 16 ||
@@ -88,6 +87,7 @@ export function recapSVG(view, { simulator = false } = {}) {
   const xAt = (i) => 85 + (i < 8 ? i : 15 - i) * 144;
   const text = (x, y, size, value, color = '#dce4ed') =>
     `<text x="${x}" y="${y}" font-family="Georgia,serif" font-size="${size}" fill="${color}">${escapeXML(value)}</text>`;
+  const keeperName = (id) => (names[id] ? '@' + names[id] : 'Unknown Keeper');
   let svg =
     '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc"><title id="title">Raid Relic journey recap</title><desc id="desc">Completed stops and retained approved mark entries. Not unique people or personal ownership.</desc><rect width="1200" height="630" fill="#101d30"/><rect x="22" y="22" width="1156" height="586" rx="8" fill="none" stroke="#9486b7"/>';
   if (simulator)

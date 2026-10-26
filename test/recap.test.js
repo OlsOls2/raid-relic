@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { runeSvg, runeGeometry, normalizeMark } from '../src/marks.js';
 import test from 'node:test';
@@ -215,7 +216,15 @@ test('judges recap always labelled in first DOM, JSON and exported SVG; real app
 });
 test('client uses fresh fetch for each download, textContent/relative links, blob cleanup and bounded offscreen PNG; Atlas links recap', async () => {
   const source = await readFile('public/recap.js', 'utf8');
-  assert.doesNotThrow(() => new Function(source));
+  const parsed = spawnSync(process.execPath, ['--check', '--input-type=module'], {
+    input: source,
+    timeout: 2000,
+    maxBuffer: 65536,
+    encoding: 'utf8',
+  });
+  assert.ok(parsed.error == null, 'ESM parser must finish without a process error');
+  assert.equal(parsed.signal, null);
+  assert.equal(parsed.status, 0, 'Public recap must parse as ESM without executing it');
   assert.ok(source.includes("cache: 'no-store'"));
   assert.ok(source.includes('const data = await read()'));
   assert.ok(source.includes('new OffscreenCanvas(1200, 630)'));

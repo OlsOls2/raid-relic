@@ -65,6 +65,9 @@ export function createMemoryState({
   wander,
 } = {}) {
   const config = lifecycleConfig(lifecycle);
+  const keeperNames = config?.logins
+    ? Object.fromEntries(Object.entries(config.logins).map(([login, id]) => [id, login]))
+    : undefined;
   reviewPolicy = trustedReviewPolicy(reviewPolicy);
   p7Enabled = Boolean(p7Enabled && config);
   let lineage = emptyLineage();
@@ -246,6 +249,7 @@ export function createMemoryState({
           sentAt,
           presenceNext,
           config?.streakEnabled,
+          keeperNames,
         );
       }
       if (claiming && chat?.markAction?.type === 'mymarks')
@@ -263,6 +267,7 @@ export function createMemoryState({
         const scoreChannels = Object.fromEntries(channels);
         if (transition) scoreChannels[host] = transition.channel;
         scoreNext = reduceScores(scores, {
+          names: keeperNames,
           channels: scoreChannels,
           marks: claiming.marks,
           chat,
@@ -340,6 +345,7 @@ export function createMemoryState({
               Object.fromEntries(channels),
               transition ? { [host]: transition.channel } : {},
             ),
+            keeperNames,
           );
           ackUpdates.set(target, value.doc);
           if (value.key) completionAcks.push({ host: target, key: value.key });
@@ -516,12 +522,14 @@ export function createMemoryState({
           now,
           Object.fromEntries(presenceDocs),
           config?.streakEnabled,
+          keeperNames,
         );
         registry = next.registry;
         lineage = next.lineage;
       }
       if (config)
         scores = reduceScores(scores, {
+          names: keeperNames,
           channels: Object.fromEntries(channels),
           marks: Object.fromEntries(markDocs),
           chat: { ...actor, markAction: action },
@@ -735,10 +743,12 @@ export function createMemoryState({
         now,
         Object.fromEntries(presenceDocs),
         config?.streakEnabled,
+        keeperNames,
       );
       registry = checked.registry;
       lineage = checked.lineage;
       scores = reduceScores(scores, {
+        names: keeperNames,
         channels: Object.fromEntries(channels),
         marks: Object.fromEntries(markDocs),
         now,
@@ -777,16 +787,18 @@ export function createMemoryState({
     },
     getPublicPresentation(host, now) {
       return {
-        ...(holderLoginView(registry) ? { holderLogin: holderLoginView(registry) } : {}),
+        ...(holderLoginView(registry, keeperNames)
+          ? { holderLogin: holderLoginView(registry, keeperNames) }
+          : {}),
         ...(wanderArrivalView(registry, lineage, host)
           ? { wanderArrival: wanderArrivalView(registry, lineage, host) }
           : {}),
         rings: lineage.stops.length,
         ...(config?.streakEnabled ? { streak: streakView(registry, now) } : {}),
-        ...(movedToView(registry, lineage, host, channels.get(host))
-          ? { movedToLogin: movedToView(registry, lineage, host, channels.get(host)) }
+        ...(movedToView(registry, lineage, host, channels.get(host), keeperNames)
+          ? { movedToLogin: movedToView(registry, lineage, host, channels.get(host), keeperNames) }
           : {}),
-        handoff: handoffView(registry, host, now, lineage),
+        handoff: handoffView(registry, host, now, lineage, keeperNames),
         claimMeter: claimMeterView(registry, host, now),
         ...(echoView(registry, host, now) ? { resonance: echoView(registry, host, now) } : {}),
       };

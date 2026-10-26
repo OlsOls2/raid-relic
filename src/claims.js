@@ -1,3 +1,4 @@
+import { RECEIVING_KEEPERS } from './receiving.js';
 import { observeStreak, completeStreak, stopStreak } from './streaks.js';
 import { scoreCompletion } from './scoreboard.js';
 import { hash } from './crypto.js';
@@ -37,6 +38,7 @@ export function reduceClaims(
   sentAt = now,
   presence = {},
   streakEnabled = false,
+  names = RECEIVING_KEEPERS,
 ) {
   registry = structuredClone(registry);
   marks = structuredClone(marks);
@@ -192,7 +194,6 @@ export function reduceClaims(
           hop.movedOffers ??= [];
           hop.movedOffers.push(chat.chatterId);
         }
-        const names = { 1591805230: 'raidrelichq', 1591806023: 'olsols2' };
         const needOffers = Math.max(0, hop.threshold - hop.offers.length),
           needAccepts = Math.max(0, hop.threshold - hop.accepts.length);
         const missing = [

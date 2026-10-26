@@ -1,5 +1,5 @@
-const keeperName = (id) =>
-  ({ 1591805230: '@raidrelichq', 1591806023: '@olsols2' })[id] ?? 'Unknown Keeper';
+import { keeperNames } from './keeper-network.js';
+const keeperName = (id) => (keeperNames[id] ? '@' + keeperNames[id] : 'Unknown Keeper');
 // Fragment is never sent to the server. Remove it from this history entry
 // immediately; keep only transient memory and a POST body, never storage/logs.
 let capability = location.hash.slice(1);

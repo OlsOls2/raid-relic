@@ -1,5 +1,5 @@
-const keeperName = (id) =>
-  ({ 1591805230: '@raidrelichq', 1591806023: '@olsols2' })[id] ?? 'Unknown Keeper';
+import { keeperNames } from './keeper-network.js';
+const keeperName = (id) => (keeperNames[id] ? '@' + keeperNames[id] : 'Unknown Keeper');
 const utcDate = (value) =>
   new Date(value).toLocaleString('en-GB', {
     timeZone: 'UTC',

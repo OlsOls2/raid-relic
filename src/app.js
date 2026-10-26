@@ -1,3 +1,4 @@
+import { RECEIVING_KEEPERS } from './receiving.js';
 import { boundedCall } from './bounded.js';
 import { EDITION_CONFIG, validEditions, editionSVG } from '../public/editions.js';
 import { canonicalLogin, shareRequestHash } from './my-marks.js';
@@ -17,6 +18,7 @@ import { parseLifecycle } from './lifecycle.js';
 export const MAX_BODY_BYTES = 65536;
 export const REPLAY_WINDOW_MS = 10 * 60 * 1000;
 const assets = new Map([
+  ['/keeper-network.js', ['keeper-network.js', 'text/javascript; charset=utf-8']],
   ['/streak-view.js', ['streak-view.js', 'text/javascript; charset=utf-8']],
   ['/ring-card.js', ['ring-card.js', 'text/javascript; charset=utf-8']],
   ['/ring-card-client.js', ['ring-card-client.js', 'text/javascript; charset=utf-8']],
@@ -79,6 +81,7 @@ const header = (headers, name) => (typeof headers[name] === 'string' ? headers[n
 const result = (status, body = '', type = 'text/plain; charset=utf-8') => ({ status, body, type });
 
 export function createApp({
+  keeperNames = RECEIVING_KEEPERS,
   scoreAcks,
   claimAcks,
   receiving,
@@ -156,6 +159,17 @@ export function createApp({
         await readFile(new URL('../public' + path, import.meta.url)),
         'text/javascript; charset=utf-8',
       );
+    }
+    if (path === '/keeper-network.js') {
+      if (method !== 'GET') return result(405, 'Read only');
+      return {
+        ...result(
+          200,
+          `export const keeperNames = Object.freeze(${JSON.stringify(keeperNames)});`,
+          'text/javascript; charset=utf-8',
+        ),
+        headers: { 'cache-control': 'no-store' },
+      };
     }
     if (faviconAssets.has(path)) {
       if (method !== 'GET') return result(previewReadOnly ? 403 : 405, 'Static icon is read only');
@@ -250,7 +264,7 @@ export function createApp({
       if (rawBody.length) return result(400, 'Invalid receiving request');
       if (!receiving) return result(503, 'Receiving view unavailable');
       const login = path.startsWith('/api/keeper/') ? path.slice(12) : null;
-      if (login && !['raidrelichq', 'olsols2'].includes(login))
+      if (login && !Object.values(keeperNames).includes(login))
         return result(404, 'Keeper not configured');
       try {
         const value = await boundedCall(() => receiving.page(), 8000);
@@ -277,9 +291,7 @@ export function createApp({
     }
     if (/^\/keeper\/[a-z0-9_]{1,25}$/.test(path)) {
       if (method !== 'GET') return result(405, 'Read only');
-      if (
-        !Object.values({ 1591805230: 'raidrelichq', 1591806023: 'olsols2' }).includes(path.slice(8))
-      )
+      if (!Object.values(keeperNames).includes(path.slice(8)))
         return result(404, 'Keeper not configured');
       return result(200, await publicHTML('keeper.html'), 'text/html; charset=utf-8');
     }
@@ -458,7 +470,7 @@ export function createApp({
       try {
         const projection = await state.getRecap();
         const simulator = overlayFeed?.simulator === true;
-        const svg = recapSVG(projection, { simulator });
+        const svg = recapSVG(projection, { simulator, names: keeperNames });
         if (path.endsWith('.svg'))
           return {
             ...result(200, svg, 'image/svg+xml'),

@@ -280,7 +280,7 @@ test('pilot gate requires both explicit accounts and OAuth before constructing s
       KEEPER_CHANNEL_IDS: HOME,
       STATE_STORE: 'memory',
     }),
-    /both configured/,
+    /all configured/,
   );
   await assert.rejects(
     createRuntime({
@@ -291,7 +291,7 @@ test('pilot gate requires both explicit accounts and OAuth before constructing s
       KEEPER_CHANNEL_IDS: `${HOME},${OTHER}`,
       STATE_STORE: 'memory',
     }),
-    /both configured/,
+    /all configured/,
   );
 });
 

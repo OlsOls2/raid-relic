@@ -1,3 +1,4 @@
+import { RECEIVING_KEEPERS } from './receiving.js';
 import { claimComplete } from '../public/ritual-copy.js';
 import { ChatSendError } from './bot.js';
 import { hash } from './crypto.js';
@@ -248,13 +249,21 @@ export function createClaimAcks({
 }
 
 export const completionAckKey = (host, eventId) => hash(`claim-completion:${host}:${eventId}`);
-export function completionAck(previous, host, eventId, deadline, now, hop, channels) {
+export function completionAck(
+  previous,
+  host,
+  eventId,
+  deadline,
+  now,
+  hop,
+  channels,
+  names = RECEIVING_KEEPERS,
+) {
   const doc = structuredClone(previous ?? { rows: [] });
   doc.rows = doc.rows.filter((r) => r.expiresAt > now);
   const key = completionAckKey(host, eventId);
   if (!doc.rows.some((r) => r.key === key)) {
     if (doc.rows.length >= 128) return { doc, key: null };
-    const names = { 1591805230: 'raidrelichq', 1591806023: 'olsols2' };
     const row = {
       key,
       expiresAt: now + 600000,

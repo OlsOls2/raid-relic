@@ -353,7 +353,8 @@ export function createP7({
     minting = null,
     roles = null,
     checking = null,
-    grantsUntil = 0;
+    grantsUntil = 0,
+    grantsKey = '';
   const call = (url, options) => boundedCall((signal) => transport(url, { ...options, signal }));
   async function appToken() {
     if (app?.until > now()) return app.token;
@@ -390,14 +391,29 @@ export function createP7({
       minting = null;
     }
   }
-  async function capabilities() {
+  async function capabilities(required) {
+    if (
+      !Array.isArray(required) ||
+      required.length !== 2 ||
+      required[0] === required[1] ||
+      !required.every((id) => keeperIds.includes(id))
+    )
+      throw Error('keeper-proof');
+    const key = [...required].sort().join(',');
+    const covered = () =>
+      roles?.until > now() && required.every((id) => roles.channels[id] === true);
     // A fresh identity/client/scope validation precedes every eligible invocation.
-    if (grantsUntil > now() && roles?.until > now()) return;
+    if (grantsKey === key && grantsUntil > now() && covered()) return;
     const token = await oauth.accessTokenForP7();
-    for (const id of keeperIds) await oauth.accessTokenForKeeper(id);
+    for (const id of required) await oauth.accessTokenForKeeper(id);
     grantsUntil = now() + 5000;
-    if (roles?.until > now()) return;
-    if (checking) return checking;
+    grantsKey = key;
+    if (covered()) return;
+    if (checking) {
+      await checking;
+      if (!covered()) throw Error('moderator-proof');
+      return;
+    }
     checking = (async () => {
       let cursor = null;
       const seen = new Set(),
@@ -431,12 +447,12 @@ export function createP7({
             v.pagination.cursor.length > 2048)
         )
           throw Error('moderator-proof');
-        if (found.size === keeperIds.length) {
+        if (required.every((id) => found.has(id))) {
           roles = {
             botId,
             checkedAt: now(),
             until: now() + 300000,
-            channels: Object.fromEntries(keeperIds.map((id) => [id, true])),
+            channels: Object.fromEntries([...found].map((id) => [id, true])),
           };
           return;
         }
@@ -466,7 +482,7 @@ export function createP7({
     const row = await state.p7Step(host, { type: 'inspect', key, flags: config }, now());
     if (!row) return { status: 'skipped' };
     try {
-      await capabilities();
+      await capabilities([host, row.proof?.from]);
     } catch {
       roles = null;
       grantsUntil = 0;

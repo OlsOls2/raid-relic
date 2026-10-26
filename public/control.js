@@ -1,3 +1,4 @@
+import { keeperNames as networkNames } from './keeper-network.js';
 import { actionMessage, botConsentStartURL } from './control-view.js';
 import { boundedResponse } from './control-read.js';
 const forgeLink = document.getElementById('forge-owner-link');
@@ -25,7 +26,7 @@ if (id) {
   document.getElementById('own-overlay').href = `/overlay/${id}`;
   document.getElementById('own-overlay-sound').href = `/overlay/${id}?sound=1`;
 }
-const names = { 1591805230: 'raidrelichq', 1591806023: 'olsols2' };
+const names = networkNames;
 let recovery = null;
 let simulated = false;
 let csrf;
@@ -154,7 +155,7 @@ async function refresh({ preserveResult = false } = {}) {
             : 'Optional actions enabled by the operator. Bot consent and moderator proof are required; checked only on a new completed claim. API acceptance does not verify viewer-visible delivery.'
           : 'Off by default. Optional actions need separate operator gates, bot consent and moderator roles in both rooms.';
     document.getElementById('keeper-summary').textContent =
-      `${value.pilot.seekers?.enabled ? 'Public Seeker queue: ' + (value.pilot.seekers.joined ? 'joined.' : 'not joined.') + ' ' : ''}Relic Keeper: @${names[value.pilot.holder] ?? 'unplaced'}. Your stream: ${value.pilot.online ? 'live' : 'offline'}. ${value.pilot.optedIn ? 'Opted in' : 'Not opted in'}. ${value.pilot.paused ? 'Paused.' : ''} ${Object.values(value.pilot.bothReadiness ?? {}).length === 2 && Object.values(value.pilot.bothReadiness).every((v) => v === true) ? 'Both channels are ready.' : 'Reconcile both channels until both are ready.'} ${value.pilot.claimProgress ? `Offer ${value.pilot.claimProgress.offers ?? 0}/${value.pilot.claimProgress.threshold} · Accept ${value.pilot.claimProgress.accepts ?? 0}/${value.pilot.claimProgress.threshold}${value.pilot.claimProgress.finalized ? ' · Bound by two chats' : ''}` : ''}`;
+      `${value.pilot.seekers?.enabled ? 'Public Seeker queue: ' + (value.pilot.seekers.joined ? 'joined.' : 'not joined.') + ' ' : ''}Relic Keeper: @${names[value.pilot.holder] ?? 'unplaced'}. Your stream: ${value.pilot.online ? 'live' : 'offline'}. ${value.pilot.optedIn ? 'Opted in' : 'Not opted in'}. ${value.pilot.paused ? 'Paused.' : ''} ${Object.values(value.pilot.bothReadiness ?? {}).length >= 2 && Object.values(value.pilot.bothReadiness).every((v) => v === true) ? 'Configured channels are ready.' : 'Reconcile channels used for this hand-off until ready.'} ${value.pilot.claimProgress ? `Offer ${value.pilot.claimProgress.offers ?? 0}/${value.pilot.claimProgress.threshold} · Accept ${value.pilot.claimProgress.accepts ?? 0}/${value.pilot.claimProgress.threshold}${value.pilot.claimProgress.finalized ? ' · Bound by two chats' : ''}` : ''}`;
     document.querySelector('label[for=intent-confirm]').textContent = simulated
       ? 'Exact queued intent ID from your private status'
       : 'Type CANCEL to confirm only this never-dispatched queue';
