@@ -1,11 +1,22 @@
-# Safe visual recording — source 182
+# Safe visual recording — published runtime 6831e25
 
-This source is awaiting parent native QA, actual screenshots and a new zero-traffic
-preview. The previous 790-test / 35-workflow result is historical, not proof of this
-renderer or filming page. No new preview, canonical promotion, real chat or raid has
-been performed by the source author.
+## Current operator-reported delivery — 26 October 2026
 
-## Mandatory candidate safety
+The parent reports the published, pinned zero-traffic revision **`raid-relic-growth-1026`**, tag **`growth-safe`**, runtime **`6831e25d6643d71253ca1d40df3b63687af174ec`**:
+
+- [Film a simulated Wander](https://growth-safe---raid-relic-vz4bhnskgq-uc.a.run.app/demo/wander)
+- [Binding tour and growth-style examples](https://growth-safe---raid-relic-vz4bhnskgq-uc.a.run.app/demo/)
+- [Read-only Atlas](https://growth-safe---raid-relic-vz4bhnskgq-uc.a.run.app/atlas/)
+
+Native Node 22.23.4 passed **812/812 tests with zero skips**, all **37 serial browser flows/116 checks** passed, and the parent actually viewed all nine current simulated captures across four capture groups. The new real **900387ms** soak passed: 25 completed natural 35-second tours, two warm-up tours and 27 samples; active context losses zero and event records empty. Retained heap grew 280012 bytes, with 12654.88 bytes/min trend. DOM 442→450 stayed within the unchanged eight-node guard; listeners 57, documents two, page/context one and sockets zero. All measured application I/O, provider/external calls and browser errors were zero, with no crash/disconnect. Reported GPU CPU was 121.87s and renderer CPU 112.21s; this passing result does not establish that aggregate GPU CPU above 120s implies a limit kill. No caps, cadence, raster, memory or duration guards were waived. No causal shader speedup or percentage gain is claimed from noisy short profiles.
+
+The parent verified health/source identity, 52 immutable served-asset pairs plus six explicit growth/Wander paths against runtime 6831e25, and the generated three-Keeper module against revision configuration. Wander CSP is `connect-src 'none'`. Unsigned Wander tick, control POST, EventSub POST and third-Keeper OAuth start were all denied 403 before writes. [CI 40397749816 succeeded](https://github.com/OlsOls2/raid-relic/actions/runs/40397749816). See the report-derived [quality record](QUALITY.md); this authored handoff does not replace generated report digests.
+
+Canonical production is separately owner-promoted **`raid-relic-network3-off-1026` at 100%**, runtime **`49e515c5240b3b902a0eeebf314a7625ed0c9bf8`**, according to the parent's fresh 20:36/20:46 checks. Its three-Keeper mapping is already live, P7 action gates remain ON, Seekers is ON and Wander remains OFF. This new preview did not move production traffic or alter prior review tags. Docs-only commits may advance HEAD without changing deployed runtime 6831e25, served artifact identity or requiring another build.
+
+All results above are parent/operator-reported, not source-author live validation or physical Twitch/OBS proof. Owner physical review and separate approval remain necessary before promotion or automation. No chat, raid, consent, grant, bootstrap or broadcast was performed by this source author.
+
+## Effective published-preview safety
 
 The operator reported the owned Wander cron entry **commented out on 26 October 2026
 at 16:36:54.531 UTC**, pending explicit Olly/Grok GO. Every unrelated J5/J6 cron line
@@ -13,13 +24,13 @@ was preserved. This source does not edit cron, the pinned worker, systemd or gat
 Do not automatically uncomment/install a worker or enable live Wander from these docs.
 Live `WANDER_ENABLED=false` must remain false until separate explicit owner approval.
 
-All next zero-traffic visual candidates must use these values; these are operator
-handoff requirements, not claims of already-applied configuration:
+The parent read these effective OFF/read-only values from the deployed growth-safe revision. They apply to this preview, not globally to canonical production:
 
 | Setting | Required value |
 | --- | --- |
 | `P5_PREVIEW_READ_ONLY` | `true` |
 | `WANDER_ENABLED` | `false` |
+| `SEEKERS_ENABLED` | `false` |
 | `WANDER_IDLE_HOURS` / `WANDER_WARNING_HOURS` | `72` / `12` |
 | `P7_BOT_ACTIONS_ENABLED` | `false` |
 | `P7_ANNOUNCEMENTS_ENABLED` | `false` |
@@ -29,15 +40,11 @@ handoff requirements, not claims of already-applied configuration:
 | `CLIPS_ENABLED` / `CLIPS_ALLOW_CREATE` | `false` / `false` |
 | `CHRONICLE_ENABLED` / `CHRONICLE_ALLOW_PAID` | `false` / `false` |
 
-No new runtime flag is added. Growth is pure presentation. `SEEKERS_ENABLED` may retain
-its reviewed read-only projection setting; it cannot bypass preview POST/OAuth/control
-or EventSub denials. Admission JSON, existing grants/scopes, callback/origin allowlists,
-resources and the worker HMAC protocol are unchanged. The parent alone supplies the
-actual candidate revision/tag and checks its effective flags. Never move traffic.
+No new runtime flag was added for these visuals. Admission JSON explicitly contains raidrelichq 1591805230, olsols2 1591806023 and olsols3 1593561134. Read-only preview denials, existing scopes, callback/origin restrictions and worker HMAC policy remain intact. The parent reports its 20:48 cron check found one owned commented entry and both unrelated jobs preserved. Only explicit Olly/Grok GO may authorize later Wander scheduling; generic keep-going nudges do not.
 
 ## Film a Wander without touching the game
 
-Open **`/demo/wander` on the new reviewed visual preview**, once the operator publishes it.
+Open the published **[Wander recording page](https://growth-safe---raid-relic-vz4bhnskgq-uc.a.run.app/demo/wander)**.
 The permanent SIMULATED / NOT LIVE banner must stay visible in recordings.
 
 1. Initial scene: fictional `fixture_keeper`, virtual clock 0h, growth ring 9, streak 3.
@@ -59,9 +66,7 @@ and numeric emblem; normal mode draws an actual static WebGL frame, then has no 
 The original crystal gains an engraved numeric medallion shared by Overlay, Atlas and
 local demos. The original core/shaders/edition geometry, DPR1, 480-axis buffer cap,
 normal tiny-widget 10 idle / 24 arrival cadence, full 30/60 and corner 30 remain intact.
-The number/tier is rasterized into one owned texture only when its count changes; the
-sprite/material is reused. Replaced textures, context-loss textures and permanent
-teardown resources are disposed. A genuine count increase yields one short pulse/tick;
+The number/tier uses one cached original SVG sprite composited on the genuine GL crystal, with no extra GL badge texture or draw call. The sprite updates only when its count/tier changes; owned feedback is cancelled and cached nodes removed on clear/disposal. A genuine count increase yields one short pulse/tick;
 initial snapshots, duplicates, clock changes and reconnects do not replay it. No audio.
 Reduced motion releases the GPU context and uses a numeric original SVG medallion.
 
@@ -110,9 +115,7 @@ remain denied. Held words are never echoed publicly.
 New gates: `test/growth.test.js`, `test/recording-replies.test.js`, strengthened
 `test/relic3d.test.js`, `scripts/browser-smoke-growth.js` and
 `scripts/browser-smoke-wander-demo.js`. Local focused tests are not native screenshots
-or a new real 15-minute soak. Renderer/demo JS changed: earlier soak metrics are history,
-not a performance claim for this source. Native browser/pixel checks and visual review
-remain operator gates under the unchanged CPU/RAM/sandbox/raster limits.
+or a real 15-minute soak. The current operator-reported native, viewed-capture and soak results are recorded above; earlier failed probes below remain history. The same CPU/RAM/sandbox/raster limits apply.
 
 Optional **test-only** `GROWTH_CAPTURE=1` saves exactly these bounded viewport PNG names:
 `growth-9.png`, `growth-17.png`, `growth-42.png`, `growth-120.png`, `growth-reduced.png`,
@@ -120,14 +123,17 @@ Optional **test-only** `GROWTH_CAPTURE=1` saves exactly these bounded viewport P
 viewport raw raster is at most 4MiB; no full-page/unbounded capture is used. The parent
 must explicitly allow these fixed names in its private capture profile and actually
 view them, including the medallion at each example, corner and reduced fallback. No
-capture or visual pass is claimed here. Existing complete tiled regression captures
+source-author capture or visual pass is claimed; the parent's nine viewed captures are recorded above. Existing complete tiled regression captures
 keep their previous guards. Reports contain closed stages/counts only and stay ≤64KiB.
 
 Third Keeper setup remains in [THIRD_KEEPER.md](THIRD_KEEPER.md): reviewed canonical
-three-Keeper mapping promotion **before** owner OAuth, `/mod raidrelicbot`, own bootstrap,
-Keep, optional Seek and OBS setup. This visual preview does not perform any of them.
+three-Keeper mapping is already canonical. Third-channel owner OAuth, `/mod raidrelicbot`, own bootstrap, Keep, optional Seek and OBS setup were not observed by this job. Use the canonical app route from that handbook; preview OAuth/control is deliberately denied. FFmpeg for a third stream is needed only for three simultaneous live broadcasts. This visual preview performs none of these owner actions.
 
-### Correction 183 — native gates still pending
+## Historical source checkpoints — superseded by the current delivery above
+
+The following notes preserve failures and pending status at each earlier source checkpoint. They are not current release gates or new evidence.
+
+### Correction 183 — native gates then pending
 
 The parent reported the first 182 cohort as 800/801 unit tests and widespread browser
 failures; that cohort was **not green**. Clearing an uninitialized growth view compared

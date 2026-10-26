@@ -80,20 +80,25 @@ Multiple **simultaneous** relics are future work requiring separate authority, i
 Unofficial fan edition; not affiliated with or endorsed by Twitch/TwitchCon. Cosmetic edition dates do not imply conference attendance. [MIT licence](LICENSE) · [Three.js MIT and Cinzel OFL notices](THIRD_PARTY_NOTICES.md).
 
 The receiving-value pilot source adds an opt-in Seeker queue, a prominent current-Keeper
-spotlight and recorded Keeper pages with two share-card orientations. It is awaiting
-separate native verification and is not a new live deployment. See the
+spotlight and recorded Keeper pages with two share-card orientations. These features
+are included in the published read-only recording preview below. See the
 [receiving-value contract](docs/RECEIVING_VALUE.md) for consent, eligibility and privacy.
 
-Auto-wander source is also under review: an explicitly enabled idle policy can warn a
+Auto-wander is a separately gated feature: an explicitly enabled idle policy can warn a
 Keeper, then pass unused ownership to an opted-in eligible Seeker. This is a typed
 **non-raid** transfer, not a raid, audience transfer or two-chat claim. It is off by
-default, adds no provider scope and needs a separately installed operator worker.
+default and adds no provider scope. The installed operator worker remains commented
+out pending explicit owner GO.
 See [Auto-wander](docs/WANDER.md) for the 72-hour / 12-hour policy and limits.
 
 ### Configuring a third Keeper
 
-The operator-only `PILOT_KEEPERS_JSON` source path supports up to four configured Keepers; unset preserves the existing two. [Third Keeper setup](docs/THIRD_KEEPER.md) documents olsols3 admission, the exact app OAuth start route, canonical promotion-before-consent order, bot moderation, bootstrap and optional broadcasting. This source is awaiting native QA and owner review; it does not claim third-channel consent, live subscriptions or a published third-network candidate.
+The operator-only `PILOT_KEEPERS_JSON` path supports up to four configured Keepers; unset preserves the existing two. The canonical service now has the three-Keeper mapping, including olsols3. [Third Keeper setup](docs/THIRD_KEEPER.md) documents the exact app OAuth route, bot moderation, bootstrap and optional broadcasting. This job did not observe third-channel consent, moderation, bootstrap, Keep, Seeking or OBS setup; those remain owner actions through the canonical service, not the read-only preview.
 
 ### Safe recording preview
 
-The new source adds a client-only `/demo/wander` filming scene and simulated 9/17/42/120 growth-style examples on `/demo/`. They do not change production policy or history. [Recording and safety handoff](docs/VISUAL_RECORDING.md) lists mandatory read-only / live-moving-OFF flags and pending native visual gates; this source is not yet a published preview. Wander scheduling stays commented out pending explicit owner GO.
+The published **[safe recording preview](https://growth-safe---raid-relic-vz4bhnskgq-uc.a.run.app/demo/)** includes the [simulated Wander film scene](https://growth-safe---raid-relic-vz4bhnskgq-uc.a.run.app/demo/wander), 9/17/42/120 style examples and the [Atlas](https://growth-safe---raid-relic-vz4bhnskgq-uc.a.run.app/atlas/). Revision `raid-relic-growth-1026` is pinned at zero traffic to runtime `6831e25d6643d71253ca1d40df3b63687af174ec`. It is read-only: Wander, all five P7 action gates, Seekers, clipping and paid features are OFF. The examples do not change production history or policy.
+
+The operator reports **812/812 tests, zero skips; 37 serial browser flows/116 checks; nine viewed simulated captures; and a passing real 900387ms soak with 25 natural tours**. See the [quality record](docs/QUALITY.md), [successful CI run](https://github.com/OlsOls2/raid-relic/actions/runs/40397749816) and [recording/safety handoff](docs/VISUAL_RECORDING.md). These are operator-reported native results, not physical Twitch/OBS signoff. A later docs-only HEAD does not change that deployed runtime or require a rebuild.
+
+Canonical production remains the owner-promoted `raid-relic-network3-off-1026` at 100%, runtime `49e515c5240b3b902a0eeebf314a7625ed0c9bf8`; its P7 gates remain ON and Wander remains OFF. No promotion was made by this recording release. Wander scheduling stays commented out pending explicit Olly/Grok GO.
