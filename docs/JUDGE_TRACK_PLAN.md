@@ -1,4 +1,25 @@
-> **P8 candidate,26 October:** production remains parent-verified judgefix1026/source6401 at100%, P7 five gates true/pin300 and paid OFF. New same-relic cosmetic edition code is local/unverified; parent may publish **zero traffic only**, intended `p8-edition` preview not yet proven. [P8 rules and test path](P8_RULES.md). P9 retained, definition missing.
+## Current delivery — 26 October 2026, 02:20 UTC
+
+Parent-reported state; Codex did not query cloud or run these host/live checks.
+
+| Surface | Revision / source | Delivery |
+| --- | --- | --- |
+| Canonical | `raid-relic-judgefix1026` / `6401dcb52e20a954f6bda9fc7403f21a0f05c646` | 100%; P7 five gates ON, pin300; paid OFF. Includes P1–P7 and judge fixes, **not P8 or its inline canvas fallback fix**. |
+| P8 preview | `raid-relic-p8edition1026` / `41f446dbe63d144b0501b9bc01cc732154e9353c` | 0%; `P5_PREVIEW_READ_ONLY=true`, P7 five gates OFF. Published for manual acceptance, not promoted. |
+
+Parent reports both health endpoints200 at02:20,49 served-response SHA matches, three OAuth document metadata timestamps unchanged (zero fields read), **644/644 tests, zero skips;25 local browser workflows/87 checks**. Three labelled Simulator captures were viewed: one GPU core/eight facets/64 arrival dust points, plus decoded colored and unoccluded SVG after context loss, reduced390/no-WebGL/corner160 and BASE date boundaries. These are parent QA results, not assistant-run physical Twitch validation.
+
+[P8 demo](https://p8-edition---raid-relic-vz4bhnskgq-uc.a.run.app/demo/) · [P8 Atlas](https://p8-edition---raid-relic-vz4bhnskgq-uc.a.run.app/atlas/) · [canonical demo](https://raid-relic-760724762396.us-central1.run.app/demo/) · [canonical Atlas](https://raid-relic-760724762396.us-central1.run.app/atlas/). Real J1/P7 raid/chat use remains canonical and owner-operated. Preview self-origin WSS403 is intentional; HTTP preview is not an OBS streaming test and origins must not be widened.
+
+**Remaining external gates:** Grok/Olly P8 manual acceptance and separate promotion authorization; owner-run J1/P7 live action test remains pending. P8 implementation is complete for this preview: one relic, cosmetic palette/geometry/particles and evidence-derived edition badge,23October–30November inclusive (end-exclusive1DecemberUTC), distinct from the official San Diego13–16November badge window. P9 remains retained but undefined. Freeze31October18:00UK/UTC. A docs commit does not change either deployed `RELEASE_COMMIT`; no rebuild/redeploy follows from this update.
+
+### Operator milestones completed (parent-reported)
+
+- **J4:** main is6401; immutable Git `judging-baseline-2026-10-26` and Artifact Registry `judging-baseline-20261026` pin6401 as a baseline, **not final v1/freeze completion**.
+- **J5:** installed09:00UTC, read-only, one attempt/day through2November; hard expiry3November00:00UTC. First actual probe OK. Pinned source `24f29c0fafcf56a105d9d8727aa7294bf4279cae` at `/home/ubuntu/.raid-relic-daily-check/source`; private wrapper `~/.raid-relic-daily-check/run.sh`, log `~/.raid-relic-daily-check/log`. Existing five-minute watchdog preserved. No persisted token, refresh/save or action path; ephemeral APP-token mint enables observational subscription reads. No job change is requested here.
+- **J6:** approved one-time cleanup removed12 inactive untagged revisions and11 unreferenced images. All aliases/current/rollback/recent-five/Git pins protected. Automatic cleanup policy **still dry-run=true**; final repository size296.752MB, below0.5GB. No repeated cleanup authorized.
+
+## Historical authorization and review notes — superseded above
 
 # Judge track — owner authorization25 October2026,23:09
 

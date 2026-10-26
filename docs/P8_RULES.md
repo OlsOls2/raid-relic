@@ -1,6 +1,19 @@
 # P8 — one relic, time-boxed cosmetic editions
 
-Owner130 authorizes this local P8 candidate only. Parent reports production `raid-relic-judgefix1026` / `6401dcb52e20a954f6bda9fc7403f21a0f05c646` at100%, P7's five gates true, pin300, paid gates OFF. That production remains unchanged. Parent baseline636/636 zero skips and24 browser workflows/84 checks predates P8; no new P8 passes or physical Twitch proof are claimed.
+## Current delivery — 26 October 2026, 02:20 UTC
+
+Parent-reported state; Codex did not query cloud or run these host/live checks.
+
+| Surface | Revision / source | Delivery |
+| --- | --- | --- |
+| Canonical | `raid-relic-judgefix1026` / `6401dcb52e20a954f6bda9fc7403f21a0f05c646` | 100%; P7 five gates ON, pin300; paid OFF. Includes P1–P7 and judge fixes, **not P8 or its inline canvas fallback fix**. |
+| P8 preview | `raid-relic-p8edition1026` / `41f446dbe63d144b0501b9bc01cc732154e9353c` | 0%; `P5_PREVIEW_READ_ONLY=true`, P7 five gates OFF. Published for manual acceptance, not promoted. |
+
+Parent reports both health endpoints200 at02:20,49 served-response SHA matches, three OAuth document metadata timestamps unchanged (zero fields read), **644/644 tests, zero skips;25 local browser workflows/87 checks**. Three labelled Simulator captures were viewed: one GPU core/eight facets/64 arrival dust points, plus decoded colored and unoccluded SVG after context loss, reduced390/no-WebGL/corner160 and BASE date boundaries. These are parent QA results, not assistant-run physical Twitch validation.
+
+[P8 demo](https://p8-edition---raid-relic-vz4bhnskgq-uc.a.run.app/demo/) · [P8 Atlas](https://p8-edition---raid-relic-vz4bhnskgq-uc.a.run.app/atlas/) · [canonical demo](https://raid-relic-760724762396.us-central1.run.app/demo/) · [canonical Atlas](https://raid-relic-760724762396.us-central1.run.app/atlas/). Real J1/P7 raid/chat use remains canonical and owner-operated. Preview self-origin WSS403 is intentional; HTTP preview is not an OBS streaming test and origins must not be widened.
+
+**Remaining external gates:** Grok/Olly P8 manual acceptance and separate promotion authorization; owner-run J1/P7 live action test remains pending. P8 implementation is complete for this preview: one relic, cosmetic palette/geometry/particles and evidence-derived edition badge,23October–30November inclusive (end-exclusive1DecemberUTC), distinct from the official San Diego13–16November badge window. P9 remains retained but undefined. Freeze31October18:00UK/UTC. A docs commit does not change either deployed `RELEASE_COMMIT`; no rebuild/redeploy follows from this update.
 
 ## Configuration and visible treatment
 
@@ -16,18 +29,18 @@ Live overlay, Atlas aggregate hero, fictional demo and recorded replay mini use 
 
 The existing **Carried during TwitchCon San Diego2026** badge and its official **13November08:00Z–16November08:00Z** rules/citation are unchanged. An October cosmetic edition badge does not prove conference attendance or personal participation.
 
-## Parent zero-traffic review
+## Published zero-traffic preview
 
-Intended revision `raid-relic-p8edition1026`, tag `p8-edition`, candidate origin `https://p8-edition---raid-relic-vz4bhnskgq-uc.a.run.app` — **not deployed/proven yet**. Parent alone may publish a zero-traffic preview after QA. No P8 canonical promotion is authorized. Keep production6401 and existing tags/config intact.
+The parent-published preview/source and QA above supersede the earlier intended/unverified statements. Inspect [demo](https://p8-edition---raid-relic-vz4bhnskgq-uc.a.run.app/demo/), [Atlas](https://p8-edition---raid-relic-vz4bhnskgq-uc.a.run.app/atlas/) and [transparent recorded replay](https://p8-edition---raid-relic-vz4bhnskgq-uc.a.run.app/atlas/embed). The demo remains permanently simulated, with fictional identities/zero initial rings and no API/Twitch connection. Atlas reads retained evidence; it does not seed history.
 
-After parent confirms publication, inspect `/atlas/` for aggregate eight-facet hero and the distinct evidence badge, `/demo/` for fictional35-second tour/visible edition, and `/atlas/embed` for transparent recorded mini. Tag-self-origin overlay WSS403 remains intentional under the single canonical origin; do not broaden origins or use a tag as canonical OBS proof. Local mock overlay gate supplies actual WebGL/receipt tests without live Twitch.
+Canonical6401 stays100%; P8 acceptance/promotion is pending. Preview WSS self-origin403 is intentional under the canonical-only origin policy; do not broaden origins or treat the preview as live OBS proof.
 
-Parent commands: `node --test`, `npm run release:files`, syntax/diff gates, existing24 browser flows plus `node scripts/browser-smoke-editions.js`. Optional `P8_CAPTURE=1` writes only `edition-overlay.png`, `edition-mobile.png`, `edition-atlas.png`, viewport-bounded≤512KiB, visibly Simulator. Parent views captures; no screenshots or native results are claimed by source author. Existing sandbox/resource/security limits remain.
+Parent commands: `node --test`, `npm run release:files`, syntax/diff gates, existing24 browser flows plus `node scripts/browser-smoke-editions.js`. Optional `P8_CAPTURE=1` writes only `edition-overlay.png`, `edition-mobile.png`, `edition-atlas.png`, viewport-bounded≤512KiB, visibly Simulator. Parent has viewed the three captures recorded above; these are parent-run local Simulator results, not source-author host/physical proof. Existing sandbox/resource/security limits remain.
 
 J5 is already installed by parent:09:00UTC daily, one attempt/day, pinned reviewed24f29c0 code, read-only first probe OK, expiry3November00:00UTC; watchdog unchanged. P8 does not modify ops files or the job. J6 parent completed the immutable judging-baseline pins and one approved cleanup (12 inactive untagged revisions/11 unreferenced images); all tagged/current/rollback/recent-five protected. Automatic registry policy remains dry-run; no final-v1 claim. P9 remains retained but undefined. Freeze31October2026,18:00UK/UTC.
 
-Review131: fallback art is now deterministic **same-origin `/edition-crystal/<configured-id>.svg`**, generated from the validated palette/facet/aspect/shape configuration before OAuth/store access, with explicit SVG dimensions. No CSP/connect/origin policy is broadened. The first screenshot's missing image is a confirmed visual failure; its exact decode/CSP cause was not proven by source inspection. The browser gate now requires successful `decode()`, positive natural dimensions and actual colored alpha pixels after real context loss, reduced motion, forced no-WebGL and BASE restoration, rather than an element box/src alone. New results/captures await parent QA.
+**Historical review131 (resolved):** fallback art is now deterministic **same-origin `/edition-crystal/<configured-id>.svg`**, generated from the validated palette/facet/aspect/shape configuration before OAuth/store access, with explicit SVG dimensions. No CSP/connect/origin policy is broadened. The first screenshot's missing image is a confirmed visual failure; its exact decode/CSP cause was not proven by source inspection. The browser gate now requires successful `decode()`, positive natural dimensions and actual colored alpha pixels after real context loss, reduced motion, forced no-WebGL and BASE restoration, rather than an element box/src alone. This historical review gap is resolved by the parent QA recorded above.
 
 Window labels derive from each configured UTC interval (exclusive end minus1ms for the displayed last day). `badgeLabel` is closed/validated and unique per configured event; interval helpers return the actual matching labels, so a future distinct event cannot inherit TwitchCon text/dates. The official San Diego badge remains unchanged. The compatibility `EDITION_BADGE` names only the first edition.
 
-Parent diagnostic135 established the white fallback rectangle: the lost canvas retained vendor inline `display:block` despite `hidden=true`, computed display remained visible and its box stayed280px. Renderer initialization/fallback now explicitly set inline display:none; only a successful eligible frame restores block. New visual verification remains pending; no CSP/origin change or test-side hiding is used.
+**Historical diagnostic135 (resolved):** parent established the white fallback rectangle: the lost canvas retained vendor inline `display:block` despite `hidden=true`, computed display remained visible and its box stayed280px. Renderer initialization/fallback now explicitly set inline display:none; only a successful eligible frame restores block. Parent subsequently verified unoccluded decoded fallback pixels and viewed good captures; no CSP/origin change or test-side hiding is used.
