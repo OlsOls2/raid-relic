@@ -1,3 +1,4 @@
+export const FAN_DISCLAIMER='Unofficial fan edition; not affiliated with or endorsed by Twitch/TwitchCon.';
 // Versioned cosmetic configuration only. No game state, network, storage or identity lookup.
 const freeze=v=>{if(v&&typeof v==='object'){for(const x of Object.values(v))freeze(x);Object.freeze(v);}return v;};
 export const EDITION_CONFIG=freeze([{version:1,id:'twitchcon-2026',name:'TwitchCon 2026',badgeLabel:'Carried during TwitchCon 2026 edition',startsAt:'2026-10-23T00:00:00Z',endsAt:'2026-12-01T00:00:00Z',design:{version:1,shape:'crystal',facets:8,aspect:1.05,palette:['#101d30','#dce4ed','#9486b7','#e6bb70']},particles:{kind:'orbit-dust',count:64}}]);

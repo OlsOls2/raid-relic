@@ -60,3 +60,12 @@ test('same-origin edition SVG is decoded art, pure before OAuth/store and reject
  for(const path of ['/edition-crystal/unknown.svg','/edition-crystal/twitchcon-2026.svg?x=1'])assert.equal((await app.dispatch({method:'GET',path})).status,404);
  assert.equal((await app.dispatch({method:'POST',path:'/edition-crystal/twitchcon-2026.svg'})).status,405);assert.equal(touched,0);
 });
+
+test('edition branding is explicitly unofficial, while event-day badge and time proofs stay distinct',async()=>{
+ const {FAN_DISCLAIMER}=await import('../public/editions.js');assert.equal(FAN_DISCLAIMER,'Unofficial fan edition; not affiliated with or endorsed by Twitch/TwitchCon.');assert.ok(badgeDescription(EDITION_BADGE).includes(FAN_DISCLAIMER));assert.match(badgeDescription('Carried during TwitchCon San Diego 2026'),/Event-days badge/);assert.equal(TWITCHCON.startsAt,Date.parse('2026-11-13T08:00:00Z'));assert.equal(TWITCHCON.endsAt,Date.parse('2026-11-16T08:00:00Z'));
+});
+
+test('changing label mode on same edition removes then restores presentation label without another relic',async()=>{
+ const {presentEdition}=await import('../public/edition-view.js');let labels=0,removed=0;const archive={dataset:{},querySelector:()=>null,ownerDocument:{body:{classList:{contains:()=>false}},createElement:()=>({style:{},remove(){removed++;}})},after(){labels++;},setAttribute(){},removeAttribute(){}};
+ presentEdition(archive,start);assert.equal(labels,1);presentEdition(archive,start,{label:false});assert.equal(removed,1);assert.equal(labels,1);presentEdition(archive,start,{label:false});assert.equal(removed,1);presentEdition(archive,start,{label:true});assert.equal(labels,2);
+});

@@ -6,7 +6,7 @@ import { attachOverlaySockets } from '../src/overlay-sockets.js';
 export const JUDGES_ORIGIN = 'http://127.0.0.1:5191';
 const ids = [HOME, OTHER];
 const actions = ['setup', 'mark', 'send', 'raid', 'offer', 'accept', 'forget', 'expire', 'closure', 'mymarks', 'echo', 'copycommand', 'reset'];
-const assets = new Set(['/editions.js','/edition-view.js','/ritual-copy.js','/demo.js','/demo-state.js','/demo.css','/journey-map.js','/journey-map.css','/scoreboard.js', '/fonts.css', '/fonts/Cinzel.ttf', '/fonts/OFL-Cinzel.txt', '/control-view.js', '/atlas-hero.js', '/cinematic.js', '/relic3d.js', '/vendor/three.module.js', '/vendor/three.core.js', '/vendor/LICENSE-three.txt', '/claim-meter.js', '/forge.js', '/forge.css','/recap.js', '/recap.css','/atlas.css', '/atlas.js', '/overlay.css', '/overlay.js', '/overlay-client.js', '/overlay-audio.js', '/arrival.js', '/crystal.svg', '/relic.svg']);
+const assets = new Set(['/favicon.svg','/favicon.ico','/editions.js','/edition-view.js','/ritual-copy.js','/demo.js','/demo-state.js','/demo.css','/journey-map.js','/journey-map.css','/scoreboard.js', '/fonts.css', '/fonts/Cinzel.ttf', '/fonts/OFL-Cinzel.txt', '/control-view.js', '/atlas-hero.js', '/cinematic.js', '/relic3d.js', '/vendor/three.module.js', '/vendor/three.core.js', '/vendor/LICENSE-three.txt', '/claim-meter.js', '/forge.js', '/forge.css','/recap.js', '/recap.css','/atlas.css', '/atlas.js', '/overlay.css', '/overlay.js', '/overlay-client.js', '/overlay-audio.js', '/arrival.js', '/crystal.svg', '/relic.svg']);
 const json = (status, value) => ({ status, type: 'application/json', body: JSON.stringify({ ...value, mode: 'simulator' }) });
 const html = body => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SIMULATOR · Raid Relic judges</title><link rel="stylesheet" href="/judges/style.css"></head><body><header class="sim-label">SIMULATOR · LOCAL MEMORY ONLY · NO REAL TWITCH</header>${body}</body></html>`;
 export async function createJudges({ intent = false, env = process.env } = {}) {
@@ -145,6 +145,22 @@ export async function createJudges({ intent = false, env = process.env } = {}) {
       res.writeHead(response.status, { ...headers, ...response.headers, 'content-type': response.type, 'content-length': Buffer.byteLength(response.body) }); res.end(response.body); if (size > 1024) req.resume();
     } catch { const error = req.url?.startsWith('/api/') ? json(500, { error: 'Simulator unavailable' }) : { type: 'text/html; charset=utf-8', body: html('<h1>SIMULATOR error · local only</h1>') }; res.writeHead(500, { ...headers, 'content-type': error.type }); res.end(error.body); }
   }
-  return { dispatch, handler, server, async listen() { await new Promise((resolve, reject) => { server.once('error', reject); server.listen(5191, '127.0.0.1', resolve); }); },
+  return { dispatch, handler, server,
+    // Test-author-only helper: actual signed lifecycle and claims, never a public route.
+    async seedReviewJourney() { return ordered(async () => {
+      await step('setup');
+      for (let i=0;i<3;i++) {
+        const from=i%2?OTHER:HOME,to=i%2?HOME:OTHER;
+        fixture.advance(120001);
+        const sent=await fixture.control(from,`send:${to}`);
+        if(sent.status!==200||JSON.parse(sent.body).status!=='accepted')throw Error('Review send rejected');
+        fixture.advance();await fixture.raid(from,to,1);
+        await fixture.chat(from,from,'!offer');await fixture.chat(to,to,'!accept');
+        const registry=await fixture.runtime.state.getKeeperRegistry();
+        if(registry.holderId!==to||!registry.pendingHop?.finalized)throw Error('Review claim incomplete');
+      }
+      const atlas=await fixture.runtime.state.getAtlasPage();if(atlas.rings!==3)throw Error('Review rings mismatch');
+      tickAt=performance.now();
+    }); }, async listen() { await new Promise((resolve, reject) => { server.once('error', reject); server.listen(5191, '127.0.0.1', resolve); }); },
     async close() { await ordered(async () => { closed = true; sockets.close(); }); server.closeAllConnections(); if (server.listening) await new Promise(resolve => server.close(resolve)); } };
 }

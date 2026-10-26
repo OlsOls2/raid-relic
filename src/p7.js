@@ -99,7 +99,7 @@ export function createP7({flags,env, state,oauth,clientId,clientSecret,botId,kee
    if(r.status===429){const after=Number.isInteger(r.retryAfter)&&r.retryAfter>=0?now()+Math.min(r.retryAfter,86400)*1000:0,reset=Number.isInteger(r.rateReset)&&r.rateReset>=0?Math.min(r.rateReset*1000,now()+86400000):0;retryAt=Math.max(after,reset,now());}
   }catch{}
   try{await state.p7Step(host,{type:'finish',key,flags:config,outcome,httpStatus,retryAt},now());}catch{}
-  try{await logger(JSON.stringify({severity:outcome==='sent'?'INFO':'WARNING',event:'raid_relic_p7_action',host,key,kind:job.kind,outcome,httpStatus}));}catch{}
+  try{const configured=safeSettings();await logger(JSON.stringify({severity:outcome==='sent'?'INFO':'WARNING',event:'raid_relic_p7_action',host,key,kind:job.kind,outcome,httpStatus,endpoint:{announcement:'/helix/chat/announcements',pin:'/helix/chat/pins',shoutout:'/helix/chat/shoutouts'}[job.kind],tokenKind:'app',moderatorId:botId,from:job.kind==='shoutout'?host:null,to:job.kind==='shoutout'&&keeperIds.includes(job.proof.from)?job.proof.from:null,gates:{master:configured.master,announcement:configured.announcement,pin:configured.pin,shoutout:configured.shoutout,pinReplace:configured.pinReplace},duration:config.duration,sourceOnly:job.kind==='announcement'?true:null,providerAccepted:httpStatus===204,deliveryVerified:false}));}catch{}
   return{status:outcome};
  }
  return{enabled:true,config,process,status:()=>({enabled:true,configured:safeSettings(),effective:effective(),moderatorChecked:!!roles&&roles.until>now(),reason:roles?.until>now()?'cached-capability':'capability-required'})};

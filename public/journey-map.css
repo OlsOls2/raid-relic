@@ -8,4 +8,4 @@
 
 #map-svg .map-hop,#map-svg .map-comet-tail,#map-svg .map-growth-band{vector-effect:non-scaling-stroke}#map-svg .map-hop{filter:drop-shadow(0 0 2px #9486b7)}#map-svg .map-selected{filter:drop-shadow(0 0 5px #e6bb70)}#map-svg .map-node-label{font-size:20px}
 
-#map-stops{padding-inline-start:32px}#map-stops>li{padding-inline-start:8px;margin-block:8px}#map-stops button{min-height:44px}
+#map-stops{padding-inline-start:32px;column-gap:40px;row-gap:16px}#map-stops>li{padding-inline-start:16px;margin-block:8px}#map-stops button{min-height:44px}

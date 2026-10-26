@@ -48,3 +48,15 @@ test('35-second demo total and phase guidance are presentation-only; countdown a
  const {raiderCount}=await import('../public/journey-map.js');assert.deepEqual([0,1,2].map(raiderCount),['0 raiders','1 raider','2 raiders']);
  for(const file of ['public/atlas.html','public/forge.html','public/recap.html'])assert.doesNotMatch(await readFile(file,'utf8'),/href="\/control\//);
 });
+
+for(const kind of ['memory','firestore'])test(`${kind}: badge command returns in both issuing live/nonholder and offline rooms without changing holder or consent`,async()=>{
+ const f=await setup(kind);const before=await f.runtime.state.getKeeperRegistry();
+ for(const host of [HOME,OTHER])for(const offline of [false,true]){if(offline){f.advance();await f.signed('stream.offline',{broadcaster_user_id:host},host);}const messageId=`badges-${host}-${offline}`;const count=posts(f).length,logs=[],warn=console.warn;try{console.warn=line=>logs.push(JSON.parse(line));await f.chat(host,'813','!relic badges',{messageId});}finally{console.warn=warn;}assert.ok(logs.some(l=>l.event==='command_reply'&&l.kind==='badges'&&l.host===host&&l.outcome==='sent'));assert.equal(posts(f).length,count+1);assert.equal(posts(f).at(-1).broadcaster_id,host);assert.match(posts(f).at(-1).message,/^Keeper badges:/);await f.chat(host,'813','!relic badges',{messageId});assert.equal(posts(f).length,count+1);f.advance(10001);}
+ assert.equal((await f.runtime.state.getKeeperRegistry()).holderId,before.holderId);assert.equal(JSON.parse((await f.request('/api/scores')).body).raiders.length,0);
+});
+test('demo takeover locks only active tour; completed tour offers replay, favicon reads are pure',async()=>{
+ const {demoControls}=await import('../public/demo-state.js');let s=demoStep(freshDemo(),{type:'send',source:'demo_keeper_a',target:'demo_keeper_b'});
+ assert.equal(demoControls(s,{playing:true,tour:true}).locked,true);assert.match(demoControls(s,{playing:true,tour:true}).notice,/Press Pause to take over/);assert.equal(demoControls(s,{playing:false,tour:true}).locked,false);
+ for(const type of ['offer','raid','accept','settle'])s=demoStep(s,{type});assert.equal(demoControls(s).pauseLabel,'Replay tour');assert.equal(demoControls(s).pauseDisabled,false);
+ let touched=0;const trap=new Proxy({},{get(){touched++;throw Error();}}),app=createApp({state:trap,oauth:trap});for(const path of ['/favicon.svg','/favicon.ico']){const r=await app.dispatch({method:'GET',path});assert.equal(r.status,200);assert.equal(r.type,'image/svg+xml');assert.match(String(r.body),/<svg/);assert.equal((await app.dispatch({method:'POST',path})).status,405);}assert.equal(touched,0);
+});

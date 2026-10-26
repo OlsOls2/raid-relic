@@ -56,6 +56,7 @@ const assets = new Map([
   ['/overlay-client.js', ['overlay-client.js', 'text/javascript; charset=utf-8']],
   ['/crystal.svg', ['crystal.svg', 'image/svg+xml']],
 ]);
+const faviconAssets=new Map([['/favicon.svg','favicon.svg'],['/favicon.ico','favicon.svg']]);
 const demoAssets=new Map([['/demo','demo.html'],['/demo/','demo.html'],['/demo.js','demo.js'],['/demo-state.js','demo-state.js'],['/demo.css','demo.css'],['/ritual-copy.js','ritual-copy.js'],['/editions.js','editions.js'],['/edition-view.js','edition-view.js']]);
 const header = (headers, name) => typeof headers[name] === 'string' ? headers[name] : '';
 const result = (status, body = '', type = 'text/plain; charset=utf-8') => ({ status, body, type });
@@ -72,6 +73,7 @@ export function createApp({ scoreAcks, claimAcks, secret, state = createMemorySt
   const publicHTML=async file=>{const bytes=await readFile(new URL(`../public/${file}`,import.meta.url));return overlayFeed?.simulator?bytes.toString().replace(/<p([^>]*\bid="simulator"[^>]*)><\/p>/,(_,attrs)=>`<p${attrs.replace(/\s+hidden\b/,'')}>SIMULATOR · local test data</p>`):bytes;};
   // Pure request boundary for tests: rawBody is never reserialized before HMAC.
   async function dispatch({ method, path, headers = {}, rawBody = Buffer.alloc(0) }) {
+    if(faviconAssets.has(path)){if(method!=='GET')return result(previewReadOnly?403:405,'Static icon is read only');return{...result(200,await readFile(new URL('../public/favicon.svg',import.meta.url)),'image/svg+xml'),headers:{'cache-control':'public, max-age=3600','content-security-policy':"default-src 'none'"}};}
     // Explicit same-origin generated art route before any OAuth/store property access.
     if(path.startsWith('/edition-crystal/')){if(method!=='GET')return result(previewReadOnly?403:405,'Read only');const match=/^\/edition-crystal\/([a-z0-9-]{1,40})\.svg$/.exec(path),edition=match&&validEditions(EDITION_CONFIG)&&EDITION_CONFIG.find(e=>e.id===match[1]);if(!edition)return result(404,'Unknown edition art');return{...result(200,editionSVG(edition),'image/svg+xml'),headers:{'cache-control':'no-store','content-security-policy':"default-src 'none'"}};}
     const demoPath=path.split('?')[0];
@@ -283,7 +285,7 @@ export function createApp({ scoreAcks, claimAcks, secret, state = createMemorySt
 
   async function handler(req, res) {
     const send = ({ status, body, type, headers: extraHeaders }) => {
-      const headers = { ...extraHeaders, 'cache-control': req.method==='GET'&&demoAssets.has(req.url.split('?')[0])&&extraHeaders?.['cache-control']==='public, max-age=3600'?'public, max-age=3600':'no-store', 'x-content-type-options': 'nosniff' };
+      const headers = { ...extraHeaders, 'cache-control': req.method==='GET'&&(demoAssets.has(req.url.split('?')[0])||faviconAssets.has(req.url))&&extraHeaders?.['cache-control']==='public, max-age=3600'?'public, max-age=3600':'no-store', 'x-content-type-options': 'nosniff' };
       // 204 responses have no content or body framing headers.
       if (status === 204) {
         res.writeHead(status, headers);

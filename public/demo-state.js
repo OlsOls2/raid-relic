@@ -22,3 +22,8 @@ export function demoProgress(s){
  if(s.phase==='bound')return 'Step 4/5: claim complete. Watch the receipt-time arrival and one new ring settle.';
  return 'Step 5/5: tour complete. The real relic is unchanged. Reset to zero or Send Off again.';
 }
+
+export function demoControls(s,{playing=false,tour=false}={}){
+ const locked=playing&&tour;
+ return{locked,pauseLabel:s.phase==='settled'?'Replay tour':playing?'Pause':'Resume',pauseDisabled:s.phase==='idle',notice:locked?'Controls locked during the tour. Press Pause to take over.':s.phase==='settled'?'Tour complete. Replay tour starts a fresh fictional run at zero rings.':tour?'Tour paused. Manual controls are unlocked; using them takes over. Resume continues the tour.':'Manual controls are ready. Send Off starts a new run only before departure or after completion; Reset starts over.'};
+}

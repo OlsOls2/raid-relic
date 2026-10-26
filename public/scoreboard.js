@@ -1,4 +1,4 @@
-import { EDITION_CONFIG, editionWindowLabel } from './editions.js';
+import { EDITION_CONFIG, editionWindowLabel,FAN_DISCLAIMER } from './editions.js';
 const $ = id => document.getElementById(id);
 let generation = 0, controller;
 const badgeNames = new Set([...EDITION_CONFIG.map(e=>e.badgeLabel),'First Keeper','24h Keeper','Ring 1','Ring 5','Ring 10','Chain of 3','Carried during TwitchCon San Diego 2026']);
@@ -15,15 +15,15 @@ export function holdDuration(seconds) {
 }
 export const EVENT_BADGE='Carried during TwitchCon San Diego 2026';
 export function badgeDescription(name) {
-  const edition=EDITION_CONFIG.find(e=>e.badgeLabel===name);if(edition)return 'Recorded carrying during the cosmetic '+edition.name+' edition, '+editionWindowLabel(edition)+'. This does not prove conference attendance.';
-  const meanings={'First Keeper':'The first Keeper of this recorded journey.','24h Keeper':'Held the relic for at least 24 hours of recorded time.','Chain of 3':'Carried the relic on the third or later raid in an unbroken chain.',[EVENT_BADGE]:'Hold the relic during TwitchCon San Diego, 13–15 Nov 2026, to earn this badge.'};
+  const edition=EDITION_CONFIG.find(e=>e.badgeLabel===name);if(edition)return 'Recorded carrying during the cosmetic '+edition.name+' edition, '+editionWindowLabel(edition)+'. This does not prove conference attendance. '+FAN_DISCLAIMER;
+  const meanings={'First Keeper':'The first Keeper of this recorded journey.','24h Keeper':'Held the relic for at least 24 hours of recorded time.','Chain of 3':'Carried the relic on the third or later raid in an unbroken chain.',[EVENT_BADGE]:'Event-days badge: recorded holding during San Diego, 13–15 Nov 2026; not proof of conference attendance.'};
   if(/^Ring (1|5|10)$/.test(name))return `Carried the relic on recorded raid ${name.slice(5)}, creating that growth ring.`;
   return Object.hasOwn(meanings,name)?meanings[name]:'';
 }
 let expanded=false;
 const clear = () => { $('keeper-rows').replaceChildren(); $('raider-rows').replaceChildren(); $('scores-coverage').textContent='';$('scores-status').textContent='';$('scores-all').hidden=true;$('scores-all').textContent='All Keepers';expanded=false;$('scores-all').setAttribute('aria-expanded','false'); };
 const node = (tag,text,className) => { const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(className)n.className=className;return n; };
-function badge(name,earned){const item=node('li'),details=node('details',undefined,'score-badge');details.dataset.earned=String(earned);details.dataset.badge=name;const label=name===EVENT_BADGE?'TwitchCon San Diego · 13–15 Nov':name;const summary=node('summary',`${earned?'◇':'Locked ·'} ${label}`);summary.setAttribute('aria-label',`${earned?'Earned':'Locked'}: ${label}`);summary.title=badgeDescription(name);details.append(summary,node('p',badgeDescription(name)));item.append(details);return item;}
+function badge(name,earned){const item=node('li'),details=node('details',undefined,'score-badge');details.dataset.earned=String(earned);details.dataset.badge=name;const label=name===EVENT_BADGE?'Event-days badge · San Diego · 13–15 Nov':name;const summary=node('summary',`${earned?'◇':'Locked ·'} ${label}`);summary.setAttribute('aria-label',`${earned?'Earned':'Locked'}: ${label}`);summary.title=badgeDescription(name);details.append(summary,node('p',badgeDescription(name)));item.append(details);if(EDITION_CONFIG.some(e=>e.badgeLabel===name))item.append(node('small',FAN_DISCLAIMER,'edition-disclaimer'));return item;}
 async function loadScores() {
   const current=++generation;controller?.abort();controller=new AbortController();const active=controller;
   clear();$('scores-refresh').disabled=true;$('keeper-scores').setAttribute('aria-busy','true');const timer=setTimeout(()=>active.abort(),8000);
