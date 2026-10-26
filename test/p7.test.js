@@ -144,7 +144,8 @@ for (const kind of ['memory', 'firestore']) {
       shout = a.find((c) => c.url.includes('/shoutouts?'));
     assert.equal(announcement.method, 'POST');
     assert.deepEqual(JSON.parse(announcement.body), {
-      message: 'The relic is bound to @olsols2. Ring 1. Thank you, @raidrelichq.',
+      message:
+        'The relic is bound to @olsols2. Ring 1. Thank you, @raidrelichq. Welcome raiders—leave !mark to add a community rune.',
       color: 'purple',
       for_source_only: true,
     });
@@ -404,7 +405,7 @@ for (const kind of ['memory', 'firestore']) {
     assert.equal(posts.filter((c) => c.message.startsWith('Claim complete')).length, 2);
     assert.equal(
       posts.at(-1).message,
-      'No active verified claim is available here. Begin a new Send Off with the Keeper.',
+      'No vote was saved. Ask the Keeper to Send Off, then watch the claim meter and try again after the raid lands.',
     );
     await f.chat(OTHER, '812', '!accept', { messageId: 'new-after-finalize-fault' });
     assert.equal(f.calls.filter((c) => c.url.endsWith('/chat/messages')).length, 4);

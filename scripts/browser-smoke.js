@@ -1,3 +1,4 @@
+import { capturePage } from '../test-support/capture-page.js';
 // Optional host QA. Local simulator only; no external requests or sandbox bypass.
 import { mkdir, writeFile } from 'node:fs/promises';
 import { createJourneyFixture } from '../test-support/journey-fixture.js';
@@ -6,9 +7,8 @@ let browser;
 let failure;
 const captures = new Map();
 const checks = [];
-const capture = async (page, name) => {
-  captures.set(name, await page.screenshot({ fullPage: true }));
-};
+const captureCoverage = [];
+const capture = (page, name) => capturePage(page, name, captures, captureCoverage);
 async function fits(page, name) {
   const geometry = await page.evaluate(() => ({
     width: innerWidth,
@@ -294,6 +294,7 @@ try {
           simulator: true,
           checks,
           captures: [...captures.keys()],
+          captureCoverage,
           failure: failure ? String(failure.message).slice(0, 2000) : null,
         },
         null,

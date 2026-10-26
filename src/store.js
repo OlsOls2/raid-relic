@@ -1,3 +1,4 @@
+import { receivingView } from './receiving.js';
 import { streakView } from './streaks.js';
 import { enqueueP7, p7Mutation, cancelP7 } from './p7.js';
 import { journeyMap } from './journey-map.js';
@@ -249,6 +250,7 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false, reviewP
         const transition =
           managed && host
             ? reduceLifecycle({
+                seekersEnabled: config?.seekersEnabled,
                 reviewPolicy,
                 registry,
                 channel,
@@ -338,6 +340,12 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false, reviewP
             chat,
             now,
             awaitingRaid: claiming.awaitingRaid,
+            registry: claiming.registry,
+            holderSince:
+              claiming.lineage?.stops?.at(-1)?.to === claiming.registry.holderId
+                ? claiming.lineage.stops.at(-1).claimedAt
+                : null,
+            seekersEnabled: config?.seekersEnabled,
             markOutcome,
             autoApprove: reviewPolicy.autoApprove,
             vote: claiming.scoreVote,
@@ -630,6 +638,7 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false, reviewP
           const scoreRef = ref('scoreboard', 'single'),
             scores = (await tx.get(scoreRef)).data();
           const transition = reduceLifecycle({
+            seekersEnabled: config?.seekersEnabled,
             reviewPolicy,
             registry,
             channel,
@@ -736,6 +745,19 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false, reviewP
         return next.result;
       });
     },
+    async getReceivingView(now) {
+      return db.runTransaction(async (tx) => {
+        const registry = (await tx.get(ref('keeperRegistry', 'single'))).data();
+        const lineage = (await tx.get(ref('lineage', 'single'))).data();
+        const channels = {},
+          marks = {};
+        for (const id of config?.channels ?? []) {
+          channels[id] = (await tx.get(ref('streamChannels', id))).data();
+          marks[id] = (await tx.get(ref('markChannels', id))).data();
+        }
+        return receivingView(registry, channels, marks, lineage, config, now);
+      });
+    },
     async getKeeperCandidates(host) {
       if (!config?.channels.includes(host)) return [];
       return db.runTransaction(async (tx) => {
@@ -790,6 +812,7 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false, reviewP
           if (doc) tx.set(ref('p7Actions', id), cancelP7(doc));
 
         const next = reduceLifecycle({
+          seekersEnabled: config?.seekersEnabled,
           reviewPolicy,
           registry,
           channel,

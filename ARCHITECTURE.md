@@ -49,3 +49,14 @@ Pending mark text is private. Only approved projections reach public HTTP/socket
 | AI / clips | Disabled; clips double-OFF and not runtime-wired; no new paid APIs, services or server renderer |
 
 These limits reduce exposure; they do not guarantee a zero invoice. Existing operations/pins/checker stay unchanged. See [operator history](docs/ops/DELIVERY_HISTORY.md) and [permission reasons](docs/JUDGE_SCOPES.md).
+
+## Receiving-value pilot (Part 3A source)
+
+The optional Seeker choice is a bounded field on the existing stream-channel document,
+mutated in the same signed lifecycle transaction (or authenticated control path).
+Public holder/profile reads project the existing registry and retained lineage inside
+one store read transaction. A separate injected read-only service validates existing
+grants and caches one bounded batched stream observation attempt per minute; it does
+not refresh/save tokens, tick state or run a background loop. Dispatch rechecks queue
+membership atomically and existing grants/moderator evidence before the irreversible
+boundary. No public queue row is transfer authority. See [Receiving value](docs/RECEIVING_VALUE.md).

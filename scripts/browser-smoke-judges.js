@@ -1,3 +1,4 @@
+import { capturePage } from '../test-support/capture-page.js';
 // Optional sequential host QA. All network is loopback, all provider work mocked.
 import { mkdir, writeFile } from 'node:fs/promises';
 import { createJudges, JUDGES_ORIGIN } from '../test-support/judges.js';
@@ -5,9 +6,8 @@ const judges = await createJudges({ intent: true });
 let browser, failure;
 const checks = [],
   captures = new Map();
-const capture = async (page, name) => {
-  captures.set(name, await page.screenshot({ fullPage: true }));
-};
+const captureCoverage = [];
+const capture = (page, name) => capturePage(page, name, captures, captureCoverage);
 try {
   await judges.listen();
   const { chromium } = await import('playwright');
@@ -151,6 +151,7 @@ try {
           passed: !failure,
           checks,
           captures: [...captures.keys()],
+          captureCoverage,
           failure: failure ? String(failure.message).slice(0, 300) : null,
         },
         null,

@@ -102,3 +102,29 @@ test('card recorded time is human UTC, unknown date never invents a completion',
     'Completion time unavailable',
   );
 });
+
+test('manual save allowlist admits only the two bounded Keeper orientations without changing stop/demo contracts', async () => {
+  const { validRingCardFilename } = await import('../public/ring-card.js');
+  for (const orientation of ['landscape', 'vertical']) {
+    assert.equal(
+      validRingCardFilename(`raid-relic-keeper-olsols2-ring-1-${orientation}.png`),
+      true,
+    );
+    assert.equal(
+      validRingCardFilename(`raid-relic-keeper-raidrelichq-ring-16-${orientation}.png`, true),
+      true,
+    );
+  }
+  assert.equal(validRingCardFilename('raid-relic-stop-2-olsols2.png'), true);
+  assert.equal(validRingCardFilename('raid-relic-demo-ring-1.png', true), true);
+  assert.equal(validRingCardFilename('raid-relic-demo-ring-1.png', false), false);
+  for (const filename of [
+    'raid-relic-keeper-olsols2-ring-0-landscape.png',
+    'raid-relic-keeper-olsols2-ring-17-vertical.png',
+    'raid-relic-keeper-olsols2-ring-1-square.png',
+    'raid-relic-keeper-../olsols2-ring-1-landscape.png',
+    'raid-relic-keeper-olsols2-ring-1-landscape.svg',
+    'raid-relic-keeper-olsols2-ring-1-vertical.png\n',
+  ])
+    assert.equal(validRingCardFilename(filename, true), false);
+});

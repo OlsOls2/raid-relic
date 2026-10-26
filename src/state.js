@@ -1,3 +1,4 @@
+import { receivingView } from './receiving.js';
 import { streakView } from './streaks.js';
 import { enqueueP7, p7Mutation, cancelP7 } from './p7.js';
 import { journeyMap } from './journey-map.js';
@@ -158,6 +159,7 @@ export function createMemoryState({
       const transition =
         config && host
           ? reduceLifecycle({
+              seekersEnabled: config?.seekersEnabled,
               reviewPolicy,
               registry,
               channel: channels.get(host),
@@ -260,6 +262,12 @@ export function createMemoryState({
           chat,
           now,
           awaitingRaid: claiming.awaitingRaid,
+          registry: claiming.registry,
+          holderSince:
+            claiming.lineage?.stops?.at(-1)?.to === claiming.registry.holderId
+              ? claiming.lineage.stops.at(-1).claimedAt
+              : null,
+          seekersEnabled: config?.seekersEnabled,
           markOutcome,
           autoApprove: reviewPolicy.autoApprove,
           vote: claiming.scoreVote,
@@ -438,6 +446,7 @@ export function createMemoryState({
         throw new Error('Unconfigured lifecycle channel');
       const transition = config
         ? reduceLifecycle({
+            seekersEnabled: config?.seekersEnabled,
             reviewPolicy,
             registry,
             channel: channels.get(host),
@@ -535,6 +544,16 @@ export function createMemoryState({
       const next = shareStep(markDocs.get(host), op, now);
       if (next.doc) markDocs.set(host, next.doc);
       return next.result;
+    },
+    getReceivingView(now) {
+      return receivingView(
+        registry,
+        Object.fromEntries(channels),
+        Object.fromEntries(markDocs),
+        lineage,
+        config,
+        now,
+      );
     },
     getKeeperCandidates(host) {
       return keeperCandidates(
@@ -639,6 +658,7 @@ export function createMemoryState({
         for (const target of config.channels)
           if (p7Docs.has(target)) p7Docs.set(target, cancelP7(p7Docs.get(target)));
       const next = reduceLifecycle({
+        seekersEnabled: config?.seekersEnabled,
         reviewPolicy,
         registry,
         channel: channels.get(host),

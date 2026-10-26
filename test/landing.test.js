@@ -200,7 +200,7 @@ for (const kind of ['memory', 'firestore']) {
       extra.every(
         (c) =>
           c.message ===
-          'No active verified claim is available here. Begin a new Send Off with the Keeper.',
+          'No vote was saved. Ask the Keeper to Send Off, then watch the claim meter and try again after the raid lands.',
       ),
     );
     assert.equal((await f.runtime.state.getPublicJourney()).rings, 0);

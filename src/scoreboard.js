@@ -55,6 +55,9 @@ export function reduceScores(
     autoApprove = false,
     awaitingRaid = false,
     markOutcome,
+    registry,
+    seekersEnabled = false,
+    holderSince = null,
   },
 ) {
   const doc = structuredClone(previous ?? { version: 1, players: [], receipts: [] }),
@@ -137,7 +140,21 @@ export function reduceScores(
           message =
             'Public scores off. Your score name, participation count and links have been erased.';
         else if (action === 'scores-on') message = consentMessage;
-        else if (action === 'scores-status') {
+        else if (['seek-on', 'seek-off', 'seek-status'].includes(action))
+          message =
+            chat.chatterId !== host
+              ? 'Only this broadcaster can change or read their Seeker choice.'
+              : !seekersEnabled
+                ? 'The authorised Keeper Seeker pilot is off.'
+                : channels[host].seeking === true
+                  ? 'Seeker queue on. Your configured channel may be suggested while live and eligible. !seek off to leave.'
+                  : 'Seeker queue off. Opt in as a Keeper first, then !seek to join; !seek off to leave.';
+        else if (action === 'where') {
+          const holder = { 1591805230: 'raidrelichq', 1591806023: 'olsols2' }[registry?.holderId];
+          message = holder
+            ? `@${holder} holds the relic. Held since: ${Number.isSafeInteger(holderSince) && holderSince >= 0 ? new Date(holderSince).toISOString().slice(0, 19).replace('T', ' ') + ' UTC' : 'not recorded'}. Watch: https://twitch.tv/${holder} · https://raid-relic-760724762396.us-central1.run.app/keeper/${holder}`
+            : 'The current relic holder is not recorded.';
+        } else if (action === 'scores-status') {
           message = ownScoreStatus(doc, key);
         } else if (['top', 'badges'].includes(action)) message = action;
         else if (action === 'offer' && awaitingRaid)
@@ -147,7 +164,7 @@ export function reduceScores(
           message =
             hop && !hop.cancelled && !hop.finalized && now < hop.endsAt
               ? 'That vote was not counted. Check the ritual, chat role and deadline.'
-              : 'No active verified claim is available here. Begin a new Send Off with the Keeper.';
+              : 'No vote was saved. Ask the Keeper to Send Off, then watch the claim meter and try again after the raid lands.';
         else if (action === 'forgetme')
           message =
             'Your retained marks, shared links and public scores were erased. Stream quota and cooldown are not refunded.';
@@ -165,8 +182,16 @@ export function reduceScores(
             markOutcome === 'vetoed'
               ? 'Vetoed latest mark.'
               : markOutcome === 'empty'
-                ? 'Nothing to veto.'
+                ? 'Nothing to veto. Only retained marks in this channel can be removed; veto never refunds quota or cooldown.'
                 : 'Veto unavailable: an eligible retained mark and authorized same-channel moderator are required.';
+        else if (action === 'mark' && ['approved', 'pending'].includes(markOutcome))
+          message =
+            markOutcome === 'approved'
+              ? 'Mark approved. Your community rune is now public.'
+              : 'Mark held for private moderator review. It is not visible on the relic.';
+        else if (action === 'mark' && markOutcome === 'not-added')
+          message =
+            'No mark was added. Check the valid word or emoji, five-mark budget, 30-second cooldown and current Keeper status. Nothing held is public.';
         else if (action === 'mark')
           message =
             channels[host].online && !channels[host].paused && marks[host]?.context?.holdsRelic

@@ -39,3 +39,23 @@ test('oversized rasters/documents fail closed rather than truncate or weaken res
   ])
     assert.throws(() => captureTiles(...args));
 });
+
+test('expanded public documents use complete tiles below4MiB without truncating first or final content', async () => {
+  const { pageCapturePlan, TILE_RAW_LIMIT } = await import('../test-support/capture-page.js');
+  for (const [width, height, documentHeight] of [
+    [1200, 1000, 4200],
+    [1200, 900, 3500],
+    [375, 800, 4300],
+    [160, 160, 160],
+  ]) {
+    const plan = pageCapturePlan(width, height, documentHeight);
+    assert.ok(plan.rawBytes < TILE_RAW_LIMIT);
+    assert.equal(plan.ranges[0].start, 0);
+    assert.equal(plan.ranges.at(-1).end, documentHeight);
+    assert.ok(plan.ranges.length <= 8);
+    for (let i = 1; i < plan.ranges.length; i++)
+      assert.ok(plan.ranges[i].start <= plan.ranges[i - 1].end);
+  }
+  assert.throws(() => pageCapturePlan(1200, 900, 100000));
+  assert.throws(() => pageCapturePlan(0, 900, 3000));
+});

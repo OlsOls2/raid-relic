@@ -161,7 +161,10 @@ for (const kind of ['memory', 'firestore']) {
     assert.doesNotMatch(replies(f).at(-1).message, /spoiler|moon|813/);
     f.advance(30001);
     await f.chat(HOME, HOME, '!relic veto');
-    assert.equal(replies(f).at(-1).message, 'Nothing to veto.');
+    assert.equal(
+      replies(f).at(-1).message,
+      'Nothing to veto. Only retained marks in this channel can be removed; veto never refunds quota or cooldown.',
+    );
     assert.equal((await f.runtime.state.getPrivateMarks(HOME, actor)).sessions[0].spent, 2);
     assert.equal(
       await f.runtime.state.controlMarks(HOME, actor, { type: 'veto-last' }, f.now()),

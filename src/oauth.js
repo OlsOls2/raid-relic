@@ -270,6 +270,22 @@ export function createOAuth({
   return {
     route,
     accessToken,
+    // Read-only validation for public receiving observations: no lease, refresh,
+    // grant save or implicit consent. Missing/expired grants fail closed.
+    async readAccessToken(role, extraScopes = []) {
+      if (
+        !validRole(role) ||
+        !Array.isArray(extraScopes) ||
+        extraScopes.some((s) => s !== 'user:read:moderated_channels')
+      )
+        throw Error('Read grant rejected');
+      const record = await store.getToken(role);
+      if (!record) throw Error('Read grant unavailable');
+      const token = cipher.open(record, context(role));
+      if (!(await validate(token, role, [...scopes(role), ...extraScopes])))
+        throw Error('Read grant unavailable');
+      return token.access_token;
+    },
     accessTokenForP7() {
       return accessToken('bot', { p7: true });
     },

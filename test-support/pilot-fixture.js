@@ -104,6 +104,11 @@ export async function pilotFixture(
         },
       };
     }
+    if (u.pathname === '/helix/moderation/channels' && chronicleEnv.SEEKERS_ENABLED === 'true')
+      return {
+        status: 200,
+        data: { data: [HOME, OTHER].map((id) => ({ broadcaster_id: id })), pagination: {} },
+      };
     if (u.pathname.endsWith('/users')) {
       const id = u.searchParams.get('login') === 'raidrelichq' ? HOME : OTHER;
       return { status: 200, data: { data: [{ id, login: u.searchParams.get('login') }] } };

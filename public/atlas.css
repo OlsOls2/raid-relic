@@ -688,3 +688,49 @@ nav > a {
   font-size: 13px;
   line-height: 1.5;
 }
+
+/* Receiving surfaces use the existing palette and bounded normal document flow. */
+#receiving {
+  margin-block: 24px;
+  border: 1px solid var(--amber);
+  padding: 16px;
+  min-width: 0;
+}
+.holder-spotlight {
+  background: var(--slate);
+  padding: 16px;
+}
+#receiving a {
+  display: inline-block;
+  padding-block: 6px;
+  overflow-wrap: anywhere;
+}
+.keeper-arrival {
+  border-top: 1px solid var(--amber);
+  padding-block: 20px;
+}
+.keeper-arrival button {
+  margin: 6px;
+  max-width: 100%;
+  white-space: normal;
+}
+#receiving-content,
+.keeper-arrival,
+.holder-spotlight {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.keeper-glyphs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.keeper-glyphs figure {
+  margin: 0;
+  max-width: 100%;
+}
+.keeper-glyphs figcaption {
+  max-width: 12em;
+  overflow-wrap: anywhere;
+}

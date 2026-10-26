@@ -21,6 +21,8 @@ const actions = [
   'reset',
 ];
 const assets = new Set([
+  '/receiving.js',
+  '/keeper-card.js',
   '/streak-view.js',
   '/ring-card.js',
   '/ring-card-client.js',
@@ -363,6 +365,7 @@ export async function createJudges({ intent = false, env = process.env } = {}) {
             '/',
             '/atlas',
             '/atlas/',
+            '/api/receiving',
             '/api/journey-map',
             '/api/atlas',
             '/api/scores',
@@ -372,6 +375,7 @@ export async function createJudges({ intent = false, env = process.env } = {}) {
             '/forge',
             '/api/forge',
           ].includes(path) ||
+          /^\/(?:api\/)?keeper\/[a-z0-9_]{1,25}$/.test(path) ||
           /^\/stops\/[a-f0-9]{64}$/.test(path) ||
           /^\/api\/atlas\/stops\/[a-f0-9]{64}(?:\?.*)?$/.test(path) ||
           /^\/api\/atlas\?.*$/.test(path) ||

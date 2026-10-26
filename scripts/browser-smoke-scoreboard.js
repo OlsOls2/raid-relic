@@ -11,7 +11,9 @@ let browser,
   tls,
   active,
   stage = 'setup',
-  failed = false;
+  failed = false,
+  failureCategory = null,
+  diagnostic = {};
 const checks = [],
   captures = [],
   captureBytes = new Map();
@@ -96,11 +98,13 @@ try {
   stage = 'completed-score';
   await hop(active);
   await page.locator('#scores-refresh').click();
+  stage = 'completed-ring';
   await page.locator('#scores-status').filter({ hasText: '1 recorded ring' }).waitFor();
   assert.match(await page.locator('#raider-rows').textContent(), /1 completed claim joined/);
   assert.match(await page.locator('#keeper-rows').textContent(), /Ring 1/);
   active.advance(86400000);
   await page.locator('#scores-refresh').click();
+  stage = 'completed-24h-badge';
   await page.locator('#keeper-rows').filter({ hasText: '24h Keeper' }).waitFor();
   assert.equal(
     await page
@@ -110,17 +114,37 @@ try {
       .count(),
     0,
   );
+  stage = 'badge-keyboard';
   await page.locator('.score-badge[data-earned=true] summary').first().focus();
   await page.keyboard.press('Enter');
   assert(await page.locator('.score-badge[data-earned=true][open] p').first().isVisible());
   await page.keyboard.press('Enter');
+  stage = 'desktop-spotlight-ledger-layout';
   await page.evaluate(() => scrollTo(0, 0));
+  await page.evaluate(
+    () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))),
+  );
   const layout = await page.locator('#keeper-scores').evaluate((n) => ({
     top: n.getBoundingClientRect().top,
     width: n.getBoundingClientRect().width,
     heroEnd: document.querySelector('.intro').getBoundingClientRect().bottom,
+    spotlightTop: document.querySelector('#receiving').getBoundingClientRect().top,
+    spotlightBottom: document.querySelector('#receiving').getBoundingClientRect().bottom,
+    spotlightWidth: document.querySelector('#receiving').getBoundingClientRect().width,
   }));
-  assert.ok(layout.top >= layout.heroEnd - 1 && layout.top < 650 && layout.width > 900);
+  diagnostic = { ...layout };
+  assert.ok(layout.spotlightTop >= layout.heroEnd - 1);
+  assert.ok(layout.top >= layout.spotlightBottom - 1);
+  assert.ok(layout.width > 900 && layout.spotlightWidth > 900);
+  stage = 'desktop-ledger-accessible-scroll';
+  await page.locator('#scores-refresh').scrollIntoViewIfNeeded();
+  await page.locator('#scores-refresh').focus();
+  assert.ok(
+    await page.locator('#scores-refresh').evaluate((n) => {
+      const r = n.getBoundingClientRect();
+      return n === document.activeElement && r.top >= 0 && r.bottom <= innerHeight;
+    }),
+  );
   assert.equal(await page.locator('#score-preview').isVisible(), false);
   await capture('scoreboard-desktop.png');
   await page.setViewportSize({ width: 393, height: 800 });
@@ -251,8 +275,34 @@ try {
     name: 'SIMULATOR actual HTTPS preview denies OAuth/control/EventSub/all mutations before provider or storage writes',
     passed: true,
   });
-} catch {
+} catch (error) {
   failed = true;
+  failureCategory = ['AssertionError', 'TimeoutError', 'TypeError'].includes(error?.name)
+    ? error.name
+    : 'browser-or-fixture';
+  const line =
+    typeof error?.stack === 'string'
+      ? error.stack.slice(0, 8192).match(/browser-smoke-scoreboard[.]js:(\d{1,6})(?::\d+)?/)
+      : null;
+  if (line && Number(line[1]) > 0 && Number(line[1]) <= 100000)
+    diagnostic.assertionLine = Number(line[1]);
+  if (page && !page.isClosed()) {
+    try {
+      const values = await page.evaluate(() => ({
+        viewportWidth: innerWidth,
+        documentHeight: document.documentElement.scrollHeight,
+        keeperRows: document.querySelectorAll('#keeper-rows>li').length,
+        earnedBadges: document.querySelectorAll('.score-badge[data-earned=true]').length,
+        ledgerTop: document.querySelector('#keeper-scores')?.getBoundingClientRect().top ?? -1,
+        spotlightTop: document.querySelector('#receiving')?.getBoundingClientRect().top ?? -1,
+        spotlightBottom: document.querySelector('#receiving')?.getBoundingClientRect().bottom ?? -1,
+      }));
+      for (const [key, value] of Object.entries(values))
+        if (Number.isFinite(value) && Math.abs(value) <= 1000000000) diagnostic[key] = value;
+    } catch {
+      /* No raw exceptions or page content in metadata. */
+    }
+  }
 } finally {
   try {
     if (captureBytes.size) {
@@ -272,7 +322,11 @@ try {
   await mkdir('artifacts', { recursive: true });
   await writeFile(
     'artifacts/scoreboard-browser-results.json',
-    JSON.stringify({ simulator: true, passed: !failed, stage, checks, captures }, null, 2),
+    JSON.stringify(
+      { simulator: true, passed: !failed, stage, failureCategory, diagnostic, checks, captures },
+      null,
+      2,
+    ),
   );
 }
 if (failed) process.exitCode = 1;

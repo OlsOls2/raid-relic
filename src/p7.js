@@ -493,7 +493,7 @@ export function createP7({
       if (job.kind === 'announcement') {
         path = 'announcements';
         body = JSON.stringify({
-          message: `The relic is bound to ${name(host)}. Ring ${job.ring}. Thank you, ${name(job.proof.from)}.`,
+          message: `The relic is bound to ${name(host)}. Ring ${job.ring}. Thank you, ${name(job.proof.from)}. Welcome raiders—leave !mark to add a community rune.`,
           color: 'purple',
           for_source_only: true,
         });

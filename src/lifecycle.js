@@ -29,6 +29,7 @@ export function lifecycleConfig(value) {
     channels: [...new Set(value.channels)],
     logins: { ...logins },
     ...(value.streakEnabled === true ? { streakEnabled: true } : {}),
+    ...(value.seekersEnabled === true ? { seekersEnabled: true } : {}),
   };
 }
 export const emptyRegistry = () => ({ holderId: null, originated: false });
@@ -114,6 +115,7 @@ export function reduceLifecycle({
   sentAt,
   observed = false,
   reviewPolicy,
+  seekersEnabled = false,
 }) {
   registry = structuredClone(registry ?? emptyRegistry());
   if (event || chat?.markAction || policy) delete registry.echo;
@@ -213,7 +215,36 @@ export function reduceLifecycle({
     delete marks.shares;
   }
   const action = chat?.markAction;
-  const owner = chat?.broadcasterId === host && chat.chatterId === host;
+  const owner =
+    chat?.broadcasterId === host && chat.chatterId === host && !chat.isBot && !chat.copied;
+  if (
+    seekersEnabled &&
+    owner &&
+    ['seek-on', 'seek-off'].includes(action?.type) &&
+    Number.isFinite(sentAt) &&
+    sentAt <= now &&
+    now - sentAt <= 600000 &&
+    (sentAt > (channel.seekAt ?? -1) || (action.type === 'seek-off' && sentAt === channel.seekAt))
+  ) {
+    if (
+      action.type === 'seek-off' ||
+      (channel.optedIn &&
+        !channel.banned &&
+        !channel.paused &&
+        !channel.blockedUserIds.includes(host) &&
+        !marks.blocked.includes(host))
+    ) {
+      channel.seeking = action.type === 'seek-on';
+      channel.seekAt = sentAt;
+    }
+  }
+  if (
+    (seekersEnabled || channel.seeking !== undefined) &&
+    owner &&
+    action?.type === 'opt-out' &&
+    sentAt >= channel.consentAt
+  )
+    channel.seeking = false;
   if (
     owner &&
     action?.type === 'keep' &&

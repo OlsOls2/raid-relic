@@ -1,3 +1,4 @@
+import { createReceiving } from './receiving.js';
 import { markReviewPolicy } from './marks.js';
 import { createP7, p7Config } from './p7.js';
 import { createMarkShares, createShareReplies } from './my-marks.js';
@@ -8,7 +9,7 @@ import { createClaimAcks, createBotReplyQueue } from './claim-ack.js';
 import { createApp } from './app.js';
 import { createMemoryState } from './state.js';
 import { createMemoryAuthStore, createFirestoreStore } from './store.js';
-import { createOAuth } from './oauth.js';
+import { createOAuth, httpTransport } from './oauth.js';
 import { createBot } from './bot.js';
 import { createPilot, KEEPERS } from './pilot.js';
 import { createOverlayHub } from './overlay-feed.js';
@@ -44,6 +45,10 @@ export async function createRuntime(
     };
   if (env.RAID_PILOT_ENABLED && !['true', 'false'].includes(env.RAID_PILOT_ENABLED))
     throw new Error('Explicit pilot gate required');
+  if (env.SEEKERS_ENABLED && !['true', 'false'].includes(env.SEEKERS_ENABLED))
+    throw Error('Explicit Seekers gate required');
+  const seekersEnabled = env.SEEKERS_ENABLED === 'true';
+  if (seekersEnabled && !raidPilot) throw Error('Seekers require the authorised Keeper pilot');
   const reviewPolicy = markReviewPolicy(env);
   let state;
   let store;
@@ -77,6 +82,7 @@ export async function createRuntime(
       ? {
           channels: keeperIds,
           streakEnabled: env.P9_STREAK_ENABLED === 'true',
+          seekersEnabled,
           ...(raidPilot
             ? {
                 logins: Object.fromEntries(
@@ -146,6 +152,16 @@ export async function createRuntime(
     });
   } else if (production || env.OAUTH_ENABLED !== 'false')
     throw new Error('Select OAUTH_ENABLED explicitly; production requires OAuth configuration');
+  const receiving = createReceiving({
+    enabled: seekersEnabled && raidPilot,
+    state,
+    store,
+    oauth,
+    clientId: env.TWITCH_CLIENT_ID,
+    botId: env.TWITCH_BOT_ID,
+    transport: transport ?? httpTransport,
+    now,
+  });
   let overlayFeed;
   let overlayFeeds;
   if (env.TWITCH_STREAMER_ID) {
@@ -222,7 +238,7 @@ export async function createRuntime(
         streamerId: id,
         transport,
         now,
-        authorize: (source) => pilot.authorizeSend(source),
+        authorize: (source, target) => pilot.authorizeSend(source, target),
       });
     }
     scoreAcks = createClaimAcks({
@@ -270,6 +286,7 @@ export async function createRuntime(
     });
     replies = createShareReplies({ state, shares, bots, now });
     pilot = createPilot({
+      receiving,
       p7,
       replies,
       forge,
@@ -288,6 +305,7 @@ export async function createRuntime(
   }
   return {
     ...createApp({
+      receiving,
       previewReadOnly,
       scoreAcks,
       claimAcks,
@@ -310,6 +328,7 @@ export async function createRuntime(
         : undefined,
     }),
     claimAcks,
+    receiving,
     p7,
     oauth,
     bot,

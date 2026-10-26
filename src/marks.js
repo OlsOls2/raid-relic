@@ -93,6 +93,11 @@ export function runeSvg(input) {
 }
 
 export function parseMarkCommand(text) {
+  if (['!seek', '!relic seek', '!seek on', '!relic seek on'].includes(text))
+    return { type: 'seek-on' };
+  if (['!seek off', '!relic seek off'].includes(text)) return { type: 'seek-off' };
+  if (['!seek status', '!relic seek status'].includes(text)) return { type: 'seek-status' };
+  if (['!where', '!relic where'].includes(text)) return { type: 'where' };
   const score = new Map(
     Object.entries({
       '!relic scores': 'scores-status',
@@ -206,7 +211,20 @@ export function reduceMark(previous, host, actor, action, now, reviewPolicy) {
   )
     return doc;
   doc.cooldowns = doc.cooldowns.filter((entry) => now - entry.at < MARK_LIMITS.cooldownMs);
-  if (['scores-status', 'scores-on', 'scores-off', 'top', 'badges', 'help'].includes(action.type))
+  if (
+    [
+      'scores-status',
+      'scores-on',
+      'scores-off',
+      'top',
+      'badges',
+      'help',
+      'seek-on',
+      'seek-off',
+      'seek-status',
+      'where',
+    ].includes(action.type)
+  )
     return doc;
   if (action.type === 'forgetme') {
     if (doc.shares) doc.shares = doc.shares.filter((s) => s.actor !== actor.chatterId);
@@ -340,6 +358,12 @@ export function createMarkService(store, { now = Date.now } = {}) {
 
 // Derived from the same transaction's before/after documents, never an external pre-read.
 export function markCommandOutcome(previous, next, host, actor, action) {
+  if (action?.type === 'mark') {
+    const all = (doc) => (doc?.sessions ?? []).flatMap((s) => s.marks);
+    const oldIds = new Set(all(previous).map((m) => m.id));
+    const added = all(next).find((m) => !oldIds.has(m.id) && m.userId === actor?.chatterId);
+    return added ? (added.status === 'approved' ? 'approved' : 'pending') : 'not-added';
+  }
   if (action?.type !== 'veto-last') return undefined;
   if (
     !isChatIdentity(actor, host) ||

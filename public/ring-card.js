@@ -147,16 +147,19 @@ export function demoCardFilename(ringIndex) {
     throw Error('Demo card filename');
   return `raid-relic-demo-ring-${ringIndex}.png`;
 }
+export function validRingCardFilename(filename, simulated = false) {
+  return (
+    typeof filename === 'string' &&
+    filename === filename.trim() &&
+    (/^raid-relic-stop-(?:[1-9]|1[0-6])-[a-z0-9_]{1,25}[.]png$/.test(filename) ||
+      /^raid-relic-keeper-[a-z0-9_]{1,25}-ring-(?:[1-9]|1[0-6])-(?:landscape|vertical)[.]png$/.test(
+        filename,
+      ) ||
+      (simulated === true && /^raid-relic-demo-ring-(?:[1-9]|1[0-6])[.]png$/.test(filename)))
+  );
+}
 export function saveRingCard(blob, simulated = false, filename = null) {
-  if (
-    filename !== null &&
-    (typeof filename !== 'string' ||
-      filename !== filename.trim() ||
-      !(
-        /^raid-relic-stop-(?:[1-9]|1[0-6])-[a-z0-9_]{1,25}\.png$/.test(filename) ||
-        (simulated === true && /^raid-relic-demo-ring-(?:[1-9]|1[0-6])\.png$/.test(filename))
-      ))
-  )
+  if (filename !== null && !validRingCardFilename(filename, simulated))
     throw Error('Card filename');
   const url = URL.createObjectURL(blob),
     a = document.createElement('a');

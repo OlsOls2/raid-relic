@@ -1,3 +1,4 @@
+import { boundedCall } from './bounded.js';
 import { EDITION_CONFIG, validEditions, editionSVG } from '../public/editions.js';
 import { canonicalLogin, shareRequestHash } from './my-marks.js';
 import { parseBan } from './bans.js';
@@ -80,6 +81,7 @@ const result = (status, body = '', type = 'text/plain; charset=utf-8') => ({ sta
 export function createApp({
   scoreAcks,
   claimAcks,
+  receiving,
   secret,
   state = createMemoryState(),
   now = Date.now,
@@ -131,6 +133,14 @@ export function createApp({
   };
   // Pure request boundary for tests: rawBody is never reserialized before HMAC.
   async function dispatch({ method, path, headers = {}, rawBody = Buffer.alloc(0) }) {
+    if (['/receiving.js', '/keeper-card.js'].includes(path)) {
+      if (method !== 'GET') return result(405, 'Static asset is read only');
+      return result(
+        200,
+        await readFile(new URL('../public' + path, import.meta.url)),
+        'text/javascript; charset=utf-8',
+      );
+    }
     if (faviconAssets.has(path)) {
       if (method !== 'GET') return result(previewReadOnly ? 403 : 405, 'Static icon is read only');
       return {
@@ -216,6 +226,44 @@ export function createApp({
       !spend()
     )
       return result(429, 'Public request budget reached; retry later');
+    if (path === '/api/receiving' || /^\/api\/keeper\/[a-z0-9_]{1,25}$/.test(path)) {
+      if (method !== 'GET') return result(405, 'Read only');
+      if (rawBody.length) return result(400, 'Invalid receiving request');
+      if (!receiving) return result(503, 'Receiving view unavailable');
+      const login = path.startsWith('/api/keeper/') ? path.slice(12) : null;
+      if (login && !['raidrelichq', 'olsols2'].includes(login))
+        return result(404, 'Keeper not configured');
+      try {
+        const value = await boundedCall(() => receiving.page(), 8000);
+        const profile = login ? value.profiles.find((p) => p.login === login) : null;
+        if (login && !profile) return result(404, 'Keeper not available');
+        const body = JSON.stringify({
+          ...(login
+            ? {
+                profile,
+                holder: value.holder,
+                live: value.holder?.login === login ? value.live : null,
+              }
+            : value),
+          mode: overlayFeed?.simulator ? 'simulator' : 'live',
+        });
+        if (Buffer.byteLength(body) > 131072) throw Error('Receiving capacity');
+        return {
+          ...result(200, body, 'application/json'),
+          headers: { 'cache-control': 'no-store' },
+        };
+      } catch {
+        return result(503, 'Receiving view unavailable; clear previous content and refresh');
+      }
+    }
+    if (/^\/keeper\/[a-z0-9_]{1,25}$/.test(path)) {
+      if (method !== 'GET') return result(405, 'Read only');
+      if (
+        !Object.values({ 1591805230: 'raidrelichq', 1591806023: 'olsols2' }).includes(path.slice(8))
+      )
+        return result(404, 'Keeper not configured');
+      return result(200, await publicHTML('keeper.html'), 'text/html; charset=utf-8');
+    }
     if (path.startsWith('/control/')) {
       if (!oauth?.control) return result(503, 'Control not configured');
       return oauth.control.route({ path, method, headers, rawBody });

@@ -37,6 +37,9 @@ const target = document.getElementById('raid-target');
 const empty = document.getElementById('target-empty');
 const labels = {
   'mark-links': 'Send queued public mark-history link',
+  'seek-on': 'Join public Seeker queue',
+  'seek-off': 'Leave Seeker queue',
+  'seek-status': 'Read Seeker choice',
   chronicle: 'Write Chronicle for latest received stop',
   bootstrap: 'Bootstrap / reconcile this channel',
   keep: 'Opt in / Keep',
@@ -151,7 +154,7 @@ async function refresh({ preserveResult = false } = {}) {
             : 'Optional actions enabled by the operator. Bot consent and moderator proof are required; checked only on a new completed claim. API acceptance does not verify viewer-visible delivery.'
           : 'Off by default. Optional actions need separate operator gates, bot consent and moderator roles in both rooms.';
     document.getElementById('keeper-summary').textContent =
-      `Relic Keeper: @${names[value.pilot.holder] ?? 'unplaced'}. Your stream: ${value.pilot.online ? 'live' : 'offline'}. ${value.pilot.optedIn ? 'Opted in' : 'Not opted in'}. ${value.pilot.paused ? 'Paused.' : ''} ${Object.values(value.pilot.bothReadiness ?? {}).length === 2 && Object.values(value.pilot.bothReadiness).every((v) => v === true) ? 'Both channels are ready.' : 'Reconcile both channels until both are ready.'} ${value.pilot.claimProgress ? `Offer ${value.pilot.claimProgress.offers ?? 0}/${value.pilot.claimProgress.threshold} · Accept ${value.pilot.claimProgress.accepts ?? 0}/${value.pilot.claimProgress.threshold}${value.pilot.claimProgress.finalized ? ' · Bound by two chats' : ''}` : ''}`;
+      `${value.pilot.seekers?.enabled ? 'Public Seeker queue: ' + (value.pilot.seekers.joined ? 'joined.' : 'not joined.') + ' ' : ''}Relic Keeper: @${names[value.pilot.holder] ?? 'unplaced'}. Your stream: ${value.pilot.online ? 'live' : 'offline'}. ${value.pilot.optedIn ? 'Opted in' : 'Not opted in'}. ${value.pilot.paused ? 'Paused.' : ''} ${Object.values(value.pilot.bothReadiness ?? {}).length === 2 && Object.values(value.pilot.bothReadiness).every((v) => v === true) ? 'Both channels are ready.' : 'Reconcile both channels until both are ready.'} ${value.pilot.claimProgress ? `Offer ${value.pilot.claimProgress.offers ?? 0}/${value.pilot.claimProgress.threshold} · Accept ${value.pilot.claimProgress.accepts ?? 0}/${value.pilot.claimProgress.threshold}${value.pilot.claimProgress.finalized ? ' · Bound by two chats' : ''}` : ''}`;
     document.querySelector('label[for=intent-confirm]').textContent = simulated
       ? 'Exact queued intent ID from your private status'
       : 'Type CANCEL to confirm only this never-dispatched queue';
@@ -205,7 +208,7 @@ async function refresh({ preserveResult = false } = {}) {
     for (const candidate of candidates) {
       const option = document.createElement('option');
       option.value = candidate.id;
-      option.textContent = `${candidate.login} · observed online`;
+      option.textContent = `${candidate.login} · observed online${Number.isSafeInteger(candidate.viewers) && candidate.viewers >= 0 ? ' · ' + candidate.viewers + ' Twitch-reported viewers' : ''}`;
       target.append(option);
     }
     target.disabled = busy || !candidates.length;

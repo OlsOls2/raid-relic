@@ -5,3 +5,13 @@ Public pages expose configured Keeper names, retained completed stops and approv
 Scores require explicit `!relic scores on` consent for future observed completions. Reading scores or marking does not opt anyone in. `!relic scores off` withdraws the score entry. `!relic forgetme` erases retained application marks, shared links and score associations, not Twitch-wide data. Existing minimal quota/cooldown identifiers remain until session closure/expiry so erasure does not refund abuse budgets.
 
 Moderator veto removes the latest retained approved or pending mark. Revocation also invalidates retained public associations. A saved PNG or copied public link cannot be recalled from someone else's device. Pending/removed mark text is not searchable or exportable. The browser demo uses fixed fictional names and memory only; no network, cookies or persistent storage writes.
+
+## Optional Seeker pilot and Keeper cards
+
+A configured broadcaster explicitly joins/leaves the public Seeker queue; this is
+separate from marks and score consent. Only channel identities and current reported
+viewer counts are listed, never chatter identities. Keeper pages use retained completed
+stops and approved glyphs; erasure/veto/opt-out flow through existing archive projections.
+Each orientation-specific card freshly checks the public exact stop before exporting.
+Previously saved downloads cannot be recalled. Twitch-reported raid audience is not
+retention, conversion, unique chatters or proof of individual raid membership.

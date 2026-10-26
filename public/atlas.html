@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/journey-map.css" />
     <script type="module" src="/journey-map.js"></script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script type="module" src="/receiving.js"></script>
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to main content</a
@@ -40,6 +41,12 @@
           </div>
         </figure>
       </div>
+      <section id="receiving" aria-labelledby="receiving-title">
+        <h2 id="receiving-title">The relic's current Keeper</h2>
+        <p id="receiving-status" role="status">Reading the current public record…</p>
+        <button id="receiving-refresh" type="button">Refresh spotlight &amp; Seekers</button>
+        <div id="receiving-content"></div>
+      </section>
       <section
         id="keeper-scores"
         class="keeper-ledger"

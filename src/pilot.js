@@ -9,6 +9,7 @@ import { httpTransport } from './oauth.js';
 
 export const KEEPERS = Object.freeze({ 1591805230: 'raidrelichq', 1591806023: 'olsols2' });
 export function createPilot({
+  receiving,
   p7,
   replies,
   forge,
@@ -27,6 +28,7 @@ export function createPilot({
   const ids = Object.keys(KEEPERS);
   const actions = (id) => [
     ...(chronicle ? ['chronicle'] : []),
+    ...(receiving?.enabled ? ['seek-on', 'seek-off', 'seek-status'] : []),
     'bootstrap',
     'keep',
     'pause',
@@ -221,7 +223,10 @@ export function createPilot({
       );
     },
     actions,
-    authorizeSend: readiness,
+    async authorizeSend(source, target) {
+      await readiness(source);
+      if (target) await receiving?.authorize(source, target);
+    },
     async cancelQueued(id, intentId, generation) {
       if (
         !ids.includes(id) ||
@@ -242,6 +247,11 @@ export function createPilot({
     },
     async execute(id, action) {
       if (!ids.includes(id) || !actions(id).includes(action)) throw new Error('Action unavailable');
+      if (action === 'seek-status')
+        return {
+          status: 'processed',
+          seeking: (await state.getStreamStatus(id))?.seeking === true,
+        };
       if (action === 'chronicle') return chronicle.write(id);
       if (action === 'mark-links') return replies.processPending(id);
       if (action === 'bootstrap') return bootstrap(id);
@@ -328,7 +338,12 @@ export function createPilot({
         chronicle: chronicle?.enabled
           ? 'Paid generation enabled: one attempt per received stop; fiction only.'
           : 'Off: handwritten template fiction; no model calls.',
-        candidates: await state.getKeeperCandidates(id),
+        seekers: receiving?.enabled
+          ? { enabled: true, joined: channel?.seeking === true }
+          : { enabled: false, joined: false },
+        candidates: receiving
+          ? await receiving.candidates(id)
+          : await state.getKeeperCandidates(id),
         candidatesObservedAt: now(),
         mode: simulator ? 'simulator' : 'live',
         account: KEEPERS[id],
