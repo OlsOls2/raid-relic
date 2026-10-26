@@ -113,6 +113,7 @@ export function createReceiving({
   keepers = RECEIVING_KEEPERS,
   streamerId = '1591805230',
   now = Date.now,
+  logger = (line) => console.warn(line),
 }) {
   keepers = keeperNetwork(keepers);
   const ids = Object.keys(keepers);
@@ -126,6 +127,23 @@ export function createReceiving({
   let cached = null,
     attemptedAt = null,
     pending = null;
+  const warnedGrants = new Map();
+  const warn = (reason, stage = 'observation') => {
+    try {
+      Promise.resolve(
+        logger(
+          JSON.stringify({
+            severity: 'WARNING',
+            event: 'raid_relic_receiving_unavailable',
+            reason,
+            stage,
+          }),
+        ),
+      ).catch(() => {});
+    } catch {
+      /* Observability cannot change eligibility. */
+    }
+  };
   async function observations() {
     if (!enabled) return null;
     const t = now();
@@ -133,12 +151,23 @@ export function createReceiving({
       return pending ?? cached;
     attemptedAt = t;
     cached = null;
+    let failure = 'bot-grant-unavailable';
     pending = boundedCall(async (signal) => {
+      signal.addEventListener(
+        'abort',
+        () => {
+          failure = 'timeout';
+        },
+        { once: true },
+      );
       const token = await oauth.readAccessToken('bot', ['user:read:moderated_channels']);
       const headers = { Authorization: `Bearer ${token}`, 'Client-Id': clientId };
       const q = new URLSearchParams(ids.map((id) => ['user_id', id]));
+      failure = 'streams-http';
       const r = await transport(`https://api.twitch.tv/helix/streams?${q}`, { headers, signal });
-      if (r.status !== 200 || !Array.isArray(r.data?.data) || r.data.data.length > ids.length)
+      if (r.status !== 200) throw Error('Observation unavailable');
+      failure = 'streams-shape';
+      if (!Array.isArray(r.data?.data) || r.data.data.length > ids.length)
         throw Error('Observation unavailable');
       const streams = {};
       for (const v of r.data.data) {
@@ -158,28 +187,30 @@ export function createReceiving({
       for (let page = 0; page < 3; page++) {
         const query = new URLSearchParams({ user_id: botId, first: '100' });
         if (after) query.set('after', after);
+        failure = 'moderation-http';
         const m = await transport(`https://api.twitch.tv/helix/moderation/channels?${query}`, {
           headers,
           signal,
         });
-        if (
-          m.status !== 200 ||
-          !Array.isArray(m.data?.data) ||
-          m.data.data.length > 100 ||
-          !m.data.pagination
-        )
+        if (m.status !== 200) throw Error('Moderator unavailable');
+        failure = 'moderation-shape';
+        if (!Array.isArray(m.data?.data) || m.data.data.length > 100 || !m.data.pagination)
           throw Error('Moderator unavailable');
         for (const row of m.data.data)
           if (ids.includes(row.broadcaster_id)) moderators.add(row.broadcaster_id);
         after = m.data.pagination.cursor;
         if (!after) break;
+        failure = 'moderation-capacity';
         if (typeof after !== 'string' || after.length > 512 || cursors.has(after) || page === 2)
           throw Error('Moderator capacity');
         cursors.add(after);
       }
       if (signal.aborted) throw Error('Observation expired');
       return { at: t, streams, moderators };
-    }, 8000).catch(() => null);
+    }, 8000).catch(() => {
+      warn(failure);
+      return null;
+    });
     try {
       cached = await pending;
       return cached;
@@ -189,11 +220,27 @@ export function createReceiving({
   }
   async function grants(id) {
     const role = id === streamerId ? 'streamer' : `keeper:${id}`;
-    if (!(await store.getToken(role)) || (await store.getJob(id))?.ready !== true) return false;
+    const warnGrant = (reason) => {
+      const t = now(),
+        previous = warnedGrants.get(role);
+      if (previous === undefined || t < previous || t - previous >= 60000) {
+        warnedGrants.set(role, t);
+        warn(reason, 'keeper-grant');
+      }
+    };
+    if (!(await store.getToken(role)) || (await store.getJob(id))?.ready !== true) {
+      warnGrant('keeper-grant-or-bootstrap-unavailable');
+      return false;
+    }
     try {
       await oauth.readAccessToken(role);
       return true;
-    } catch {
+    } catch (error) {
+      warnGrant(
+        error?.code === 'grant-expired-or-invalid'
+          ? 'grant-expired-or-invalid'
+          : 'keeper-grant-unavailable',
+      );
       return false;
     }
   }
@@ -223,14 +270,38 @@ export function createReceiving({
     page,
     async candidates(source) {
       if (!enabled) return state.getKeeperCandidates(source);
-      const value = await page();
+      const value = await state.getReceivingView(now());
+      const observation = await observations();
+      if (!observation || now() < observation.at || now() - observation.at >= 60000) return [];
       const eligible = await state.getKeeperCandidates(source);
-      return value.seekers
-        .filter((s) => s.login !== keepers[source])
-        .flatMap((s) => {
-          const row = eligible.find((r) => r.login === s.login);
-          return row ? [{ ...row, viewers: s.viewers }] : [];
-        });
+      const seekers = new Set(value.seekers.map((row) => row.id));
+      const rows = [];
+      for (const row of eligible) {
+        if (!ids.includes(row.id) || row.id === source || row.eligible !== true) continue;
+        const channel = await state.getStreamStatus(row.id);
+        const stream = observation.streams[row.id];
+        if (
+          !stream ||
+          stream.streamId !== channel?.streamId ||
+          !observation.moderators.has(row.id) ||
+          !(await grants(row.id))
+        )
+          continue;
+        rows.push({ ...row, viewers: stream.viewers });
+      }
+      const stillEligible = new Set(
+        (await state.getKeeperCandidates(source))
+          .filter((row) => row.eligible === true)
+          .map((row) => row.id),
+      );
+      return rows
+        .filter((row) => stillEligible.has(row.id))
+        .sort(
+          (a, b) =>
+            Number(seekers.has(b.id)) - Number(seekers.has(a.id)) ||
+            a.viewers - b.viewers ||
+            a.login.localeCompare(b.login, 'en'),
+        );
     },
     async authorize(source, target) {
       if (!enabled) return;

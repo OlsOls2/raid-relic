@@ -10,6 +10,7 @@ import { httpTransport } from './oauth.js';
 export const KEEPERS = Object.freeze({ 1591805230: 'raidrelichq', 1591806023: 'olsols2' });
 export function createPilot({
   keepers = KEEPERS,
+  streamerId = '1591805230',
   receiving,
   p7,
   replies,
@@ -31,6 +32,7 @@ export function createPilot({
     ...(chronicle ? ['chronicle'] : []),
     ...(receiving?.enabled ? ['seek-on', 'seek-off', 'seek-status'] : []),
     'bootstrap',
+    'refresh-authorization',
     'keep',
     'pause',
     'resume',
@@ -253,6 +255,14 @@ export function createPilot({
     },
     async execute(id, action) {
       if (!ids.includes(id) || !actions(id).includes(action)) throw new Error('Action unavailable');
+      if (action === 'refresh-authorization') {
+        try {
+          await oauth.accessTokenForKeeper(id);
+          return { status: 'processed', authorization: 'ready' };
+        } catch {
+          return { status: 'processed', authorization: 'needs-reconnect' };
+        }
+      }
       if (action === 'seek-status')
         return {
           status: 'processed',
@@ -342,7 +352,9 @@ export function createPilot({
         );
         registry = await state.getKeeperRegistry();
       }
+      const authorization = 'not-checked';
       return {
+        authorization,
         optionalBotActions: p7?.status() ?? { enabled: false, reason: 'disabled' },
         chronicle: chronicle?.enabled
           ? 'Paid generation enabled: one attempt per received stop; fiction only.'
@@ -369,7 +381,7 @@ export function createPilot({
           ),
         ),
         ownerStep:
-          'Wait for the selected source and target readiness flags; Bootstrap / reconcile pending channels after callback verification. Reconnect missing grants.',
+          'Status shows cached subscription/lifecycle readiness, not fresh Keeper authorization. If targets are missing, use Check / refresh my Keeper authorization; reconnect this matching Keeper if it fails.',
         recovery:
           registry.send?.sourceId === id
             ? {

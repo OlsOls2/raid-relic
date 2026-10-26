@@ -310,6 +310,7 @@ export async function createRuntime(
     replies = createShareReplies({ state, shares, bots, now });
     pilot = createPilot({
       keepers: keeperNames,
+      streamerId: env.TWITCH_STREAMER_ID,
       receiving,
       p7,
       replies,

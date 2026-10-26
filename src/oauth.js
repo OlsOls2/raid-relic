@@ -279,7 +279,7 @@ export function createOAuth({
       if (!record) throw Error('Read grant unavailable');
       const token = cipher.open(record, context(role));
       if (!(await validate(token, role, [...scopes(role), ...extraScopes])))
-        throw Error('Read grant unavailable');
+        throw Object.assign(Error('Read grant unavailable'), { code: 'grant-expired-or-invalid' });
       return token.access_token;
     },
     accessTokenForP7() {

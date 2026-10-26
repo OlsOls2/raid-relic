@@ -42,6 +42,7 @@ export async function pilotFixture(
   const calls = [],
     subscriptions = [];
   const revoked = new Set();
+  const expired = new Set();
   let streamsHook;
   let conflict = false;
   let timeoutRaid = false;
@@ -55,6 +56,7 @@ export async function pilotFixture(
         return { status: 200, data: { access_token: 'synthetic-app' } };
       const id = form.get('code') ?? form.get('refresh_token')?.slice('refresh-'.length);
       if (revoked.has(id)) return { status: 400, data: {} };
+      expired.delete(id);
       return {
         status: 200,
         data: {
@@ -66,7 +68,7 @@ export async function pilotFixture(
     }
     if (u.pathname.endsWith('/validate')) {
       const id = options.headers.Authorization.slice('OAuth access-'.length);
-      if (revoked.has(id)) return { status: 401, data: {} };
+      if (revoked.has(id) || expired.has(id)) return { status: 401, data: {} };
       return {
         status: 200,
         data: {
@@ -271,6 +273,9 @@ export async function pilotFixture(
     },
     chatFailure(mode) {
       chatFailure = mode;
+    },
+    expire(id) {
+      expired.add(id);
     },
     revoke(id) {
       revoked.add(id);

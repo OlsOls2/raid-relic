@@ -1,3 +1,4 @@
+import { capturePage } from '../test-support/capture-page.js';
 // Optional host QA: local mocked OAuth/Helix only; never follows Twitch URLs.
 import { createServer } from 'node:https';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -8,7 +9,11 @@ const origin = 'https://localhost:5191';
 const f = await pilotFixture('memory', { origin });
 let server, sockets, localTLS;
 const captures = new Map();
-let browser, failure;
+const captureCoverage = [];
+const capture = (page, name) => capturePage(page, name, captures, captureCoverage);
+let browser, failure, activePage;
+let frontendPageErrorCount = 0;
+let diagnostic = null;
 let phase = 'local startup';
 let diagnostics;
 let lastPostStatus;
@@ -177,6 +182,8 @@ try {
   }
   checks.push({ name: 'Local HTTPS and Secure __Host Keeper cookies', passed: true });
   const page = await context.newPage();
+  activePage = page;
+  page.on('pageerror', () => frontendPageErrorCount++);
   for (const id of [HOME, OTHER]) {
     await page.goto(`${origin}/control/${id}`);
     await page
@@ -185,7 +192,9 @@ try {
     if (await page.locator('#simulator').isHidden()) throw new Error('Simulator label missing');
     await press(page, id, 'Bootstrap / reconcile this channel', 'reconciled');
     await press(page, id, 'Opt in / Keep', 'processed');
-    captures.set(`pilot-control-${id}`, await page.screenshot({ fullPage: true }));
+    phase = 'capture-control';
+    await capture(page, `pilot-control-${id}`);
+    phase = 'control-capture-complete';
     f.advance();
   }
   await f.chat(HOME, HOME, '!mark moon');
@@ -214,7 +223,9 @@ try {
   await page.locator('.rune').first().waitFor();
   if ((await f.runtime.state.getKeeperRegistry()).holderId !== HOME)
     throw new Error('Preview prematurely transferred ownership');
-  captures.set('pilot-incoming-preview', await page.screenshot({ fullPage: true }));
+  phase = 'capture-incoming-preview';
+  await capture(page, 'pilot-incoming-preview');
+  phase = 'incoming-capture-complete';
   checks.push({
     name: 'Verified fake raid preview before claims; API acceptance is not travel',
     passed: true,
@@ -227,7 +238,9 @@ try {
     await page.locator('#compact-count').filter({ hasText: 'Rings 1' }).waitFor();
     if (await page.locator('#simulator').isHidden())
       throw new Error('Overlay simulator label missing');
-    captures.set(`pilot-overlay-${id}`, await page.screenshot({ fullPage: true }));
+    phase = 'capture-overlay';
+    await capture(page, `pilot-overlay-${id}`);
+    phase = 'overlay-capture-complete';
   }
   if ((await f.runtime.state.getKeeperRegistry()).holderId !== OTHER)
     throw new Error('Mock claim did not transfer');
@@ -237,6 +250,76 @@ try {
   });
 } catch (error) {
   failure = error;
+  try {
+    diagnostic = await activePage.evaluate(() => {
+      const result = document.getElementById('result')?.textContent ?? '';
+      const patterns = [
+        ['processed', /processed/i],
+        ['choice-saved', /Keeper choice saved/i],
+        ['reconciled', /reconciled/i],
+        ['status-refreshed', /Status refreshed/i],
+        ['status-reading', /Reading your session/i],
+        ['status-invalid', /Status unavailable or invalid|Invalid status/i],
+        ['outcome-unavailable', /Request outcome unavailable/i],
+        [
+          'auth-reconnect',
+          /expired or unauthorized|authorization failed|Reconnect this matching Keeper/i,
+        ],
+      ];
+      const proof = window.__pilotPostProof;
+      const allowed = [
+        'accepted',
+        'processed',
+        'reconciled',
+        'blocked',
+        'busy',
+        'failed',
+        'unknown',
+        'rejected',
+        'rejected-preflight',
+        'idle-or-reconcile-only',
+      ];
+      return {
+        resultState: patterns.find(([, pattern]) => pattern.test(result))?.[0] ?? 'other',
+        resultLength: Math.min(65536, result.length),
+        refreshDisabled: document.getElementById('refresh')?.disabled === true,
+        simulatorHidden: document.getElementById('simulator')?.hidden === true,
+        actionHttp:
+          Number.isInteger(proof?.http) && proof.http >= 100 && proof.http <= 599 ? proof.http : 0,
+        actionStatus: allowed.includes(proof?.status) ? proof.status : 'unexpected',
+      };
+    });
+  } catch {
+    diagnostic = { resultState: 'unavailable', resultLength: 0 };
+  }
+  diagnostic.frontendPageErrorCount = Math.min(10000, frontendPageErrorCount);
+  diagnostic.errorName = [
+    'Error',
+    'TypeError',
+    'ReferenceError',
+    'TimeoutError',
+    'TargetClosedError',
+  ].includes(error?.name)
+    ? error.name
+    : 'other';
+  // Classify locally; never serialize the provider/runtime message or stack.
+  const message = typeof error?.message === 'string' ? error.message : '';
+  diagnostic.errorCategory = /capture.*(?:bound|size)|bounded encoded|cumulative PNG|raster/i.test(
+    message,
+  )
+    ? 'capture-size'
+    : /capture geometry|tile scroll|document changed|explicit viewport/i.test(message)
+      ? 'capture-geometry'
+      : /screenshot/i.test(message)
+        ? 'screenshot'
+        : /target.*closed|page.*closed|browser.*closed/i.test(message)
+          ? 'target-closed'
+          : /timeout/i.test(message)
+            ? 'timeout'
+            : /strict mode|strict locator/i.test(message)
+              ? 'strict-locator'
+              : 'other';
+
   try {
     diagnostics = {
       tls: { localOnly: true, configured: Boolean(localTLS) },
@@ -273,7 +356,9 @@ try {
           simulator: true,
           checks,
           captures: [...captures.keys()],
+          captureCoverage,
           diagnostics,
+          diagnostic,
           failure: failure ? `Pilot browser check failed during ${phase}` : null,
         },
         null,

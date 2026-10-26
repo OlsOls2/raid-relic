@@ -155,6 +155,7 @@ test('one-minute batched observations, deterministic low-viewer ordering, no sta
   const state = {
     getReceivingView: () => structuredClone(raw),
     getKeeperCandidates: () => raw.seekers.map((r) => ({ ...r, eligible: true })),
+    getStreamStatus: (id) => ({ streamId: id === HOME ? '1' : '2' }),
   };
   const service = createReceiving({
     enabled: true,
@@ -290,3 +291,198 @@ for (const kind of ['memory', 'firestore']) {
     assert.ok(!JSON.stringify(first).includes('seekAt'));
   });
 }
+
+for (const kind of ['memory', 'firestore']) {
+  test(`${kind}: expired grants stay hidden until explicit own CSRF recovery; non-Seekers remain manual targets only`, async () => {
+    const f = await setup(kind);
+    await f.control(OTHER, 'seek-on');
+    assert.equal(JSON.parse((await f.control(HOME, 'send:' + OTHER)).body).status, 'accepted');
+    await f.raid();
+    await f.chat(HOME, '7001', '!offer');
+    await f.chat(OTHER, '7002', '!accept');
+    assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, OTHER);
+    f.advance(60001);
+    f.expire(HOME);
+    f.expire(OTHER);
+    const before = f.calls.filter((c) => c.url.endsWith('/token')).length;
+    assert.deepEqual(await f.runtime.receiving.candidates(OTHER), []);
+    assert.deepEqual((await f.runtime.receiving.page()).seekers, []);
+    assert.equal(f.calls.filter((c) => c.url.endsWith('/token')).length, before);
+    const blocked = await f.request(
+      '/control/' + HOME,
+      'POST',
+      {
+        origin: 'https://foreign.example',
+        'content-type': 'application/json',
+      },
+      Buffer.from(JSON.stringify({ action: 'refresh-authorization', csrf: 'wrong' })),
+    );
+    assert.equal(blocked.status, 403);
+    for (const cookie of [f.cookies[HOME], f.cookies[OTHER]]) {
+      const denied = await f.request(
+        '/control/' + HOME,
+        'POST',
+        {
+          cookie,
+          origin: 'https://pilot.example',
+          'content-type': 'application/json',
+        },
+        Buffer.from(JSON.stringify({ action: 'refresh-authorization', csrf: 'wrong' })),
+      );
+      assert.equal(denied.status, 403);
+    }
+    assert.equal(f.calls.filter((c) => c.url.endsWith('/token')).length, before);
+    const recovered = await f.control(OTHER, 'refresh-authorization');
+    assert.equal(recovered.status, 200);
+    assert.equal(JSON.parse(recovered.body).authorization, 'ready');
+    let refreshes = f.calls.filter((c) => c.url.endsWith('/token')).slice(before);
+    assert.equal(refreshes.length, 1);
+    assert.equal(new URLSearchParams(refreshes[0].body).get('refresh_token'), 'refresh-' + OTHER);
+    assert.equal((await f.runtime.receiving.page()).seekers[0].login, 'olsols2');
+    assert.deepEqual(await f.runtime.receiving.candidates(OTHER), []); // HOME still invalid.
+    assert.equal((await f.control(HOME, 'refresh-authorization')).status, 200);
+    assert.deepEqual(
+      (await f.runtime.receiving.candidates(OTHER)).map((r) => r.login),
+      ['raidrelichq'],
+    );
+    assert.ok(!(await f.runtime.receiving.page()).seekers.some((r) => r.login === 'raidrelichq'));
+    const calls = f.calls.length;
+    await f.runtime.receiving.authorize(OTHER, HOME);
+    assert.ok(f.calls.length > calls); // Dispatch revalidates rather than trusting selection.
+    f.revoke(HOME);
+    await assert.rejects(() => f.runtime.receiving.authorize(OTHER, HOME));
+    assert.equal(
+      JSON.parse((await f.control(HOME, 'refresh-authorization')).body).authorization,
+      'needs-reconnect',
+    );
+  });
+}
+test('receiving warnings are closed, throttled and logger failure cannot admit a target', async () => {
+  let now = 1000;
+  const logs = [];
+  const service = createReceiving({
+    enabled: true,
+    now: () => now,
+    state: { getReceivingView: () => ({ seekers: [] }), getKeeperCandidates: () => [] },
+    oauth: {
+      readAccessToken() {
+        throw Error('private secret URL body');
+      },
+    },
+    store: {},
+    logger: (value) => {
+      logs.push(JSON.parse(value));
+      throw Error('logger failed');
+    },
+    transport() {
+      throw Error('must not call');
+    },
+  });
+  await service.page();
+  await service.page();
+  assert.deepEqual(logs, [
+    {
+      severity: 'WARNING',
+      event: 'raid_relic_receiving_unavailable',
+      reason: 'bot-grant-unavailable',
+      stage: 'observation',
+    },
+  ]);
+  now += 60000;
+  await service.page();
+  assert.equal(logs.length, 2);
+  assert.ok(!JSON.stringify(logs).includes('private'));
+});
+
+test('master read-only denies authorization refresh before any grant/provider access', async () => {
+  const f = await pilotFixture('memory', {
+    chronicleEnv: { P5_PREVIEW_READ_ONLY: 'true', SEEKERS_ENABLED: 'true' },
+  });
+  const before = f.calls.length;
+  const response = await f.request(
+    '/control/' + HOME,
+    'POST',
+    { origin: 'https://pilot.example', 'content-type': 'application/json' },
+    Buffer.from(JSON.stringify({ action: 'refresh-authorization', csrf: 'invalid' })),
+  );
+  assert.equal(response.status, 403);
+  assert.equal(f.calls.length, before);
+});
+
+test('manual targets prefer opted Seekers even when a non-Seeker has fewer viewers; public queue does not enroll it', async () => {
+  const third = '1593561134';
+  const keepers = { [HOME]: 'raidrelichq', [OTHER]: 'olsols2', [third]: 'olsols3' };
+  const service = createReceiving({
+    enabled: true,
+    keepers,
+    clientId: 'synthetic',
+    botId: BOT,
+    now: () => 1000,
+    state: {
+      getReceivingView: () => ({
+        seekers: [{ id: OTHER, login: 'olsols2', streamId: '2' }],
+        holder: null,
+      }),
+      getKeeperCandidates: () =>
+        [HOME, OTHER].map((id) => ({ id, login: keepers[id], eligible: true })),
+      getStreamStatus: (id) => ({ streamId: id === HOME ? '1' : '2' }),
+    },
+    store: { getToken: () => ({}), getJob: () => ({ ready: true }) },
+    oauth: { readAccessToken: () => 'synthetic' },
+    transport: async (url) =>
+      new URL(url).pathname.endsWith('/streams')
+        ? {
+            status: 200,
+            data: {
+              data: [
+                { user_id: HOME, id: '1', type: 'live', viewer_count: 1 },
+                { user_id: OTHER, id: '2', type: 'live', viewer_count: 100 },
+              ],
+            },
+          }
+        : {
+            status: 200,
+            data: {
+              data: [HOME, OTHER].map((broadcaster_id) => ({ broadcaster_id })),
+              pagination: {},
+            },
+          },
+  });
+  assert.deepEqual(
+    (await service.candidates(third)).map((row) => row.login),
+    ['olsols2', 'raidrelichq'],
+  );
+  assert.deepEqual(
+    (await service.page()).seekers.map((row) => row.login),
+    ['olsols2'],
+  );
+});
+
+test('async logger rejection is contained without awaiting logging or changing fail-closed eligibility', async () => {
+  const logs = [];
+  let rejectLog;
+  const service = createReceiving({
+    enabled: true,
+    state: { getReceivingView: () => ({ seekers: [] }), getKeeperCandidates: () => [] },
+    oauth: {
+      readAccessToken() {
+        throw Error('private upstream detail');
+      },
+    },
+    store: {},
+    logger: (payload) => {
+      logs.push(JSON.parse(payload));
+      return new Promise((_, reject) => {
+        rejectLog = reject;
+      });
+    },
+  });
+  assert.deepEqual((await service.page()).seekers, []);
+  assert.equal(logs.length, 1);
+  assert.deepEqual(Object.keys(logs[0]).sort(), ['event', 'reason', 'severity', 'stage']);
+  assert.equal(logs[0].severity, 'WARNING');
+  rejectLog(Error('private logger failure'));
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual((await service.page()).seekers, []);
+  assert.equal(logs.length, 1);
+});

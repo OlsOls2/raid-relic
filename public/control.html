@@ -22,6 +22,10 @@
         <p id="light-subscriptions" data-state="unknown">Subscriptions: not yet checked</p>
         <p id="light-live" data-state="unknown">Stream: not yet checked</p>
       </div>
+      <p id="authorization-status" role="status">
+        Authorization is not checked yet. Refresh status never renews tokens; use Check / refresh my
+        Keeper authorization explicitly if needed.
+      </p>
       <p id="keeper-summary" role="status">Read status before taking action.</p>
       <section>
         <h2>Send Off</h2>
@@ -40,7 +44,8 @@
       <p>Private Keeper control. Actions apply only to your authenticated account.</p>
       <p>
         <a id="reconnect" href="/oauth/keeper/1591805230/start">Reconnect this matching Keeper</a> ·
-        Retry with Refresh status below.
+        Refresh status is read-only and never renews authorization. Use the explicit authorization
+        button to try renewal for your account.
       </p>
       <dl id="ledger" hidden></dl>
       <section>

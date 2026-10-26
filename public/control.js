@@ -43,6 +43,7 @@ const labels = {
   'seek-status': 'Read Seeker choice',
   chronicle: 'Write Chronicle for latest received stop',
   bootstrap: 'Bootstrap / reconcile this channel',
+  'refresh-authorization': 'Check / refresh my Keeper authorization',
   keep: 'Opt in / Keep',
   pause: 'Pause',
   resume: 'Resume',
@@ -110,6 +111,11 @@ async function refresh({ preserveResult = false } = {}) {
       !value.pilot
     )
       throw Error('Invalid status');
+    const authorization = value.pilot.authorization;
+    if (authorization !== undefined && !['not-checked'].includes(authorization))
+      throw Error('Invalid authorization status');
+    document.getElementById('authorization-status').textContent =
+      'Fresh Keeper authorization is not checked by status. If targets are missing, use Check / refresh my Keeper authorization; reconnect this matching Keeper if it fails. Refresh status never renews tokens.';
     csrf = value.csrf;
     document.getElementById('simulator').hidden = value.pilot.mode !== 'simulator';
     simulated = value.pilot.mode === 'simulator';
