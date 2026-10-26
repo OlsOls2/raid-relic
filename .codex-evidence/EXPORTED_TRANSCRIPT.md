@@ -2,7 +2,7 @@
 
 Session: 01a1705c-a87d-7143-80f6-021e47b78ced
 
-Snapshot cutoff: 2026-10-26T20:51:43.900Z (last timestamped record; not a claim that future/active conversation is included).
+Snapshot cutoff: 2026-10-26T21:00:30.508Z (last timestamped record; not a claim that future/active conversation is included).
 
 This is a readable selected native-JSONL export, NOT a complete raw transcript. User/assistant messages and tool calls/results are retained; duplicate native event records are labelled. Private system/developer/bootstrap instructions, reasoning/analysis, opaque encrypted fields, media/base64 and other internal metadata are omitted. Each item is capped at 32768 characters with an explicit omission count and sanitized-item digest. No raw-backup links or private credentials are published. Credential-looking literals, headers or sensitive fields cause whole-item content omission, with source line and reason retained; counts are in the manifest. Strong key patterns remain fatal across all selected visible fields, even in otherwise omitted items. Existing synthetic fixture literals are explicitly classified, not proof of real authentication.
 
@@ -65254,6 +65254,116 @@ This is a readable selected native-JSONL export, NOT a complete raw transcript. 
   {
     "type": "output_text",
     "text": "193 docs closeout ready. Changed only:\n\n- `README.md`\n- `docs/VISUAL_RECORDING.md`\n- `AGENTS.md`\n\nRecorded the published growth-safe URLs, runtime6831e25, parent-reported passing QA/soak, exact safety gates and unchanged production boundary. Historical failures remain labelled; cron still requires explicit GO.\n\n`git diff --check` passed. No runtime, test, generated metadata or operations changes; no rebuild needed.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4145. 2026-10-26T21:00:00.201Z — user (source line 15618)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "[bootstrap/instruction block omitted]"
+  }
+]
+````
+
+### 4146. 2026-10-26T21:00:00.209Z — user (source line 15621)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "194 DOCSONLYTRAFFICSNAPSHOTCLARIFICATION sameORIGINAL01a1705c-a87d-7143-80f6-021e47b78cedONLY/nootherwriter/Git/cloud/provider/credentials/rawselectedevidence/delegation/J5J6/cron/operations.193docsHEAD97b14b2d4a89e7806f1af0a399852d623a4f4d1ePUSHEDexactCI40399785984SUCCESS; RuntimeSTILL6831e25/tagsgrowth-safe0/shapeall81237/116/9900387soakPASS.Source193 closed20:51:43.9004144entries194CLIlogs/5omissions0rescan.TinyPROSEcorrectionnotnewfeature/runtime/testNo rebuild/revision/tag/promotion/rollback.\nImportantMUTABLEFACTchangedBYSEPARATEOPERATIONafterourstaging. Ouronlydeployment20:44–20:46createdraid-relic-growth-1026 growth-safe0readOnly exactlyasdocs193, PRESERVEDnetwork3-off49e100/all7priortagsat20:46:55 VERIFIED. During193doccloseout(unrelatedGCPoperationcreatednewraid-relic-growth-on-1026at20:52:44.519547Z), freshParent20:56serviceGETshowsgrowth-on100/tagsgrowth-on plusgrowth-safeSTILL0PINNEDgrowth-1026. ItusesSAMEimage/release6831e25, P5false/P7BOTtrue/SeekersTRUE/WanderFALSE/clipsandpaidFALSE. ParentdidNOTcreate/promotegrowth-on(no configwritesafter20:46pin); onlyGET/assetverify/docs/Git/CI. Cannotattributeprincipal/authorizationorassumeGO: approvalforseparateoperationnotinthisrun(no sessionmatchoutsidecurrentcomment). DoNOTreadprivateaudit/auth/memory/logs/sourcecloud. DoNOTrollitback/pretendweapprovedpromotion/changeanyflag/reenableWander. Genericuserstale19:10keepgoingnudgeNOTactivationauthority. Currentreadonlygrowth-safehealthy200/git683 all52+6bytehash/4negative403verified20:48; docsCI812stable.CurrentonlyremainingworkfactualREADMEpublicationhandoffnotnewcode.\nIssueREADME193lastparagraphsays'Canonicalproductionremainsnetwork3-off100' WITHOUTSNAPSHOTTIME thereforecurrentlyfalse. VISUAL_RECORDING says20:36/20:46snapshotbutcanclarifyafterseparatepromotion, andAGENTS193historicalcurrent49e notegetsCURRENT194snapshotqualifier. FixONLYREADME/docsVISUAL_RECORDING/AGENTS smallparagraphs(~1min). WordingSTABLETIMELINE: 'Atthisrun20:46stagingcheckproductionwasnetwork3-off49e100andunchangedbythisrelease. Aseparateoperationlatercreatedgrowth-on20:52:44andfresh20:56readobservedgrowth-on100/runtime683. Thisrunonlypublished0read-onlygrowth-safe; no promotion/rollback/liveactivationwasperformedbythisrun. Separateoperationapprovalnotestablishedhere; don'tinferWanderGO. Liveallocationisoperator-controlled/mutable; thesearenamedobservationtimesnotpermanentlive-stateclaims. Read-onlyreviewtagisstillgrowth-safe0/WanderP7SeekersclippaidOFF, ownedWandercroncommenteduntilEXPLICITGO.' Needno detailedhashRepeatiftooVerbosecopyshortREADME+precisehandoff.TheuserexplicitkeepCurrentmeansPRESERVEnewOwner-controlledcurrentdon'trollold49eback. DoNOTclaimwhoauthorisedunobservedproductionchange/don'tlabelmalicious/unapproved.ItisOBSERVEDSEPARATEactionnotours.No query otherSessions/credentials/audittools. No code/qualityCurrentgeneratedevidence edits. NativeSourceproof812/37/116900387allstillvalidunchangedno claimnewphysicalOBS/livechatverification. Runtime683/readOnly0URLunchangedonebuildonly. Parentlateststricttrafficguardexpectedold49e100correctlystoppedwhenexternalchanged; no retriesPUT/oldbaselineSource. DoNOT'fix'test/guardtoleratefutureunapprovedtrafficmods.\nCurrentSourceNoMorefunctionalWork/noblindretestP9replies/badgesdoneNative, no autoplay/worker.Goalreadonlysafe0+docscomplete. Parentfinalcantruthfullysayprodadvancedseparately—notclaimunchangedglobally/notaskunattendedapproval. Ownerconfirmseparatepromotionifneedednotagentgo. No newflagvaluesonpreviewchange/no CIpseudo evidence. NewdoccommitC-RUN194sourceOriginalParentonlyGit/sanitizedexport/allrefscan/CI(noimage). STOPafterminimalexactprose/diffcheck; no localbrowser/subagents/newscript. Futuretimestampsavoidforeverclaims.MutableproductionURLshouldnotbeadvertisedReadonly; safeURLonly.\n"
+  }
+]
+````
+
+### 4147. 2026-10-26T21:00:04.498Z — assistant (source line 15624)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll make the production statements time-stamped snapshots and distinguish the separately observed promotion from this run’s zero-traffic preview release. I’ll change only the three authorized Markdown files.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4148. 2026-10-26T21:00:05.059Z — tool call (source line 15625)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_91bb99fcf41a48aeb006b286071d2c77",
+  "input": "text((await tools.exec_command({cmd:\"tail -5 README.md; head -22 docs/VISUAL_RECORDING.md; head -2 AGENTS.md\",\"max_output_tokens\":1800})).output)\n"
+}
+````
+
+### 4149. 2026-10-26T21:00:05.230Z — tool result (source line 15628)
+
+````text
+{
+  "call_id": "call_91bb99fcf41a48aeb006b286071d2c77",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "The published **[safe recording preview](https://growth-safe---raid-relic-vz4bhnskgq-uc.a.run.app/demo/)** includes the [simulated Wander film scene](https://growth-safe---raid-relic-vz4bhnskgq-uc.a.run.app/demo/wander), 9/17/42/120 style examples and the [Atlas](https://growth-safe---raid-relic-vz4bhnskgq-uc.a.run.app/atlas/). Revision `raid-relic-growth-1026` is pinned at zero traffic to runtime `6831e25d6643d71253ca1d40df3b63687af174ec`. It is read-only: Wander, all five P7 action gates, Seekers, clipping and paid features are OFF. The examples do not change production history or policy.\n\nThe operator reports **812/812 tests, zero skips; 37 serial browser flows/116 checks; nine viewed simulated captures; and a passing real 900387ms soak with 25 natural tours**. See the [quality record](docs/QUALITY.md), [successful CI run](https://github.com/OlsOls2/raid-relic/actions/runs/40397749816) and [recording/safety handoff](docs/VISUAL_RECORDING.md). These are operator-reported native results, not physical Twitch/OBS signoff. A later docs-only HEAD does not change that deployed runtime or require a rebuild.\n\nCanonical production remains the owner-promoted `raid-relic-network3-off-1026` at 100%, runtime `49e515c5240b3b902a0eeebf314a7625ed0c9bf8`; its P7 gates remain ON and Wander remains OFF. No promotion was made by this recording release. Wander scheduling stays commented out pending explicit Olly/Grok GO.\n# Safe visual recording — published runtime 6831e25\n\n## Current operator-reported delivery — 26 October 2026\n\nThe parent reports the published, pinned zero-traffic revision **`raid-relic-growth-1026`**, tag **`growth-safe`**, runtime **`6831e25d6643d71253ca1d40df3b63687af174ec`**:\n\n- [Film a simulated Wander](https://growth-safe---raid-relic-vz4bhnskgq-uc.a.run.app/demo/wander)\n- [Binding tour and growth-style examples](https://growth-safe---raid-relic-vz4bhnskgq-uc.a.run.app/demo/)\n- [Read-only Atlas](https://growth-safe---raid-relic-vz4bhnskgq-uc.a.run.app/atlas/)\n\nNative Node 22.23.4 passed **812/812 tests with zero skips**, all **37 serial browser flows/116 checks** passed, and the parent actually viewed all nine current simulated captures across four capture groups. The new real **900387ms** soak passed: 25 completed natural 35-second tours, two warm-up tours and 27 samples; active context losses zero and event records empty. Retained heap grew 280012 bytes, with 12654.88 bytes/min trend. DOM 442→450 stayed within the unchanged eight-node guard; listeners 57, documents two, page/context one and sockets zero. All measured application I/O, provider/external calls and browser errors were zero, with no crash/disconnect. Reported GPU CPU was 121.87s and renderer CPU 112.21s; this passing result does not establish that aggregate GPU CPU above 120s implies a limit kill. No caps, cadence, raster, memory or duration guards were waived. No causal shader speedup or percentage gain is claimed from noisy short profiles.\n\nThe parent verified health/source identity, 52 immutable served-asset pairs plus six explicit growth/Wander paths against runtime 6831e25, and the generated three-Keeper module against revision configuration. Wander CSP is `connect-src 'none'`. Unsigned Wander tick, control POST, EventSub POST and third-Keeper OAuth start were all denied 403 before writes. [CI 40397749816 succeeded](https://github.com/OlsOls2/raid-relic/actions/runs/40397749816). See the report-derived [quality record](QUALITY.md); this authored handoff does not replace generated report digests.\n\nCanonical production is separately owner-promoted **`raid-relic-network3-off-1026` at 100%**, runtime **`49e515c5240b3b902a0eeebf314a7625ed0c9bf8`**, according to the parent's fresh 20:36/20:46 checks. Its three-Keeper mapping is already live, P7 action gates remain ON, Seekers is ON and Wander remains OFF. This new preview did not move production traffic or alter prior review tags. Docs-only commits may advance HEAD without changing deployed runtime 6831e25, served artifact identity or requiring another build.\n\nAll results above are parent/operator-reported, not source-author live validation or physical Twitch/OBS proof. Owner physical review and separate approval remain necessary before promotion or automation. No chat, raid, consent, grant, bootstrap or broadcast was performed by this source author.\n\n## Effective published-preview safety\n\nThe operator reported the owned Wander cron entry **commented out on 26 October 2026\nat 16:36:54.531 UTC**, pending explicit Olly/Grok GO. Every unrelated J5/J6 cron line\n> CURRENT193 DOCS-ONLY CLOSEOUT: parent reports runtime 6831e25d6643d71253ca1d40df3b63687af174ec published as raid-relic-growth-1026/growth-safe at zero traffic, read-only with Wander/Seekers/P7 five/clip/paid OFF. Parent native 812/812 zero skips, 37 serial flows / 116 checks, nine viewed SIM captures and real 900387ms / 25-tour soak PASS; no source-author physical Twitch/OBS proof. Canonical remains owner-promoted network3-off / 49e at 100%, P7 ON and Wander OFF; three-Keeper mapping already canonical, third consent/mod/bootstrap/Keep/Seeking/OBS unobserved. Owned Wander cron remains COMMENTED pending explicit Olly/Grok GO. Only README/VISUAL_RECORDING/this note change; no rebuild/republish, runtime/test/config/generated-quality/evidence/operations edits. Parent alone evidence/Git/CI/cloud; original-session sole author, no delegation/provider/credentials/raw or selected transcript/J5/J6/cron changes. Earlier CURRENT notes below are historical where superseded.\n\n"
+    }
+  ]
+}
+````
+
+### 4150. 2026-10-26T21:00:25.989Z — tool call (source line 15630)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_13810cc706ed487da58db692a04b5c1a",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='README.md';s=open(p).read();old=s[s.index('Canonical production remains the owner-promoted'):];new='''At this run’s 26 October 2026, 20:46 UTC staging check, production was `raid-relic-network3-off-1026` / runtime `49e515c` at 100%, unchanged by this release. A separate operation created `raid-relic-growth-on-1026` at 20:52:44 UTC; the parent’s 20:56 read observed it at 100%, using runtime `6831e25`. This run published only the read-only `growth-safe` zero-traffic preview and performed no promotion, rollback or live activation. Production allocation is operator-controlled and mutable; these are timed observations. Approval for the separate operation is not established here and does not imply Wander GO. The safe preview remains read-only with its listed gates OFF; Wander scheduling remains commented out pending explicit Olly/Grok GO.\\n''';s=s.replace(old,new);open(p,'w').write(s)\\np='docs/VISUAL_RECORDING.md';s=open(p).read();a=s.index('Canonical production is separately owner-promoted');b=s.index('\\\\n\\\\nAll results above',a);s=s[:a]+'''At this run’s **26 October 2026, 20:46 UTC** staging check (verified at 20:46:55), production was **`raid-relic-network3-off-1026` / runtime `49e515c5240b3b902a0eeebf314a7625ed0c9bf8` at 100%**, with the three-Keeper mapping, P7 and Seekers ON, and Wander OFF. This run’s deployment preserved that allocation and all seven prior tags.\\n\\nA **separate operation** created `raid-relic-growth-on-1026` at **20:52:44.519547 UTC**. The parent’s **20:56 UTC read** observed `growth-on` at 100%, using the same image and runtime `6831e25`; its read-only flag was false, bot actions and Seekers were true, and Wander, clipping and paid features were false. This run did not create or promote that revision and performed no promotion, rollback or live activation. The separate operation’s principal and approval are not established here; no Wander GO may be inferred. Production allocation is operator-controlled and mutable, so these statements are named observation times, not permanent traffic claims.\\n\\nThe separately pinned **`growth-safe` tag remained at zero traffic on `raid-relic-growth-1026`**, read-only with all flags listed below unchanged. Its 20:48 health, asset and negative-mutation checks remain the recording-preview evidence. Docs-only commits may advance HEAD without changing runtime 6831e25 or requiring another image, revision or tag. Owned Wander scheduling remains commented out until explicit Olly/Grok GO.''' +s[b:];s=s.replace('Owner physical review and separate approval remain necessary before promotion or automation.', 'Owner physical review and explicit approval remain necessary for any future promotion or automation by this run.');open(p,'w').write(s)\\np='AGENTS.md';s=open(p).read();s='''> CURRENT194 DOCS-ONLY TRAFFIC SNAPSHOTS: parent reports this run preserved network3-off / 49e at 100% at 20:46 UTC on 26 October 2026 and published only growth-safe at zero traffic, pinned to growth-1026 / runtime6831e25. A separate operation created growth-on at 20:52:44 UTC; the parent's 20:56 read observed growth-on / runtime6831e25 at 100%, read-only false, bot actions/Seekers true, Wander/clip/paid false. Its principal/approval are not established here; do not infer GO, attribute promotion to this run, roll back traffic or change guards. Production allocation is mutable; CURRENT193's 49e statement is a staging snapshot, not current permanent allocation. Safe growth-safe stays read-only with P7 five/Seekers/Wander/clip/paid OFF; owned Wander cron remains COMMENTED pending explicit Olly/Grok GO. Only README/VISUAL_RECORDING/this note change; no runtime, tests, generated evidence/quality, operations, rebuild or new tag. Parent alone Git/CI/evidence; original-session sole author, no delegation/provider/credentials/raw or selected transcript/J5/J6/cron changes.\\n\\n'''+s;s=s.replace('Canonical remains owner-promoted network3-off / 49e at 100%, P7 ON and Wander OFF;', 'At the 20:46 UTC staging snapshot, canonical was owner-promoted network3-off / 49e at 100%, P7 ON and Wander OFF;');s=s.replace('runtime6831e25','runtime 6831e25');open(p,'w').write(s)\\nPY\\ngit diff --check\\ngit diff --name-only\",\"max_output_tokens\":200}))\n"
+}
+````
+
+### 4151. 2026-10-26T21:00:26.102Z — tool result (source line 15633)
+
+````text
+{
+  "call_id": "call_13810cc706ed487da58db692a04b5c1a",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "09819e",
+        "wall_time_seconds": 0.00000472,
+        "exit_code": 0,
+        "original_token_count": 12,
+        "output": "AGENTS.md\nREADME.md\ndocs/VISUAL_RECORDING.md\n"
+      }
+    }
+  ]
+}
+````
+
+### 4152. 2026-10-26T21:00:30.475Z — assistant (source line 15636)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "194 ready. Updated only README, VISUAL_RECORDING and AGENTS with timed production observations and the separate later promotion. The read-only `growth-safe` preview and explicit Wander-GO requirement remain clear.\n\nDiff check passed. No runtime, tests, generated metadata, operations or deployment changes.",
     "annotations": [],
     "logprobs": []
   }
