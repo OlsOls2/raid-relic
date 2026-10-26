@@ -1,3 +1,4 @@
+import {ringCardModel,ringCardPNG,saveRingCard} from './ring-card.js';
 import { presentEdition } from './edition-view.js';
 import { freshDemo,demoStep,DEMO_TOUR_MS,demoProgress,demoControls } from './demo-state.js';
 import { cinematicPhase } from './cinematic.js';
@@ -20,3 +21,5 @@ $('demo-send').onclick=()=>{step({type:'send',source:$('demo-source').value,targ
 function reset(){epoch++;pending?.abort();pending=null;view?.dispose();view=null;stop();state=freshDemo();$('demo-proof').open=false;render();}
 $('demo-reset').onclick=reset;function startTour(){reset();step({type:'send',source:'demo_keeper_a',target:'demo_keeper_b'});tour=true;play();}
 $('demo-pause').onclick=()=>state.phase==='settled'?startTour():playing?stop(true):play();$('demo-tour').onclick=startTour;document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});addEventListener('pagehide',()=>{reset();});motion.addEventListener('change',()=>{if(motion.matches){view?.dispose();view=null;}render();});render();
+
+$('demo-download').onclick=async()=>{const button=$('demo-download');if(button.disabled)return;button.disabled=true;const own=epoch,rings=state.rings,target=$('demo-target').value;try{const model=ringCardModel({stopId:null,keeper:'@'+target,ringIndex:rings,claimedAt:Date.now()},{mode:'demo'});const blob=await ringCardPNG(model);if(own!==epoch||state.rings!==rings||$('demo-target').value!==target)return;saveRingCard(blob,true);$('demo-card-status').textContent='Simulated card downloaded; saved files cannot be recalled.';}catch{$('demo-card-status').textContent='Simulated card export unavailable.';}finally{button.disabled=false;}};

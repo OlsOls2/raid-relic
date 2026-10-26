@@ -1,3 +1,4 @@
+import {streakView} from './streaks.js';
 import { enqueueP7, p7Mutation, cancelP7 } from './p7.js';
 import { journeyMap } from './journey-map.js';
 import { reduceScores, retainedScores, scoreboard, scoreMessage, isScoreCommand, isReplyCommand, scoreAckDocument, scoreAckMutation } from './scoreboard.js';
@@ -14,7 +15,7 @@ import { reduceClaims, publicJourney } from './claims.js';
 import { sendState } from './send-state.js';
 import { lifecycleConfig, reduceLifecycle } from './lifecycle.js';
 import { hash } from './crypto.js';
-import { setMarkContext, reduceMark, publicMarks, publicOverlayState, privateMarks, isModerator, isChatIdentity } from './marks.js';
+import { setMarkContext, reduceMark, publicMarks, publicOverlayState, privateMarks, isModerator, isChatIdentity, markPrivacyChange, trustedReviewPolicy } from './marks.js';
 
 export function ritualFor(id, now, raid) {
   return { eventId: id, incomingBroadcasterId: raid.from_broadcaster_user_id,
@@ -63,8 +64,9 @@ export function createMemoryAuthStore() {
   };
 }
 
-export function createFirestoreStore(db, { lifecycle, p7Enabled = false } = {}) {
+export function createFirestoreStore(db, { lifecycle, p7Enabled = false, reviewPolicy } = {}) {
   const config = lifecycleConfig(lifecycle);
+  reviewPolicy=trustedReviewPolicy(reviewPolicy);
   p7Enabled=Boolean(p7Enabled&&config);
   const ref = (collection, key) => db.collection(collection).doc(hash(key));
   return {
@@ -109,7 +111,7 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false } = {}) 
         }
         const ackMap={};if(managed)for(const target of config.channels)ackMap[target]=(await tx.get(ref('claimAcks',target))).data();
         const ackRef=managed&&host?ref('claimAcks',host):null, ackDoc=ackMap[host];
-        const p7Cancel={};if(p7Enabled&&managed&&(['forgetme','pause','opt-out','block','veto'].includes(chat?.markAction?.type)||event?.type==='ban'))for(const id of config.channels)p7Cancel[id]=(await tx.get(ref('p7Actions',id))).data();
+        const p7Cancel={};if(p7Enabled&&managed&&(['forgetme','pause','opt-out','block','veto-last'].includes(chat?.markAction?.type)||event?.type==='ban'))for(const id of config.channels)p7Cancel[id]=(await tx.get(ref('p7Actions',id))).data();
         const scoreAckRef = managed && isReplyCommand(chat) ? ref('scoreAcks', host) : null;
         const scoreAckPrevious = scoreAckRef ? (await tx.get(scoreAckRef)).data() : null;
         const channel = channelMap[host];
@@ -121,8 +123,9 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false } = {}) 
         const markDoc = managed ? markMap[host] : markRef ? (await tx.get(markRef)).data() : null;
         const receiptRef = chat?.markAction?.type === 'forgetme' ? ref('chatReceipts', chat.broadcasterId) : null;
         const receipt = receiptRef ? (await tx.get(receiptRef)).data() : null;
-        const transition = managed && host ? reduceLifecycle({ registry, channel, marks: markDoc, host, event, chat, now, sentAt, observed: Boolean(observation) }) : null;
-        const next = transition ? transition.marks : markRef ? reduceMark(markDoc, chat.broadcasterId, chat, chat.markAction, now) : null;
+        const transition = managed && host ? reduceLifecycle({ reviewPolicy, registry, channel, marks: markDoc, host, event, chat:proofSeen?null:chat, now, sentAt, observed: Boolean(observation) }) : null;
+        const next = transition ? transition.marks : markRef&&!proofSeen ? reduceMark(markDoc, chat.broadcasterId, chat, chat.markAction, now, reviewPolicy) : null;
+        const privacyChanged=event?.type==='ban'||(!proofSeen&&markPrivacyChange(markDoc,next,chat,host,chat?.markAction));
         let claiming; let sending;
         if (managed) {
           if (transition) { channelMap[host] = transition.channel; markMap[host] = transition.marks; }
@@ -133,12 +136,12 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false } = {}) 
           const op = raid ? { type: 'raid', raid, id, sentAt } : chat?.markAction?.type === 'send'
             ? { type: 'reserve', source: host, actor: chat.chatterId, login: chat.markAction.login, id, sentAt } : { type: 'noop' };
           sending = sendState(transition?.registry ?? registry, channelMap, markMap, config, op, now);
-          claiming = reduceClaims(sending.registry, channelMap, markMap, lineage, (proofSeen || ackSeen(ackDoc, chat, now)) ? null : chat, now, sentAt, presenceNext);
+          claiming = reduceClaims(sending.registry, channelMap, markMap, lineage, (proofSeen || ackSeen(ackDoc, chat, now)) ? null : chat, now, sentAt, presenceNext, config?.streakEnabled);
         }
         if (claiming && chat?.markAction?.type === 'mymarks') claiming.marks[host] = reserveShare(claiming.marks[host], claiming.lineage, chat, share, now);
         let commandReply;
         if (claiming) {
-          const scoreNext = reduceScores(scores, { channels: channelMap, marks: claiming.marks, chat, now, vote: claiming.scoreVote, completion: claiming.completedScore, hop: claiming.registry.pendingHop, acknowledged:Boolean(proofSeen||claiming.acknowledgement||claiming.completedScore||(chat?.markAction?.type==='mymarks'&&share&&claiming.marks[host]?.shares?.some(row=>row.nonce===share.nonce&&row.status==='queued'))) });
+          const scoreNext = reduceScores(scores, { channels: channelMap, marks: claiming.marks, chat, now, autoApprove:reviewPolicy.autoApprove, vote: claiming.scoreVote, completion: claiming.completedScore, hop: claiming.registry.pendingHop, acknowledged:Boolean(proofSeen||claiming.acknowledgement||claiming.completedScore||(chat?.markAction?.type==='mymarks'&&share&&claiming.marks[host]?.shares?.some(row=>row.nonce===share.nonce&&row.status==='queued'))) });
           if(isReplyCommand(chat))commandReply={kind:chat.markAction.type,reason:scoreNext.reason};
           if (['top','badges'].includes(scoreNext.message)) scoreNext.message = scoreMessage(scoreNext.message, scoreboard(claiming.lineage, claiming.registry, scoreNext.doc, config, now), host);
           if (scoreAckRef) tx.set(scoreAckRef, scoreAckDocument(scoreAckPrevious, chat, scoreNext.message, transition?.channel, claiming.marks[host], now));
@@ -146,10 +149,10 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false } = {}) 
         }
         if (proofRef && !proofSeen) tx.set(proofRef, { expiresAt: now + 600000 });
         const ackUpdates=new Map();if(claiming&&ackRef)ackUpdates.set(host,ackDocument(ackDoc,isScoreCommand(chat)?null:chat,claiming.acknowledgement,transition?.channel,claiming.marks[host],now,claiming.ackDeadline,claiming.acknowledgementKind));
-        if(managed && (['forgetme','pause','opt-out','block'].includes(chat?.markAction?.type)||event?.type==='ban'))for(const target of config.channels){const c=channelMap[target],m=claiming.marks[target],d=ackMap[target];ackUpdates.set(target,cancelCompletionNotices(ackDocument(ackUpdates.get(target)??d,chat,null,c,m,now)));}
+        if(managed && privacyChanged)for(const target of config.channels){const c=channelMap[target],m=claiming.marks[target],d=ackMap[target];ackUpdates.set(target,cancelCompletionNotices(ackDocument(ackUpdates.get(target)??d,chat,null,c,m,now)));}
         const completionAcks=[];let completionSkipped=0;
         if(claiming?.completedScore){const h=claiming.registry.pendingHop;for(const target of[h.from,h.to]){const value=completionAck(ackUpdates.get(target)??ackMap[target],target,h.eventId,h.endsAt,now,h,channelMap);ackUpdates.set(target,value.doc);if(value.key)completionAcks.push({host:target,key:value.key});else completionSkipped++;}}
-        for(const[target,doc]of Object.entries(p7Cancel))if(doc)tx.set(ref('p7Actions',target),cancelP7(doc));
+        if(privacyChanged)for(const[target,doc]of Object.entries(p7Cancel))if(doc)tx.set(ref('p7Actions',target),cancelP7(doc));
         for(const[target,doc]of ackUpdates)tx.set(ref('claimAcks',target),doc);
         if (managed) for (const [key, doc] of Object.entries(presenceNext)) tx.set(ref('presence', key), doc);
         tx.set(eventRef, {expiresAt,...(completionAcks.length?{completionAcks}:{})});
@@ -214,21 +217,21 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false } = {}) 
           for (const key of config.channels) { channelMap[key] = (await tx.get(ref('streamChannels', key))).data(); markMap[key] = (await tx.get(ref('markChannels', key))).data(); presenceMap[key] = (await tx.get(ref('presence', key))).data(); }
           const ackRef = ref('claimAcks', host), ackDoc = (await tx.get(ackRef)).data();
         const otherAcks={};for(const target of config.channels)if(target!==host)otherAcks[target]=(await tx.get(ref('claimAcks',target))).data();
-        const p7Cancel={};if(p7Enabled&&['forgetme','pause','opt-out','block','veto'].includes(action.type))for(const id of config.channels)p7Cancel[id]=(await tx.get(ref('p7Actions',id))).data();
+        const p7Cancel={};if(p7Enabled&&['forgetme','pause','opt-out','block','veto-last'].includes(action.type))for(const id of config.channels)p7Cancel[id]=(await tx.get(ref('p7Actions',id))).data();
         const scoreRef = ref('scoreboard','single'), scores = (await tx.get(scoreRef)).data();
-        for(const[id,doc]of Object.entries(p7Cancel))if(doc)tx.set(ref('p7Actions',id),cancelP7(doc));
-
-          const transition = reduceLifecycle({ registry, channel, marks: previous, host, chat: { ...actor, markAction: action }, now, sentAt: now });
+          const transition = reduceLifecycle({ reviewPolicy, registry, channel, marks: previous, host, chat: { ...actor, markAction: action }, now, sentAt: now });
+          const privacyChanged=markPrivacyChange(previous,transition.marks,actor,host,action);
+          if(privacyChanged)for(const[id,doc]of Object.entries(p7Cancel))if(doc)tx.set(ref('p7Actions',id),cancelP7(doc));
           channelMap[host] = transition.channel; markMap[host] = transition.marks;
           for (const key of config.channels) { presenceMap[key] = updatePresence(presenceMap[key], key, channelMap[key], markMap[key], null, now, now); if (action.type === 'forgetme') presenceMap[key] = revokePresenceActor(presenceMap[key], key, actor.chatterId, now); }
-          const checked = reduceClaims(transition.registry, channelMap, markMap, history, null, now, now, presenceMap);
+          const checked = reduceClaims(transition.registry, channelMap, markMap, history, null, now, now, presenceMap, config?.streakEnabled);
           if (scores) tx.set(scoreRef, reduceScores(scores, { channels: channelMap, marks: checked.marks, chat: { ...actor, markAction: action }, now }).doc);
         for (const [key, doc] of Object.entries(presenceMap)) tx.set(ref('presence', key), doc);
-        if(['forgetme','pause','opt-out','block'].includes(action.type))for(const[target,doc]of Object.entries(otherAcks))tx.set(ref('claimAcks',target),cancelCompletionNotices(doc));
-        tx.set(ackRef, ackDocument(['forgetme','pause','opt-out','block'].includes(action.type)?cancelCompletionNotices(ackDoc):ackDoc, { ...actor, markAction: action }, null, transition.channel, transition.marks, now));
+        if(privacyChanged)for(const[target,doc]of Object.entries(otherAcks))tx.set(ref('claimAcks',target),cancelCompletionNotices(doc));
+        tx.set(ackRef, ackDocument(privacyChanged?cancelCompletionNotices(ackDoc):ackDoc, { ...actor, markAction: action }, null, transition.channel, transition.marks, now));
           tx.set(ref('lineage', 'single'), checked.lineage);
           tx.set(ref('keeperRegistry', 'single'), checked.registry); tx.set(ref('streamChannels', host), transition.channel); next = transition.marks;
-        } else next = reduceMark(previous, host, actor, action, now);
+        } else next = reduceMark(previous, host, actor, action, now, reviewPolicy);
         tx.set(doc, next);
         if (receipt && receipt.chatterId === actor?.chatterId) tx.delete(receiptRef);
       });
@@ -277,10 +280,10 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false } = {}) 
         const scoreRef = ref('scoreboard','single'), scores = (await tx.get(scoreRef)).data();
         for(const[id,doc]of Object.entries(p7Cancel))if(doc)tx.set(ref('p7Actions',id),cancelP7(doc));
 
-        const next = reduceLifecycle({ registry, channel, marks, host, policy, now, sentAt: now });
+        const next = reduceLifecycle({ reviewPolicy, registry, channel, marks, host, policy, now, sentAt: now });
         channelMap[host] = next.channel; markMap[host] = next.marks;
         for (const key of config.channels) presenceMap[key] = updatePresence(presenceMap[key], key, channelMap[key], markMap[key], null, now, now);
-        const checked = reduceClaims(next.registry, channelMap, markMap, history, null, now, now, presenceMap);
+        const checked = reduceClaims(next.registry, channelMap, markMap, history, null, now, now, presenceMap, config?.streakEnabled);
         if (scores) tx.set(scoreRef, reduceScores(scores, { channels: channelMap, marks: checked.marks, now }).doc);
         for (const [key, doc] of Object.entries(presenceMap)) tx.set(ref('presence', key), doc);
         for(const[target,doc]of Object.entries(otherAcks))tx.set(ref('claimAcks',target),cancelCompletionNotices(doc));
@@ -309,7 +312,7 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false } = {}) 
         const registry = (await tx.get(ref('keeperRegistry', 'single'))).data();
         const lineage = (await tx.get(ref('lineage', 'single'))).data();
         const channel = (await tx.get(ref('streamChannels', host))).data();
-        return { rings: lineage?.stops?.length ?? 0, ...(movedToView(registry, lineage, host, channel) ? { movedToLogin: movedToView(registry, lineage, host, channel) } : {}), handoff: handoffView(registry, host, now, lineage), claimMeter: claimMeterView(registry, host, now), ...(echoView(registry, host, now) ? { resonance: echoView(registry, host, now) } : {}) };
+        return { rings: lineage?.stops?.length ?? 0, ...(config?.streakEnabled?{streak:streakView(registry,now)}:{}), ...(movedToView(registry, lineage, host, channel) ? { movedToLogin: movedToView(registry, lineage, host, channel) } : {}), handoff: handoffView(registry, host, now, lineage), claimMeter: claimMeterView(registry, host, now), ...(echoView(registry, host, now) ? { resonance: echoView(registry, host, now) } : {}) };
       });
     },
     async getPublicJourney() { return publicJourney((await ref('lineage', 'single').get()).data()); },

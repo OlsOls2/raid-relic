@@ -1,3 +1,4 @@
+import {streakText} from './streak-view.js';
 import { presentEdition } from './edition-view.js';
 import { createCinemaTracker, wordBatch, runePose, ambientSigils, decorativePoints, validSourceLogin } from './cinematic.js';
 import { createRelic3D, ringSummary } from './relic3d.js';
@@ -54,6 +55,7 @@ function render(snapshot) {
   ringPips.replaceChildren(); for (let i=0;i<Math.min(16,snapshot?.lineageRings??0);i++) { const pip=document.createElement('span'); pip.setAttribute('aria-hidden','true'); ringPips.append(pip); }
   document.querySelector('#rings').replaceChildren();
   document.querySelector('#lineage').textContent = snapshot ? snapshot.mode === 'simulator' ? ringSummary(snapshot.lineageRings).text : `Ring ${snapshot.lineageRings}` : 'The relic rests…';
+  if(snapshot?.streak){const line=document.querySelector('#lineage');line.title=streakText(snapshot.streak);line.dataset.streak=snapshot.streak.known?String(snapshot.streak.current):'unknown';line.textContent+=snapshot.streak.known?` · Streak ${snapshot.streak.current}`:' · Streak ?';}else{document.querySelector('#lineage').removeAttribute('data-streak');document.querySelector('#lineage').removeAttribute('title');}
   for (let i = 0; i < Math.min(16, snapshot?.lineageRings ?? 0); i++) { const ring = document.createElement('span'); ring.style.inset = `${4 + i * 1.8}%`; document.querySelector('#rings').append(ring); }
   runes.replaceChildren();
   document.querySelector('#charge').style.width = '0%';
@@ -64,6 +66,7 @@ function render(snapshot) {
   state.textContent = snapshot.claimMeter?.awaitingRaid ? 'The relic stirs… waiting for Twitch to confirm the raid' : messages[snapshot.status];
   document.querySelector('#compact-status').textContent = snapshot.movedToLogin ? `Moved to @${snapshot.movedToLogin}` : { incoming: 'Incoming · claim pending', ready: 'Relic connected', paused: 'Marks paused', waiting: 'Waiting for Keeper', unavailable: 'State unavailable' }[snapshot.status];
   document.querySelector('#compact-count').textContent = simulated ? `Charge ${snapshot.approvedCount}/160 · Rings ${snapshot.lineageRings}` : `Ring ${snapshot.lineageRings} · ${snapshot.approvedCount} runes`;
+  if(snapshot.streak){const compact=document.querySelector('#compact-count');compact.textContent=`Ring ${snapshot.lineageRings} · S${snapshot.streak.known?snapshot.streak.current:'?'} · ${snapshot.approvedCount} runes`;compact.title=streakText(snapshot.streak);compact.setAttribute('aria-label',(snapshot.streak.known?`${snapshot.streak.current} consecutive verified hand-offs in tracked coverage. `:'')+streakText(snapshot.streak)+`. Ring ${snapshot.lineageRings}; ${snapshot.approvedCount} approved runes.`);}else{document.querySelector('#compact-count').removeAttribute('title');document.querySelector('#compact-count').removeAttribute('aria-label');}
   if (!simulated) document.querySelector('#waiting-note').textContent = snapshot.movedToLogin ? `The relic has moved on to @${snapshot.movedToLogin}` : 'The relic stirs… a confirmed raid will light the way here.';
   count.textContent = simulated ? `${snapshot.approvedCount} approved marks · charge ${snapshot.approvedCount}/160` : `${snapshot.approvedCount} approved runes`;
   document.querySelector('#charge').style.width = `${snapshot.approvedCount / 160 * 100}%`;

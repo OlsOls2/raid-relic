@@ -1,3 +1,4 @@
+import {streakView,stopStreak} from './streaks.js';
 import { selectEdition, editionBadgesForInterval } from '../public/editions.js';
 import { ackDocument, ackKey, ackStep } from './claim-ack.js';
 import { hash } from './crypto.js';
@@ -16,7 +17,7 @@ export function retainedScores(scores, channels, marks) {
     && !Object.keys(channels).some(host => [...(channels[host]?.blockedUserIds ?? []), ...(marks[host]?.blocked ?? [])].some(id => actorKey(id) === p.key))) };
 }
 // Private bounded consent/aggregate document. No raw actor IDs or chat text.
-export function reduceScores(previous, { channels, marks, chat, now, vote, completion, hop, acknowledged=false }) {
+export function reduceScores(previous, { channels, marks, chat, now, vote, completion, hop, acknowledged=false, autoApprove=false }) {
  const doc=structuredClone(previous??{version:1,players:[],receipts:[]}),action=chat?.markAction?.type,key=chat&&actorKey(chat.chatterId),host=chat?.broadcasterId;
  doc.receipts=doc.receipts.filter(r=>r.until>now);doc.players=retainedScores(doc,channels,marks).players.filter(p=>!(action==='forgetme'&&p.key===key));
  const command=isReplyCommand(chat),request=command?hash(JSON.stringify(['score-command-v1',host,chat.chatterId,chat.messageId])):null,duplicate=doc.receipts.some(r=>r.key===request);
@@ -47,9 +48,9 @@ export function reduceScores(previous, { channels, marks, chat, now, vote, compl
    else if(action==='forgetme')message='Your retained marks, shared links and public scores were erased. Stream quota and cooldown are not refunded.';
    else if(action==='mymarks')message='Mark-history link not queued. Use your own verified login and wait one minute between requests. Shared links are public to anyone who receives them.';
    else if(['approve','block','veto-last','pause'].includes(action)&&chat.chatterId!==host&&!chat.isModerator)message='Only this broadcaster or an authorized moderator can use that command.';
-   else if(action==='mark')message=channels[host].online&&!channels[host].paused&&marks[host]?.context?.holdsRelic?'Mark request processed under the stream quota and cooldown. Only moderator-approved marks become public.':'Marks require a live, unpaused Keeper holding the relic. Nothing pending is public.';
+   else if(action==='mark')message=channels[host].online&&!channels[host].paused&&marks[host]?.context?.holdsRelic?(autoApprove?'Mark request checked under quota and cooldown. Clean valid marks become public automatically; held marks stay private until moderator approval.':'Mark request processed under the stream quota and cooldown. Only moderator-approved marks become public.'):'Marks require a live, unpaused Keeper holding the relic. Nothing pending is public.';
    else if(action==='send')message='Send Off request checked. The Keeper uses private control to process an eligible queued request; never repeat an unknown dispatch.';
-   else if(action==='help')message='Raid Relic: !mark word, !offer, !accept, !relic mymarks, !relic top, !relic badges, !relic scores on/off, !relic forgetme. Keeper setup and Send Off use private controls.';
+   else if(action==='help')message='Raid Relic: !mark word, !offer, !accept, !relic mymarks, !relic top, !relic badges, !relic scores on/off, !relic forgetme, !relic veto (moderators). Keeper setup and Send Off use private controls.';
    else message='Keeper command checked. Refresh your private control for the authoritative result; role and stream safety rules still apply.';
   }
  }}
@@ -74,6 +75,7 @@ export function scoreboard(lineage, registry, scores, config, now) {
   for (let i=0;i<stops.length;i++) { const s=stops[i], r=row(s.from); r.hopsCarried++;
     if ([1,5,10].includes(s.ringIndex)) r.badges.push(`Ring ${s.ringIndex}`);
     if (i>=2) r.badges.push('Chain of 3');
+    if(config?.streakEnabled&&stopStreak(s).streakCount>=3)row(s.to).badges.push('Unbroken streak · 3 hand-offs');
     if(i===0&&selectEdition(s.claimedAt))r.badges.push(selectEdition(s.claimedAt).badgeLabel);
     if(i)row(stops[i-1].to).badges.push(...editionBadgesForInterval(stops[i-1].claimedAt,s.claimedAt));
     if (i===0 && s.claimedAt>=TWITCHCON.startsAt && s.claimedAt<TWITCHCON.endsAt) r.badges.push('Carried during TwitchCon San Diego 2026');
@@ -85,7 +87,7 @@ export function scoreboard(lineage, registry, scores, config, now) {
   rows.sort((a,b)=>b.knownHoldSeconds-a.knownHoldSeconds||b.hopsCarried-a.hopsCarried||a.channelId.localeCompare(b.channelId));
   if ((scores?.players?.length ?? 0) > 128 || (scores?.players ?? []).some(p => !login(p.login) || !Number.isInteger(p.joined) || p.joined < 0 || p.joined > 16 || !Number.isSafeInteger(p.since) || p.since < 0 || p.since > now)) throw Error('Invalid score aggregate');
   const raiders=(scores?.players??[]).filter(p=>login(p.login)).map(p=>({ login:p.login, claimsJoined:p.joined, since:p.since })).sort((a,b)=>b.claimsJoined-a.claimsJoined||a.login.localeCompare(b.login)).slice(0,20);
-  return { asOf:now, rings:stops.length, coverage:'Retained completed archive only. Initial home hold start is unknown; historical raider participation is not available. Raider counts start after explicit score opt-in, never retroactively.', channels:rows, raiders, event:TWITCHCON };
+  return { asOf:now, rings:stops.length, ...(config?.streakEnabled?{streak:streakView(registry,now)}:{}), coverage:'Retained completed archive only. Initial home hold start is unknown; historical raider participation is not available. Raider counts start after explicit score opt-in, never retroactively.', channels:rows, raiders, event:TWITCHCON };
 }
 export function scoreMessage(kind, view, host) {
   if(kind==='badges') return `Keeper badges: ${view.channels.find(r=>r.channelId===host)?.badges.join(', ') || 'none recorded yet'}. Retained completed archive only.`.slice(0,500);

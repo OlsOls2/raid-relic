@@ -16,6 +16,9 @@ import { parseLifecycle } from './lifecycle.js';
 export const MAX_BODY_BYTES = 65536;
 export const REPLAY_WINDOW_MS = 10 * 60 * 1000;
 const assets = new Map([
+  ['/streak-view.js',['streak-view.js','text/javascript; charset=utf-8']],
+  ['/ring-card.js',['ring-card.js','text/javascript; charset=utf-8']],
+  ['/ring-card-client.js',['ring-card-client.js','text/javascript; charset=utf-8']],
   ['/editions.js',['editions.js','text/javascript; charset=utf-8']],
   ['/edition-view.js',['edition-view.js','text/javascript; charset=utf-8']],
   ['/journey-map.js', ['journey-map.js', 'text/javascript; charset=utf-8']],
@@ -57,7 +60,7 @@ const assets = new Map([
   ['/crystal.svg', ['crystal.svg', 'image/svg+xml']],
 ]);
 const faviconAssets=new Map([['/favicon.svg','favicon.svg'],['/favicon.ico','favicon.svg']]);
-const demoAssets=new Map([['/demo','demo.html'],['/demo/','demo.html'],['/demo.js','demo.js'],['/demo-state.js','demo-state.js'],['/demo.css','demo.css'],['/ritual-copy.js','ritual-copy.js'],['/editions.js','editions.js'],['/edition-view.js','edition-view.js']]);
+const demoAssets=new Map([['/ring-card.js','ring-card.js'],['/demo','demo.html'],['/demo/','demo.html'],['/demo.js','demo.js'],['/demo-state.js','demo-state.js'],['/demo.css','demo.css'],['/ritual-copy.js','ritual-copy.js'],['/editions.js','editions.js'],['/edition-view.js','edition-view.js']]);
 const header = (headers, name) => typeof headers[name] === 'string' ? headers[name] : '';
 const result = (status, body = '', type = 'text/plain; charset=utf-8') => ({ status, body, type });
 

@@ -1,3 +1,4 @@
+import {validStreak} from './streak-view.js';
 import { validFlightText, validSourceLogin } from './cinematic.js';
 import { validClaimMeter } from './claim-meter.js';
 export { validClaimMeter } from './claim-meter.js';
@@ -8,7 +9,7 @@ function validHandoff(h) {
 }
 export function resonanceActive(cue, now) { return Boolean(cue && now >= cue.receivedAt && now < cue.expiresAt); }
 export function validSnapshot(value) {
-  return value?.type === 'snapshot' && Number.isSafeInteger(value.revision) && value.revision >= 0
+  return (value?.streak===undefined||(validStreak(value.streak)&&(!value.streak.known||value.streak.since<=value.serverNow))) && value?.type === 'snapshot' && Number.isSafeInteger(value.revision) && value.revision >= 0
     && (value.resonance === undefined || (value.resonance && Number.isFinite(value.resonance.receivedAt) && Number.isFinite(value.resonance.expiresAt) && value.resonance.expiresAt - value.resonance.receivedAt === 1200 && /^[a-f0-9]{64}$/.test(value.resonance.id)))
     && (value.claimMeter == null || (Number.isFinite(value.serverNow) && validClaimMeter(value.claimMeter)))
     && (value.movedToLogin === undefined || (value.status === 'waiting' && validSourceLogin(value.movedToLogin)))

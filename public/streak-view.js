@@ -1,0 +1,3 @@
+// Closed anonymous coverage metadata; not raid-membership or viewer information.
+export function validStreak(v){return Boolean(v&&Object.keys(v).sort().join(',')==='best,current,known,since,version'&&v.version===1&&typeof v.known==='boolean'&&(v.known?Number.isInteger(v.current)&&v.current>=0&&v.current<=16&&Number.isInteger(v.best)&&v.best>=v.current&&v.best<=16&&Number.isSafeInteger(v.since)&&v.since>=0:v.current===null&&v.best===null&&v.since===null));}
+export const streakText=v=>!validStreak(v)||!v.known?'Streak: not tracked for earlier hand-offs':`Streak ${v.current} · best ${v.best} · tracked since ${new Date(v.since).toISOString()}`;

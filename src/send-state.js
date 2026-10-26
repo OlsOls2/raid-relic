@@ -1,3 +1,4 @@
+import {observeStreak,beginStreak} from './streaks.js';
 import { validRaidDiagnostic } from './raid-diagnostic.js';
 import { hash } from './crypto.js';
 
@@ -18,6 +19,7 @@ export function eligible(registry, channels, marks, source, target, retired = fa
 }
 export function sendState(previous, channels, marks, config, op, now) {
   let registry = structuredClone(previous ?? { holderId: null, originated: false }); let result = null; let ritual = null;
+  observeStreak(registry,now,config?.streakEnabled);
   let automaticallyRetired = false; const priorSendWatermark = registry.sendWatermark ?? -1; const retiredDeadline = registry.pendingHop?.endsAt;
   if (['reserve', 'reconcile-ended'].includes(op.type) && config.channels.includes(op.source) && op.actor === op.source
     && registry.send?.status === 'confirmed' && registry.pendingHop && now >= registry.pendingHop.endsAt
@@ -126,6 +128,7 @@ export function sendState(previous, channels, marks, config, op, now) {
       ritual = { eventId: id, incomingBroadcasterId: source, hostBroadcasterId: target, startedAt: now, endsAt: registry.pendingHop.endsAt };
     }
   }
+  if(config?.streakEnabled&&registry.pendingHop?.verified===true&&registry.pendingHop.eventId!==previous?.pendingHop?.eventId)beginStreak(registry,now,true);
   if (Buffer.byteLength(JSON.stringify(registry)) > 4096) throw new Error('Relic registry capacity reached');
   return { registry, result, ritual };
 }

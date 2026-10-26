@@ -1,3 +1,4 @@
+import {markReviewPolicy} from './marks.js';
 import { createP7, p7Config } from './p7.js';
 import { createMarkShares, createShareReplies } from './my-marks.js';
 import { createForge } from './forge.js';
@@ -25,19 +26,21 @@ export async function createRuntime(env, { firestoreClient, transport, chronicle
   const raidPilot = env.RAID_PILOT_ENABLED === 'true';
   const requestedP7=p7Config(env),p7Flags={...requestedP7,enabled:requestedP7.enabled&&raidPilot&&env.OAUTH_ENABLED==='true'&&!previewReadOnly};
   if (env.RAID_PILOT_ENABLED && !['true', 'false'].includes(env.RAID_PILOT_ENABLED)) throw new Error('Explicit pilot gate required');
+  const reviewPolicy=markReviewPolicy(env);
   let state; let store;
   const keeperIds = env.KEEPER_CHANNEL_IDS ? env.KEEPER_CHANNEL_IDS.split(',') : [env.TWITCH_STREAMER_ID];
   if (env.KEEPER_CHANNEL_IDS && (!keeperIds.every(id => ['1591805230', '1591806023'].includes(id)) || env.TWITCH_STREAMER_ID !== '1591805230' || env.TWITCH_BOT_ID !== '1591804828')) throw new Error('Keeper allowlist rejected');
   if (raidPilot && (env.OAUTH_ENABLED !== 'true' || keeperIds.length !== 2 || !Object.keys(KEEPERS).every(id => keeperIds.includes(id)))) throw new Error('Pilot needs both configured Keepers and OAuth controls');
   if (raidPilot && (new URL(env.OAUTH_REDIRECT_URI).pathname !== '/auth/callback' || new URL(env.EVENTSUB_CALLBACK_URL).origin !== new URL(env.OAUTH_REDIRECT_URI).origin)) throw new Error('Pilot callback configuration mismatch');
-  const lifecycle = env.OAUTH_ENABLED === 'true' ? { channels: keeperIds, ...(raidPilot ? { logins: Object.fromEntries(Object.entries(KEEPERS).map(([id, login]) => [login, id])) } : {}) } : undefined;
+  if(env.P9_STREAK_ENABLED&&!['true','false'].includes(env.P9_STREAK_ENABLED))throw Error('Explicit streak gate required');
+  const lifecycle = env.OAUTH_ENABLED === 'true' ? { channels: keeperIds, streakEnabled:env.P9_STREAK_ENABLED==='true', ...(raidPilot ? { logins: Object.fromEntries(Object.entries(KEEPERS).map(([id, login]) => [login, id])) } : {}) } : undefined;
   if (env.STATE_STORE === 'firestore') {
     if (env.GOOGLE_CLOUD_PROJECT !== PROJECT_ID || env.FIRESTORE_EMULATOR_HOST) throw new Error('Firestore project configuration rejected');
     const db = firestoreClient ?? new (await loadSDK()).Firestore({ projectId: PROJECT_ID });
-    state = store = createFirestoreStore(db, { lifecycle, p7Enabled:p7Flags.enabled });
+    state = store = createFirestoreStore(db, { lifecycle, p7Enabled:p7Flags.enabled, reviewPolicy });
   } else {
     if (production || env.STATE_STORE !== 'memory') throw new Error('Select STATE_STORE explicitly; production requires Firestore');
-    state = createMemoryState({ lifecycle, p7Enabled:p7Flags.enabled }); store = createMemoryAuthStore();
+    state = createMemoryState({ lifecycle, p7Enabled:p7Flags.enabled, reviewPolicy }); store = createMemoryAuthStore();
   }
   if (!env.TWITCH_EVENTSUB_SECRET || env.TWITCH_EVENTSUB_SECRET.length < 10 || env.TWITCH_EVENTSUB_SECRET.length > 100) throw new Error('Webhook secret required');
   let oauth; let bot; let subscriptions;

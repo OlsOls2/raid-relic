@@ -17,6 +17,31 @@ export function normalizeMark(input) {
   return null;
 }
 
+// Operator-only literal review rules. Invalid configuration always stays manual.
+const reviewPolicies=new WeakSet();
+const manualReview=Object.freeze({autoApprove:false,terms:Object.freeze([])});reviewPolicies.add(manualReview);
+export function markReviewPolicy(env={}){
+ if(env.MARK_AUTO_APPROVE_ENABLED!=='true')return manualReview;
+ try{const raw=env.MARK_REVIEW_BLOCKLIST??'[]';if(typeof raw!=='string'||Buffer.byteLength(raw)>4096)return manualReview;
+  const values=JSON.parse(raw);if(!Array.isArray(values)||values.length>32)return manualReview;
+  const terms=values.map(normalizeMark);if(terms.some(t=>!t))return manualReview;
+  const policy=Object.freeze({autoApprove:true,terms:Object.freeze([...new Set(terms)])});reviewPolicies.add(policy);return policy;
+ }catch{return manualReview;}
+}
+export const trustedReviewPolicy=value=>value&&reviewPolicies.has(value)?value:manualReview;
+// Cancellation follows actual authorized privacy effects, not attacker command names.
+export function markPrivacyChange(previous,next,actor,host,action){
+ if(!isChatIdentity(actor,host)||actor.isBot||actor.copied||!action)return false;
+ if(action.type==='forgetme')return true;
+ if(!isModerator(actor,host)||previous?.blocked?.includes(actor.chatterId)||previous?.context?.blockedUserIds?.includes(actor.chatterId))return false;
+ const count=d=>(d?.sessions??[]).reduce((n,s)=>n+s.marks.length,0),removed=count(next)<count(previous);
+ if(action.type==='veto-last')return removed;
+ if(action.type==='pause')return next?.paused===true&&previous?.paused!==true;
+ if(action.type==='opt-out')return removed||(previous?.context?.optedIn===true&&next?.context?.optedIn===false);
+ if(action.type==='block')return removed||(next?.blocked?.length??0)>(previous?.blocked?.length??0);
+ return false;
+}
+
 // Original numeric geometry only. Input text never appears in SVG markup.
 export function runeGeometry(input) {
   const normalized = normalizeMark(input);
@@ -41,7 +66,7 @@ export function parseMarkCommand(text) {
   const own = /^!relic mymarks(?: @([a-zA-Z0-9_]{1,25}))?$/.exec(text);
   if (own) return { type: 'mymarks', ...(own[1] ? { login: own[1].toLowerCase() } : {}) };
   if (text === '!relic forgetme') return { type: 'forgetme' };
-  if (text === '!relic veto-last') return { type: 'veto-last' };
+  if (text === '!relic veto-last' || text === '!relic veto') return { type: 'veto-last' };
   if (text === '!offer') return { type: 'offer' };
   if (text === '!accept') return { type: 'accept' };
   if (text === '!relic pause') return { type: 'pause', paused: true };
@@ -86,9 +111,9 @@ export function setMarkContext(previous, host, context) {
 const active = (doc, host) => doc.context?.optedIn === true && doc.context.holdsRelic === true && doc.context.keeperId === host;
 
 // Pure reducer shared by memory and Firestore; invoke only with trusted identities.
-export function reduceMark(previous, host, actor, action, now) {
+export function reduceMark(previous, host, actor, action, now, reviewPolicy) {
   const doc = structuredClone(previous ?? empty());
-  if (!userId(host) || actor?.broadcasterId !== host || !userId(actor.chatterId) || !Number.isFinite(now) || !action) return doc;
+  if (actor?.isBot || actor?.copied || !userId(host) || actor?.broadcasterId !== host || !userId(actor.chatterId) || !Number.isFinite(now) || !action) return doc;
   doc.cooldowns = doc.cooldowns.filter(entry => now - entry.at < MARK_LIMITS.cooldownMs);
   if (['scores-on','scores-off','top','badges','help'].includes(action.type)) return doc;
   if (action.type === 'forgetme') {
@@ -99,6 +124,7 @@ export function reduceMark(previous, host, actor, action, now) {
     return bounded(doc);
   }
   if (action.type !== 'mark') {
+    if(doc.blocked.includes(actor.chatterId)||doc.context?.blockedUserIds?.includes(actor.chatterId))return doc;
     if (action.type !== 'mymarks' && isModerator(actor, host)) delete doc.shares;
     if (!isModerator(actor, host)) return doc;
     const session = doc.sessions.find(item => item.streamId === doc.context?.streamId);
@@ -138,7 +164,7 @@ export function reduceMark(previous, host, actor, action, now) {
   if (viewer) viewer.spent++;
   else session.viewers.push({ userId: actor.chatterId, spent: 1 });
   session.spent++;
-  session.marks.push({ id: `m${++doc.serial}`, userId: actor.chatterId, text, status: 'pending', createdAt: now });
+  session.marks.push({ id: `m${++doc.serial}`, userId: actor.chatterId, text, status: trustedReviewPolicy(reviewPolicy).autoApprove&&!trustedReviewPolicy(reviewPolicy).terms.some(term=>text.includes(term))?'approved':'pending', createdAt: now });
   doc.cooldowns.push({ userId: actor.chatterId, at: now });
   return bounded(doc);
 }

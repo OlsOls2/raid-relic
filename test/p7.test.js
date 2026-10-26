@@ -104,3 +104,11 @@ for(const kind of ['memory','firestore'])test(`${kind}: three accepted APP actio
  assert.equal(actions(p).length,3);assert.equal(logs.length,3);assert.doesNotMatch(JSON.stringify(logs),/synthetic|Authorization|access_token|refresh_token|messageId/);
  const saved=await f.runtime.state.getPrivateP7(OTHER);assert.ok(saved.cooldowns.shoutout>=f.now()+120000);assert.ok(saved.cooldowns[`pair:${HOME}`]>=f.now()+3600000);
 });
+
+for(const kind of['memory','firestore'])for(const path of['signed-chat','trusted-control'])test(`${kind}: authorized actual veto cancels queued P7 and completion proofs; unauthorized veto cannot cancel (${path})`,async()=>{
+ const p=fakeP7(),f=await prepared(kind,p,{chronicleEnv:{...env,MARK_AUTO_APPROVE_ENABLED:'true',MARK_REVIEW_BLOCKLIST:'[]'}});
+ await f.chat(HOME,'811','!mark moon');f.runtime.p7.process=async()=>{};await complete(f);let doc=await f.runtime.state.getPrivateP7(OTHER);assert.equal(doc.rows.filter(r=>r.status==='queued').length,3);
+ await f.chat(HOME,'999','!relic veto');doc=await f.runtime.state.getPrivateP7(OTHER);assert.equal(doc.rows.filter(r=>r.status==='queued').length,3);assert.equal((await f.runtime.state.getPublicJourney()).stops[0].marks.length,1);
+ if(path==='signed-chat')await f.chat(HOME,HOME,'!relic veto');else await f.runtime.state.controlMarks(HOME,{broadcasterId:HOME,chatterId:HOME},{type:'veto-last'},f.now());
+ doc=await f.runtime.state.getPrivateP7(OTHER);assert.equal(doc.rows.filter(r=>r.status==='cancelled').length,3);assert.equal(actions(p).length,0);assert.equal((await f.runtime.state.getPublicJourney()).stops[0].marks.length,0);
+});

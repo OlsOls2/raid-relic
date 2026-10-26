@@ -13,7 +13,7 @@ try{
  await context.route('**/*',r=>{if(new URL(r.request().url()).origin!==origin){external++;return r.abort();}return r.continue();});
  await context.addInitScript(()=>{const Native=Date;window.Date=class extends Native{constructor(...a){super(...(a.length?a:['2026-10-26T12:00:00Z']));}static now(){return Native.parse('2026-10-26T12:00:00Z');}};});
  page=await context.newPage();page.on('pageerror',()=>pageErrors++);page.on('requestfailed',()=>failedRequests++);
- stage='atlas-earned-hero';await page.goto(origin+'/atlas/');await page.locator('#map-stops button').nth(2).waitFor();await page.locator('.edition-label').waitFor();await paint();
+ stage='atlas-earned-hero';await page.goto(origin+'/atlas/');await page.locator('#map-stops .map-stop-select').nth(2).waitFor();await page.locator('.edition-label').waitFor();await paint();
  for(const width of[1280,375,390]){
   stage='atlas-layout-'+width;await page.setViewportSize({width,height:800});await paint();assert.equal(await page.locator('.edition-label').count(),1);
   const layout=await page.evaluate(()=>{

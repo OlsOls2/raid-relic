@@ -1,3 +1,4 @@
+import {observeStreak,completeStreak,stopStreak} from './streaks.js';
 import { scoreCompletion } from './scoreboard.js';
 import { hash } from './crypto.js';
 import { runeSvg } from './marks.js';
@@ -8,12 +9,13 @@ export const emptyLineage = () => ({ stops: [] });
 export function publicJourney(lineage) {
   return { rings: lineage?.stops?.length ?? 0, stops: (lineage?.stops ?? []).map(stop => ({
     stopId: stop.stopId, from: stop.from, to: stop.to, claimedAt: stop.claimedAt, raidSize: stop.raidSize,
-    ringIndex: stop.ringIndex, marks: stop.marks.map(mark => ({ id: mark.id, text: mark.text, runeSvg: runeSvg(mark.text) })),
+    ringIndex: stop.ringIndex, ...stopStreak(stop), marks: stop.marks.map(mark => ({ id: mark.id, text: mark.text, runeSvg: runeSvg(mark.text) })),
   })) };
 }
 // All inputs are store-owned snapshots. No effects; caller commits every result together.
-export function reduceClaims(registry, channels, marks, previous, chat, now, sentAt = now, presence = {}) {
+export function reduceClaims(registry, channels, marks, previous, chat, now, sentAt = now, presence = {}, streakEnabled = false) {
   registry = structuredClone(registry); marks = structuredClone(marks); const lineage = structuredClone(previous ?? emptyLineage()); let acknowledgement = null, acknowledgementKind, ackDeadline, scoreVote, completedScore;
+  observeStreak(registry,now,streakEnabled);
   // References are private and scoped to source channel/stream/mark/user. Purge
   // permanently when approval/content is removed; never regenerate archived entries.
   for (const stop of lineage.stops) stop.marks = stop.marks.filter(item => {
@@ -80,6 +82,7 @@ export function reduceClaims(registry, channels, marks, previous, chat, now, sen
           lineage.stops.push({ stopId: hash(hop.eventId), eventId: hop.eventId, from: hop.from, to: hop.to,
             streamId: hop.sourceStreamId, claimedAt: now, raidSize: hop.raidSize, ringIndex: lineage.stops.length + 1,
             marks: approved.map(({ id, userId, text }) => ({ id, userId, text })) });
+          completeStreak(registry,lineage.stops.at(-1),now,streakEnabled);
           if (Buffer.byteLength(JSON.stringify(lineage)) > LINEAGE_LIMITS.bytes) throw new Error('Lineage capacity reached');
           completedScore = scoreCompletion(hop, [...hop.offers, ...hop.accepts]);
           acknowledgement = null;
@@ -106,5 +109,7 @@ export function reduceClaims(registry, channels, marks, previous, chat, now, sen
     }
   }
   if (Buffer.byteLength(JSON.stringify(registry)) > 4096) throw new Error('Relic registry capacity reached');
+  observeStreak(registry,now,streakEnabled);
+  if(streakEnabled&&Buffer.byteLength(JSON.stringify(registry))>4096)throw Error('Relic registry capacity reached');
   return { registry, marks, lineage, scoreVote, completedScore, acknowledgement, acknowledgementKind, ackDeadline: ackDeadline ?? registry.pendingHop?.endsAt };
 }

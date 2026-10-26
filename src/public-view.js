@@ -1,9 +1,10 @@
+import {stopStreak} from './streaks.js';
 import { chronicleView } from './chronicle.js';
 import { eligible } from './send-state.js';
 import { runeSvg } from './marks.js';
 
 const stopSummary = stop => ({ stopId: stop.stopId, from: stop.from, to: stop.to, claimedAt: stop.claimedAt,
-  raidSize: stop.raidSize, ringIndex: stop.ringIndex, chronicle: chronicleView(stop), approvedCount: stop.marks.length });
+  raidSize: stop.raidSize, ringIndex: stop.ringIndex, ...stopStreak(stop), chronicle: chronicleView(stop), approvedCount: stop.marks.length });
 export function atlasPage(lineage, { stopId, offset = 0, limit = 8 } = {}) {
   const stops = lineage?.stops ?? [];
   if (stopId) {

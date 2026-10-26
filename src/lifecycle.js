@@ -8,7 +8,7 @@ export function lifecycleConfig(value) {
     || !value.channels.every(id => typeof id === 'string' && /^\d{1,32}$/.test(id))) throw new Error('Bounded lifecycle channels required');
   const logins = value.logins ?? (value.channels.includes(INITIAL_HOME) ? { raidrelichq: INITIAL_HOME } : {});
   if (Object.keys(logins).length > LIFECYCLE_LIMITS.channels || !Object.entries(logins).every(([login, id]) => /^[a-z0-9_]{1,25}$/.test(login) && value.channels.includes(id))) throw new Error('Bounded Keeper login mapping required');
-  return { channels: [...new Set(value.channels)], logins: { ...logins } };
+  return { channels: [...new Set(value.channels)], logins: { ...logins }, ...(value.streakEnabled===true?{streakEnabled:true}:{}) };
 }
 export const emptyRegistry = () => ({ holderId: null, originated: false });
 const emptyChannel = () => ({ online: false, streamId: null, startedAt: null, lifecycleAt: -1, closedThrough: -1,
@@ -46,7 +46,7 @@ function sync(registry, channel, marks, host) {
 }
 
 // Called inside one store transaction, including event dedupe. No external effects.
-export function reduceLifecycle({ registry, channel, marks, host, event, chat, policy, now, sentAt, observed = false }) {
+export function reduceLifecycle({ registry, channel, marks, host, event, chat, policy, now, sentAt, observed = false, reviewPolicy }) {
   registry = structuredClone(registry ?? emptyRegistry());
   if (event || chat?.markAction || policy) delete registry.echo;
   channel = structuredClone(channel ?? emptyChannel());
@@ -115,7 +115,7 @@ export function reduceLifecycle({ registry, channel, marks, host, event, chat, p
   if (action && !['keep', 'opt-out'].includes(action.type)) {
     // A delayed chat mark from an older stream must not spend the new stream budget.
     if (action.type !== 'mark' || (channel.online && sentAt >= channel.startedAt && sentAt >= channel.consentAt && sentAt > channel.closedThrough)) {
-      marks = reduceMark(marks, host, chat, action, now);
+      marks = reduceMark(marks, host, chat, action, now, reviewPolicy);
     }
     channel.paused = marks.paused;
   }

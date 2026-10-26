@@ -1,3 +1,4 @@
+import {stopStreak} from './streaks.js';
 // Completed archive only. Never pass private lineage through to the browser.
 export function journeyMap(lineage, config, now) {
   const stops = lineage?.stops ?? [];
@@ -10,7 +11,7 @@ export function journeyMap(lineage, config, now) {
       || !Number.isSafeInteger(s.claimedAt) || s.claimedAt < 0 || s.claimedAt < last || s.claimedAt > now
       || !Number.isInteger(s.raidSize) || s.raidSize < 0 || s.raidSize > 1000000 || (i && stops[i-1].to !== s.from)) throw Error('Invalid journey');
     seen.add(s.stopId); events.add(s.eventId); last=s.claimedAt;
-    return {stopId:s.stopId,from:s.from,to:s.to,claimedAt:s.claimedAt,ringIndex:s.ringIndex,raidSize:s.raidSize};
+    return {stopId:s.stopId,from:s.from,to:s.to,claimedAt:s.claimedAt,ringIndex:s.ringIndex,raidSize:s.raidSize,...stopStreak(s)};
   });
   return {version:1,coverage:'Retained completed journeys only; not a lifetime route.',nodes:ids.map(id=>({id,label:Object.entries(config.logins ?? {}).some(([,v])=>v===id)?'@'+Object.entries(config.logins).find(([,v])=>v===id)[0]:`Channel ${id}`})),hops};
 }

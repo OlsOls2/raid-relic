@@ -61,9 +61,9 @@ export async function pilotFixture(kind = 'memory', { simulator = true, extraKee
     if (result.status !== 200) throw new Error('Synthetic OAuth failed');
     if (id !== BOT) cookies[id] = result.headers['set-cookie'][1].split(';')[0]; return result;
   }
-  async function control(id, action, overrides = {}) {
-    const status = await request(`/control/${id}/status`, 'GET', { cookie: cookies[id] });
-    const csrf = status.status === 200 ? JSON.parse(status.body).csrf : 'expired';
+  async function control(id, action, overrides = {}, cached = {}) {
+    const status = cached.csrf ? null : await request(`/control/${id}/status`, 'GET', { cookie: cookies[id] });
+    const csrf = cached.csrf ?? (status.status === 200 ? JSON.parse(status.body).csrf : 'expired');
     return request(`/control/${id}`, 'POST', { cookie: cookies[id], origin, 'content-type': 'application/json', ...overrides }, Buffer.from(JSON.stringify({ action, csrf })));
   }
   function signed(type, event, host, condition, options = {}) {
