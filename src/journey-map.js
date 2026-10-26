@@ -29,9 +29,10 @@ export function journeyMap(lineage, config, now) {
       s.claimedAt < 0 ||
       s.claimedAt < last ||
       s.claimedAt > now ||
-      !Number.isInteger(s.raidSize) ||
-      s.raidSize < 0 ||
-      s.raidSize > 1000000 ||
+      (s.kind === 'wander'
+        ? s.raidSize !== null
+        : !Number.isInteger(s.raidSize) || s.raidSize < 0 || s.raidSize > 1000000) ||
+      (s.kind !== undefined && s.kind !== 'wander') ||
       (i && stops[i - 1].to !== s.from)
     )
       throw Error('Invalid journey');
@@ -45,6 +46,7 @@ export function journeyMap(lineage, config, now) {
       claimedAt: s.claimedAt,
       ringIndex: s.ringIndex,
       raidSize: s.raidSize,
+      ...(s.kind === 'wander' ? { kind: 'wander' } : {}),
       ...stopStreak(s),
     };
   });

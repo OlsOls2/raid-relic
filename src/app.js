@@ -82,6 +82,7 @@ export function createApp({
   scoreAcks,
   claimAcks,
   receiving,
+  wander,
   secret,
   state = createMemoryState(),
   now = Date.now,
@@ -133,6 +134,21 @@ export function createApp({
   };
   // Pure request boundary for tests: rawBody is never reserialized before HMAC.
   async function dispatch({ method, path, headers = {}, rawBody = Buffer.alloc(0) }) {
+    if (path === '/internal/wander/tick') {
+      if (method !== 'POST' || previewReadOnly || !wander?.enabled)
+        return result(403, 'Trusted Wander tick unavailable');
+      if (!spend()) return result(429, 'Tick budget reached');
+      if (headers['content-type'] !== 'application/json')
+        return result(403, 'Trusted Wander JSON required');
+      const request = wander.verify(rawBody, headers['x-rr-wander-signature']);
+      if (!request) return result(403, 'Trusted Wander signature required');
+      const outcome = await wander.tick(request);
+      return result(
+        outcome.status === 'duplicate' ? 409 : 200,
+        JSON.stringify({ status: outcome.status }),
+        'application/json',
+      );
+    }
     if (['/receiving.js', '/keeper-card.js'].includes(path)) {
       if (method !== 'GET') return result(405, 'Static asset is read only');
       return result(
@@ -193,6 +209,9 @@ export function createApp({
         JSON.stringify({
           status: 'ok',
           demo: 'simulated-client-only',
+          ...(wander?.enabled
+            ? { wander: { enabled: true, kind: 'non-raid', ...wander.policy } }
+            : {}),
           releaseCommit: release,
           phase: raidPilot ? 'live' : 'foundation',
           ...(!raidPilot ? { readiness: 'not-ready-for-raids' } : {}),

@@ -44,11 +44,15 @@ export function recapProjection(lineage) {
       claimedAt: stop.claimedAt,
       ringIndex: stop.ringIndex,
       retainedEntries: stop.marks.length,
+      ...(stop.kind === 'wander' ? { kind: 'wander' } : {}),
     };
   });
   return {
     rings: route.length,
     completedStops: route.length,
+    ...(route.some((s) => s.kind === 'wander')
+      ? { wanderStops: route.filter((s) => s.kind === 'wander').length }
+      : {}),
     retainedMarkEntries: entries,
     route,
     runes,
@@ -103,7 +107,7 @@ export function recapSVG(view, { simulator = false } = {}) {
     52,
     157,
     20,
-    `${view.completedStops} completed stops · ${view.rings} growth rings · ${view.retainedMarkEntries} retained mark entries`,
+    `${view.completedStops} completed stops · ${view.rings} growth rings${view.wanderStops ? ' · ' + view.wanderStops + ' Wandered (no raid)' : ''} · ${view.retainedMarkEntries} retained mark entries`,
   );
   svg +=
     '<g transform="translate(1050 75)"><path d="M0-25 36 2 46 46 0 100-46 46-36 2Z" fill="#829bb3"/><path d="M0-25 0 100 46 46 36 2Z" fill="#9486b7"/><path d="M0 15-24 48 0 84Z" fill="#dce4ed"/><path d="M0 15 24 48 0 84Z" fill="#b5a9d4"/><path d="M0 84 24 48 0 100Z" fill="#e6bb70"/></g>';

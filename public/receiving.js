@@ -175,14 +175,20 @@ if (root) {
               'Ring ' + s.ringIndex + ' · from @' + (configured.has(s.from) ? s.from : 'unknown'),
               '/stops/' + s.stopId,
             ),
-            node('p', 'Recorded arrival: ' + utc(s.claimedAt)),
+            node(
+              'p',
+              (s.kind === 'wander' ? 'Wandered (no raid): ' : 'Recorded arrival: ') +
+                utc(s.claimedAt),
+            ),
           );
           article.append(
             node(
               'p',
-              Number.isInteger(s.raidAudience)
-                ? 'Twitch-reported raid audience: ' + s.raidAudience
-                : 'Raid audience not recorded',
+              s.kind === 'wander'
+                ? 'Wandered — no raid or audience transfer'
+                : Number.isInteger(s.raidAudience)
+                  ? 'Twitch-reported raid audience: ' + s.raidAudience
+                  : 'Raid audience not recorded',
             ),
           );
           for (const orientation of ['landscape', 'vertical']) {

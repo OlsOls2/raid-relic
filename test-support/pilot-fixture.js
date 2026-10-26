@@ -16,10 +16,13 @@ export async function pilotFixture(
     chronicleHTTP,
     forgeHTTP,
     origin = 'https://pilot.example',
+    initialNow,
   } = {},
 ) {
   const db = kind === 'firestore' ? fakeFirestore() : undefined;
-  let time = Date.parse('2026-10-25T12:00:00Z');
+  let time = initialNow ?? Date.parse('2026-10-25T12:00:00Z');
+  if (!Number.isSafeInteger(time) || time < 0 || time > Date.now())
+    throw Error('Synthetic fixture clock rejected');
   let seq = 0;
   let validationOverride = null;
   const secret = 'synthetic-pilot-hmac-secret';

@@ -1,3 +1,4 @@
+import { wanderMutation, wanderActivity } from './wander-state.js';
 import { receivingView } from './receiving.js';
 import { streakView } from './streaks.js';
 import { enqueueP7, p7Mutation, cancelP7 } from './p7.js';
@@ -31,6 +32,7 @@ import {
   atlasPage,
   atlasSearch,
   holderLoginView,
+  wanderArrivalView,
   movedToView,
   claimMeterView,
   handoffView,
@@ -142,7 +144,10 @@ export function createMemoryAuthStore() {
   };
 }
 
-export function createFirestoreStore(db, { lifecycle, p7Enabled = false, reviewPolicy } = {}) {
+export function createFirestoreStore(
+  db,
+  { lifecycle, p7Enabled = false, reviewPolicy, wander } = {},
+) {
   const config = lifecycleConfig(lifecycle);
   reviewPolicy = trustedReviewPolicy(reviewPolicy);
   p7Enabled = Boolean(p7Enabled && config);
@@ -251,6 +256,7 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false, reviewP
           managed && host
             ? reduceLifecycle({
                 seekersEnabled: config?.seekersEnabled,
+                wanderEnabled: wander?.enabled,
                 reviewPolicy,
                 registry,
                 channel,
@@ -332,6 +338,8 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false, reviewP
             share,
             now,
           );
+        if (claiming && (claiming.completedScore || sending?.result?.status === 'reserved'))
+          wanderActivity(claiming.registry, now, wander?.enabled);
         let commandReply;
         if (claiming) {
           const scoreNext = reduceScores(scores, {
@@ -346,6 +354,7 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false, reviewP
                 ? claiming.lineage.stops.at(-1).claimedAt
                 : null,
             seekersEnabled: config?.seekersEnabled,
+            wanderEnabled: wander?.enabled,
             markOutcome,
             autoApprove: reviewPolicy.autoApprove,
             vote: claiming.scoreVote,
@@ -639,6 +648,7 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false, reviewP
             scores = (await tx.get(scoreRef)).data();
           const transition = reduceLifecycle({
             seekersEnabled: config?.seekersEnabled,
+            wanderEnabled: wander?.enabled,
             reviewPolicy,
             registry,
             channel,
@@ -725,6 +735,7 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false, reviewP
           marks[host] = (await tx.get(ref('markChannels', host))).data();
         }
         const next = sendState(registry, channels, marks, config, op, now);
+        if (next.result?.status === 'reserved') wanderActivity(next.registry, now, wander?.enabled);
         tx.set(ref('keeperRegistry', 'single'), next.registry);
         return next.result;
       });
@@ -742,6 +753,49 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false, reviewP
         const previous = (await tx.get(doc)).data();
         const next = shareStep(previous, op, now);
         if (next.doc) tx.set(doc, next.doc);
+        return next.result;
+      });
+    },
+    async getWanderInput() {
+      if (!wander?.enabled) return null;
+      return db.runTransaction(async (tx) => {
+        const registry = (await tx.get(ref('keeperRegistry', 'single'))).data() ?? {
+          holderId: null,
+          originated: false,
+        };
+        const lineage = (await tx.get(ref('lineage', 'single'))).data() ?? { stops: [] };
+        const channels = {},
+          marks = {};
+        for (const id of config.channels) {
+          channels[id] = (await tx.get(ref('streamChannels', id))).data();
+          marks[id] = (await tx.get(ref('markChannels', id))).data();
+        }
+        return { registry, lineage, channels, marks };
+      });
+    },
+    async wanderStep(op, now) {
+      if (!wander?.enabled) return { status: 'disabled' };
+      return db.runTransaction(async (tx) => {
+        const registry = (await tx.get(ref('keeperRegistry', 'single'))).data() ?? {
+          holderId: null,
+          originated: false,
+        };
+        const lineage = (await tx.get(ref('lineage', 'single'))).data() ?? { stops: [] };
+        const channels = {},
+          marks = {};
+        for (const id of config.channels) {
+          channels[id] = (await tx.get(ref('streamChannels', id))).data();
+          marks[id] = (await tx.get(ref('markChannels', id))).data();
+        }
+        const input = { registry, lineage, channels, marks };
+        const next = wanderMutation(input, config, wander, op, now);
+        if (JSON.stringify(next.registry) !== JSON.stringify(registry))
+          tx.set(ref('keeperRegistry', 'single'), next.registry);
+        if (JSON.stringify(next.lineage) !== JSON.stringify(lineage))
+          tx.set(ref('lineage', 'single'), next.lineage);
+        for (const [id, doc] of Object.entries(next.marks))
+          if (doc && JSON.stringify(doc) !== JSON.stringify(marks[id]))
+            tx.set(ref('markChannels', id), doc);
         return next.result;
       });
     },
@@ -813,6 +867,7 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false, reviewP
 
         const next = reduceLifecycle({
           seekersEnabled: config?.seekersEnabled,
+          wanderEnabled: wander?.enabled,
           reviewPolicy,
           registry,
           channel,
@@ -925,6 +980,9 @@ export function createFirestoreStore(db, { lifecycle, p7Enabled = false, reviewP
         const channel = (await tx.get(ref('streamChannels', host))).data();
         return {
           ...(holderLoginView(registry) ? { holderLogin: holderLoginView(registry) } : {}),
+          ...(wanderArrivalView(registry, lineage, host)
+            ? { wanderArrival: wanderArrivalView(registry, lineage, host) }
+            : {}),
           rings: lineage?.stops?.length ?? 0,
           ...(config?.streakEnabled ? { streak: streakView(registry, now) } : {}),
           ...(movedToView(registry, lineage, host, channel)

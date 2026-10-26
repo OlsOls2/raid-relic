@@ -70,8 +70,9 @@ async function load() {
     $('simulator').hidden = data.mode !== 'simulator';
     if (data.pilotEnabled)
       document.querySelector('.note').textContent =
-        'Only confirmed raids and completed two-chat bindings enter this recorded journey.';
-    $('rings').textContent = `${data.rings} completed growth rings`;
+        'Raid stops require verified arrivals and two-chat binding. Dotted Wander stops are idle transfers, not raids.';
+    $('rings').textContent =
+      `${data.rings} completed growth rings${data.wanderStops ? ' · ' + data.wanderStops + ' Wandered (no raid) · ' + (data.rings - data.wanderStops) + ' raid/legacy stops' : ''}`;
     $('status').textContent = data.total
       ? `Showing ${offset + 1}–${Math.min(offset + (stopId ? data.marks.length : data.stops.length), data.total)} of ${data.total}`
       : stopId
@@ -80,7 +81,7 @@ async function load() {
     if (stopId) {
       $('title').textContent = `Stop ${data.stop.ringIndex}`;
       $('description').textContent =
-        `${keeperName(data.stop.from)} to ${keeperName(data.stop.to)}. Claimed ${utcDate(data.stop.claimedAt)}. ${data.stop.raidSize} reported raid viewers.`;
+        `${keeperName(data.stop.from)} to ${keeperName(data.stop.to)}. ${data.stop.kind === 'wander' ? 'Wandered at' : 'Claimed'} ${utcDate(data.stop.claimedAt)}. ${data.stop.kind === 'wander' ? 'Wandered — no raid or audience transfer.' : data.stop.raidSize + ' reported raid viewers.'}`;
       $('detail').hidden = false;
       $('journey').append(node('p', chronicleCaption(data.stop.chronicle)));
       for (const mark of data.marks) {
@@ -97,7 +98,7 @@ async function load() {
         const link = node('a', 'Open this stop');
         link.href = `/stops/${stop.stopId}`;
         item.append(
-          node('h2', `Ring ${stop.ringIndex}`),
+          node('h2', `${stop.kind === 'wander' ? 'Wandered · ' : ''}Ring ${stop.ringIndex}`),
           node('p', chronicleCaption(stop.chronicle)),
           node('p', `${keeperName(stop.from)} to ${keeperName(stop.to)}`),
           node('p', utcDate(stop.claimedAt)),

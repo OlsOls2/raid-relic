@@ -8,10 +8,11 @@ export function ringCardModel(value, options = {}) {
     !options ||
     typeof options !== 'object' ||
     Array.isArray(options) ||
-    Object.keys(options).some((k) => !['mode', 'now'].includes(k))
+    Object.keys(options).some((k) => !['mode', 'now', 'kind'].includes(k))
   )
     throw Error('Card options');
-  const { mode = 'live', now = Date.now() } = options;
+  const { mode = 'live', now = Date.now(), kind } = options;
+  if (kind !== undefined && kind !== 'wander') throw Error('Card journey kind');
   if (!['live', 'simulator', 'demo'].includes(mode)) throw Error('Card mode');
   const demo = mode === 'demo',
     simulated = mode !== 'live';
@@ -36,6 +37,7 @@ export function ringCardModel(value, options = {}) {
   const edition = claimedAt === null ? null : selectEdition(claimedAt);
   return Object.freeze({
     keeper,
+    ...(kind === 'wander' ? { kind: 'wander' } : {}),
     ringIndex,
     stopId,
     mode,
@@ -52,14 +54,22 @@ export function ringCardModel(value, options = {}) {
     caption: demo
       ? 'SIMULATED DEMO—no Twitch connection'
       : mode === 'simulator'
-        ? 'SIMULATOR—mock recorded stop; no real Twitch'
-        : 'Recorded completion · Ring ' + ringIndex,
+        ? kind === 'wander'
+          ? 'SIMULATOR—wandered; no raid or audience transfer'
+          : 'SIMULATOR—mock recorded stop; no real Twitch'
+        : kind === 'wander'
+          ? 'Wandered — no raid or audience transfer · Ring ' + ringIndex
+          : 'Recorded completion · Ring ' + ringIndex,
     editionCaption:
       (demo
         ? 'Demo cosmetic edition: '
-        : mode === 'simulator'
-          ? 'Edition at mock completion: '
-          : 'Edition at recorded completion: ') + (edition?.name ?? 'Base'),
+        : kind === 'wander'
+          ? mode === 'simulator'
+            ? 'Edition at mock Wander transfer: '
+            : 'Edition at Wander transfer: '
+          : mode === 'simulator'
+            ? 'Edition at mock completion: '
+            : 'Edition at recorded completion: ') + (edition?.name ?? 'Base'),
     disclaimer: edition ? FAN_DISCLAIMER : '',
   });
 }
@@ -151,8 +161,8 @@ export function validRingCardFilename(filename, simulated = false) {
   return (
     typeof filename === 'string' &&
     filename === filename.trim() &&
-    (/^raid-relic-stop-(?:[1-9]|1[0-6])-[a-z0-9_]{1,25}[.]png$/.test(filename) ||
-      /^raid-relic-keeper-[a-z0-9_]{1,25}-ring-(?:[1-9]|1[0-6])-(?:landscape|vertical)[.]png$/.test(
+    (/^raid-relic-(?:wander-)?stop-(?:[1-9]|1[0-6])-[a-z0-9_]{1,25}[.]png$/.test(filename) ||
+      /^raid-relic-keeper-[a-z0-9_]{1,25}-(?:wander-)?ring-(?:[1-9]|1[0-6])-(?:landscape|vertical)[.]png$/.test(
         filename,
       ) ||
       (simulated === true && /^raid-relic-demo-ring-(?:[1-9]|1[0-6])[.]png$/.test(filename)))

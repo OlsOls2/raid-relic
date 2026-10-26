@@ -83,3 +83,9 @@ The receiving-value pilot source adds an opt-in Seeker queue, a prominent curren
 spotlight and recorded Keeper pages with two share-card orientations. It is awaiting
 separate native verification and is not a new live deployment. See the
 [receiving-value contract](docs/RECEIVING_VALUE.md) for consent, eligibility and privacy.
+
+Auto-wander source is also under review: an explicitly enabled idle policy can warn a
+Keeper, then pass unused ownership to an opted-in eligible Seeker. This is a typed
+**non-raid** transfer, not a raid, audience transfer or two-chat claim. It is off by
+default, adds no provider scope and needs a separately installed operator worker.
+See [Auto-wander](docs/WANDER.md) for the 72-hour / 12-hour policy and limits.

@@ -34,6 +34,14 @@ export function resonanceActive(cue, now) {
 }
 export function validSnapshot(value) {
   return (
+    (value?.wanderArrival === undefined ||
+      (value.wanderArrival?.kind === 'wander' &&
+        value.handoff == null &&
+        Object.keys(value.wanderArrival).sort().join(',') === 'at,kind,stopId' &&
+        Number.isSafeInteger(value.wanderArrival.at) &&
+        value.wanderArrival.at >= 0 &&
+        value.wanderArrival.at <= value.serverNow &&
+        /^[a-f0-9]{64}$/.test(value.wanderArrival.stopId))) &&
     (value?.streak === undefined ||
       (validStreak(value.streak) &&
         (!value.streak.known || value.streak.since <= value.serverNow))) &&

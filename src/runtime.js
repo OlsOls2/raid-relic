@@ -1,3 +1,5 @@
+import { wanderPolicy } from './wander-state.js';
+import { createWander } from './wander.js';
 import { createReceiving } from './receiving.js';
 import { markReviewPolicy } from './marks.js';
 import { createP7, p7Config } from './p7.js';
@@ -49,6 +51,9 @@ export async function createRuntime(
     throw Error('Explicit Seekers gate required');
   const seekersEnabled = env.SEEKERS_ENABLED === 'true';
   if (seekersEnabled && !raidPilot) throw Error('Seekers require the authorised Keeper pilot');
+  const wander = wanderPolicy(env);
+  if (wander.enabled && (!seekersEnabled || !raidPilot))
+    throw Error('Wander requires the authorised Seeker pilot');
   const reviewPolicy = markReviewPolicy(env);
   let state;
   let store;
@@ -100,11 +105,12 @@ export async function createRuntime(
       lifecycle,
       p7Enabled: p7Flags.enabled,
       reviewPolicy,
+      wander,
     });
   } else {
     if (production || env.STATE_STORE !== 'memory')
       throw new Error('Select STATE_STORE explicitly; production requires Firestore');
-    state = createMemoryState({ lifecycle, p7Enabled: p7Flags.enabled, reviewPolicy });
+    state = createMemoryState({ lifecycle, p7Enabled: p7Flags.enabled, reviewPolicy, wander });
     store = createMemoryAuthStore();
   }
   if (
@@ -303,8 +309,20 @@ export async function createRuntime(
     });
     oauth.control.bindPilot(pilot);
   }
+  const wanderService = createWander({
+    policy: wander,
+    key: env.TOKEN_ENCRYPTION_KEY,
+    state,
+    oauth,
+    bots,
+    botId: env.TWITCH_BOT_ID,
+    clientId: env.TWITCH_CLIENT_ID,
+    transport: transport ?? httpTransport,
+    now,
+  });
   return {
     ...createApp({
+      wander: wanderService,
       receiving,
       previewReadOnly,
       scoreAcks,
@@ -329,6 +347,7 @@ export async function createRuntime(
     }),
     claimAcks,
     receiving,
+    wander: wanderService,
     p7,
     oauth,
     bot,

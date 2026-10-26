@@ -15,3 +15,14 @@ stops and approved glyphs; erasure/veto/opt-out flow through existing archive pr
 Each orientation-specific card freshly checks the public exact stop before exporting.
 Previously saved downloads cannot be recalled. Twitch-reported raid audience is not
 retention, conversion, unique chatters or proof of individual raid membership.
+
+## Explicit non-raid Wander consent
+
+The optional idle policy may select only explicitly joined eligible Seekers within the
+configured network. A transfer records channel identities, time, typed growth and
+approved retained origin references; it records no audience/raid participation and
+creates no new viewer index. Original mark erasure/veto/block/opt-out invalidates derived
+content through those references. Offline ownership does not fabricate a stream or
+permit marks. The warning and arrival messages are fixed, bounded and at-most-once;
+provider acceptance does not prove human visibility. Public requests cannot sign ticks
+or choose a recipient. See [Wander policy](WANDER.md) before operator activation.

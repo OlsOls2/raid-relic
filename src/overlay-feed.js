@@ -85,6 +85,7 @@ export function createOverlayHub(store, channels, { simulator = false, now = Dat
           ? { movedToLogin: journey.movedToLogin }
           : {}),
         ...(journey.streak === undefined ? {} : { streak: journey.streak }),
+        ...(journey.wanderArrival ? { wanderArrival: journey.wanderArrival } : {}),
         marks,
         approvedCount: marks.length,
         lineageRings: journey.rings,
@@ -112,6 +113,7 @@ export function createOverlayHub(store, channels, { simulator = false, now = Dat
     'controlMarks',
     'setChannelPolicy',
     'sendOffStep',
+    'wanderStep',
   ]) {
     if (!store[name]) continue;
     wrapped[name] = (...args) =>

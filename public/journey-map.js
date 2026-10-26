@@ -41,7 +41,7 @@ export function validJourney(v) {
     if (
       !exact(
         Object.fromEntries(
-          Object.entries(h).filter(([k]) => !['streakCount', 'streakSince'].includes(k)),
+          Object.entries(h).filter(([k]) => !['streakCount', 'streakSince', 'kind'].includes(k)),
         ),
         'stopId,from,to,claimedAt,ringIndex,raidSize',
       ) ||
@@ -61,9 +61,10 @@ export function validJourney(v) {
       !Number.isSafeInteger(h.claimedAt) ||
       h.claimedAt < 0 ||
       h.claimedAt < at ||
-      !Number.isInteger(h.raidSize) ||
-      h.raidSize < 0 ||
-      h.raidSize > 1000000 ||
+      (h.kind === 'wander'
+        ? h.raidSize !== null || h.streakCount !== undefined
+        : !Number.isInteger(h.raidSize) || h.raidSize < 0 || h.raidSize > 1000000) ||
+      (h.kind !== undefined && h.kind !== 'wander') ||
       (i && v.hops[i - 1].to !== h.from)
     )
       return false;
@@ -220,7 +221,7 @@ if (typeof document !== 'undefined' && document.querySelector('#journey-map')) {
       caption.textContent =
         value === 0
           ? 'Origin — before first recorded completion'
-          : `${reached} recorded ${reached === 1 ? 'ring' : 'rings'} · ${data.nodes.find((n) => n.id === h.from).label} to ${data.nodes.find((n) => n.id === h.to).label} · ${raiderCount(h.raidSize)} · ${new Date(h.claimedAt).toLocaleString('en-GB', { timeZone: 'UTC', dateStyle: 'medium', timeStyle: 'short' }) + ' UTC'}`;
+          : `${reached} recorded ${reached === 1 ? 'ring' : 'rings'} · ${data.nodes.find((n) => n.id === h.from).label} to ${data.nodes.find((n) => n.id === h.to).label} · ${h.kind === 'wander' ? 'Wandered · no raid or audience transfer' : raiderCount(h.raidSize)} · ${new Date(h.claimedAt).toLocaleString('en-GB', { timeZone: 'UTC', dateStyle: 'medium', timeStyle: 'short' }) + ' UTC'}`;
     } else caption.textContent = 'No completed journeys yet. No route has been invented.';
     range.setAttribute('aria-valuetext', caption.textContent);
     share.disabled = !h || value === 0;
@@ -270,11 +271,12 @@ if (typeof document !== 'undefined' && document.querySelector('#journey-map')) {
         h = data.hops[i],
         path = svg('path', {
           d: `M${a.x},${a.y} Q${c.x},${c.y} ${b.x},${b.y}`,
-          'stroke-width': raidWidth(h.raidSize),
+          'stroke-width': h.kind === 'wander' ? 2 : raidWidth(h.raidSize),
+          ...(h.kind === 'wander' ? { 'stroke-dasharray': '4 8', 'data-kind': 'wander' } : {}),
           class: 'map-hop',
           tabindex: '0',
           role: 'button',
-          'aria-label': `Stop ${i + 1}: ${data.nodes.find((n) => n.id === h.from).label} to ${data.nodes.find((n) => n.id === h.to).label}, ${raiderCount(h.raidSize)}`,
+          'aria-label': `Stop ${i + 1}: ${data.nodes.find((n) => n.id === h.from).label} to ${data.nodes.find((n) => n.id === h.to).label}, ${h.kind === 'wander' ? 'Wandered · no raid or audience transfer' : raiderCount(h.raidSize)}`,
         });
       const select = () => {
         pause();
@@ -300,7 +302,7 @@ if (typeof document !== 'undefined' && document.querySelector('#journey-map')) {
         const li = document.createElement('li'),
           button = document.createElement('button');
         button.className = 'map-stop-select';
-        button.textContent = `${data.nodes.find((n) => n.id === h.from).label} → ${data.nodes.find((n) => n.id === h.to).label} · ${raiderCount(h.raidSize)}${h.streakCount === undefined ? (data.hops.some((n) => n.streakCount !== undefined) ? ' · streak not tracked' : '') : ` · streak ${h.streakCount}`}`;
+        button.textContent = `${data.nodes.find((n) => n.id === h.from).label} → ${data.nodes.find((n) => n.id === h.to).label} · ${h.kind === 'wander' ? 'Wandered · no raid or audience transfer' : raiderCount(h.raidSize)}${h.streakCount === undefined ? (data.hops.some((n) => n.streakCount !== undefined) ? ' · streak not tracked' : '') : ` · streak ${h.streakCount}`}`;
         button.addEventListener('click', select);
         li.append(button);
         if (!embed) {

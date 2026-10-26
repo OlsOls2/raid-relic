@@ -24,9 +24,11 @@ export function validScores(v) {
       v.rings >= 0 &&
       v.rings <= 16 &&
       Object.keys(v)
-        .filter((k) => k !== 'streak')
+        .filter((k) => !['streak', 'wanderStops'].includes(k))
         .sort()
         .join(',') === 'asOf,channels,coverage,event,mode,previewReadOnly,raiders,rings' &&
+      (v.wanderStops === undefined ||
+        (Number.isInteger(v.wanderStops) && v.wanderStops >= 1 && v.wanderStops <= v.rings)) &&
       (v.streak === undefined ||
         (validStreak(v.streak) && (!v.streak.known || v.streak.since <= v.asOf))) &&
       ['live', 'simulator'].includes(v.mode) &&
@@ -94,7 +96,7 @@ export function holdDuration(seconds) {
 export const EVENT_BADGE = 'Carried during TwitchCon San Diego 2026';
 export function badgeDescription(name) {
   if (name === 'Unbroken streak · 3 hand-offs')
-    return 'Received the relic after three consecutive tracked successful bindings, without a known verified-window lapse. Earlier hand-offs are not tracked.';
+    return 'Received the relic after three consecutive tracked successful bindings, without a known verified-window lapse or Wander transfer. Earlier hand-offs are not tracked.';
   const edition = EDITION_CONFIG.find((e) => e.badgeLabel === name);
   if (edition)
     return (
@@ -113,7 +115,7 @@ export function badgeDescription(name) {
       'Event-days badge: recorded holding during San Diego, 13–15 Nov 2026; not proof of conference attendance.',
   };
   if (/^Ring (1|5|10)$/.test(name))
-    return `Carried the relic on recorded raid ${name.slice(5)}, creating that growth ring.`;
+    return `Carried the relic on recorded raid/legacy hand-off ${name.slice(5)}. Wander growth is excluded from this milestone.`;
   return Object.hasOwn(meanings, name) ? meanings[name] : '';
 }
 let expanded = false;
@@ -203,7 +205,7 @@ async function loadScores() {
       $('raider-rows').append(node('li', 'Raiders: type !relic scores on to join the ledger.'));
     $('scores-coverage').textContent = v.coverage;
     $('scores-status').textContent =
-      `${v.rings} recorded ${v.rings === 1 ? 'ring' : 'rings'} · as of ${new Date(v.asOf).toLocaleString()}. Refresh manually.${v.streak ? ' ' + streakText(v.streak) : ''}`;
+      `${v.rings} recorded ${v.rings === 1 ? 'ring' : 'rings'}${v.wanderStops ? ' · ' + v.wanderStops + ' Wandered (not raids)' : ''} · as of ${new Date(v.asOf).toLocaleString()}. Refresh manually.${v.streak ? ' ' + streakText(v.streak) : ''}`;
   } catch {
     if (current === generation) {
       clear();

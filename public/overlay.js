@@ -253,6 +253,8 @@ function render(snapshot) {
   state.textContent = snapshot.claimMeter?.awaitingRaid
     ? 'The relic stirs… waiting for Twitch to confirm the raid'
     : messages[snapshot.status];
+  if (snapshot.wanderArrival)
+    state.textContent = `The relic wandered here to @${ownLogin} · no raid or audience transfer. Marks require a live opted-in stream.`;
   if (idleHolder && snapshot.holderLogin !== ownLogin) state.append(holderLink);
   document.querySelector('#compact-status').textContent = snapshot.movedToLogin
     ? `Moved to @${snapshot.movedToLogin}`
@@ -267,6 +269,8 @@ function render(snapshot) {
           waiting: 'Waiting for Keeper',
           unavailable: 'State unavailable',
         }[snapshot.status];
+  if (snapshot.wanderArrival)
+    document.querySelector('#compact-status').textContent = 'Wandered · no raid';
   document.querySelector('#compact-count').textContent = simulated
     ? `Charge ${snapshot.approvedCount}/160 · Rings ${snapshot.lineageRings}`
     : `Ring ${snapshot.lineageRings} · ${snapshot.approvedCount} runes`;

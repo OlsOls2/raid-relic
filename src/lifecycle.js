@@ -1,3 +1,4 @@
+import { wanderActivity } from './wander-state.js';
 import { emptyMarkDocument, reduceMark, setMarkContext } from './marks.js';
 
 export const INITIAL_HOME = '1591805230';
@@ -116,7 +117,12 @@ export function reduceLifecycle({
   observed = false,
   reviewPolicy,
   seekersEnabled = false,
+  wanderEnabled = false,
 }) {
+  const approvedBefore = (marks?.sessions ?? []).reduce(
+    (n, s) => n + s.marks.filter((m) => m.status === 'approved').length,
+    0,
+  );
   registry = structuredClone(registry ?? emptyRegistry());
   if (event || chat?.markAction || policy) delete registry.echo;
   channel = structuredClone(channel ?? emptyChannel());
@@ -293,6 +299,11 @@ export function reduceLifecycle({
     }
     channel.paused = marks.paused;
   }
+  const approvedAfter = marks.sessions.reduce(
+    (n, s) => n + s.marks.filter((m) => m.status === 'approved').length,
+    0,
+  );
+  if (approvedAfter > approvedBefore) wanderActivity(registry, now, wanderEnabled);
   // Recheck holder eligibility after controls, but do not acquire on a resume.
   marks = sync(registry, channel, marks, host);
   if (

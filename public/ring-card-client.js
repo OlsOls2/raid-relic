@@ -21,17 +21,25 @@ export async function downloadStopCard(h, keeper, { signal, current = () => true
     if (
       !['live', 'simulator'].includes(v.mode) ||
       !s ||
-      ['stopId', 'from', 'to', 'claimedAt', 'ringIndex', 'raidSize'].some((k) => s[k] !== h[k]) ||
+      ['stopId', 'from', 'to', 'claimedAt', 'ringIndex', 'raidSize', 'kind'].some(
+        (k) => s[k] !== h[k],
+      ) ||
       !current()
     )
       throw Error('Changed stop');
     const model = ringCardModel(
       { stopId: s.stopId, keeper, ringIndex: s.ringIndex, claimedAt: s.claimedAt },
-      { mode: v.mode },
+      { mode: v.mode, ...(s.kind === 'wander' ? { kind: 'wander' } : {}) },
     );
     const blob = await ringCardPNG(model);
     if (own.signal.aborted || !current()) throw Error('Stale stop');
-    saveRingCard(blob, model.simulated, ringCardFilename(s.ringIndex, model.keeper));
+    saveRingCard(
+      blob,
+      model.simulated,
+      s.kind === 'wander'
+        ? 'raid-relic-wander-stop-' + s.ringIndex + '-' + model.keeper.slice(1) + '.png'
+        : ringCardFilename(s.ringIndex, model.keeper),
+    );
     return true;
   } finally {
     clearTimeout(timer);

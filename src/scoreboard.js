@@ -264,22 +264,25 @@ export function scoreboard(lineage, registry, scores, config, now) {
   const row = (id) => rows.find((r) => r.channelId === id);
   if (registry?.originated || stops[0]?.from === INITIAL_HOME)
     row(INITIAL_HOME)?.badges.push('First Keeper');
+  let raidIndex = 0;
   for (let i = 0; i < stops.length; i++) {
+    if (stops[i].kind === 'wander') continue;
+    raidIndex++;
     const s = stops[i],
       r = row(s.from);
     r.hopsCarried++;
-    if ([1, 5, 10].includes(s.ringIndex)) r.badges.push(`Ring ${s.ringIndex}`);
-    if (i >= 2) r.badges.push('Chain of 3');
+    if ([1, 5, 10].includes(raidIndex)) r.badges.push(`Ring ${raidIndex}`);
+    if (raidIndex >= 3) r.badges.push('Chain of 3');
     if (config?.streakEnabled && stopStreak(s).streakCount >= 3)
       row(s.to).badges.push('Unbroken streak · 3 hand-offs');
     if (i === 0 && selectEdition(s.claimedAt)) r.badges.push(selectEdition(s.claimedAt).badgeLabel);
-    if (i)
+    if (i && stops[i - 1].kind !== 'wander')
       row(stops[i - 1].to).badges.push(
         ...editionBadgesForInterval(stops[i - 1].claimedAt, s.claimedAt),
       );
     if (i === 0 && s.claimedAt >= TWITCHCON.startsAt && s.claimedAt < TWITCHCON.endsAt)
       r.badges.push('Carried during TwitchCon San Diego 2026');
-    if (i) {
+    if (i && stops[i - 1].kind !== 'wander') {
       const held = row(stops[i - 1].to),
         start = stops[i - 1].claimedAt;
       held.knownHoldSeconds += (s.claimedAt - start) / 1000;
@@ -287,14 +290,14 @@ export function scoreboard(lineage, registry, scores, config, now) {
         held.badges.push('Carried during TwitchCon San Diego 2026');
     }
   }
-  if (stops.length && registry?.holderId === stops.at(-1).to) {
+  if (stops.length && stops.at(-1).kind !== 'wander' && registry?.holderId === stops.at(-1).to) {
     const held = row(registry.holderId),
       start = stops.at(-1).claimedAt;
     held.knownHoldSeconds += (now - start) / 1000;
     if (start < TWITCHCON.endsAt && now >= TWITCHCON.startsAt)
       held.badges.push('Carried during TwitchCon San Diego 2026');
   }
-  if (stops.length && registry?.holderId === stops.at(-1).to)
+  if (stops.length && stops.at(-1).kind !== 'wander' && registry?.holderId === stops.at(-1).to)
     row(registry.holderId).badges.push(
       ...editionBadgesForInterval(stops.at(-1).claimedAt, now, { ongoing: true }),
     );
@@ -331,6 +334,9 @@ export function scoreboard(lineage, registry, scores, config, now) {
   return {
     asOf: now,
     rings: stops.length,
+    ...(stops.some((s) => s.kind === 'wander')
+      ? { wanderStops: stops.filter((s) => s.kind === 'wander').length }
+      : {}),
     ...(config?.streakEnabled ? { streak: streakView(registry, now) } : {}),
     coverage:
       'Retained completed archive only. Initial home hold start is unknown; historical raider participation is not available. Raider counts start after explicit score opt-in, never retroactively.',

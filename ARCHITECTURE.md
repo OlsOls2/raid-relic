@@ -60,3 +60,14 @@ grants and caches one bounded batched stream observation attempt per minute; it 
 not refresh/save tokens, tick state or run a background loop. Dispatch rechecks queue
 membership atomically and existing grants/moderator evidence before the irreversible
 boundary. No public queue row is transfer authority. See [Receiving value](docs/RECEIVING_VALUE.md).
+
+## Explicit idle-transfer exception (Part 3B source)
+
+Normal transfers still require a verified raid and two-chat binding. The separately
+flagged [Wander engine](docs/WANDER.md) instead records a typed non-raid stop after
+forward-tracked inactivity and a warning. A purpose-HMAC internal tick prepares replay
+protection, gathers capability evidence outside transactions, then commits only against
+an unchanged full state snapshot. Its independent at-most-once message outbox never
+uses P7 raid proof/jobs. The operator-only existing-VM worker is authored, not installed;
+canonical health gates metadata/credential access. Public reads cannot trigger a tick,
+refresh a grant or reset activity. No new infrastructure or default scope is added.

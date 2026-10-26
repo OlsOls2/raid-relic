@@ -38,7 +38,11 @@ export function receivingView(registry, channels, marks, lineage, config, now) {
     to: names[s.to] ?? null,
     ringIndex: s.ringIndex,
     claimedAt: s.claimedAt,
-    ...(count(s.raidSize) ? { raidAudience: s.raidSize } : {}),
+    ...(s.kind === 'wander'
+      ? { kind: 'wander' }
+      : count(s.raidSize)
+        ? { raidAudience: s.raidSize }
+        : {}),
   });
   const last = stops.at(-1);
   const holder = ids.includes(registry?.holderId) ? names[registry.holderId] : null;

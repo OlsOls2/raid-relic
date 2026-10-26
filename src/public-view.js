@@ -9,6 +9,7 @@ const stopSummary = (stop) => ({
   to: stop.to,
   claimedAt: stop.claimedAt,
   raidSize: stop.raidSize,
+  ...(stop.kind === 'wander' ? { kind: 'wander' } : {}),
   ringIndex: stop.ringIndex,
   ...stopStreak(stop),
   chronicle: chronicleView(stop),
@@ -21,6 +22,9 @@ export function atlasPage(lineage, { stopId, offset = 0, limit = 8 } = {}) {
     if (!stop) return null;
     return {
       rings: stops.length,
+      ...(stops.some((s) => s.kind === 'wander')
+        ? { wanderStops: stops.filter((s) => s.kind === 'wander').length }
+        : {}),
       stop: stopSummary(stop),
       offset,
       total: stop.marks.length,
@@ -32,6 +36,9 @@ export function atlasPage(lineage, { stopId, offset = 0, limit = 8 } = {}) {
   }
   return {
     rings: stops.length,
+    ...(stops.some((s) => s.kind === 'wander')
+      ? { wanderStops: stops.filter((s) => s.kind === 'wander').length }
+      : {}),
     offset,
     total: stops.length,
     nextOffset: offset + limit < stops.length ? offset + limit : null,
@@ -169,6 +176,7 @@ export function atlasSearch(lineage, { query, offset = 0, limit = 20 }) {
       from: stop.from,
       to: stop.to,
       claimedAt: stop.claimedAt,
+      ...(stop.kind === 'wander' ? { kind: 'wander' } : {}),
       ringIndex: stop.ringIndex,
       text: mark.text,
       runeSvg: runeSvg(mark.text),
@@ -217,4 +225,16 @@ export function movedToView(registry, lineage, host, channel) {
 export function holderLoginView(registry) {
   const names = { 1591805230: 'raidrelichq', 1591806023: 'olsols2' };
   return Object.hasOwn(names, registry?.holderId) ? names[registry.holderId] : undefined;
+}
+
+// An idle transfer is not a receipt, claim window or arrival animation.
+export function wanderArrivalView(registry, lineage, host) {
+  const s = lineage?.stops?.at(-1),
+    h = registry?.pendingHop;
+  return s?.kind === 'wander' &&
+    s.to === host &&
+    registry?.holderId === host &&
+    (!h || h.cancelled || h.finalized)
+    ? { kind: 'wander', at: s.claimedAt, stopId: s.stopId }
+    : undefined;
 }

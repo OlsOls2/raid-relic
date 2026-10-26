@@ -15,6 +15,7 @@ export function publicJourney(lineage) {
       to: stop.to,
       claimedAt: stop.claimedAt,
       raidSize: stop.raidSize,
+      ...(stop.kind === 'wander' ? { kind: 'wander' } : {}),
       ringIndex: stop.ringIndex,
       ...stopStreak(stop),
       marks: stop.marks.map((mark) => ({
@@ -51,13 +52,16 @@ export function reduceClaims(
   // permanently when approval/content is removed; never regenerate archived entries.
   for (const stop of lineage.stops)
     stop.marks = stop.marks.filter((item) => {
-      const doc = marks[stop.from];
-      const session = doc?.sessions.find((s) => s.streamId === stop.streamId);
+      const originHost = stop.kind === 'wander' ? (item.originHost ?? stop.from) : stop.from;
+      const originStream =
+        stop.kind === 'wander' ? (item.originStream ?? stop.streamId) : stop.streamId;
+      const doc = marks[originHost];
+      const session = doc?.sessions.find((s) => s.streamId === originStream);
       return (
         doc?.context?.optedIn &&
-        !channels[stop.from]?.banned &&
+        !channels[originHost]?.banned &&
         !doc.blocked.includes(item.userId) &&
-        !channels[stop.from]?.blockedUserIds.includes(item.userId) &&
+        !channels[originHost]?.blockedUserIds.includes(item.userId) &&
         session?.marks.some(
           (mark) =>
             mark.id === item.id &&

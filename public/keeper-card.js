@@ -42,7 +42,9 @@ export async function keeperCardPNG(model, orientation, audience) {
     c.font = '18px system-ui';
     c.fillText(
       audience === undefined
-        ? 'Raid audience not recorded'
+        ? model.kind === 'wander'
+          ? 'Wandered — no raid audience'
+          : 'Raid audience not recorded'
         : `Twitch-reported raid audience: ${audience}`,
       32,
       orientation === 'landscape' ? 655 : 990,
@@ -91,7 +93,9 @@ export async function downloadKeeperCard(
       !stop ||
       !['live', 'simulator'].includes(value.mode) ||
       value.profile.login !== profile.login ||
-      ['ringIndex', 'claimedAt', 'to', 'from', 'raidAudience'].some((k) => stop[k] !== recorded[k])
+      ['ringIndex', 'claimedAt', 'to', 'from', 'raidAudience', 'kind'].some(
+        (k) => stop[k] !== recorded[k],
+      )
     )
       throw Error('Changed stop');
     const exact = await read('/api/atlas/stops/' + recorded.stopId);
@@ -111,14 +115,17 @@ export async function downloadKeeperCard(
         ringIndex: stop.ringIndex,
         claimedAt: stop.claimedAt,
       },
-      { mode: value.mode },
+      { mode: value.mode, ...(stop.kind === 'wander' ? { kind: 'wander' } : {}) },
     );
     const blob = await keeperCardPNG(model, orientation, stop.raidAudience);
     if (own.signal.aborted || !current()) throw Error('Cancelled export');
     saveRingCard(
       blob,
       model.simulated,
-      keeperCardFilename(stop.ringIndex, profile.login, orientation),
+      keeperCardFilename(stop.ringIndex, profile.login, orientation).replace(
+        '-ring-',
+        stop.kind === 'wander' ? '-wander-ring-' : '-ring-',
+      ),
     );
   } finally {
     clearTimeout(timer);

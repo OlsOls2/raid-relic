@@ -1,3 +1,4 @@
+import { wanderMutation, wanderActivity } from './wander-state.js';
 import { receivingView } from './receiving.js';
 import { streakView } from './streaks.js';
 import { enqueueP7, p7Mutation, cancelP7 } from './p7.js';
@@ -31,6 +32,7 @@ import {
   atlasPage,
   atlasSearch,
   holderLoginView,
+  wanderArrivalView,
   movedToView,
   claimMeterView,
   handoffView,
@@ -60,6 +62,7 @@ export function createMemoryState({
   lifecycle,
   p7Enabled = false,
   reviewPolicy,
+  wander,
 } = {}) {
   const config = lifecycleConfig(lifecycle);
   reviewPolicy = trustedReviewPolicy(reviewPolicy);
@@ -160,6 +163,7 @@ export function createMemoryState({
         config && host
           ? reduceLifecycle({
               seekersEnabled: config?.seekersEnabled,
+              wanderEnabled: wander?.enabled,
               reviewPolicy,
               registry,
               channel: channels.get(host),
@@ -252,6 +256,8 @@ export function createMemoryState({
           share,
           now,
         );
+      if (claiming && (claiming.completedScore || sending?.result?.status === 'reserved'))
+        wanderActivity(claiming.registry, now, wander?.enabled);
       let scoreNext;
       if (claiming) {
         const scoreChannels = Object.fromEntries(channels);
@@ -447,6 +453,7 @@ export function createMemoryState({
       const transition = config
         ? reduceLifecycle({
             seekersEnabled: config?.seekersEnabled,
+            wanderEnabled: wander?.enabled,
             reviewPolicy,
             registry,
             channel: channels.get(host),
@@ -534,6 +541,7 @@ export function createMemoryState({
         op,
         now,
       );
+      if (next.result?.status === 'reserved') wanderActivity(next.registry, now, wander?.enabled);
       registry = next.registry;
       return next.result;
     },
@@ -543,6 +551,34 @@ export function createMemoryState({
     shareReplyStep(host, op, now) {
       const next = shareStep(markDocs.get(host), op, now);
       if (next.doc) markDocs.set(host, next.doc);
+      return next.result;
+    },
+    getWanderInput() {
+      if (!wander?.enabled) return null;
+      return structuredClone({
+        registry,
+        channels: Object.fromEntries(channels),
+        marks: Object.fromEntries(markDocs),
+        lineage,
+      });
+    },
+    wanderStep(op, now) {
+      if (!wander?.enabled) return { status: 'disabled' };
+      const next = wanderMutation(
+        {
+          registry,
+          channels: Object.fromEntries(channels),
+          marks: Object.fromEntries(markDocs),
+          lineage,
+        },
+        config,
+        wander,
+        op,
+        now,
+      );
+      registry = next.registry;
+      lineage = next.lineage;
+      for (const [id, doc] of Object.entries(next.marks)) if (doc) markDocs.set(id, doc);
       return next.result;
     },
     getReceivingView(now) {
@@ -659,6 +695,7 @@ export function createMemoryState({
           if (p7Docs.has(target)) p7Docs.set(target, cancelP7(p7Docs.get(target)));
       const next = reduceLifecycle({
         seekersEnabled: config?.seekersEnabled,
+        wanderEnabled: wander?.enabled,
         reviewPolicy,
         registry,
         channel: channels.get(host),
@@ -741,6 +778,9 @@ export function createMemoryState({
     getPublicPresentation(host, now) {
       return {
         ...(holderLoginView(registry) ? { holderLogin: holderLoginView(registry) } : {}),
+        ...(wanderArrivalView(registry, lineage, host)
+          ? { wanderArrival: wanderArrivalView(registry, lineage, host) }
+          : {}),
         rings: lineage.stops.length,
         ...(config?.streakEnabled ? { streak: streakView(registry, now) } : {}),
         ...(movedToView(registry, lineage, host, channels.get(host))

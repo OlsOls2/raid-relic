@@ -63,7 +63,7 @@ async function read() {
     $('card').src = previewURL;
     $('card').hidden = false;
     $('summary').textContent =
-      `${data.completedStops} completed stops · ${data.rings} growth rings · ${data.retainedMarkEntries} retained approved mark entries (not unique people). ${data.shownRunes} rune entries pictured.`;
+      `${data.completedStops} completed stops · ${data.rings} growth rings${data.wanderStops ? ' · ' + data.wanderStops + ' Wandered (no raid)' : ''} · ${data.retainedMarkEntries} retained approved mark entries (not unique people). ${data.shownRunes} rune entries pictured.`;
     if (!data.route.length) $('summary').textContent += ' No completed hops yet.';
     for (const stop of data.route) {
       const item = document.createElement('li'),
