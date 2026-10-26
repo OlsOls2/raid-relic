@@ -1,3 +1,4 @@
+import { seekerState } from './seeker-state.js';
 import { boundedCall } from './bounded.js';
 import { runeSvg } from './marks.js';
 
@@ -70,12 +71,19 @@ export function receivingView(registry, channels, marks, lineage, config, now) {
           .filter(Boolean),
       ),
     ].slice(0, 4),
+    ...(config?.seekersEnabled
+      ? {
+          queueStates: Object.fromEntries(
+            ids.map((id) => [names[id], seekerState(registry, lineage, channels, marks, id)]),
+          ),
+        }
+      : {}),
     seekers: config?.seekersEnabled
       ? ids
           .filter(
             (id) =>
               safe(id) &&
-              channels[id]?.seeking === true &&
+              seekerState(registry, lineage, channels, marks, id).member &&
               channels[id]?.online &&
               !channels[id]?.paused &&
               !marks[id]?.paused &&
@@ -244,7 +252,7 @@ export function createReceiving({
     }
   }
   async function page() {
-    const value = await state.getReceivingView(now());
+    const { queueStates, ...value } = await state.getReceivingView(now());
     if (!enabled) return { ...value, enabled: false, seekers: [], live: null };
     const observation = await observations();
     const fresh = observation && now() >= observation.at && now() - observation.at < 60000;
@@ -267,6 +275,20 @@ export function createReceiving({
   return {
     enabled,
     page,
+    async status(id) {
+      if (!ids.includes(id)) return { member: false, reason: 'not-opted-in' };
+      const raw = await state.getReceivingView(now());
+      const local = raw.queueStates?.[keepers[id]] ?? { member: false, reason: 'not-joined' };
+      if (!enabled || !local.member || local.reason !== 'observations-required') return local;
+      const observed = await page();
+      const latest = (await state.getReceivingView(now())).queueStates?.[keepers[id]];
+      if (!latest?.member || latest.reason !== 'observations-required')
+        return latest ?? { member: false, reason: 'not-joined' };
+      const index = observed.seekers.findIndex((row) => row.login === keepers[id]);
+      return index >= 0
+        ? { ...latest, position: index + 1, total: observed.seekers.length }
+        : latest;
+    },
     async candidates(source) {
       if (!enabled) return state.getKeeperCandidates(source);
       const value = await state.getReceivingView(now());

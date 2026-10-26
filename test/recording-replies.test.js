@@ -27,7 +27,11 @@ for (const kind of ['memory', 'firestore'])
     await f.control(HOME, 'keep');
     f.advance();
     await f.chat(HOME, HOME, '!seek off');
-    assert.equal(replies().at(-1), 'Seeker queue off. Type !seek to rejoin.');
+    assert.equal(
+      replies().at(-1),
+      'You hold the relic. Seeker queue off; pass it on before joining again.',
+    );
+    assert.equal((await f.runtime.state.getStreamStatus(HOME)).seeking, false);
     await f.chat(HOME, '9601', '!offer');
     assert.equal(
       replies().at(-1),

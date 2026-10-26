@@ -1,3 +1,4 @@
+import { dequeueSeeker } from './seeker-state.js';
 import { RECEIVING_KEEPERS } from './receiving.js';
 import { observeStreak, completeStreak, stopStreak } from './streaks.js';
 import { scoreCompletion } from './scoreboard.js';
@@ -41,6 +42,7 @@ export function reduceClaims(
   names = RECEIVING_KEEPERS,
 ) {
   registry = structuredClone(registry);
+  channels = structuredClone(channels);
   marks = structuredClone(marks);
   const lineage = structuredClone(previous ?? emptyLineage());
   let awaitingRaid = false;
@@ -246,6 +248,7 @@ export function reduceClaims(
         acknowledgement = null;
         delete registry.echo;
         registry.holderId = hop.to;
+        dequeueSeeker(channels[hop.to], now);
         registry.carriedClosures = 0;
         delete registry.send;
         hop.finalized = true;
@@ -354,6 +357,9 @@ export function reduceClaims(
     awaitingRaid,
     scoreVote,
     completedScore,
+    dequeued: completedScore
+      ? { id: registry.holderId, channel: channels[registry.holderId] }
+      : null,
     acknowledgement,
     acknowledgementKind,
     ackDeadline: ackDeadline ?? registry.pendingHop?.endsAt,

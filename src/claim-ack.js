@@ -159,6 +159,7 @@ export function createClaimAcks({
   p7,
   commandReplies = false,
   schedule,
+  resolveMessage,
 }) {
   let queue = Promise.resolve();
   return {
@@ -174,7 +175,15 @@ export function createClaimAcks({
           messageId = null;
         let diagnostic = { stage: 'response', httpStatus: 200, dropKind: null, isSent: true };
         try {
-          const result = await bots[host].sendChat(row.message, { retryUnauthorized: false });
+          let message = row.message;
+          if (row.queueStatus && resolveMessage) {
+            try {
+              message = await resolveMessage(host, row);
+            } catch {
+              /* Keep the closed, position-unconfirmed transactional reply. */
+            }
+          }
+          const result = await bots[host].sendChat(message, { retryUnauthorized: false });
           messageId = result?.messageId;
           sent = true;
         } catch (error) {

@@ -48,6 +48,8 @@ for (const kind of ['memory', 'firestore']) {
     f.advanceHours(12);
     assert.equal(status(await f.tick({ nonce: 'b'.repeat(32) })), 'wandered');
     assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, OTHER);
+    assert.equal((await f.runtime.state.getStreamStatus(OTHER)).seeking, false);
+    assert.ok((await f.runtime.state.getStreamStatus(OTHER)).seekAt >= f.now());
     assert.equal((await f.runtime.state.getStreamStatus(OTHER)).online, false);
     assert.equal(
       (await f.runtime.state.getPrivateMarks(OTHER, { broadcasterId: OTHER, chatterId: OTHER }))
@@ -175,6 +177,7 @@ test('pure CAS rejects stale activity/policy, prioritises live then small audien
       online: id !== '2',
       streamId: 's' + id,
       seeking: true,
+      seekAt: 1, // Explicit pre-hold membership in this synthetic capability fixture.
       paused: false,
       banned: false,
       blockedUserIds: [],

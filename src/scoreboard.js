@@ -1,3 +1,4 @@
+import { seekerState, seekerStatusMessage } from './seeker-state.js';
 import { RECEIVING_KEEPERS } from './receiving.js';
 import { streakView, stopStreak } from './streaks.js';
 import { selectEdition, editionBadgesForInterval } from '../public/editions.js';
@@ -59,6 +60,7 @@ export function reduceScores(
     registry,
     seekersEnabled = false,
     holderSince = null,
+    lineage,
     names = RECEIVING_KEEPERS,
   },
 ) {
@@ -150,11 +152,17 @@ export function reduceScores(
               ? 'Only this broadcaster can change or read their Seeker choice.'
               : !seekersEnabled
                 ? 'The authorised Keeper Seeker pilot is off.'
-                : channels[host].seeking === true
-                  ? 'Seeker queue on. Your configured channel may be suggested while live and eligible. !seek off to leave.'
-                  : channels[host]?.optedIn === true
-                    ? 'Seeker queue off. Type !seek to rejoin.'
-                    : KEEPER_SETUP_HINT;
+                : action === 'seek-status'
+                  ? channels[host]?.optedIn === true
+                    ? seekerStatusMessage(seekerState(registry, lineage, channels, marks, host))
+                    : KEEPER_SETUP_HINT
+                  : registry?.holderId === host
+                    ? 'You hold the relic. Seeker queue off; pass it on before joining again.'
+                    : seekerState(registry, lineage, channels, marks, host).member
+                      ? 'Seeker queue on. Your configured channel may be suggested while live and eligible. !seek off to leave.'
+                      : channels[host]?.optedIn === true
+                        ? 'Seeker queue off. Type !seek to rejoin.'
+                        : KEEPER_SETUP_HINT;
         else if (action === 'where') {
           const holder = names[registry?.holderId];
           message = holder
@@ -416,6 +424,14 @@ export function scoreAckDocument(previous, chat, message, channel, marks, now) {
   if (row?.status === 'queued') {
     row.scoreKind = chat.markAction.type;
     if (
+      message !== KEEPER_SETUP_HINT &&
+      row.scoreKind === 'seek-status' &&
+      chat.chatterId === chat.broadcasterId &&
+      message &&
+      !message.startsWith('Please wait')
+    )
+      row.ownSeekerStatus = true;
+    if (
       chat.chatterId === chat.broadcasterId &&
       ['seek-on', 'seek-off', 'seek-status'].includes(row.scoreKind) &&
       message === KEEPER_SETUP_HINT
@@ -504,12 +520,14 @@ export function scoreAckMutation(
   );
   if (next.result) {
     next.result.kind = row?.scoreKind;
+    if (row?.ownSeekerStatus) next.result.queueStatus = true;
     next.result.reason = row?.message?.startsWith('Please wait') ? 'cooldown' : 'normal';
   }
   for (const r of next.doc.rows)
     if (r.status !== 'queued') {
       delete r.consentKey;
       delete r.scoreKind;
+      delete r.ownSeekerStatus;
       delete r.readSummary;
       delete r.selfStatusKey;
     }

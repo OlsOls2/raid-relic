@@ -1,3 +1,4 @@
+import { dequeueSeeker, seekerState } from './seeker-state.js';
 import { hash } from './crypto.js';
 
 export const WANDER_BYTES = 128 * 1024;
@@ -78,7 +79,7 @@ export function wanderMembers(input, config) {
     (id) =>
       id !== from &&
       allowed(input, id) &&
-      input.channels[id].seeking === true &&
+      seekerState(input.registry, input.lineage, input.channels, input.marks, id).member &&
       !input.channels[from].blockedUserIds?.includes(id) &&
       !input.channels[id].blockedUserIds?.includes(from) &&
       !input.marks[from]?.blocked?.includes(id) &&
@@ -305,6 +306,7 @@ export function wanderMutation(previous, config, policy, op, now) {
     return result('capacity');
   input.lineage.stops.push(stop);
   r.holderId = to;
+  dequeueSeeker(input.channels[to], now);
   r.carriedClosures = 0;
   delete r.send;
   delete r.pendingHop;

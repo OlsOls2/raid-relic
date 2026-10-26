@@ -1,3 +1,4 @@
+import { seekerStatusMessage } from './seeker-state.js';
 import { wanderPolicy } from './wander-state.js';
 import { createWander } from './wander.js';
 import { createReceiving, configuredKeeperNetwork, RECEIVING_KEEPERS } from './receiving.js';
@@ -269,6 +270,8 @@ export async function createRuntime(
       bots,
       now,
       commandReplies: true,
+      resolveMessage: async (host, row) =>
+        receiving.enabled ? seekerStatusMessage(await receiving.status(host)) : row.message,
       schedule: replySchedule,
     });
     p7 = createP7({

@@ -313,10 +313,8 @@ for (const kind of ['memory', 'firestore']) {
       (await f.runtime.receiving.candidates(OTHER)).map((r) => r.login),
       ['raidrelichq'],
     );
-    assert.deepEqual(
-      (await f.runtime.receiving.page()).seekers.map((r) => r.login),
-      ['olsols2'],
-    );
+    assert.deepEqual((await f.runtime.receiving.page()).seekers, []); // Holder is dequeued.
+    await f.runtime.oauth.accessTokenForKeeper(OTHER); // Maintain its grant on actual use.
     assert.equal(f.calls.filter((c) => c.url.endsWith('/token')).length, initial + 2);
     const before = initial + 2;
     const blocked = await f.request(
@@ -348,7 +346,7 @@ for (const kind of ['memory', 'firestore']) {
     assert.equal(JSON.parse(recovered.body).authorization, 'ready');
     let refreshes = f.calls.filter((c) => c.url.endsWith('/token')).slice(before);
     assert.equal(refreshes.length, 0); // Already-valid authorization does not rotate again.
-    assert.equal((await f.runtime.receiving.page()).seekers[0].login, 'olsols2');
+    assert.deepEqual((await f.runtime.receiving.page()).seekers, []);
     assert.deepEqual(
       (await f.runtime.receiving.candidates(OTHER)).map((r) => r.login),
       ['raidrelichq'],

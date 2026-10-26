@@ -275,6 +275,7 @@ export function createMemoryState({
           now,
           awaitingRaid: claiming.awaitingRaid,
           registry: claiming.registry,
+          lineage: claiming.lineage,
           holderSince:
             claiming.lineage?.stops?.at(-1)?.to === claiming.registry.holderId
               ? claiming.lineage.stops.at(-1).claimedAt
@@ -395,6 +396,7 @@ export function createMemoryState({
       }
       if (markDoc) markDocs.set(host, markDoc);
       if (claiming) {
+        if (claiming.dequeued) channels.set(claiming.dequeued.id, claiming.dequeued.channel);
         registry = claiming.registry;
         lineage = claiming.lineage;
         for (const [key, doc] of Object.entries(claiming.marks)) markDocs.set(key, doc);
@@ -588,6 +590,10 @@ export function createMemoryState({
       registry = next.registry;
       lineage = next.lineage;
       for (const [id, doc] of Object.entries(next.marks)) if (doc) markDocs.set(id, doc);
+      if (next.result.status === 'wandered') {
+        const target = next.registry.holderId;
+        channels.set(target, next.channels[target]);
+      }
       return next.result;
     },
     getReceivingView(now) {

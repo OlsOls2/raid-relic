@@ -355,6 +355,7 @@ export function createFirestoreStore(
             now,
             awaitingRaid: claiming.awaitingRaid,
             registry: claiming.registry,
+            lineage: claiming.lineage,
             holderSince:
               claiming.lineage?.stops?.at(-1)?.to === claiming.registry.holderId
                 ? claiming.lineage.stops.at(-1).claimedAt
@@ -477,6 +478,8 @@ export function createFirestoreStore(
         // Store only bounded metadata, never raw chat text or proof of membership.
         if (next) tx.set(markRef, next);
         if (claiming) {
+          if (claiming.dequeued)
+            tx.set(ref('streamChannels', claiming.dequeued.id), claiming.dequeued.channel);
           tx.set(ref('keeperRegistry', 'single'), claiming.registry);
           tx.set(ref('lineage', 'single'), claiming.lineage);
           for (const [key, doc] of Object.entries(claiming.marks))
@@ -798,6 +801,10 @@ export function createFirestoreStore(
         }
         const input = { registry, lineage, channels, marks };
         const next = wanderMutation(input, config, wander, op, now);
+        if (next.result.status === 'wandered') {
+          const target = next.registry.holderId;
+          tx.set(ref('streamChannels', target), next.channels[target]);
+        }
         if (JSON.stringify(next.registry) !== JSON.stringify(registry))
           tx.set(ref('keeperRegistry', 'single'), next.registry);
         if (JSON.stringify(next.lineage) !== JSON.stringify(lineage))

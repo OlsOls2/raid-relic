@@ -1,3 +1,4 @@
+import { dequeueSeeker } from './seeker-state.js';
 import { wanderActivity } from './wander-state.js';
 import { emptyMarkDocument, reduceMark, setMarkContext } from './marks.js';
 
@@ -234,7 +235,8 @@ export function reduceLifecycle({
   ) {
     if (
       action.type === 'seek-off' ||
-      (channel.optedIn &&
+      (registry.holderId !== host &&
+        channel.optedIn &&
         !channel.banned &&
         !channel.paused &&
         !channel.blockedUserIds.includes(host) &&
@@ -283,6 +285,7 @@ export function reduceLifecycle({
     !marks.blocked.includes(host)
   ) {
     registry.holderId = host;
+    if (seekersEnabled) dequeueSeeker(channel, now);
     registry.originated = true;
   }
   marks = sync(registry, channel, marks, host);

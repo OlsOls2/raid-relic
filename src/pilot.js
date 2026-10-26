@@ -268,11 +268,10 @@ export function createPilot({
           };
         }
       }
-      if (action === 'seek-status')
-        return {
-          status: 'processed',
-          seeking: (await state.getStreamStatus(id))?.seeking === true,
-        };
+      if (action === 'seek-status') {
+        const seekerStatus = await receiving.status(id);
+        return { status: 'processed', seeking: seekerStatus.member, seekerStatus };
+      }
       if (action === 'chronicle') return chronicle.write(id);
       if (action === 'mark-links') return replies.processPending(id);
       if (action === 'bootstrap') return bootstrap(id);
@@ -365,7 +364,11 @@ export function createPilot({
           ? 'Paid generation enabled: one attempt per received stop; fiction only.'
           : 'Off: handwritten template fiction; no model calls.',
         seekers: receiving?.enabled
-          ? { enabled: true, joined: channel?.seeking === true }
+          ? {
+              enabled: true,
+              joined:
+                (await state.getReceivingView(now())).queueStates?.[keepers[id]]?.member === true,
+            }
           : { enabled: false, joined: false },
         candidates: receiving
           ? await receiving.candidates(id)
