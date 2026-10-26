@@ -14,3 +14,5 @@ a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible,s
 
 #demo-streak{font:13px/1.5 system-ui;color:#e6bb70;margin:2px 0}#demo-mark-approved{position:absolute;bottom:12%;color:#e6bb70;font:16px Cinzel,serif;pointer-events:none}.edition-label,.edition-disclaimer{font-size:13px;line-height:1.5}
 @media(max-width:650px){.demo-visual{max-height:min(35vh,220px)}.demo-visual .edition-label{font-size:13px;line-height:1.5}.demo-visual #demo-streak{font-size:12px}}
+
+.sr-only{position:absolute;width:1px;height:1px;padding:0;contain:strict;clip-path:inset(50%);white-space:nowrap}

@@ -14,3 +14,5 @@ test('fresh Atlas API mode is distinct from fictional demo identity and always w
 });
 
 test('per-stop filename is deterministic, normalized and path-safe',async()=>{const{ringCardFilename}=await import('../public/ring-card.js');assert.equal(ringCardFilename(1,'@OlsOls2'),'raid-relic-stop-1-olsols2.png');assert.equal(ringCardFilename(2,'@raidrelichq'),'raid-relic-stop-2-raidrelichq.png');for(const [n,name]of[[0,'@x'],[17,'@x'],[1,'../x'],[1,'@x/y'],[1,'@x.png'],[1,'@'],[1,'@x\n']])assert.throws(()=>ringCardFilename(n,name));});
+
+test('fictional demo filenames require a completed positive bounded ring count',async()=>{const{demoCardFilename}=await import('../public/ring-card.js');for(const n of[1,2,16])assert.equal(demoCardFilename(n),`raid-relic-demo-ring-${n}.png`);for(const n of[0,17,-1,1.5,NaN,Infinity,'1','../1'])assert.throws(()=>demoCardFilename(n));});
