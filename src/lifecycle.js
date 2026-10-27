@@ -74,10 +74,21 @@ export function parseLifecycle(payload, host, sentAt) {
     throw new Error('Invalid stream');
   return { host, type: 'online', streamId: event.id, startedAt, sentAt };
 }
+const closureFence = (channel) =>
+  Math.max(
+    channel.closedStartFence ?? -1,
+    channel.closedThrough,
+    channel.lifecycleAt,
+    channel.startedAt ?? -1,
+  );
 function closeStream(channel, marks) {
   if (channel.streamId && !channel.closedIds.includes(channel.streamId)) {
-    if (channel.closedIds.length >= LIFECYCLE_LIMITS.closedStreams)
-      throw new Error('Stream tombstone capacity reached');
+    if (channel.closedIds.length >= LIFECYCLE_LIMITS.closedStreams) {
+      // Legacy IDs have no individual start timestamps. Fence through the
+      // authoritative ordering boundary before forgetting any opaque ID.
+      channel.closedStartFence = closureFence(channel);
+      channel.closedIds.shift();
+    }
     channel.closedIds.push(channel.streamId);
   }
   const session = marks.sessions.find((item) => item.streamId === channel.streamId);
@@ -164,6 +175,12 @@ export function reduceLifecycle({
   if (
     event?.type === 'online' &&
     event.sentAt > channel.lifecycleAt &&
+    event.startedAt > (channel.closedStartFence ?? -1) &&
+    // Replacement must also satisfy the fence its own closure would establish.
+    (!channel.online ||
+      channel.closedIds.length < LIFECYCLE_LIMITS.closedStreams ||
+      channel.closedIds.includes(channel.streamId) ||
+      event.startedAt > closureFence(channel)) &&
     (event.startedAt > channel.closedThrough ||
       event.startedAt >= Math.floor(channel.closedThrough / 1000) * 1000 ||
       (observed &&

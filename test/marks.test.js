@@ -463,10 +463,30 @@ for (const kind of ['memory', 'firestore']) {
       for (let j = 0; j < 5; j++)
         await f.send('!mark orchid', { userId: String(500000 + i * 5 + j) });
     }
-    await assert.rejects(
-      Promise.resolve().then(() => f.setup({ streamId: 'overflow' })),
-      /capacity/,
+    const before = await f.view();
+    const retained = (doc) =>
+      doc.sessions.map(({ streamId, spent, marks }) => ({
+        streamId,
+        spent,
+        marks,
+      }));
+    assert.equal(before.sessions.length, MARK_LIMITS.sessions);
+    assert.ok(
+      before.sessions.every((session) => session.spent === 5 && session.marks.length === 5),
     );
+    assert.equal(before.serial, MARK_LIMITS.sessions * 5);
+    await f.setup({ streamId: 'overflow' });
+    const overflow = await f.view();
+    assert.equal(overflow.context.streamId, 'overflow');
+    assert.equal(current(overflow), undefined);
+    assert.equal(overflow.sessions.length, MARK_LIMITS.sessions);
+    assert.deepEqual(retained(overflow), retained(before));
+    assert.equal(overflow.serial, before.serial);
+    assert.deepEqual(overflow.cooldowns, before.cooldowns);
+    assert.ok(overflow.sessions.every((session) => session.closed && session.viewers.length === 0));
+    assert.ok(Buffer.byteLength(JSON.stringify(overflow)) < MARK_LIMITS.bytes);
+    await f.send('!mark lantern', { userId: '700000' });
+    assert.deepEqual(await f.view(), overflow);
     for (let i = 0; i < MARK_LIMITS.blockedUsers; i++)
       await f.instance.marks.blockUser(host, admin, String(800000 + i));
     await assert.rejects(
