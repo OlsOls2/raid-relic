@@ -168,15 +168,29 @@ export function setMarkContext(previous, host, context) {
   const selected = doc.sessions.find((session) => session.streamId === context.streamId);
   if (selected?.closed) throw new Error('Closed stream cannot be reactivated');
   if (!doc.sessions.some((session) => session.streamId === context.streamId)) {
-    if (doc.sessions.length >= MARK_LIMITS.sessions)
-      throw new Error('Retained stream capacity reached');
-    doc.sessions.push({
-      streamId: context.streamId,
-      spent: 0,
-      viewers: [],
-      marks: [],
-      closed: false,
-    });
+    if (doc.sessions.length >= MARK_LIMITS.sessions) {
+      // Lifecycle owns closed-stream replay protection. Reclaim only an
+      // inactive, closed, content-free session whose viewer counters were
+      // already cleared at stream closure; never discard retained marks.
+      const disposable = doc.sessions.findIndex(
+        (session) =>
+          session.closed === true &&
+          session.streamId !== doc.context?.streamId &&
+          session.marks.length === 0 &&
+          session.viewers.length === 0,
+      );
+      if (disposable >= 0) doc.sessions.splice(disposable, 1);
+    }
+    // A full retained archive must not reject authoritative online/context or
+    // privacy transitions. Without a session, reduceMark declines collection.
+    if (doc.sessions.length < MARK_LIMITS.sessions)
+      doc.sessions.push({
+        streamId: context.streamId,
+        spent: 0,
+        viewers: [],
+        marks: [],
+        closed: false,
+      });
   }
   if (doc.context && doc.context.streamId !== context.streamId) {
     const ended = doc.sessions.find((session) => session.streamId === doc.context.streamId);
