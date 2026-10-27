@@ -36,13 +36,13 @@ An accepted Send Off is not an arrival. Watch the claim meter: eligible early of
 
 Operator-reported physical review, **26 October 2026, approximately 09:15 UK (UTC)**:
 
-| Journey | Reported result |
-|---|---|
-| olsols2 → raidrelichq | Ring 8, tracked streak 1; arrival and two-chat binding completed |
-| Community hand-off | Announcement, pin and shoutout/follow card appeared; no duplicate effects reported |
-| Recorded journey | Stop 8 and replay worked; `!relic top` and `!relic badges` replied correctly |
+| Journey               | Reported result                                                                    |
+| --------------------- | ---------------------------------------------------------------------------------- |
+| olsols2 → raidrelichq | Ring 8, tracked streak 1; arrival and two-chat binding completed                   |
+| Community hand-off    | Announcement, pin and shoutout/follow card appeared; no duplicate effects reported |
+| Recorded journey      | Stop 8 and replay worked; `!relic top` and `!relic badges` replied correctly       |
 
-The author did not independently observe this stream. A separate operator read confirmed the pin request used bot **raidrelicbot** (1591804828), HTTP 204 and a 300-second duration at 09:15:44.959506 UTC. Twitch's differing “raidrelichqbot” UI attribution remains unexplained. The newer own-score and veto-outcome replies have local test coverage, not a new physical review.
+The author did not independently observe this stream. A separate operator read confirmed the pin request used bot **raidrelicbot** (1591804828), HTTP 204 and a 300-second duration at 09:15:44.959506 UTC. Twitch's differing “raidrelichqbot” UI attribution remains unexplained. Later owner-reported olsols2 → olsols3 feedback reached Ring 10 / Streak 3 on 26 October, with retained state independently read by the operator at 22:47 UTC. This is owner physical feedback, not source-author observation.
 
 ## Install on a stream
 
@@ -95,16 +95,20 @@ See [Auto-wander](docs/WANDER.md) for the 72-hour / 12-hour policy and limits.
 
 The operator-only `PILOT_KEEPERS_JSON` path supports up to four configured Keepers; unset preserves the existing two. The canonical service now has the three-Keeper mapping, including olsols3. [Third Keeper setup](docs/THIRD_KEEPER.md) documents the exact app OAuth route, bot moderation, bootstrap and optional broadcasting. This job did not observe third-channel consent, moderation, bootstrap, Keep, Seeking or OBS setup; those remain owner actions through the canonical service, not the read-only preview.
 
-### Safe recording preview
+### Read-only card review and screenshots
 
-The published **[safe recording preview](https://growth-safe---raid-relic-vz4bhnskgq-uc.a.run.app/demo/)** includes the [simulated Wander film scene](https://growth-safe---raid-relic-vz4bhnskgq-uc.a.run.app/demo/wander), 9/17/42/120 style examples and the [Atlas](https://growth-safe---raid-relic-vz4bhnskgq-uc.a.run.app/atlas/). Revision `raid-relic-growth-1026` is pinned at zero traffic to runtime `6831e25d6643d71253ca1d40df3b63687af174ec`. It is read-only: Wander, all five P7 action gates, Seekers, clipping and paid features are OFF. The examples do not change production history or policy.
+The published [holder-card preview](https://holder-card---raid-relic-vz4bhnskgq-uc.a.run.app/atlas/) adds approved engravings, retained journey/hops and separate **Keeper at this stop** / **Current holder at export** labels to the existing manual PNG downloads. Try the Atlas and [Keeper page](https://holder-card---raid-relic-vz4bhnskgq-uc.a.run.app/keeper/olsols3), or the [local simulated tour](https://holder-card---raid-relic-vz4bhnskgq-uc.a.run.app/demo/). No login or live action is needed. [Card review steps](docs/JUDGES_QUICKSTART.md) · [Dated preview screenshot gallery](docs/SCREENSHOTS.md).
 
-The operator reports **812/812 tests, zero skips; 37 serial browser flows/116 checks; nine viewed simulated captures; and a passing real 900387ms soak with 25 natural tours**. See the [quality record](docs/QUALITY.md), [successful CI run](https://github.com/OlsOls2/raid-relic/actions/runs/40397749816) and [recording/safety handoff](docs/VISUAL_RECORDING.md). These are operator-reported native results, not physical Twitch/OBS signoff. A later docs-only HEAD does not change that deployed runtime or require a rebuild.
+![Read-only holder-card preview Atlas, captured 27 October 2026 at 02:57 UTC; recorded Ring 10 is a dated snapshot](docs/media/atlas-preview.png)
 
-At this run’s 26 October 2026, 20:46 UTC staging check, production was `raid-relic-network3-off-1026` / runtime `49e515c` at 100%, unchanged by this release. A separate operation created `raid-relic-growth-on-1026` at 20:52:44 UTC; the parent’s 20:56 read observed it at 100%, using runtime `6831e25`. This run published only the read-only `growth-safe` zero-traffic preview and performed no promotion, rollback or live activation. Production allocation is operator-controlled and mutable; these are timed observations. Approval for the separate operation is not established here and does not imply Wander GO. The safe preview remains read-only with its listed gates OFF; Wander scheduling remains commented out pending explicit Olly/Grok GO.
+The operator reports **838/838 native tests, zero skips, and 38 serial browser workflows / 119 checks**, plus three decoded synthetic-fixture card PNGs actually viewed. This cohort validates runtime `4640d0fc17cd8e3b8806ec243e119642e2098dcb`, revision `raid-relic-holder-card-1027`, tag `holder-card` at zero traffic, published at 02:55:45 UTC on 27 October 2026. [Successful CI](https://github.com/OlsOls2/raid-relic/actions/runs/40441046599) · [Report-derived quality record](docs/QUALITY.md). These are native synthetic/browser results, not physical Twitch or OBS signoff. This docs-only update inherits that application cohort; it does not claim a new runtime test or deployment.
 
-### Keeper authorization recovery candidate
+At the operator's pre-release observation, production remained `raid-relic-seeker-state-on-1026` at 100%, runtime `3dbae6fb751e1cbdc8e47f07236d773bad676a44`. Its existing cards have the earlier metadata-only layout; the expanded cards are in the zero-traffic preview only. Production allocation is mutable and owner-controlled. The preview is master read-only, all five P7 action gates OFF, Seekers ON, Wander/clipping/paid features OFF. OAuth/control mutations are denied by design; this release performs no promotion or live activation. Wander scheduling remains commented out until explicit Olly/Grok GO.
 
-The source-only authorization candidate now automatically maintains existing Keeper and bot grants before use, including ordinary access-token expiry, under the existing token lease and encrypted pair rotation. It also makes ready non-Seeker Keepers selectable after Seeker suggestions. Cached control status stays provider-free; the explicit own-account recovery action remains available. Consent is needed only when refresh is definitively rejected or authorization is absent, not for routine access expiry. See [authorization maintenance](docs/AUTHORIZATION_RECOVERY.md) for the narrow token-write exception, temporary-failure handling and pending native/preview gates. No actual account recovery is claimed by the source author; the recording-preview evidence above remains tied to runtime `6831e25`.
+### Seeker choice and authorization maintenance
 
-The next [Seeker membership correction](docs/SEEKER_MEMBERSHIP.md) dequeues only completed recipients, excludes current/stale former-holder choices and makes `!seek status` a distinct observed-status reply. Former holders can explicitly rejoin after passing; they are never automatically enrolled. This source correction is awaiting native QA and its own read-only preview.
+The live baseline includes Seeker-first suggestions while allowing other ready, live, opted-in configured Keepers as manual targets. Completed recipients leave the queue; holders are excluded, former holders must explicitly rejoin after passing, and `!seek status` reports observed membership/rank without joining. [Membership policy](docs/SEEKER_MEMBERSHIP.md).
+
+Existing Keeper/bot grants are maintained before use on access-token rejection or within 120 seconds of expiry, using per-role singleflight, distributed leases and atomic encrypted pair rotation. Fresh valid grants need no token-lease writes; cached control status makes no extra provider calls. Transient failures mean retry later; definitive refresh rejection requires reconnecting. The operator recovered all three Keeper grants on 26 October at 22:10 UTC without reconsent; this is a dated result, not a promise that future grants remain valid. [Authorization maintenance](docs/AUTHORIZATION_RECOVERY.md). The source author performed no account recovery or live provider action.
+
+Freeze: **31 October 2026, 18:00 UK/UTC**.

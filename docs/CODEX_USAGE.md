@@ -2,7 +2,21 @@
 
 This is a draft for the owner's Devpost submission, not a submitted entry or a claim of live validation. Codex authored the application code, tests, documentation and original procedural vector assets in one saved session: **01a1705c-a87d-7143-80f6-021e47b78ced**. No delegated code agents or forked authoring threads were used. The parent/orchestrator handled review, Git operations, independent QA and authorised builds/deployments. Owner direction and parent-reported evidence are distinguished from tests performed by Codex; this draft does not invent human review, footage or live results.
 
-## What we built
+## Current delivery checkpoint — 27 October 2026
+
+The operator published the audit (`5fb4bf1`, `must-audit` at zero traffic), then the expanded-card feature (`4640d0fc17cd8e3b8806ec243e119642e2098dcb`, `holder-card` at zero traffic). The feature cohort passed **838/838 native Node.js 22.23.4 tests with zero skips and 38 serial browser workflows / 119 checks**. Three actual synthetic-fixture PNG downloads were decoded and viewed by the operator. [Feature CI](https://github.com/OlsOls2/raid-relic/actions/runs/40441046599) · [Report-derived quality record](QUALITY.md). This final judge-document increment changes prose and includes supplied read-only preview screenshots; it inherits the unchanged app cohort and does not invent its own CI result or future commit hash.
+
+Current code includes before-use OAuth renewal on 401/near expiry, per-role singleflight and distributed leased encrypted-pair rotation; Seeker-first manual targets with other eligible Keepers allowed; atomic recipient dequeue, holder exclusion and explicit former-holder rejoin; observed queue status; approved engravings and retained journeys on share cards. Cards distinguish recorded destination from current holder at export, recheck fresh public content and preserve erasure/held-text boundaries. No new dependency, paid API, rendering server, storage service or scheduler was added for cards. Existing hosting is not guaranteed a zero invoice.
+
+At the operator's pre-release observation, live production remained `raid-relic-seeker-state-on-1026` / runtime `3dbae6f` at 100%; expanded cards were preview-only. Allocation remains owner-controlled and mutable. The new preview is master read-only, P7 five OFF, Seekers ON, Wander/clip/paid OFF. The owned Wander cron stays commented until explicit Olly/Grok GO. No source-author provider, control, stream, chat, raid, consent or traffic action was performed. The operator's Ring 10 / Streak 3 feedback and dated grant recovery are separate from synthetic native proof. [Preview screenshot provenance](SCREENSHOTS.md) records the actual GET-only capture and its limits.
+
+## Evidence selection and authorship
+
+The [machine export manifest](../.codex-evidence/EXPORT_MANIFEST.json) and [generated session summary](../CODEX_SESSION.md) are the authority for the latest cutoff, counts, digests and run range. The selected [sanitized transcript](../.codex-evidence/EXPORTED_TRANSCRIPT.md) is not a complete raw conversation: private reasoning, system/developer/bootstrap material, opaque/media content and sensitive entries are omitted. The operator reports five whole-entry secondary secret-scan omissions and a zero-finding rescan at the source-206 checkpoint; later export metadata is generated after authoring stops, not guessed here. Raw JSONL, credentials and private scan inputs are not committed or read by the source author. Selected evidence is not a claim that every session or historical commit has a mapped trailer. [Built-with timeline](../BUILT_WITH_CODEX.md) and [evidence rules](CODEX_EVIDENCE.md) preserve those limits.
+
+The following early implementation narrative and commit table are retained as history. Their old deployment, count and pending-review statements describe their own checkpoints; they are not current release authority. In particular, the early 90-second window below predates the current 180-second policy.
+
+## Early implementation narrative (historical)
 
 Raid Relic is a Node.js HTTP service targeting Cloud Run with Firestore production persistence. Webhook authentication verifies the exact raw Twitch EventSub body with timing-safe HMAC comparison, timestamp replay checks, transactional event dedupe, bounded parsing and raw UTF-8 challenge responses. Memory and injected fake-Firestore stores exercise the same reducers without real accounts or cloud operations.
 
@@ -14,24 +28,24 @@ Pending mark text stays private. Approval controls public projection; forget, bl
 
 ## Concrete implementation and review checkpoints
 
-| Commit | Work and relevant review lesson |
-| --- | --- |
-| `c63ec31` | Recap uses shared canonical rune geometry; the same approved word keeps its glyph across views. |
-| `523d772` | Forge template/schema/render/download path and mocked optional paid path; no actual AI proof. |
-| `d392a0c` | Carried-rune visual fade after three accepted holder-stream closures; fresh local marks remain bright, no erasure/quota change. |
-| `d8eecf4` | Copied Shared Chat commands lose all command authority; bounded decorative echoes do not establish membership. Regression, not an observed live exploit. |
-| `82325ee` | Public own-mark capability sharing, bounded known-ban enforcement and generation-CAS cancellation of never-claimed queues. |
+| Commit    | Work and relevant review lesson                                                                                                                                          |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `c63ec31` | Recap uses shared canonical rune geometry; the same approved word keeps its glyph across views.                                                                          |
+| `523d772` | Forge template/schema/render/download path and mocked optional paid path; no actual AI proof.                                                                            |
+| `d392a0c` | Carried-rune visual fade after three accepted holder-stream closures; fresh local marks remain bright, no erasure/quota change.                                          |
+| `d8eecf4` | Copied Shared Chat commands lose all command authority; bounded decorative echoes do not establish membership. Regression, not an observed live exploit.                 |
+| `82325ee` | Public own-mark capability sharing, bounded known-ban enforcement and generation-CAS cancellation of never-claimed queues.                                               |
 | `b079fe8` | Corrected a self-imposed manual reply requirement: a proven command now awaits its exact-row at-most-once bot reply, including 401/timeout/finalize-failure protections. |
-| `8ded729` | Emergency precision-aware restart recovery and explicit Send Off reservation failures. HTTP-only historical logs did not prove the exact earlier failed predicate. |
-| `1a26c81` | Parent merged the emergency fix into polish, retaining generation cancellation, exact worker identity, privacy and local features. |
+| `8ded729` | Emergency precision-aware restart recovery and explicit Send Off reservation failures. HTTP-only historical logs did not prove the exact earlier failed predicate.       |
+| `1a26c81` | Parent merged the emergency fix into polish, retaining generation cancellation, exact worker identity, privacy and local features.                                       |
 
 Parent-provided Simulator screenshots also drove 375 px whole-word layout, true 160 px corner bounds, 1920 px framing and stable fade comparisons. These are labelled local mocked captures, not physical OBS, Shared Chat, audio-listening or actual Twitch/AI proof.
 
 Later local run descriptions, supplied as task context rather than inferred from raw transcripts: 055 share/ban/CAS; 056 automatic exact reply; 057 read-only worktree blocker; 058 minimal d529-based emergency fix; 059 merge retaining generation and exact intent; 060 self-login mapping and this writeup; 061 replay-idempotency correction; 062 final evidence and prose cleanup. No raw run JSONL, rollout backup, exported transcript or auth directory was read to write this document.
 
-## Evidence and limits
+## Early evidence and limits (historical)
 
-The current [export manifest](../.codex-evidence/EXPORT_MANIFEST.json) records **1008 selected entries**, cutoff **2026-10-25T07:37:52.839Z**, 49 CLI digests 000–048 and export SHA256 `6f3f6f6e94a88d0014f7d3d89708f67aa5a315a38f767c8e8f13d3d5ce78ce93`. It is a selected sanitized export with explicit omissions, not a raw complete conversation. Older 870-entry/042 accounts are historical. Runs 055–062 are later than this snapshot and are not automatically covered. Raw backups remain local/ignored. [Session guide](../CODEX_SESSION.md) and [evidence guide](CODEX_EVIDENCE.md) explain cutoff and omission rules. Parent independently verified the final local 061 source: **374/374 tests, zero failures or skips**, and **nine isolated browser workflows / 39 checks**, including the named profile and negative name filter. The rename-replay probe now produces exactly two bot POSTs in both memory and fake Firestore, versus three before the fix. Parent is preparing the [name-lookup verification manifest](../.codex-evidence/name-lookup-verification.json) after commit; its source commit and hashes are not predicted here.
+The then-current [export manifest](../.codex-evidence/EXPORT_MANIFEST.json) records **1008 selected entries**, cutoff **2026-10-25T07:37:52.839Z**, 49 CLI digests 000–048 and export SHA256 `6f3f6f6e94a88d0014f7d3d89708f67aa5a315a38f767c8e8f13d3d5ce78ce93`. It is a selected sanitized export with explicit omissions, not a raw complete conversation. Older 870-entry/042 accounts are historical. Runs 055–062 are later than this snapshot and are not automatically covered. Raw backups remain local/ignored. [Session guide](../CODEX_SESSION.md) and [evidence guide](CODEX_EVIDENCE.md) explain cutoff and omission rules. Parent independently verified the final local 061 source: **374/374 tests, zero failures or skips**, and **nine isolated browser workflows / 39 checks**, including the named profile and negative name filter. The rename-replay probe now produces exactly two bot POSTs in both memory and fake Firestore, versus three before the fix. Parent is preparing the [name-lookup verification manifest](../.codex-evidence/name-lookup-verification.json) after commit; its source commit and hashes are not predicted here.
 
 Parent reported the merged local checkpoint 359/359 tests with zero skips and nine sandboxed browser flows/39 checks. Separately, the canonical emergency deployment record reports source 8ded729/revision `raid-relic-sendfix1025` at 100%,235/235 tests, eight mocked pilot browser checks, 15 asset matches and unchanged OAuth grant metadata. These are **different source checkpoints**. See [typed deployment proof](../.codex-evidence/live-restart-deployment.json). Codex has not rechecked production. Production/provider/cloud access is frozen during owner/Grok retesting; neither the new mapping nor the merged polish source was deployed by this job. Grok owns the production retest.
 
