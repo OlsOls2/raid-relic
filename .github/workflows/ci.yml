@@ -17,3 +17,24 @@ jobs:
       - run: npm ci
       - run: npm run format:check
       - run: npm test
+  journey:
+    needs: test
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      # Toolchain setup may download; the journey itself runs in an offline namespace.
+      - run: sudo apt-get update && sudo apt-get install -y bubblewrap
+      - run: npx playwright-core install --with-deps chromium
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/raid-relic-browsers
+      - run: node scripts/ci-journey.js
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/raid-relic-browsers

@@ -1,19 +1,30 @@
 export const OVERLAY_WALL_MS = 7200000;
 export function overlaySoakOptions(args = []) {
   if (
-    args.some((a) => !/^--(?:mode=(?:smoke|wall|logical)|duration-ms=7200000)$/.test(a)) ||
+    args.some(
+      (a) =>
+        !/^--(?:mode=(?:smoke|wall|wall-probe|logical)|duration-ms=(?:7200000|600000))$/.test(a),
+    ) ||
     new Set(args.map((a) => a.split('=')[0])).size !== args.length
   )
     throw Error('Invalid soak options');
   const mode = args.find((a) => a.startsWith('--mode='))?.slice(7) ?? 'smoke';
-  const duration = args.includes('--duration-ms=7200000');
-  if ((mode === 'wall') !== duration) throw Error('Wall mode requires explicit two-hour duration');
+  const requested = args.find((a) => a.startsWith('--duration-ms='));
+  const required = { wall: '--duration-ms=7200000', 'wall-probe': '--duration-ms=600000' }[mode];
+  if (requested !== required) throw Error('Wall modes require their exact explicit duration');
   return {
     mode,
-    durationMs: mode === 'smoke' ? 20000 : OVERLAY_WALL_MS,
+    durationMs: mode === 'smoke' ? 20000 : mode === 'wall-probe' ? 600000 : OVERLAY_WALL_MS,
     warmupMs: mode === 'wall' ? 120000 : 2000,
     logical: mode === 'logical',
   };
+}
+// Floor cumulative elapsed time, not each interval: preserve sub-ms remainder
+// without passing fractional timestamps into a Date.now()-based fixture.
+export function overlayFixtureElapsed(elapsed, duration) {
+  if (!Number.isFinite(elapsed) || elapsed < 0 || !Number.isSafeInteger(duration) || duration < 1)
+    throw Error('Invalid fixture clock');
+  return Math.floor(Math.min(elapsed, duration));
 }
 export function overlaySoakBounds(samples) {
   if (samples.length < 2 || samples.length > 25) return false;

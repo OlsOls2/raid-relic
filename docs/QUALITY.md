@@ -5,13 +5,13 @@ Generated from successful operator reports; not source-author execution or physi
 
 | Latest observed cohort | Value |
 |---|---|
-| Observed UTC | 2026-10-27T08:49:25.375Z |
+| Observed UTC | 2026-10-27T12:24:48.497Z |
 | Node | 22.23.4 |
-| Unit tests / pass / skip | 901 / 901 / 0 |
-| Browser workflows / checks | 43 / 133 |
-| Source identity SHA256 | c9ef1946f6a04748ecc8e81a0dad56530cb2754e9824228a5769d92d73d43bb3 |
-| Unit report SHA256 | 34d42eec97b2f1b54b8ab8dac7b9c5646b0902bab7ea724563d2117aa682994c |
-| Browser report SHA256 | d4430743e884cbc2597b5db897b5d53130c9b4f1ecd0378d1d92d4017aebc4bc |
+| Unit tests / pass / skip | 913 / 913 / 0 |
+| Browser workflows / checks | 44 / 137 |
+| Source identity SHA256 | dcfb925967703e984999e9c5dadb5b4bf803190ff97e8a41d0192ea2cef35f32 |
+| Unit report SHA256 | 8ab92de05a3e1d29bf2ccb54b4df03815c64be3ec56633efe608cdb4d33e32bf |
+| Browser report SHA256 | df272653424456a2a5513f3a0ea858543960efde6bd35be2568d975def21d316 |
 
 <!-- CURRENT_QUALITY_END -->
 

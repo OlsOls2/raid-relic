@@ -3,6 +3,23 @@ import { createServer } from 'node:https';
 import { createLocalTLS } from './local-tls.js';
 import { attachOverlaySockets } from '../src/overlay-sockets.js';
 import { pilotFixture } from './pilot-fixture.js';
+import { access, constants, realpath } from 'node:fs/promises';
+import { isAbsolute, sep } from 'node:path';
+export async function localChromiumOptions(chromium) {
+  try {
+    await access('/snap/bin/chromium', constants.X_OK);
+    return { executablePath: '/snap/bin/chromium', headless: true, chromiumSandbox: true };
+  } catch {
+    const cache = process.env.PLAYWRIGHT_BROWSERS_PATH;
+    if (!cache || !isAbsolute(cache) || cache === '/')
+      throw Error('Explicit local browser cache required');
+    const root = await realpath(cache),
+      executablePath = await realpath(chromium.executablePath());
+    if (!executablePath.startsWith(root + sep)) throw Error('Browser outside toolchain cache');
+    await access(executablePath, constants.X_OK);
+    return { executablePath, headless: true, chromiumSandbox: true };
+  }
+}
 export async function visualReview({ seekers = false, durable = false } = {}) {
   const origin = 'https://localhost:5191',
     fixture = await pilotFixture(durable === true ? 'firestore' : 'memory', {
@@ -29,12 +46,8 @@ export async function visualReview({ seekers = false, durable = false } = {}) {
       server.once('error', j);
       server.listen(5191, '127.0.0.1', r);
     });
-    const { chromium } = await import('playwright');
-    browser = await chromium.launch({
-      executablePath: '/snap/bin/chromium',
-      headless: true,
-      chromiumSandbox: true,
-    });
+    const { chromium } = await import('playwright-core');
+    browser = await chromium.launch(await localChromiumOptions(chromium));
     context = await browser.newContext({
       ignoreHTTPSErrors: true,
       viewport: { width: 390, height: 844 },

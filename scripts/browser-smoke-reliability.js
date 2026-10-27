@@ -7,18 +7,25 @@ let review,
   stage = 'setup',
   passed = false,
   failureCategory = null,
-  connections = 0;
+  connections = 0,
+  closedConnections = 0;
 const checks = [],
   diagnostic = {};
 try {
   review = await visualReview({ durable: true });
   const { page, context, fixture: f, origin } = review;
+  // Install before module evaluation: overlay-client captures timer functions
+  // at creation. The clock runs normally until the explicit idle fast-forward.
+  await page.clock.install();
   await context.routeWebSocket('**/*', (route) =>
     new URL(route.url()).origin === origin.replace('https:', 'wss:')
       ? route.connectToServer()
       : route.close(),
   );
-  page.on('websocket', () => connections++);
+  page.on('websocket', (socket) => {
+    connections++;
+    socket.on('close', () => closedConnections++);
+  });
   for (const id of [BOT, HOME, OTHER]) await f.login(id);
   for (const id of [HOME, OTHER]) {
     await f.control(id, 'bootstrap');
@@ -124,6 +131,42 @@ try {
   assert.deepEqual(review.stats(), { errors: 0, external: 0 });
   checks.push({
     name: 'Fresh post-disconnect erasure removes carried words; decoded reduced SVG, no extra Raid POST or unbounded reconnect loop',
+    passed: true,
+  });
+  stage = 'human-idle-suspend';
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.waitForFunction(
+    () => Number(document.querySelector('canvas.relic3d')?.dataset.frames) > 2,
+  );
+  f.advance(240000); // Resume must seek an elapsed completed receipt, not replay arrival.
+  await page.keyboard.press('Shift');
+  const closedBeforeIdle = closedConnections;
+  await page.clock.fastForward(600001);
+  await page.waitForFunction(() => document.body.dataset.connection === 'suspended');
+  // The browser's actual WebSocket close event must arrive, not just a label.
+  for (let i = 0; i < 50 && closedConnections === closedBeforeIdle; i++)
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  assert.equal(closedConnections, closedBeforeIdle + 1);
+  assert.equal(await page.locator('#runes img').count(), 0);
+  const idleConnections = connections;
+  await page.clock.fastForward(10000);
+  assert.equal(connections, idleConnections);
+  assert.equal(await page.locator('body').getAttribute('data-connection'), 'suspended');
+  stage = 'human-idle-trusted-resume';
+  await page.keyboard.press('Shift');
+  await page.waitForFunction(() => document.body.dataset.connection === 'connected');
+  assert.equal(connections, idleConnections + 1);
+  assert.equal(await page.locator('#runes img').count(), 0);
+  assert.equal((await f.runtime.overlayFeeds[OTHER].snapshot()).approvedCount, 0);
+  assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
+  assert.equal(
+    Number(await page.locator('.p3-flash').evaluate((el) => getComputedStyle(el).opacity)),
+    0,
+  );
+  assert.deepEqual(review.stats(), { errors: 0, external: 0 });
+  diagnostic.independentIdleResumeChecks = 1;
+  checks.push({
+    name: 'Browser-clock ten-minute human idle closes actual WSS; trusted Shift resumes fresh erased projection without arrival replay',
     passed: true,
   });
   diagnostic.connections = connections;

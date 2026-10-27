@@ -4,7 +4,12 @@ import { mkdir, writeFile, stat } from 'node:fs/promises';
 import { performance } from 'node:perf_hooks';
 import { visualReview } from '../test-support/visual-review.js';
 import { HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';
-import { overlaySoakOptions, overlaySoakBounds } from '../test-support/overlay-soak.js';
+import {
+  overlaySoakOptions,
+  overlaySoakBounds,
+  overlayFixtureElapsed,
+} from '../test-support/overlay-soak.js';
+import { hash } from '../src/crypto.js';
 let review,
   deadline,
   cdp,
@@ -21,11 +26,17 @@ let peakHeap = 0,
   sockets = 0,
   forbidden = 0;
 let observationStart = null;
+let trustedInputCount = 0;
+let fixture,
+  requestedActor = null;
+const diagnostic = {};
 const started = performance.now(),
   samples = [];
 const assets = { files: 0, bytes: 0, largestBytes: 0 };
 async function sample() {
+  stage = 'sample-gc';
   await cdp.send('HeapProfiler.collectGarbage'); // Retained heap, explicitly forced GC.
+  stage = 'sample-metrics';
   const [heap, dom, data] = await Promise.all([
     cdp.send('Runtime.getHeapUsage'),
     cdp.send('Memory.getDOMCounters'),
@@ -66,6 +77,12 @@ try {
   const maxWall = options.logical ? 150000 : options.warmupMs + options.durationMs + 120000;
   review = await visualReview();
   const { context, page, origin, fixture: f } = review;
+  fixture = f;
+  const advanceFixture = (delta = 1) => {
+    assert.ok(Number.isSafeInteger(delta) && delta >= 0 && Number.isSafeInteger(f.now()));
+    f.advance(delta);
+    assert.ok(Number.isSafeInteger(f.now()));
+  };
   deadline = setTimeout(() => {
     void context.close().catch(() => {});
   }, maxWall);
@@ -104,18 +121,27 @@ try {
   for (const id of [HOME, OTHER]) {
     f.streams.get(id).viewer_count = 1;
     await f.control(id, 'bootstrap');
-    f.advance();
+    advanceFixture();
     await f.control(id, 'keep');
-    f.advance();
+    advanceFixture();
   }
   await f.control(HOME, `send:${OTHER}`);
   await f.raid();
   await f.chat(HOME, '6500', '!offer');
   await f.chat(OTHER, '6501', '!accept');
-  f.advance(240000); // Initial completed arrival is elapsed, not restarted on read.
+  advanceFixture(240000); // Initial completed arrival is elapsed, not restarted on read.
   await page.setViewportSize({ width: 480, height: 800 });
+  stage = 'overlay-navigation';
   await page.goto(origin + '/overlay/' + OTHER);
   await page.bringToFront();
+  // Playwright keyboard input is browser-trusted; never forge isTrusted or
+  // change the production ten-minute human-idle policy.
+  const activeInput = async () => {
+    stage = 'trusted-input';
+    await page.keyboard.press('Shift');
+    trustedInputCount++;
+  };
+  stage = 'frame-ready';
   await page.waitForFunction(
     () =>
       document.body.dataset.connection === 'connected' &&
@@ -124,49 +150,72 @@ try {
   await page.locator('canvas.relic3d').evaluate((c) => c.setAttribute('data-render-profile', ''));
   cdp = await context.newCDPSession(page);
   stage = 'warmup';
+  await activeInput();
+  stage = 'warmup';
   await page.waitForTimeout(options.warmupMs);
-  f.advance(options.warmupMs);
+  advanceFixture(options.warmupMs);
   await sample();
   observationStart = performance.now();
+  await activeInput();
+  let nextInputAt = performance.now() + 300000;
   let nextUpdate = options.mode === 'smoke' ? 2000 : 60000;
   let nextCheckpoint = options.mode === 'smoke' ? 10000 : 300000;
   while (logicalElapsedMs < options.durationMs) {
+    if (performance.now() >= nextInputAt) {
+      await activeInput();
+      nextInputAt = performance.now() + 300000;
+    }
     const previousLogical = logicalElapsedMs;
     if (options.logical) {
-      f.advance(60000);
+      advanceFixture(60000);
       logicalElapsedMs = Math.min(options.durationMs, logicalElapsedMs + 60000);
+      stage = 'logical-wait';
       await page.waitForTimeout(100);
     } else {
+      stage = 'observation-wait';
       await page.waitForTimeout(1000);
-      logicalElapsedMs = Math.min(options.durationMs, performance.now() - observationStart);
-      f.advance(logicalElapsedMs - previousLogical);
+      logicalElapsedMs = overlayFixtureElapsed(
+        performance.now() - observationStart,
+        options.durationMs,
+      );
+      advanceFixture(logicalElapsedMs - previousLogical);
     }
-    stage = 'observe';
+    stage = 'peak-heap';
     const live = await cdp.send('Runtime.getHeapUsage');
     peakHeap = Math.max(peakHeap, live.usedSize);
     if (logicalElapsedMs >= nextUpdate) {
       const actor = String(7000 + (cycles % 32));
+      requestedActor = actor;
+      stage = 'cycle-mark';
       await f.chat(OTHER, actor, '!mark moon');
+      stage = 'cycle-mark-read';
       const doc = await f.runtime.state.getPrivateMarks(OTHER, {
         broadcasterId: OTHER,
         chatterId: OTHER,
       });
       const mark = doc.sessions.flatMap((s) => s.marks).find((m) => m.userId === actor);
       assert.ok(mark);
+      stage = 'cycle-approve';
       await f.chat(OTHER, OTHER, `!relic approve ${mark.id}`);
+      stage = 'rune-visible';
       await page.waitForFunction(() => document.querySelector('#runes').children.length > 0);
+      stage = 'cycle-forget';
       await f.chat(OTHER, actor, '!relic forgetme');
+      stage = 'rune-cleared';
       await page.waitForFunction(() => document.querySelector('#runes').children.length === 0);
       cycles++;
       f.calls.length = 0; // No retained growing provider-call history in this long fixture.
       if (cycles % 5 === 0) {
+        stage = 'socket-drop';
         review.dropConnections();
         await page.waitForFunction(() => document.body.dataset.connection !== 'connected');
+        stage = 'socket-reconnect';
         await page.waitForFunction(() => document.body.dataset.connection === 'connected');
       }
       nextUpdate += options.mode === 'smoke' ? 2000 : 60000;
     }
     if (logicalElapsedMs >= nextCheckpoint || logicalElapsedMs >= options.durationMs) {
+      stage = 'checkpoint-wait';
       await page.waitForTimeout(150);
       await sample();
       nextCheckpoint += options.mode === 'smoke' ? 10000 : 300000;
@@ -176,18 +225,75 @@ try {
   assert.equal(forbidden, 0);
   assert.deepEqual(review.stats(), { errors: 0, external: 0 });
   assert.ok(cycles > 0 && cycles <= 120);
-  if (options.mode === 'wall') assert.ok(performance.now() - observationStart >= 7200000);
+  if (['wall', 'wall-probe'].includes(options.mode))
+    assert.ok(performance.now() - observationStart >= options.durationMs);
   passed = true;
   stage = 'complete';
 } catch (e) {
   failureCategory = ['AssertionError', 'TimeoutError', 'TypeError'].includes(e?.name)
     ? e.name
     : 'fixture-or-browser';
+  const line = /soak-overlay[.]js:(\d+)/.exec(e?.stack ?? '');
+  diagnostic.assertionLine = line ? Number(line[1]) : 0;
+  diagnostic.cycle = cycles;
+  diagnostic.logicalClockMs = logicalElapsedMs;
+  diagnostic.fixtureClockInteger = Number.isSafeInteger(fixture?.now()) ? 1 : 0;
+  try {
+    if (fixture) {
+      const channel = await fixture.runtime.state.getStreamStatus(OTHER);
+      const doc = await fixture.runtime.state.getPrivateMarks(OTHER, {
+        broadcasterId: OTHER,
+        chatterId: OTHER,
+      });
+      const marks = doc.sessions.flatMap((s) => s.marks);
+      diagnostic.channelOnline = channel?.online ? 1 : 0;
+      diagnostic.channelOptedIn = channel?.optedIn ? 1 : 0;
+      diagnostic.channelPaused = channel?.paused ? 1 : 0;
+      diagnostic.channelBanned = channel?.banned ? 1 : 0;
+      diagnostic.approvedMarkCount = marks.filter((m) => m.status === 'approved').length;
+      diagnostic.pendingMarkCount = marks.filter((m) => m.status === 'pending').length;
+      diagnostic.actorSpent =
+        doc.sessions.flatMap((s) => s.viewers).find((v) => v.userId === requestedActor)?.spent ?? 0;
+      diagnostic.privacyFloorMs = fixture.db?.docs.get(`presence/${hash(OTHER)}`)?.notBefore ?? -1;
+    }
+  } catch {
+    diagnostic.stateDiagnosticUnavailable = 1;
+  }
+  let diagnosticTimer;
+  try {
+    Object.assign(
+      diagnostic,
+      await Promise.race([
+        review.page.evaluate(() => ({
+          domRuneCount: document.querySelector('#runes')?.children.length ?? -1,
+          connectionCode: ['connected', 'connecting', 'reconnecting', 'stale', 'suspended'].indexOf(
+            document.body.dataset.connection,
+          ),
+          contextStatusCode: ['active', 'lost', 'disposed'].indexOf(
+            document.querySelector('canvas.relic3d')?.dataset.contextStatus,
+          ),
+        })),
+        new Promise((_, reject) => {
+          diagnosticTimer = setTimeout(() => reject(Error()), 1500);
+        }),
+      ]),
+    );
+  } catch {
+    diagnostic.domDiagnosticUnavailable = 1;
+  } finally {
+    clearTimeout(diagnosticTimer);
+  }
 } finally {
   clearTimeout(deadline);
   const actualElapsedMs =
     observationStart === null ? 0 : Math.round(performance.now() - observationStart);
-  await review?.close();
+  try {
+    await review?.close();
+  } catch {
+    diagnostic.cleanupFailed = 1;
+    passed = false;
+    failureCategory ??= 'cleanup';
+  }
   const report = {
     passed,
     mode: options?.mode ?? 'invalid',
@@ -206,9 +312,11 @@ try {
     peakHeap,
     requests,
     sockets,
+    trustedInputCount,
     forbidden,
     errors: review?.stats().errors ?? 0,
     assets,
+    diagnostic,
   };
   const encoded = JSON.stringify(report);
   assert.ok(Buffer.byteLength(encoded) <= 65536);

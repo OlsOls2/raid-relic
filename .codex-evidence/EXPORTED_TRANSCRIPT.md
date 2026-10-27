@@ -2,7 +2,7 @@
 
 Session: 01a1705c-a87d-7143-80f6-021e47b78ced
 
-Snapshot cutoff: 2026-10-27T08:40:31.054Z (last timestamped record; not a claim that future/active conversation is included).
+Snapshot cutoff: 2026-10-27T12:12:50.605Z (last timestamped record; not a claim that future/active conversation is included).
 
 This is a readable selected native-JSONL export, NOT a complete raw transcript. User/assistant messages and tool calls/results are retained; duplicate native event records are labelled. Private system/developer/bootstrap instructions, reasoning/analysis, opaque encrypted fields, media/base64 and other internal metadata are omitted. Each item is capped at 32768 characters with an explicit omission count and sanitized-item digest. No raw-backup links or private credentials are published. Credential-looking literals, headers or sensitive fields cause whole-item content omission, with source line and reason retained; counts are in the manifest. Strong key patterns remain fatal across all selected visible fields, even in otherwise omitted items. Existing synthetic fixture literals are explicitly classified, not proof of real authentication.
 
@@ -76743,6 +76743,2240 @@ This is a readable selected native-JSONL export, NOT a complete raw transcript. 
   {
     "type": "output_text",
     "text": "Updated only README and [JUDGES.md](/home/ubuntu/.openclaw/workspace/apps/raid-relic/docs/JUDGES.md).\n\n- Restored the exact secondary option **Autoplay 35-second tour** using the existing demo page; no autoplay query parameter is supported.\n- Recorded the completed native screenshot capture, review and promotion.\n\nPNGs, application files and the frozen soak were untouched. Full publication gates remain pending.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4885. 2026-10-27T08:55:27.620Z — user (source line 18341)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "235 SOAKFAILUREFIX BEFORECI sameORIGINAL01a1705c-a87d-7143-80f6-021e47b78cedsolecreativeauthor/no fork/Git/cloud/provider/keys/rawselectedlogs/realstreams/chat/control/SendOff. Phase3JUDGEDONEpushedf18a503b9f016fd0f3e6eebdd84f5e4981751554/revraid-relic-judge-sandbox-1027/tagjudge-sandbox0 https://judge-sandbox---raid-relic-vz4bhnskgq-uc.a.run.app/demo/judge CI40476381940SUCCESS/image510004821d9acb24fda994224cfcbeb120463b8d8532784bd7a18caa7603bcb7.NativeFULL901/901ZEROskip/ALL43SERIAL133checksPASS/63staticsha.Png2reallycaptured233VIEWED/FDpromoteddocsmedia267120B/1280x720/no live/private.AuthNo realIo.LegacyREADME'Autoplay35-secondtour'preserved234(notnewfunctionalitybug). CurrentHEADf18clean.Parentphase1safety7ec6221/89841+phase2perf001d06/90042all0prod3d100allaliasesunchanged. NEWQUEUE4PHASE4CIactualjourneySTILLPENDINGnext236afteryousmallsoakfix.Source235Task2realtestfollowthroughnotnewfeature.\nREALWALLSOAKFAILED(notmemorybudget) atabout08:34:08discovered8:45,collectedtender-zephyrfinishedcode1; NO LONGPROCESSESrunningnow. FrozenSource232/001d06 NodeChromiumfixture. ReportONLYfacts: modewall requested7200000ms, actualObservation510034ms (~8.5minincludes30sectimeout), total633345ms(+120swarmup), lastlogicalElapsed480025ms, cycles7 (next8thminute transition), stagestillgeneric'observe', TimeoutError, 2checkpoints baselineGCheap4879920/frames3493/geom4tex1tri866nodes181listeners52docs2;at5minGCheap5042364/frames12238/geom4tex1tri866nodes185listener52docs3;peak6125252;requests21sockets2forbidden0errors0. ThisisNOT2hpass, SourceDocsdoNOTimply2hzeroMemoryGrowth. AllUI900/43functionalgatesotherwisepassed.Nativelogical120cycles7200000gameclock51743ms28? frames550/resourcesbounded passed, smoke10cycles21434ms passed. So REALCADENCE/time matters.No actualOBS/Twitch/prodoperated.\nNeedMINIMALdriverbugdiagnose/fix source scripts/soak-overlay.js/test-supportsoakoptions/tests/docs; doNOTmodproductionunlesssource+boundedcasegenuinelydemonstratesappdefect. Currentstagegenericobservecovers markcreation/approval/visibleRune/forget/clearRune andforcedWSdrop+reconnect. SetstageBEFOREeveryWAIT/effect explicitclosedenumcycle-mark,cycle-approve,rune-visible,cycle-forget,rune-cleared,socket-drop,socket-reconnect,sample etc toidentifyexactfailedtransition.Numericonlydiagnostic oncatch fromalreadyLOCALfakeState andDOM: cycle/logicalclock/broadRoomonline/optIn/pausedbanned/approvedMarkCount/pendingCount/requestedActorSpent/floor integer/DOMruneCount/connectioncode/contextStatuscode; no rawtext/login/IDs/providerbody/errors/authstate/tokens.IncludeassertionLine/sourceStage numeric closed JSON64K. ParentprivateSupervisorcurrentlywhitelistsoaknumeric keys+samples≤25; tellnewdiagkeysParentcanpermitexplicitly.Smoke/logicalshortANDlongmodecatchmustproduceclosedfailureJSONwithoutunhandledPromise/keepaliveafterbrowserclose.\nPotentialGROUNDEDCLOCKBUG: ParentREADactualfixture.advance(ms){time+=ms}; fixture.signed.timestamp=newDate(time).toISOString() ->integerMillis, butWALLdriverusesperformance.now-observationStart FRACTIONAL andf.advance(logicalElapsedMs-previousLogical), injectingNONINTEGERservernowwhereproductionDate.nowinteger. logical f.advance60000staysintegerandpasses; wallfractionaltimecanmismatchprivacy/eligibility timestamps overmanycycles. NormalizeSYNTHETICgameTime deltas toMath.floor realElapsed(cumulativenotfloorEachdtlosingtime), keepactualperformanceNow reportingraw/roundedactualWallindependent. Thisisproperfixturecontractnotaccelerating/weakeningprivacyinequality.CountersoverflowdiagnosticRootmayproveotherissue; don'tblindlyfixallappguards. SetupClockf.now integer validateaftereveryadvance/options. Couldalsofakequeue/providerperActor8/10minlimitsaffectAPPRoval beyond8cycles? existingcommandsmuststillapplyprivacypolicybeforeACKlimits; assessACTUALapproval/forgetoutcomes notsourceonlyassumption. f.calls.length=0 ONLYemptiesfakeproviderhistory, returnmockchatmessageIDbasedcalls.length canrepeat; event/signedchatIDsseqmonotonic sourcepilotFixture++seq notactualdupe.WSlastsourceStamp/currentStream receiveexactrace after8min couldexist.Genuineproductionbugifprovedthenminimalregressionbutno newauthscope/liveprobe.\nAddEXPLICITwall-PROBE real~10min variant tosurface8minfailurebefore2hrun: e.g --mode=wall-probe --duration-ms=600000, shortwarmup2000 maybekeep120000? stateclockalignmentInitialcompletedhopadvance240s heldsame. Smoke20sec/logical2h remainunchanged anddefaultno2hCI. Optionsstrict bounded/maxduration7200000/duplicateargsrejectalluntrustedCLI.SourceNo targetexecambientParentnativeoffline. Wall-probeMUSTclearlyNOT2hpass; real2hwallstillmandatoryexplicit--duration-ms7200000+warmup2min.Iftimeoutprobe10minmeans15minpointglobalkernel resource no paidnewjobs.Dynamicwall actualElapsedcontinuousperformanceclock butfakeclockinteger.Model metrics25samples atwall5min checkpoints+probe10? sampleboundsatleast2 okay.Relaxed3mincheckpointforprobe onlyifspecified. ParentnewdedicatedtaskCPU2400/timeBudgetmodeWalllike/readonlytools+source/clearenv/unshareall/1GBmem/FD2048/16Mfiles/512Mscratch—notGlobalcapraise. Userowns2hrequest, no newCloudservicemod/max1min0/privatecontextsAliveNo oldpollbecauseCOLLECTEDfailedsoakpidgone.\nSource235~4mcode/diagnostics/probe+clockregressiontests STOPParentnativefastsmoke/logical+STARTreal10minprobeimmutableSnapshotwhileSource236CIimplementationworksandthenifPASSstartreal2hnewownedwatch. Ifprobestillfailsnewdetailedstageenabletargetedfixnotvacuouslyskipvisibility/no testBudgetwaive/raisebounds/maskrunes. Dontsimplifyloopremoveengraveapproveforget/reconnectcases.WeNeedrealtestnotwishfulPASS.Otherunblockedphase4mustcontinuewhilelongtestawaits.Parentpostsphase3revisiondonealready.Lateractual2hproofappenddocs/smallfactscommitnew0soak-proof canfollow4CI0, no finaluntilallactualterminal. ScopeNo SourceEditCI/READMEJudgeyetitsnext236.Task4factsParentcurrentCIexistingNode22ubuntu10mincheckoutv4persistfalse/npmci/format/npmtest only, preinstalledworkspacePlaywrightandcore1.58.2 notappdevdep; visualReviewhardcodes/snap/bin/chromium.Portability/securityneedsnext236 Sourcewillmodifytest-supportnotproduction.HeadlessNoSandboxban.DoNOTmixCIinthis235soakbugfix. No generatedQUALITYcounts oractualSOAKpassbeforeParent. Returnprecisechangedpaths/clockcanonicalizationsourcecontract/diagnosticfields andpendingNative—notwholequeuefinished.\n"
+  }
+]
+````
+
+### 4886. 2026-10-27T08:55:33.755Z — assistant (source line 18344)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll keep this fix in the soak harness: use cumulative integer milliseconds for the fixture clock, add precise failure stages and bounded diagnostics, and add a clearly labelled 10-minute wall probe. The failed run will remain recorded as an incomplete observation, not a two-hour pass.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4887. 2026-10-27T08:55:34.042Z — tool call (source line 18345)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_5a0593cf73a64a238466d7557b3abd3e",
+  "input": "text(await tools.exec_command({cmd:\"cat test-support/overlay-soak.js; cat test/overlay-soak.test.js; cat scripts/soak-overlay.js\",\"max_output_tokens\":5700}));\n"
+}
+````
+
+### 4888. 2026-10-27T08:55:34.155Z — tool result (source line 18348)
+
+````text
+{
+  "call_id": "call_5a0593cf73a64a238466d7557b3abd3e",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "994892",
+        "wall_time_seconds": 0.00000408,
+        "exit_code": 0,
+        "original_token_count": 2669,
+        "output": "export const OVERLAY_WALL_MS = 7200000;\nexport function overlaySoakOptions(args = []) {\n  if (\n    args.some((a) => !/^--(?:mode=(?:smoke|wall|logical)|duration-ms=7200000)$/.test(a)) ||\n    new Set(args.map((a) => a.split('=')[0])).size !== args.length\n  )\n    throw Error('Invalid soak options');\n  const mode = args.find((a) => a.startsWith('--mode='))?.slice(7) ?? 'smoke';\n  const duration = args.includes('--duration-ms=7200000');\n  if ((mode === 'wall') !== duration) throw Error('Wall mode requires explicit two-hour duration');\n  return {\n    mode,\n    durationMs: mode === 'smoke' ? 20000 : OVERLAY_WALL_MS,\n    warmupMs: mode === 'wall' ? 120000 : 2000,\n    logical: mode === 'logical',\n  };\n}\nexport function overlaySoakBounds(samples) {\n  if (samples.length < 2 || samples.length > 25) return false;\n  const a = samples[0],\n    b = samples.at(-1);\n  return (\n    samples.every(\n      (s) =>\n        Object.values(s).every(Number.isFinite) &&\n        s.canvases === 1 &&\n        s.geometry <= a.geometry + 2 &&\n        s.textures <= a.textures + 2 &&\n        s.nodes <= a.nodes + 64 &&\n        s.listeners <= a.listeners + 8 &&\n        s.documents <= a.documents + 1 &&\n        s.triangles < 20000,\n    ) &&\n    b.heap <= a.heap * 1.1 + 8 * 1024 * 1024 &&\n    b.frames > a.frames\n  );\n}\nimport test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { overlaySoakOptions, overlaySoakBounds } from '../test-support/overlay-soak.js';\ntest('overlay soak explicitly distinguishes real two-hour wall time from accelerated fixture time', () => {\n  assert.equal(overlaySoakOptions().mode, 'smoke');\n  assert.throws(() => overlaySoakOptions(['--mode=wall']));\n  assert.equal(overlaySoakOptions(['--mode=wall', '--duration-ms=7200000']).logical, false);\n  assert.equal(overlaySoakOptions(['--mode=logical']).logical, true);\n  assert.throws(() => overlaySoakOptions(['--duration-ms=10']));\n  assert.throws(() => overlaySoakOptions(['--mode=smoke', '--mode=logical']));\n});\ntest('retained metric gates reject stopped rendering, excessive retained growth and accumulating resources', () => {\n  const a = {\n    heap: 4000000,\n    frames: 10,\n    canvases: 1,\n    geometry: 5,\n    textures: 2,\n    nodes: 500,\n    listeners: 60,\n    documents: 2,\n    triangles: 868,\n  };\n  assert.equal(overlaySoakBounds([a, { ...a, frames: 20 }]), true);\n  for (const change of [\n    { frames: 10 },\n    { heap: 20000000 },\n    { canvases: 2 },\n    { geometry: 8 },\n    { listeners: 80 },\n    { nodes: 600 },\n    { triangles: 20000 },\n  ])\n    assert.equal(overlaySoakBounds([a, { ...a, frames: 20, ...change }]), false);\n});\n// LOCAL synthetic TLS/WSS only. Never included in the default browser-smoke glob.\nimport assert from 'node:assert/strict';\nimport { mkdir, writeFile, stat } from 'node:fs/promises';\nimport { performance } from 'node:perf_hooks';\nimport { visualReview } from '../test-support/visual-review.js';\nimport { HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\nimport { overlaySoakOptions, overlaySoakBounds } from '../test-support/overlay-soak.js';\nlet review,\n  deadline,\n  cdp,\n  options,\n  failureCategory = null,\n  passed = false;\nlet stage = 'options',\n  logicalElapsedMs = 0,\n  cycles = 0,\n  lastFrames = 0,\n  frames = 0;\nlet peakHeap = 0,\n  requests = 0,\n  sockets = 0,\n  forbidden = 0;\nlet observationStart = null;\nconst started = performance.now(),\n  samples = [];\nconst assets = { files: 0, bytes: 0, largestBytes: 0 };\nasync function sample() {\n  await cdp.send('HeapProfiler.collectGarbage'); // Retained heap, explicitly forced GC.\n  const [heap, dom, data] = await Promise.all([\n    cdp.send('Runtime.getHeapUsage'),\n    cdp.send('Memory.getDOMCounters'),\n    review.page.evaluate(() => {\n      const c = document.querySelector('canvas.relic3d');\n      return {\n        frames: Number(c?.dataset.frames ?? 0),\n        canvases: document.querySelectorAll('canvas.relic3d').length,\n        geometry: Number(c?.dataset.geometryCount ?? -1),\n        textures: Number(c?.dataset.textureCount ?? -1),\n        triangles: Number(c?.dataset.triangles ?? 0),\n        active: c?.dataset.contextStatus === 'active',\n        visible: !document.hidden && c?.getBoundingClientRect().width > 0,\n        connected: document.body.dataset.connection === 'connected',\n      };\n    }),\n  ]);\n  assert.ok(data.active && data.visible && data.connected);\n  assert.ok(data.frames > lastFrames, 'Actual GL frames must advance between samples');\n  frames += data.frames - lastFrames;\n  lastFrames = data.frames;\n  assert.ok(data.geometry >= 0 && data.textures >= 0);\n  samples.push({\n    heap: heap.usedSize,\n    frames,\n    canvases: data.canvases,\n    geometry: data.geometry,\n    textures: data.textures,\n    triangles: data.triangles,\n    nodes: dom.nodes,\n    listeners: dom.jsEventListeners,\n    documents: dom.documents,\n  });\n  assert.ok(samples.length <= 25);\n}\ntry {\n  options = overlaySoakOptions(process.argv.slice(2));\n  const maxWall = options.logical ? 150000 : options.warmupMs + options.durationMs + 120000;\n  review = await visualReview();\n  const { context, page, origin, fixture: f } = review;\n  deadline = setTimeout(() => {\n    void context.close().catch(() => {});\n  }, maxWall);\n  await context.routeWebSocket('**/*', (route) => {\n    if (new URL(route.url()).origin !== origin.replace('https:', 'wss:')) {\n      forbidden++;\n      return route.close();\n    }\n    sockets++;\n    return route.connectToServer();\n  });\n  page.on('request', (r) => {\n    requests++;\n    if (\n      new URL(r.url()).origin !== origin ||\n      r.method() !== 'GET' ||\n      /^\\/(?:control|oauth|auth|internal|eventsub)(?:\\/|$)/.test(new URL(r.url()).pathname)\n    )\n      forbidden++;\n  });\n  for (const file of [\n    'public/overlay.js',\n    'public/overlay-client.js',\n    'public/relic3d.js',\n    'public/overlay.css',\n    'public/vendor/three.core.js',\n    'public/vendor/three.module.js',\n  ]) {\n    const value = await stat(file);\n    assets.files++;\n    assets.bytes += value.size;\n    assets.largestBytes = Math.max(assets.largestBytes, value.size);\n  }\n  stage = 'fixture';\n  for (const id of [BOT, HOME, OTHER]) await f.login(id);\n  for (const id of [HOME, OTHER]) {\n    f.streams.get(id).viewer_count = 1;\n    await f.control(id, 'bootstrap');\n    f.advance();\n    await f.control(id, 'keep');\n    f.advance();\n  }\n  await f.control(HOME, `send:${OTHER}`);\n  await f.raid();\n  await f.chat(HOME, '6500', '!offer');\n  await f.chat(OTHER, '6501', '!accept');\n  f.advance(240000); // Initial completed arrival is elapsed, not restarted on read.\n  await page.setViewportSize({ width: 480, height: 800 });\n  await page.goto(origin + '/overlay/' + OTHER);\n  await page.bringToFront();\n  await page.waitForFunction(\n    () =>\n      document.body.dataset.connection === 'connected' &&\n      Number(document.querySelector('canvas.relic3d')?.dataset.frames) > 2,\n  );\n  await page.locator('canvas.relic3d').evaluate((c) => c.setAttribute('data-render-profile', ''));\n  cdp = await context.newCDPSession(page);\n  stage = 'warmup';\n  await page.waitForTimeout(options.warmupMs);\n  f.advance(options.warmupMs);\n  await sample();\n  observationStart = performance.now();\n  let nextUpdate = options.mode === 'smoke' ? 2000 : 60000;\n  let nextCheckpoint = options.mode === 'smoke' ? 10000 : 300000;\n  while (logicalElapsedMs < options.durationMs) {\n    const previousLogical = logicalElapsedMs;\n    if (options.logical) {\n      f.advance(60000);\n      logicalElapsedMs = Math.min(options.durationMs, logicalElapsedMs + 60000);\n      await page.waitForTimeout(100);\n    } else {\n      await page.waitForTimeout(1000);\n      logicalElapsedMs = Math.min(options.durationMs, performance.now() - observationStart);\n      f.advance(logicalElapsedMs - previousLogical);\n    }\n    stage = 'observe';\n    const live = await cdp.send('Runtime.getHeapUsage');\n    peakHeap = Math.max(peakHeap, live.usedSize);\n    if (logicalElapsedMs >= nextUpdate) {\n      const actor = String(7000 + (cycles % 32));\n      await f.chat(OTHER, actor, '!mark moon');\n      const doc = await f.runtime.state.getPrivateMarks(OTHER, {\n        broadcasterId: OTHER,\n        chatterId: OTHER,\n      });\n      const mark = doc.sessions.flatMap((s) => s.marks).find((m) => m.userId === actor);\n      assert.ok(mark);\n      await f.chat(OTHER, OTHER, `!relic approve ${mark.id}`);\n      await page.waitForFunction(() => document.querySelector('#runes').children.length > 0);\n      await f.chat(OTHER, actor, '!relic forgetme');\n      await page.waitForFunction(() => document.querySelector('#runes').children.length === 0);\n      cycles++;\n      f.calls.length = 0; // No retained growing provider-call history in this long fixture.\n      if (cycles % 5 === 0) {\n        review.dropConnections();\n        await page.waitForFunction(() => document.body.dataset.connection !== 'connected');\n        await page.waitForFunction(() => document.body.dataset.connection === 'connected');\n      }\n      nextUpdate += options.mode === 'smoke' ? 2000 : 60000;\n    }\n    if (logicalElapsedMs >= nextCheckpoint || logicalElapsedMs >= options.durationMs) {\n      await page.waitForTimeout(150);\n      await sample();\n      nextCheckpoint += options.mode === 'smoke' ? 10000 : 300000;\n    }\n  }\n  assert.ok(overlaySoakBounds(samples));\n  assert.equal(forbidden, 0);\n  assert.deepEqual(review.stats(), { errors: 0, external: 0 });\n  assert.ok(cycles > 0 && cycles <= 120);\n  if (options.mode === 'wall') assert.ok(performance.now() - observationStart >= 7200000);\n  passed = true;\n  stage = 'complete';\n} catch (e) {\n  failureCategory = ['AssertionError', 'TimeoutError', 'TypeError'].includes(e?.name)\n    ? e.name\n    : 'fixture-or-browser';\n} finally {\n  clearTimeout(deadline);\n  const actualElapsedMs =\n    observationStart === null ? 0 : Math.round(performance.now() - observationStart);\n  await review?.close();\n  const report = {\n    passed,\n    mode: options?.mode ?? 'invalid',\n    stage,\n    failureCategory,\n    requestedDurationMs: options?.durationMs ?? 0,\n    actualElapsedMs,\n    totalElapsedMs: Math.round(performance.now() - started),\n    logicalElapsedMs: Math.round(logicalElapsedMs),\n    warmupMs: options?.warmupMs ?? 0,\n    forcedGarbageCollection: true,\n    checkpoints: samples.length,\n    samples,\n    cycles,\n    frames,\n    peakHeap,\n    requests,\n    sockets,\n    forbidden,\n    errors: review?.stats().errors ?? 0,\n    assets,\n  };\n  const encoded = JSON.stringify(report);\n  assert.ok(Buffer.byteLength(encoded) <= 65536);\n  await mkdir('artifacts', { recursive: true });\n  await writeFile('artifacts/overlay-soak-results.json', encoded + '\\n');\n}\nif (!passed) process.exitCode = 1;\n"
+      }
+    }
+  ]
+}
+````
+
+### 4889. 2026-10-27T08:56:24.091Z — tool call (source line 18352)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_3f7c112960ee4eb2a1ff071ef08c211b",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/test-support/overlay-soak.js\\n@@\\n-    args.some((a) => !/^--(?:mode=(?:smoke|wall|logical)|duration-ms=7200000)$/.test(a)) ||\\n+    args.some((a) => !/^--(?:mode=(?:smoke|wall|wall-probe|logical)|duration-ms=(?:7200000|600000))$/.test(a)) ||\\n@@\\n-  const duration = args.includes('--duration-ms=7200000');\\n-  if ((mode === 'wall') !== duration) throw Error('Wall mode requires explicit two-hour duration');\\n+  const requested = args.find((a) => a.startsWith('--duration-ms='));\\n+  const required = { wall: '--duration-ms=7200000', 'wall-probe': '--duration-ms=600000' }[mode];\\n+  if (requested !== required) throw Error('Wall modes require their exact explicit duration');\\n@@\\n-    durationMs: mode === 'smoke' ? 20000 : OVERLAY_WALL_MS,\\n+    durationMs: mode === 'smoke' ? 20000 : mode === 'wall-probe' ? 600000 : OVERLAY_WALL_MS,\\n@@\\n }\\n+// Floor cumulative elapsed time, not each interval: preserve sub-ms remainder\\n+// without passing fractional timestamps into a Date.now()-based fixture.\\n+export function overlayFixtureElapsed(elapsed, duration) {\\n+  if (!Number.isFinite(elapsed) || elapsed < 0 || !Number.isSafeInteger(duration) || duration < 1)\\n+    throw Error('Invalid fixture clock');\\n+  return Math.floor(Math.min(elapsed, duration));\\n+}\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/scripts/soak-overlay.js\\n@@\\n-import { overlaySoakOptions, overlaySoakBounds } from '../test-support/overlay-soak.js';\\n+import { overlaySoakOptions, overlaySoakBounds, overlayFixtureElapsed } from '../test-support/overlay-soak.js';\\n+import { hash } from '../src/crypto.js';\\n@@\\n let observationStart = null;\\n+let fixture, requestedActor = null;\\n+const diagnostic = {};\\n@@\\n async function sample() {\\n+  stage = 'sample';\\n@@\\n   const { context, page, origin, fixture: f } = review;\\n+  fixture = f;\\n+  const advanceFixture = (delta = 1) => {\\n+    assert.ok(Number.isSafeInteger(delta) && delta >= 0 && Number.isSafeInteger(f.now()));\\n+    f.advance(delta);\\n+    assert.ok(Number.isSafeInteger(f.now()));\\n+  };\\n@@\\n-    f.advance();\\n+    advanceFixture();\\n@@\\n-    f.advance();\\n+    advanceFixture();\\n@@\\n-  f.advance(240000); // Initial completed arrival is elapsed, not restarted on read.\\n+  advanceFixture(240000); // Initial completed arrival is elapsed, not restarted on read.\\n@@\\n-  f.advance(options.warmupMs);\\n+  advanceFixture(options.warmupMs);\\n@@\\n-      f.advance(60000);\\n+      advanceFixture(60000);\\n@@\\n-      logicalElapsedMs = Math.min(options.durationMs, performance.now() - observationStart);\\n-      f.advance(logicalElapsedMs - previousLogical);\\n+      logicalElapsedMs = overlayFixtureElapsed(performance.now() - observationStart, options.durationMs);\\n+      advanceFixture(logicalElapsedMs - previousLogical);\\n@@\\n       const actor = String(7000 + (cycles % 32));\\n+      requestedActor = actor;\\n+      stage = 'cycle-mark';\\n       await f.chat(OTHER, actor, '!mark moon');\\n+      stage = 'cycle-mark-read';\\n@@\\n       assert.ok(mark);\\n+      stage = 'cycle-approve';\\n       await f.chat(OTHER, OTHER, `!relic approve ${mark.id}`);\\n+      stage = 'rune-visible';\\n       await page.waitForFunction(() => document.querySelector('#runes').children.length > 0);\\n+      stage = 'cycle-forget';\\n       await f.chat(OTHER, actor, '!relic forgetme');\\n+      stage = 'rune-cleared';\\n@@\\n       if (cycles % 5 === 0) {\\n+        stage = 'socket-drop';\\n         review.dropConnections();\\n         await page.waitForFunction(() => document.body.dataset.connection !== 'connected');\\n+        stage = 'socket-reconnect';\\n@@\\n-  if (options.mode === 'wall') assert.ok(performance.now() - observationStart >= 7200000);\\n+  if (['wall', 'wall-probe'].includes(options.mode))\\n+    assert.ok(performance.now() - observationStart >= options.durationMs);\\n@@\\n } catch (e) {\\n@@\\n     : 'fixture-or-browser';\\n+  const line = /soak-overlay[.]js:(\\\\d+)/.exec(e?.stack ?? '');\\n+  diagnostic.assertionLine = line ? Number(line[1]) : 0;\\n+  diagnostic.cycle = cycles;\\n+  diagnostic.logicalClockMs = logicalElapsedMs;\\n+  diagnostic.fixtureClockInteger = Number.isSafeInteger(fixture?.now()) ? 1 : 0;\\n+  if (fixture) {\\n+    const channel = await fixture.runtime.state.getStreamStatus(OTHER);\\n+    const doc = await fixture.runtime.state.getPrivateMarks(OTHER,\\n+      { broadcasterId: OTHER, chatterId: OTHER });\\n+    const marks = doc.sessions.flatMap((s) => s.marks);\\n+    diagnostic.channelOnline = channel?.online ? 1 : 0;\\n+    diagnostic.channelOptedIn = channel?.optedIn ? 1 : 0;\\n+    diagnostic.channelPaused = channel?.paused ? 1 : 0;\\n+    diagnostic.channelBanned = channel?.banned ? 1 : 0;\\n+    diagnostic.approvedMarkCount = marks.filter((m) => m.status === 'approved').length;\\n+    diagnostic.pendingMarkCount = marks.filter((m) => m.status === 'pending').length;\\n+    diagnostic.actorSpent = doc.sessions.flatMap((s) => s.viewers)\\n+      .find((v) => v.userId === requestedActor)?.spent ?? 0;\\n+    diagnostic.privacyFloorMs = fixture.db?.docs.get(`presence/${hash(OTHER)}`)?.notBefore ?? -1;\\n+  }\\n+  let diagnosticTimer;\\n+  try {\\n+    Object.assign(diagnostic, await Promise.race([\\n+      review.page.evaluate(() => ({\\n+        domRuneCount: document.querySelector('#runes')?.children.length ?? -1,\\n+        connectionCode: ['connected','connecting','reconnecting','stale','suspended']\\n+          .indexOf(document.body.dataset.connection),\\n+        contextStatusCode: ['active','lost','disposed']\\n+          .indexOf(document.querySelector('canvas.relic3d')?.dataset.contextStatus),\\n+      })),\\n+      new Promise((_, reject) => { diagnosticTimer = setTimeout(() => reject(Error()), 1500); }),\\n+    ]));\\n+  } catch { diagnostic.domDiagnosticUnavailable = 1; }\\n+  finally { clearTimeout(diagnosticTimer); }\\n@@\\n     assets,\\n+    diagnostic,\\n*** End Patch\"));\n"
+}
+````
+
+### 4890. 2026-10-27T08:56:24.173Z — tool result (source line 18355)
+
+````text
+{
+  "call_id": "call_3f7c112960ee4eb2a1ff071ef08c211b",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 4891. 2026-10-27T08:57:18.866Z — tool call (source line 18361)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_ab23f7177ad8452e8e1aa5ea3e92e67f",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/scripts/soak-overlay.js\\n@@\\n async function sample() {\\n-  stage = 'sample';\\n+  stage = 'sample-gc';\\n   await cdp.send('HeapProfiler.collectGarbage'); // Retained heap, explicitly forced GC.\\n+  stage = 'sample-metrics';\\n@@\\n   await page.setViewportSize({ width: 480, height: 800 });\\n+  stage = 'overlay-navigation';\\n   await page.goto(origin + '/overlay/' + OTHER);\\n   await page.bringToFront();\\n+  stage = 'frame-ready';\\n@@\\n     if (options.logical) {\\n@@\\n-      await page.waitForTimeout(100);\\n+      stage = 'logical-wait';\\n+      await page.waitForTimeout(100);\\n     } else {\\n+      stage = 'observation-wait';\\n       await page.waitForTimeout(1000);\\n@@\\n-    stage = 'observe';\\n+    stage = 'peak-heap';\\n@@\\n     if (logicalElapsedMs >= nextCheckpoint || logicalElapsedMs >= options.durationMs) {\\n+      stage = 'checkpoint-wait';\\n@@\\n-  if (fixture) {\\n+  try { if (fixture) {\\n@@\\n-  }\\n+  } } catch { diagnostic.stateDiagnosticUnavailable = 1; }\\n@@\\n-  await review?.close();\\n+  try { await review?.close(); }\\n+  catch { diagnostic.cleanupFailed = 1; passed = false; failureCategory ??= 'cleanup'; }\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/test/overlay-soak.test.js\\n@@\\n-import { overlaySoakOptions, overlaySoakBounds } from '../test-support/overlay-soak.js';\\n+import { overlaySoakOptions, overlaySoakBounds, overlayFixtureElapsed } from '../test-support/overlay-soak.js';\\n@@\\n   assert.throws(() => overlaySoakOptions(['--mode=smoke', '--mode=logical']));\\n+  assert.equal(overlaySoakOptions(['--mode=wall-probe', '--duration-ms=600000']).durationMs, 600000);\\n+  assert.equal(overlaySoakOptions(['--mode=wall-probe', '--duration-ms=600000']).warmupMs, 2000);\\n+  assert.throws(() => overlaySoakOptions(['--mode=wall-probe']));\\n+  assert.throws(() => overlaySoakOptions(['--mode=wall-probe', '--duration-ms=7200000']));\\n+  assert.throws(() => overlaySoakOptions(['--mode=wall', '--duration-ms=600000']));\\n@@\\n });\\n+test('wall fixture uses integer cumulative milliseconds without losing fractional interval remainder', () => {\\n+  let fixtureNow = 1800000000000, previous = 0;\\n+  for (const actual of [1000.75, 2001.5, 60000.25, 480025.999, 600000.75]) {\\n+    const elapsed = overlayFixtureElapsed(actual, 600000);\\n+    fixtureNow += elapsed - previous;\\n+    previous = elapsed;\\n+    assert.ok(Number.isSafeInteger(fixtureNow));\\n+    assert.equal(fixtureNow, 1800000000000 + Math.floor(Math.min(actual, 600000)));\\n+    assert.equal(new Date(fixtureNow).getTime(), fixtureNow);\\n+  }\\n+  assert.equal(previous, 600000);\\n+  for (const invalid of [NaN, Infinity, -1])\\n+    assert.throws(() => overlayFixtureElapsed(invalid, 600000));\\n+});\\n*** End Patch\"));\n"
+}
+````
+
+### 4892. 2026-10-27T08:57:18.977Z — tool result (source line 18364)
+
+````text
+{
+  "call_id": "call_ab23f7177ad8452e8e1aa5ea3e92e67f",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 4893. 2026-10-27T08:57:49.375Z — assistant (source line 18369)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "The harness now advances fixture time with `floor(total elapsed)`, so it preserves fractional remainder without passing fractional timestamps into the server fixture. Real elapsed reporting stays independent.\n\nThe ten-minute probe keeps mark creation, approval, visible-rune, forgetting and reconnect checks. New stages and numeric-only diagnostics should identify the failed transition if it recurs. I haven’t changed production code or claimed the clock fix resolves the failure.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4894. 2026-10-27T08:58:06.661Z — tool call (source line 18370)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_b63490a002614f3494483c7df1cfd3ef",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='docs/ACCESSIBILITY_PERFORMANCE.md';s=open(p).read().replace('node scripts/soak-overlay.js --mode=logical\\\\n', 'node scripts/soak-overlay.js --mode=logical\\\\nnode scripts/soak-overlay.js --mode=wall-probe --duration-ms=600000\\\\n');s=s.replace('- Wall mode requires the explicit two-hour argument,', '- Wall-probe mode requires the explicit 600,000 ms argument and measures ten real minutes after two seconds of warm-up. It is a diagnostic probe, never a two-hour pass. It retains the same per-minute engraving/approval/forget and reconnect sequence.\\\\n- Wall mode requires the explicit two-hour argument,');s=s.replace('The fixture clock advances with the selected mode.', 'The fixture clock advances with the selected mode. Real-time modes floor cumulative elapsed milliseconds before advancing the synthetic server clock; they do not independently floor every interval or alter real observation duration. Each fixture advance asserts integer milliseconds, matching Date.now() and signed ISO timestamp precision.');s=s.replace('No two-hour observation has been performed by the source author.', '''## Incomplete real-wall observation and follow-up\\n\\nThe parent reported the first frozen source232 real-wall attempt failed with TimeoutError: requested 7,200,000 ms, actual observation 510,034 ms, total including warm-up/setup 633,345 ms, last logical elapsed 480,025 ms and seven completed cycles. The generic observe stage could not identify which transition timed out. Two retained-heap checkpoints were 4,879,920 and 5,042,364 bytes; geometry four, texture one and triangles 866 remained stable. This was an incomplete failed run, not a two-hour pass or a demonstrated memory-budget failure. Earlier smoke and accelerated logical runs passed, but do not replace real-wall evidence.\\n\\nSource review found fractional performance-clock deltas were entering an integer-millisecond fixture clock, unlike the logical mode. The harness now canonicalizes cumulative elapsed time and adds a ten-minute probe; this corrects a fixture-contract violation but does not establish the cause of the observed timeout. Fresh smoke, logical, ten-minute probe and eventually two-hour wall execution remain parent validation gates.\\n\\nFailure stages now distinguish mark creation/read, approval, rune visibility, forgetting, rune clearance, socket drop/reconnect, sample GC/metrics and observation waits. Catch diagnostics project only numeric fixture/DOM facts: cycle, logical clock, integer-clock flag, channel online/opt-in/pause/ban flags, approved/pending counts, requested participant's spent quota, available privacy floor, rune count, connection/context enums and assertion line. A -1 floor denotes unavailable private presence inspection in the memory fixture, not a measured floor. Diagnostic collection failure is itself a closed numeric flag; no text, participant ID, URL, token, provider body or raw error is reported. Failure does not change the visibility, privacy or resource gates.\\n\\nNo two-hour observation has been performed by the source author.''');open(p,'w').write(s)\\nPY\\nsed -n '229,290p' scripts/soak-overlay.js; cat test-support/overlay-soak.js | head -30\",\"max_output_tokens\":1400}));\n"
+}
+````
+
+### 4895. 2026-10-27T08:58:06.756Z — tool result (source line 18373)
+
+````text
+{
+  "call_id": "call_b63490a002614f3494483c7df1cfd3ef",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "9e46ba",
+        "wall_time_seconds": 0.00000428,
+        "exit_code": 0,
+        "original_token_count": 859,
+        "output": "      .find((v) => v.userId === requestedActor)?.spent ?? 0;\n    diagnostic.privacyFloorMs = fixture.db?.docs.get(`presence/${hash(OTHER)}`)?.notBefore ?? -1;\n  } } catch { diagnostic.stateDiagnosticUnavailable = 1; }\n  let diagnosticTimer;\n  try {\n    Object.assign(diagnostic, await Promise.race([\n      review.page.evaluate(() => ({\n        domRuneCount: document.querySelector('#runes')?.children.length ?? -1,\n        connectionCode: ['connected','connecting','reconnecting','stale','suspended']\n          .indexOf(document.body.dataset.connection),\n        contextStatusCode: ['active','lost','disposed']\n          .indexOf(document.querySelector('canvas.relic3d')?.dataset.contextStatus),\n      })),\n      new Promise((_, reject) => { diagnosticTimer = setTimeout(() => reject(Error()), 1500); }),\n    ]));\n  } catch { diagnostic.domDiagnosticUnavailable = 1; }\n  finally { clearTimeout(diagnosticTimer); }\n} finally {\n  clearTimeout(deadline);\n  const actualElapsedMs =\n    observationStart === null ? 0 : Math.round(performance.now() - observationStart);\n  try { await review?.close(); }\n  catch { diagnostic.cleanupFailed = 1; passed = false; failureCategory ??= 'cleanup'; }\n  const report = {\n    passed,\n    mode: options?.mode ?? 'invalid',\n    stage,\n    failureCategory,\n    requestedDurationMs: options?.durationMs ?? 0,\n    actualElapsedMs,\n    totalElapsedMs: Math.round(performance.now() - started),\n    logicalElapsedMs: Math.round(logicalElapsedMs),\n    warmupMs: options?.warmupMs ?? 0,\n    forcedGarbageCollection: true,\n    checkpoints: samples.length,\n    samples,\n    cycles,\n    frames,\n    peakHeap,\n    requests,\n    sockets,\n    forbidden,\n    errors: review?.stats().errors ?? 0,\n    assets,\n    diagnostic,\n  };\n  const encoded = JSON.stringify(report);\n  assert.ok(Buffer.byteLength(encoded) <= 65536);\n  await mkdir('artifacts', { recursive: true });\n  await writeFile('artifacts/overlay-soak-results.json', encoded + '\\n');\n}\nif (!passed) process.exitCode = 1;\nexport const OVERLAY_WALL_MS = 7200000;\nexport function overlaySoakOptions(args = []) {\n  if (\n    args.some((a) => !/^--(?:mode=(?:smoke|wall|wall-probe|logical)|duration-ms=(?:7200000|600000))$/.test(a)) ||\n    new Set(args.map((a) => a.split('=')[0])).size !== args.length\n  )\n    throw Error('Invalid soak options');\n  const mode = args.find((a) => a.startsWith('--mode='))?.slice(7) ?? 'smoke';\n  const requested = args.find((a) => a.startsWith('--duration-ms='));\n  const required = { wall: '--duration-ms=7200000', 'wall-probe': '--duration-ms=600000' }[mode];\n  if (requested !== required) throw Error('Wall modes require their exact explicit duration');\n  return {\n    mode,\n    durationMs: mode === 'smoke' ? 20000 : mode === 'wall-probe' ? 600000 : OVERLAY_WALL_MS,\n    warmupMs: mode === 'wall' ? 120000 : 2000,\n    logical: mode === 'logical',\n  };\n}\n// Floor cumulative elapsed time, not each interval: preserve sub-ms remainder\n// without passing fractional timestamps into a Date.now()-based fixture.\nexport function overlayFixtureElapsed(elapsed, duration) {\n  if (!Number.isFinite(elapsed) || elapsed < 0 || !Number.isSafeInteger(duration) || duration < 1)\n    throw Error('Invalid fixture clock');\n  return Math.floor(Math.min(elapsed, duration));\n}\nexport function overlaySoakBounds(samples) {\n  if (samples.length < 2 || samples.length > 25) return false;\n  const a = samples[0],\n    b = samples.at(-1);\n  return (\n"
+      }
+    }
+  ]
+}
+````
+
+### 4896. 2026-10-27T08:58:22.455Z — assistant (source line 18378)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Updated four harness/doc files; production code is unchanged.\n\n- Canonicalized fixture time from cumulative elapsed milliseconds.\n- Added explicit failure stages, numeric diagnostics and clock regression tests.\n- Added `--mode=wall-probe --duration-ms=600000`.\n- Documented the failed 510,034 ms observation as incomplete, not a two-hour pass.\n\nNew diagnostic keys: `assertionLine`, `cycle`, `logicalClockMs`, `fixtureClockInteger`, `channelOnline`, `channelOptedIn`, `channelPaused`, `channelBanned`, `approvedMarkCount`, `pendingMarkCount`, `actorSpent`, `privacyFloorMs`, `domRuneCount`, `connectionCode`, `contextStatusCode`, `stateDiagnosticUnavailable`, `domDiagnosticUnavailable`, `cleanupFailed`.\n\nNo target execution. Fresh smoke/logical/probe gates remain pending; the timeout’s cause is not yet established.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4897. 2026-10-27T09:03:54.842Z — user (source line 18386)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "236 FINALUSERPHASE4 CI FULLJOURNEY sameORIGINAL01a1705c-a87d-7143-80f6-021e47b78cedsolecreativewriter/nofork/Git/cloud/providers/keys/rawselectedevidence/REALstreams/chat/controlpages/SendOff. User777c14c5whole4queue: safety7ec0 DONE89841; accessibleperf001d0 CODEDONE90042 actual2hwallFAILEDdriver at8.5min recordednotpass; judgef18a503b9f016fd0f3e6eebdd84f5e4981751554/revraid-relic-judge-sandbox-1027/tagjudge-sandbox0 DONE901/901zeroSkip+43serial133checks/CI40476381940SUCCESS/63staticsha+health.Permanentfiction45secjudge/noTwitchlogin/readOnlyall8scenes withREADMETrylink+2actualNative1280x720/demo/filmimagesParentVIEWED/promotiondone(no thirdpartyart) andlegacy35sautoplaypreservedSource234. CurrentGitHEADf18/source235UNCOMMITTEDtestharnessclockrepairdocsonly below.No mainmerge/prodchange—raid-relic-seeker-state-on-1026/3d100ALLoldtagsstillprotected/min0max1newP5ROtrueP7all5OFFStrueWfalseclipPaidfalse. RepoPRIVATE/no publicpost/invite/visibilityflip/Devpostsubmission. SourceSlot OAuth256 boundedexistingcollectionready legacyorphansnotdeletednoneTTLpolicyedited. Don'tredoearlier4queues.\nSOAK235NOWIMPLEMENTEDINTEGERCLOCK+fineClosedFailurestage+wall-probe; ParentNativeSMOKE20s actual20882ms10cyclesPASS andLOGICAL7200000ms/120cycles/25samples ACTUAL43158ms PASS (not2hwall). 2hOLDfailed510034ms previouslydocumented. NEWACTIVETENMINUTEprobe Parentmarine-cometPID1473894started~09:01:45 actual UTC modewall-probe explicitduration600000/2secwarmup; frozenSource235private/workcopyimmutable. DoNOTstop/modifyrunningbrowser/probe orsourcecopy/ports. Original236CODEchangeshostWONTalterprivatecopy; pauseTargetexecNo realIO. Parentcollectprobe~09:12; ifPASSstartNEW2hwall+2minwarmupownedwatch; actual2hresultneededbeforefinal. Snapshot235metadata sourceClosed08:58:22.4954896entries236CLIlogs5wholeomissions0rescan435files26526797. UserwholelistTASK4unblockedwhilelongprobe runs—IMPLEMENTNOW, parentscopepub4CIafterNative/probeissuefix ifneeded. Don'tclaimwallPASS.Code235modes/diagnosticsNOotherappchanges.PreserveSource235uncommittedfilesbelongsTask2followupwillcoherentlyincludeCItestinginfra4commit orlaterfactsonly0soak-proof. Stage4Docsinclude pendingreal2hqualificationnotcompleted.\nIMPLEMENT actualHEADLESS E2Ewalk usingLOCALFIXTUREENTIRErealRUNTIMEauthority: SendOff HTTP/owncontrolvisibleUI →oneMOCKTwitchRaidPOSTacceptednottravel→HMACSIGNEDactualraidEventSub→arrivaloverlaycinematic/currentclaimclock →distinctchat offers/accept signedlocal actualquorum→completedring/holderexact →approvedengraving(sourcebeforehopsoARCHIVEhaswordprecondition +targetafterhopactiveifwanted)→KeeperLIVEholder spotlight actualexistingpublicDTO→Atlasretainedjourney/replayUI →manualRingCardexportsignature/dimensions/decodedpixels/approvedword+SIMULATEDfixturequalifications. UserlistengravingafterclaimcanalsoincludebeforeforpayloadArchive; don'tvacuouslyasserterasureabsentword.NonSeeker/manualP3recipientunchanged. FULL journey is NOTjust45secondpureclientfictionfilm whichalreadytested; thismustcrossactualfixtureHTTP/session/CSRF/provider-boundprincipal/signature parsing/store projection/BrowserUI withFAKEprovidertransport/no externalnetwork/CloudSDK. ExistingpilotFixture+visualReview localTLS/WSS/fakeFirestore ormemory, seedlegitHomecurrentHolder/Userf.accept parsedshape notinventedDTO. AuthSourcecontrolONLYlocalfake approvedexplicitTask notactualpages. NumberfakeIDdefaultscompareBodyNo rawkey/cookie/authcode/providerbody logs; browserdownloadsmanual exactone call. IfSourcecanuseDUMMYIDsconfigwithoutbroadfactoryrefactorpreferred, otherwisecopiednumericIDsfixtureconstantsAREmock principalsnotliveauth noRealCalls. f.calls countsonePOST/raids sourceprincipal, duplicateeventNo doubleRing orduplicateACK; publicPNGno actorIDs/heldword/rawSVG. Approvedmoonactualpublicbeforeexport notonlymockedDOMdraw instrumentation.Artifact/resultsclosedJSON≤64K/deterministic no unboundedimages/no testtimeoutcapsraise. newbrowser-smoke-journey-ci.js fitsautomaticALL44serialnative; normalrunfullpath≤150s. CIreliableclock useexistingfixturesf.advance frominteger (235fix), actualbrowserclocktestforarrival/replay seek notwall180s.WhenBrowser3Dmotionreducedmustfallbackpreservemeaning; actualdefaultGLonce.NativeMarkerSourceDOMCounter/no fakeconnected/perceivedlivepeople. No userbackgroundpoll/privatequeryfabrication.\nWIREINCI .github/workflows/ci.ymlINSPECT/PRESERVEexistingonejobtestubuntu-latest timeout10 checkoutv4withpersistcredentialsfalse/setup-nodev4node22/cacheNPM/npmci/format/npmtest. Addshortdeterministicheadlessjoborstep(needsunitifseparate) onexistingstandardFREErunner(no paidservices/largeGPUrunner/multiOSmatrix/2hourjob/scheduler/cron). Node22keep.CIbrowsermustACTUALLYrunandFAILifabsent, not'test.skip if unavailable'. New2hsoakNEVERautomaticCIeverycommit; CLIexplicitmanualonly.Codeciworkflowjobtimeout<=10min amplebrowserdownloadsetup+journeyseconds. No publicartifacts/rawprivateDOM/screenshots actual controls.A minimalclosedfailureJSONuploadoptionalprivateActionsartifact bounded no token. PinnedexistingActionsvariantskeeppermissionscontentsreadnothingwrite/newsecretsnoADC/provider env. DependencysetupCIhostedallowedexplicitusertaskNo actualbrowserdownloads/localnpmfetchduringSourceauthor orParentnative offline.\nPORTABILITYFACTS: test-support/visual-review.js currently chromium.launch executablePath:'/snap/bin/chromium',headlesstrue,chromiumSandbox:true. GitHubrunnerNOsnapbinary. NeedportableTOOLCHAINselector(notHTTP/userinput): trustedoperatorabsenvvalidatedorifSnapfileexistsuseitelseofficialPlaywrightinstalledbrowsercache; keepCURRENTnativeharnessSnap(defaultpathMountworks) andchromiumSandboxTRUE. Never --no-sandbox/chromiumSandbox:false/securityfeaturedisable flags, don'tweakenorigin/CSP/WSS/CSRF toCI. OnUbuntu24AppArmorusernsproblem, preferseparateheadlessSTANDARDubuntu-22.04runner preservingunitjobubuntu-latest insteadofsudo sysctl disablinghostsecurity.Namespaceisolatedloopbacksource/Node envclear/scratchonly/rotools/source/resourcecaps byportableCIharness(bwraporunshare) NOexternalruntimeaccess; context.route denyexternal alone notOSnetworkboundary. Toolchainsetupdownloadbeforelockedtestisfine; Nodeprovidertransportmockonly. CIfixtureHTTPSlocalhost5191 wsapprovedselforigin, no realprojectFirestorecontacts.No APISDKcredentials/capabilities.User“No newservices” newtestJOBexistingGitHubActionsstandardnotCloudresource. No installplugins/GCP/stripe/min1/no updater.\nLOCALDEPSFACTS ParentREADONLYworkspaceinstalledplaywright andplaywright-coreEXACT1.58.2 Node>=18. AppcurrentlydevDepsprettierONLY, parentworkspacepreinstalledimportworksinnativebwrap /node_modules ro (doNOTnpmInstall locally). UserexplicitCIrequestauthorizespinnedDEVdependency playwright1.58.2+lock ifneeded; deriveexactresolution/integrity/dependencyrecordsfromlocallyavailableworkspacepackage-lock.json OR node_modules/.package-lock.json forknownpackageentriesONLY, no readingnpmrc/auth/globalenv/rawlockdump/no networkregistryrequest. Includeplaywright-core1.58.2 andoptionalDarwinfseventsmetadataiflockrequiresfromlocalfile; ifmetadataunavailableexplainrealblockerbutcontinueCIscript native existingPlaywright.PackageLockalgorithmnpm v10/npmci hostedactualchecks—notliehandwave.No newproductiondependency; Docker alreadyomitdev/ignore scriptssoPlaywrightbrowsermustNOTenterimage. CIsetup npx playwright install --with-deps chromiumversionpinnedSDK (networkCItoolchainonly), readonlycachemountedexplicitPLAYWRIGHT_BROWSERS_PATH allowlist insideCItestRunner. IfchooseequivalentinstalledsystemChromiumtoolchainnoNewdep goodbutmustactuallyresolvePlaywrightimport portable notworkspacehardcoded.NotoolchainfallbacktocredentialsHosthome. PinneddependencyoptionalDev/OSplatformflagsvalidateCIactualnpmci.OldCIformat/evidence/unitkeepallgreen.No test or build onhostambientbySource.\nParentOPpublisher guardALREADYMERGEDexactallowedpackage.json/package-lock.json/.github/workflows/ci.yml/filesdirs—notallhiddenfiles. SourcecaneditrequestedCIconfigPRESERVEMERGEexisting(no wholesaleunrelatedscheduler). Newscriptsthroughscripts/ andtest-support/ allowed. ParentnativeartifactScopeCIclientprivate0sameexpectedmasterreadonly/hashesallstatic.UseraskedcommitpushpublishEACHcompletedincrementasnew0journey-ci/revraid-relic-journey-ci-1027; no trafficshiftMainmerge. Fullnativeunit+ALL44?actualSourcecounts thenCIexactSHAwithACTUALheadlessjobgreen required—notunitjobonly. README/docsJUDGESupdateclaimCIonlyAFTERactualCIwiredwithtest-layerexplain(runtimefakesvs45secfictionvsphysicalOwner) no claiminglivephysicalraid/stream.NothingpublishedtoDevpost/social/no publicrepo change. KeepREADMEnewPNGsha untouched. DocsACCESS_PERFclock235stillpendingprobe/real2hno absolutenomemorygrowthclaim.\nSource236~8minrealtest+CIharness+config/deps+shortdocumentation/targetunitcontractfornewCIguard ifneededthenSTOP. ParentExecOSofflineNativefreshgates andhostedCItoolchainperexplicitUserallowed; actualremoteciNo secrets.Userwhole4newqueueonceCI0landsstillmustcollectprobe/wall2h+qualifiedmetricscloseoutbeforefinal.MaybeSource237soakbugcaseifprobeFAILED, don'tpreemptscope.DON'TcreateNEWfeatureafterall4and2hfinished.SourceNo Git/deploy/cloud/min0ops.SourceAuthorityseparateArtifactSourceParentcapturesbinaryonlysameOriginalcreativeall.Node_Path_Record_Framework.\n"
+  }
+]
+````
+
+### 4898. 2026-10-27T09:04:04.739Z — assistant (source line 18389)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll add a runtime journey workflow using the local signed fixture, then wire a short headless CI job with an OS-level network boundary. The fixture will exercise controls, EventSub, claims, public views and export; it will remain separate from the fictional judge film. I won’t touch the running probe.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4899. 2026-10-27T09:04:06.492Z — tool call (source line 18390)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_e083f906b025407cbe6e41078d5b89bb",
+  "input": "text(await tools.exec_command({cmd:\"cat .github/workflows/ci.yml; head -42 package-lock.json; sed -n '45,90p' test-support/visual-review.js; cat scripts/browser-smoke-share-card.js | head -150; sed -n '1,82p' scripts/browser-smoke-pilot.js; sed -n '1,60p' test-support/local-tls.js; ls /home/ubuntu/.openclaw/workspace/node_modules/.package-lock.json /home/ubuntu/.openclaw/workspace/package-lock.json\",\"max_output_tokens\":4200}));\n"
+}
+````
+
+### 4900. 2026-10-27T09:04:06.614Z — tool result (source line 18393)
+
+````text
+{
+  "call_id": "call_e083f906b025407cbe6e41078d5b89bb",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "37debf",
+        "wall_time_seconds": 0.00000468,
+        "exit_code": 0,
+        "original_token_count": 3373,
+        "output": "name: CI\non: [push, pull_request]\npermissions:\n  contents: read\njobs:\n  test:\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v4\n        with:\n          persist-credentials: false\n      - uses: actions/setup-node@v4\n        with:\n          node-version: '22'\n          cache: npm\n      - run: npm ci\n      - run: npm run format:check\n      - run: npm test\n{\n  \"name\": \"raid-relic\",\n  \"version\": \"0.1.0\",\n  \"lockfileVersion\": 3,\n  \"requires\": true,\n  \"packages\": {\n    \"\": {\n      \"name\": \"raid-relic\",\n      \"version\": \"0.1.0\",\n      \"license\": \"MIT\",\n      \"dependencies\": {\n        \"@google-cloud/firestore\": \"^9.4.0\",\n        \"ws\": \"8.22.0\"\n      },\n      \"devDependencies\": {\n        \"prettier\": \"3.9.10\"\n      },\n      \"engines\": {\n        \"node\": \">=22\"\n      }\n    },\n    \"node_modules/@google-cloud/firestore\": {\n      \"version\": \"9.4.0\",\n      \"resolved\": \"https://registry.npmjs.org/@google-cloud/firestore/-/firestore-9.4.0.tgz\",\n      \"integrity\": \"sha512-4tVhdRFepX5w+fRfl3H6D2+gaGQjmMiA9l+OwIwInfAkCi8iacfRx4jS9SmSfpQNlXequ55DfzFopwyFnIIJ9w==\",\n      \"license\": \"Apache-2.0\",\n      \"dependencies\": {\n        \"@google-cloud/firestore-api\": \"^0.2.0\",\n        \"@opentelemetry/api\": \"^1.9.0\",\n        \"fast-deep-equal\": \"^3.1.3\",\n        \"functional-red-black-tree\": \"^1.0.1\",\n        \"google-gax\": \"^6.0.1\",\n        \"protobufjs\": \"^7.5.3\"\n      },\n      \"engines\": {\n        \"node\": \">=22\"\n      }\n    },\n    \"node_modules/@google-cloud/firestore-api\": {\n      \"version\": \"0.2.0\",\n      \"resolved\": \"https://registry.npmjs.org/@google-cloud/firestore-api/-/firestore-api-0.2.0.tgz\",\n      \"integrity\": \"sha512-wfHJPZmLqzpy6FN6U+7HkkP/AKhGsbHSpEy/qL2TyI3/pKRAvpamQxZ2qvps5hMRgAjfuHCim+oeJj9RveCaqg==\",\n        external++;\n        return r.abort();\n      }\n      return r.continue();\n    });\n    const page = await context.newPage();\n    page.on('pageerror', () => errors++);\n    return {\n      origin,\n      fixture,\n      dropConnections() {\n        for (const socket of sockets.clients) socket.terminate();\n      },\n      async restartRuntime() {\n        if (durable !== true) throw Error('Durable fixture required');\n        sockets.close();\n        await fixture.restart();\n        sockets = attachOverlaySockets(server, fixture.runtime.overlayFeeds, {\n          origins: [origin],\n          allowRead: fixture.runtime.allowPublicRead,\n        });\n      },\n      page,\n      context,\n      observe: (p) => p.on('pageerror', () => errors++),\n      stats: () => ({ errors, external }),\n      close: async () => {\n        sockets.close();\n        await browser?.close();\n        server.closeAllConnections();\n        await new Promise((r) => server.close(r));\n        await tls.cleanup();\n      },\n    };\n  } catch (e) {\n    sockets.close();\n    await browser?.close().catch(() => {});\n    server.closeAllConnections();\n    if (server.listening) await new Promise((r) => server.close(r));\n    await tls.cleanup();\n    throw e;\n  }\n}\nexport async function noDemoIO(context) {\n  await context.addInitScript(() => {\n    const counts = { fetch: 0, xhr: 0, ws: 0, beacon: 0, storage: 0, eventsource: 0 };\n// Parent native QA only: signed local kernel, actual canvas PNGs, no provider access.\nimport assert from 'node:assert/strict';\nimport { mkdir, writeFile } from 'node:fs/promises';\nimport { visualReview } from '../test-support/visual-review.js';\nimport { HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\nlet review,\n  stage = 'setup',\n  passed = false,\n  failureCategory = null;\nconst checks = [],\n  captures = new Map(),\n  diagnostic = {};\nasync function decode(page, download, width, height, capture) {\n  const chunks = [];\n  let size = 0;\n  for await (const b of await download.createReadStream()) {\n    size += b.length;\n    assert.ok(size <= 524288);\n    chunks.push(b);\n  }\n  const bytes = Buffer.concat(chunks);\n  assert.deepEqual([...bytes.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);\n  assert.equal(bytes.readUInt32BE(16), width);\n  assert.equal(bytes.readUInt32BE(20), height);\n  assert.ok(width * height * 4 <= 4 * 1024 * 1024);\n  const pixels = await page.evaluate(\n    async (raw) => {\n      const image = await createImageBitmap(\n        new Blob([Uint8Array.from(raw)], { type: 'image/png' }),\n      );\n      const canvas = document.createElement('canvas');\n      canvas.width = image.width;\n      canvas.height = image.height;\n      const c = canvas.getContext('2d');\n      c.drawImage(image, 0, 0);\n      const rgba = c.getImageData(0, 0, image.width, image.height).data;\n      let colored = 0;\n      for (let i = 0; i < rgba.length; i += 4)\n        if (rgba[i + 3] && Math.max(rgba[i], rgba[i + 1], rgba[i + 2]) > 80) colored++;\n      image.close();\n      canvas.width = canvas.height = 0;\n      return colored;\n    },\n    [...bytes],\n  );\n  assert.ok(pixels > 1000);\n  if (process.env.SHARE_CARD_CAPTURE === '1' && capture) captures.set(capture, bytes);\n  await download.delete();\n}\ntry {\n  review = await visualReview();\n  const { fixture: f, page, context, origin } = review;\n  await context.addInitScript(() => {\n    window.__shareLabels = { recorded: false, current: false, engraving: false, journey: false };\n    const original = CanvasRenderingContext2D.prototype.fillText;\n    CanvasRenderingContext2D.prototype.fillText = function (text, ...args) {\n      const flags = window.__shareLabels;\n      if (text === 'Keeper at this stop: @olsols2') flags.recorded = true;\n      if (text === 'Current holder at export: @raidrelichq') flags.current = true;\n      if (text === 'moon') flags.engraving = true;\n      if (typeof text === 'string' && text.startsWith('Retained journey')) flags.journey = true;\n      return original.call(this, text, ...args);\n    };\n  });\n  for (const id of [BOT, HOME, OTHER]) await f.login(id);\n  for (const id of [HOME, OTHER]) f.streams.get(id).viewer_count = 1;\n  for (const id of [HOME, OTHER]) {\n    await f.control(id, 'bootstrap');\n    f.advance();\n    await f.control(id, 'keep');\n    f.advance();\n  }\n  await f.chat(HOME, '8101', '!mark moon');\n  await f.chat(HOME, HOME, '!relic approve m1');\n  for (const [from, to, i] of [\n    [HOME, OTHER, 1],\n    [OTHER, HOME, 2],\n  ]) {\n    f.advance(31000);\n    assert.equal(JSON.parse((await f.control(from, 'send:' + to)).body).status, 'accepted');\n    await f.raid(from, to);\n    await f.chat(from, '820' + i, '!offer');\n    await f.chat(to, '830' + i, '!accept');\n  }\n  assert.equal((await f.runtime.state.getPublicJourney()).rings, 2);\n  stage = 'atlas-historical-stop';\n  await page.goto(origin + '/atlas/');\n  let pending = page.waitForEvent('download');\n  await page.getByRole('button', { name: 'Download ring card Stop 1', exact: true }).click();\n  let download = await pending;\n  assert.equal(download.suggestedFilename(), 'raid-relic-stop-1-olsols2.png');\n  await decode(page, download, 1200, 630, 'share-atlas.png');\n  assert.deepEqual(await page.evaluate(() => window.__shareLabels), {\n    recorded: true,\n    current: true,\n    engraving: true,\n    journey: true,\n  });\n  f.advance(31000);\n  pending = page.waitForEvent('download');\n  await page.getByRole('button', { name: 'Download ring card Stop 2', exact: true }).click();\n  download = await pending;\n  assert.equal(download.suggestedFilename(), 'raid-relic-stop-2-raidrelichq.png');\n  await decode(page, download, 1200, 630);\n  checks.push({\n    name: 'Historical stop PNG distinguishes recorded/current Keeper with approved engraving and retained journey; distinct filenames',\n    passed: true,\n  });\n  stage = 'keeper-orientations';\n  f.advance(31000);\n  await page.goto(origin + '/keeper/olsols2');\n  for (const [orientation, w, h] of [\n    ['landscape', 1200, 675],\n    ['vertical', 720, 1280],\n  ]) {\n    stage = 'keeper-' + orientation;\n    f.advance(31000);\n    pending = page.waitForEvent('download');\n    await page\n      .getByRole('button', { name: 'Download ' + orientation + ' card · Ring 1', exact: true })\n      .click();\n    download = await pending;\n    assert.equal(\n      download.suggestedFilename(),\n      'raid-relic-keeper-olsols2-ring-1-' + orientation + '.png',\n    );\n    await decode(page, download, w, h, 'share-keeper-' + orientation + '.png');\n    assert.deepEqual(await page.evaluate(() => window.__shareLabels), {\n      recorded: true,\n      current: true,\n      engraving: true,\n      journey: true,\n    });\n  }\n  for (const width of [320, 390, 1280]) {\n    await page.setViewportSize({ width, height: 800 });\n    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));\n  }\n  checks.push({\n    name: 'Keeper landscape/vertical actual PNG bytes and pixels, honest canvas labels and responsive controls',\n    passed: true,\n  });\n  stage = 'privacy-race';\n  f.advance(31000);\n  let stopReads = 0,\n    downloads = 0;\n  page.on('download', () => downloads++);\n  await page.route('**/api/atlas/stops/*', async (route) => {\n    if (++stopReads === 2) {\n      f.advance(31000);\nimport { capturePage } from '../test-support/capture-page.js';\n// Optional host QA: local mocked OAuth/Helix only; never follows Twitch URLs.\nimport { createServer } from 'node:https';\nimport { mkdir, writeFile } from 'node:fs/promises';\nimport { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\nimport { createLocalTLS } from '../test-support/local-tls.js';\nimport { attachOverlaySockets } from '../src/overlay-sockets.js';\nconst origin = 'https://localhost:5191';\nconst f = await pilotFixture('memory', { origin });\nlet server, sockets, localTLS;\nconst captures = new Map();\nconst captureCoverage = [];\nconst capture = (page, name) => capturePage(page, name, captures, captureCoverage);\nlet browser, failure, activePage;\nlet frontendPageErrorCount = 0;\nlet diagnostic = null;\nlet phase = 'local startup';\nlet diagnostics;\nlet lastPostStatus;\nasync function press(page, id, label, expected) {\n  phase = label;\n  const ownPath = `/control/${id}`;\n  const post = page.waitForResponse(\n    (r) => new URL(r.url()).pathname === ownPath && r.request().method() === 'POST',\n  );\n  const refreshed = page\n    .waitForResponse(\n      (r) => new URL(r.url()).pathname === `${ownPath}/status` && r.request().method() === 'GET',\n    )\n    .catch(() => null);\n  await page.evaluate(() => {\n    window.__pilotPostProof = null;\n  });\n  await page.getByRole('button', { name: label, exact: true }).click();\n  phase = `${label}: own-response`;\n  const response = await post;\n  await page.waitForFunction(() => Boolean(window.__pilotPostProof));\n  const result = await page.evaluate(() => window.__pilotPostProof);\n  if (result.http !== response.status()) throw Error('Response proof mismatch');\n  lastPostStatus = {\n    http: response.status(),\n    status: [\n      'accepted',\n      'processed',\n      'reconciled',\n      'blocked',\n      'busy',\n      'failed',\n      'unknown',\n      'rejected',\n      'rejected-preflight',\n      'idle-or-reconcile-only',\n    ].includes(result.status)\n      ? result.status\n      : 'unexpected',\n  };\n  if (response.status() !== 200 || result.status !== expected)\n    throw new Error('Owner POST returned unexpected status');\n  phase = `${label}: status-refresh`;\n  if (!(await refreshed)) throw new Error('Owner status refresh missing');\n  await page.waitForFunction(() => !document.getElementById('refresh').disabled);\n  phase = `${label}: result-dom`;\n  await page\n    .locator('#result')\n    .filter({\n      hasText:\n        expected === 'processed'\n          ? /processed|Keeper choice saved/i\n          : expected === 'reconciled'\n            ? /reconciled/i\n            : /accepted/i,\n    })\n    .waitFor();\n  if (expected === 'reconciled' && result.ready !== true)\n    throw new Error('Mocked subscriptions not enabled');\n  checks.push({ name: label, status: result.status, passed: true });\n}\nconst checks = [];\ntry {\n  phase = 'ephemeral local HTTPS fixture';\n  localTLS = await createLocalTLS();\n  server = createServer(localTLS.options, f.runtime.handler);\n// Ephemeral local-test key material only. Never reads existing auth/cert files.\nimport { execFile } from 'node:child_process';\nimport { promisify } from 'node:util';\nimport { mkdir, mkdtemp, readFile, chmod, rm } from 'node:fs/promises';\nimport { resolve, join } from 'node:path';\nconst run = promisify(execFile);\nexport async function createLocalTLS() {\n  const root = resolve('artifacts');\n  await mkdir(root, { recursive: true });\n  const directory = await mkdtemp(join(root, '.pilot-tls-'));\n  await chmod(directory, 0o700);\n  const cleanup = () => rm(directory, { recursive: true, force: true });\n  try {\n    const keyPath = join(directory, 'local.key'),\n      certPath = join(directory, 'local.pem');\n    await run(\n      'openssl',\n      [\n        'req',\n        '-x509',\n        '-newkey',\n        'rsa:2048',\n        '-nodes',\n        '-days',\n        '1',\n        '-subj',\n        '/CN=localhost',\n        '-addext',\n        'subjectAltName=DNS:localhost,IP:127.0.0.1',\n        '-keyout',\n        keyPath,\n        '-out',\n        certPath,\n      ],\n      { timeout: 15000, maxBuffer: 16384 },\n    );\n    await chmod(keyPath, 0o600);\n    return {\n      directory,\n      options: { key: await readFile(keyPath), cert: await readFile(certPath) },\n      cleanup,\n    };\n  } catch {\n    await cleanup();\n    throw new Error('Ephemeral local TLS generation failed');\n  }\n}\n/home/ubuntu/.openclaw/workspace/node_modules/.package-lock.json\n/home/ubuntu/.openclaw/workspace/package-lock.json\n"
+      }
+    }
+  ]
+}
+````
+
+### 4901. 2026-10-27T09:04:15.239Z — tool call (source line 18397)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_3973956d42ec4cd985df7caf02454e7f",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\nimport json\\np=json.load(open('/home/ubuntu/.openclaw/workspace/package-lock.json'))['packages']\\nfor k in ['node_modules/playwright','node_modules/playwright-core','node_modules/fsevents']:\\n v=p.get(k)\\n print(k, json.dumps(v))\\nPY\\nrg -n 'send|raid-target|Send Off' public/control.html; rg -n 'Replay|replay' public/atlas.js | head -20; sed -n '195,220p' test-support/pilot-fixture.js; cat .dockerignore | head -40; cat Dockerfile | head -26\",\"max_output_tokens\":1800}));\n"
+}
+````
+
+### 4902. 2026-10-27T09:04:15.422Z — tool result (source line 18400)
+
+````text
+{
+  "call_id": "call_3973956d42ec4cd985df7caf02454e7f",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "30c7e8",
+        "wall_time_seconds": 0.00000456,
+        "exit_code": 0,
+        "original_token_count": 866,
+        "output": "node_modules/playwright null\nnode_modules/playwright-core {\"version\": \"1.58.2\", \"resolved\": \"https://registry.npmjs.org/playwright-core/-/playwright-core-1.58.2.tgz\", \"integrity\": \"sha512-yZkEtftgwS8CsfYo7nm0KE8jsvm6i/PTgVtB8DL726wNf6H2IMsDuxCpJj59KDaxCtSnrWan2AeDqM7JBaultg==\", \"license\": \"Apache-2.0\", \"bin\": {\"playwright-core\": \"cli.js\"}, \"engines\": {\"node\": \">=18\"}}\nnode_modules/fsevents null\n71:        <h2>Send Off</h2>\n73:          Send Off requests a real Twitch raid to this observed Keeper. The relic moves only after\n74:          Twitch confirms the raid and both chats bind it; sending rechecks eligibility.\n76:        <label for=\"raid-target\">Observed eligible raid target</label\n77:        ><select id=\"raid-target\" aria-describedby=\"target-help target-empty\" disabled></select>\n104:        <h2 id=\"recovery-title\">Own Send Off recovery</h2>\n    transport,\n    p7HTTP,\n    chronicleHTTP,\n    forgeHTTP,\n    simulator,\n    now: () => time,\n  };\n  let runtime = await createRuntime(runtimeEnv, runtimeOptions);\n  const cookies = {};\n  const request = (path, method = 'GET', headers = {}, rawBody = Buffer.alloc(0)) =>\n    runtime.dispatch({ path, method, headers, rawBody });\n  async function login(id, { p7 = false } = {}) {\n    const start = await request(\n      id === BOT ? `/oauth/bot/start${p7 ? '?features=p7' : ''}` : `/oauth/keeper/${id}/start`,\n    );\n    const state = new URL(start.headers.location).searchParams.get('state');\n    const result = await request(`/auth/callback?state=${state}&code=${id}`, 'GET', {\n      cookie: start.headers['set-cookie'].split(';')[0],\n    });\n    if (result.status !== 200) throw new Error('Synthetic OAuth failed');\n    if (id !== BOT) cookies[id] = result.headers['set-cookie'][1].split(';')[0];\n    return result;\n  }\n  async function control(id, action, overrides = {}, cached = {}) {\n    const status = cached.csrf\n      ? null\n# Strict build allowlist: secrets, evidence, tests and simulator never enter context.\n**\n!package.json\n!package-lock.json\n!Dockerfile\n!.dockerignore\n!LICENSE\n!src/\n!src/*.js\n!public/\n!public/*.html\n!public/*.css\n!public/*.js\n!public/*.svg\n\n!public/vendor/\n!public/vendor/three.module.js\n!public/vendor/three.core.js\n!public/vendor/LICENSE-three.txt\n\n!public/fonts/\n!public/fonts/Cinzel.ttf\n!public/fonts/OFL-Cinzel.txt\nFROM node:24.22.1-bookworm-slim\nWORKDIR /app\nENV NODE_ENV=production PORT=8080\nCOPY package.json package-lock.json ./\nRUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund && npm cache clean --force\nCOPY src/ ./src/\nCOPY public/ ./public/\nRUN chmod 0755 public/fonts && chmod 0644 public/fonts/Cinzel.ttf public/fonts/OFL-Cinzel.txt\nCOPY LICENSE ./LICENSE\nARG RELEASE_COMMIT\nENV RELEASE_COMMIT=${RELEASE_COMMIT}\nRUN node --input-type=module -e 'import { validateReleaseCommit } from \"./src/release.js\"; validateReleaseCommit(process.env.RELEASE_COMMIT, { required: true });'\nLABEL org.opencontainers.image.revision=${RELEASE_COMMIT}\nUSER node\nRUN node -e 'const fs = require(\"node:fs\"), crypto = require(\"node:crypto\"); for (const [file, expected] of [[\"public/fonts/Cinzel.ttf\", \"f4d83d34d1f6c741193e4acf4b3dff9531e5a67b6aa65228d00a7db72a4e0f34\"], [\"public/fonts/OFL-Cinzel.txt\", \"f2b3029aba64c378bf0963b62945eee15e564fe4330b934c8f2eb058282b5e83\"]]) { if (crypto.createHash(\"sha256\").update(fs.readFileSync(file)).digest(\"hex\") !== expected) throw new Error(\"Public font integrity check failed\"); }'\nEXPOSE 8080\nCMD [\"node\", \"src/server.js\"]\n"
+      }
+    }
+  ]
+}
+````
+
+### 4903. 2026-10-27T09:04:22.413Z — tool call (source line 18404)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_3efb69437cc0419c924322748c516f5a",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\nimport json\\np=json.load(open('/home/ubuntu/.openclaw/workspace/node_modules/.package-lock.json'))['packages']\\nfor k in ['node_modules/playwright','node_modules/playwright-core','node_modules/fsevents']:\\n print(k,json.dumps(p.get(k)))\\nPY\\nsed -n '76,101p' public/control.html; rg -n 'Replay|replay' public/*.js | grep -E 'atlas|replay' | head -20; rg -n 'receiving.*holder|current.*Keeper|LIVE|offline' public/receiving.js | head -22; sed -n '38,61p' test-support/visual-review.js\",\"max_output_tokens\":1900}));\n"
+}
+````
+
+### 4904. 2026-10-27T09:04:22.543Z — tool result (source line 18407)
+
+````text
+{
+  "call_id": "call_3efb69437cc0419c924322748c516f5a",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "f71939",
+        "wall_time_seconds": 0.0000054,
+        "exit_code": 0,
+        "original_token_count": 848,
+        "output": "node_modules/playwright {\"version\": \"1.58.2\", \"resolved\": \"https://registry.npmjs.org/playwright/-/playwright-1.58.2.tgz\", \"integrity\": \"sha512-vA30H8Nvkq/cPBnNw4Q8TWz1EJyqgpuinBcHET0YVJVFldr8JDNiU9LaWAE1KqSkRYazuaBhTpB5ZzShOezQ6A==\", \"license\": \"Apache-2.0\", \"dependencies\": {\"playwright-core\": \"1.58.2\"}, \"bin\": {\"playwright\": \"cli.js\"}, \"engines\": {\"node\": \">=18\"}, \"optionalDependencies\": {\"fsevents\": \"2.3.2\"}}\nnode_modules/playwright-core {\"version\": \"1.58.2\", \"resolved\": \"https://registry.npmjs.org/playwright-core/-/playwright-core-1.58.2.tgz\", \"integrity\": \"sha512-yZkEtftgwS8CsfYo7nm0KE8jsvm6i/PTgVtB8DL726wNf6H2IMsDuxCpJj59KDaxCtSnrWan2AeDqM7JBaultg==\", \"license\": \"Apache-2.0\", \"bin\": {\"playwright-core\": \"cli.js\"}, \"engines\": {\"node\": \">=18\"}}\nnode_modules/fsevents null\n        <label for=\"raid-target\">Observed eligible raid target</label\n        ><select id=\"raid-target\" aria-describedby=\"target-help target-empty\" disabled></select>\n        <p id=\"target-empty\" role=\"status\">\n          No observed eligible Keeper targets. Refresh status after setup or a state change.\n        </p>\n        <div id=\"raid\" class=\"actions\"></div>\n      </section>\n      <p id=\"result\" role=\"status\" aria-live=\"polite\">Reading your session…</p>\n      <p>Private Keeper control. Actions apply only to your authenticated account.</p>\n      <p>\n        <a id=\"reconnect\" href=\"/oauth/keeper/1591805230/start\">Reconnect this matching Keeper</a> ·\n        Refresh status is read-only and never renews authorization. Use the explicit authorization\n        button to try renewal for your account.\n      </p>\n      <dl id=\"ledger\" hidden></dl>\n      <section>\n        <h2>Set up this channel</h2>\n        <p>\n          Bootstrap reconciles subscriptions and observes your current stream. It never starts a\n          raid.\n        </p>\n        <div id=\"setup\" class=\"actions\"></div>\n      </section>\n      <section>\n        <h2>Keeper state</h2>\n        <div id=\"keeper\" class=\"actions\"></div>\npublic/arrival.js:1:// Receipt-time seeking, never replay-on-connect. No Twitch countdown is inferred.\npublic/film-state.js:47:    name: 'Journey replay',\npublic/film-state.js:93:    replay: index === 6,\npublic/cinematic.js:101:// Cold reads/reconnects seek visually but cannot replay a flash or chord.\npublic/journey-map.js:250:    play.textContent = 'Pause replay';\npublic/journey-map.js:416:        document.title = 'SIMULATOR · Recorded journey replay';\npublic/film.js:26:    '45-second fictional whole-loop preview · no account, audio or real actions. Pause, skip or replay; card export is optional.';\npublic/film.js:196:        completed: f.completed && !f.replay,\n    context = await browser.newContext({\n      ignoreHTTPSErrors: true,\n      viewport: { width: 390, height: 844 },\n      serviceWorkers: 'block',\n    });\n    await context.route('**/*', (r) => {\n      if (new URL(r.request().url()).origin !== origin) {\n        external++;\n        return r.abort();\n      }\n      return r.continue();\n    });\n    const page = await context.newPage();\n    page.on('pageerror', () => errors++);\n    return {\n      origin,\n      fixture,\n      dropConnections() {\n        for (const socket of sockets.clients) socket.terminate();\n      },\n      async restartRuntime() {\n        if (durable !== true) throw Error('Durable fixture required');\n        sockets.close();\n        await fixture.restart();\n"
+      }
+    }
+  ]
+}
+````
+
+### 4905. 2026-10-27T09:04:29.191Z — tool call (source line 18411)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_75c39b649fbb4af4b9be26d791634e3d",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\nimport json\\nfor file in ['/home/ubuntu/.openclaw/workspace/package-lock.json','/home/ubuntu/.openclaw/workspace/node_modules/.package-lock.json']:\\n p=json.load(open(file))['packages']\\n for k,v in p.items():\\n  if k.endswith('/fsevents'):print(k,json.dumps(v))\\nPY\\nrg -n 'play.textContent|Replay|replay.*href|replay-' public/journey-map.js public/atlas.html | head -24; rg -n 'Send Off|button.*send|send:' public/control-view.js public/control.js; head -65 public/receiving.js; sed -n '27,39p' test-support/visual-review.js\",\"max_output_tokens\":1600}));\n"
+}
+````
+
+### 4906. 2026-10-27T09:04:29.365Z — tool result (source line 18414)
+
+````text
+{
+  "call_id": "call_75c39b649fbb4af4b9be26d791634e3d",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "af0e0f",
+        "wall_time_seconds": 0.00000488,
+        "exit_code": 0,
+        "original_token_count": 1011,
+        "output": "public/atlas.html:91:          <button id=\"map-play\" type=\"button\" disabled>Replay journey</button\npublic/journey-map.js:154:    play.textContent = 'Replay journey';\npublic/journey-map.js:250:    play.textContent = 'Pause replay';\npublic/control.js:232:        send.textContent = `Send Off to ${names[target.value]}`;\npublic/control.js:236:      send.onclick = () => run(`send:${target.value}`);\npublic/control.js:239:    for (const action of value.actions.filter((a) => a !== 'logout' && !a.startsWith('send:'))) {\npublic/control.js:241:      button.textContent = action.startsWith('send:')\npublic/control.js:242:        ? `Send Off to ${names[action.slice(5)]}`\npublic/control.js:249:            : action === 'process' || action.startsWith('send:')\npublic/control.js:256:      status.textContent = 'Status refreshed. Review both channels before Send Off.';\npublic/control.js:279:  if (action.startsWith('send:')) {\npublic/control.js:388:    status.textContent = 'Outcome unavailable. Refresh; do not blindly repeat Send Off.';\npublic/control-view.js:22:      'A native Twitch raid is already pending. Stop; do not Send Off or Process again.',\npublic/control-view.js:52:      'not-holder': 'Only the current relic Keeper can Send Off.',\npublic/control-view.js:54:        'There is an existing Send Off. Refresh and review it; never repeat accepted or unknown requests.',\npublic/control-view.js:55:      'intent-reconcile-only': 'This Send Off cannot be retried. Stop for operator review.',\npublic/control-view.js:59:      'Send Off is blocked. Refresh both Keepers and review the current state before any new request.'\nimport { keeperNames } from './keeper-network.js';\nimport { downloadKeeperCard } from './keeper-card.js';\nconst root = document.getElementById('receiving');\nconst configured = new Set(Object.values(keeperNames));\nconst utc = (v) =>\n  Number.isSafeInteger(v) && v >= 0\n    ? new Date(v).toLocaleString('en-GB', {\n        timeZone: 'UTC',\n        dateStyle: 'medium',\n        timeStyle: 'short',\n      }) + ' UTC'\n    : 'Time not recorded';\nconst node = (tag, text) => {\n  const n = document.createElement(tag);\n  if (text !== undefined) n.textContent = text;\n  return n;\n};\nfunction link(text, href) {\n  const n = node('a', text);\n  n.href = href;\n  return n;\n}\nfunction valid(v) {\n  return (\n    v &&\n    ['live', 'simulator'].includes(v.mode) &&\n    (!v.holder ||\n      (configured.has(v.holder.login) &&\n        Number.isInteger(v.holder.ringCount) &&\n        v.holder.ringCount >= 0 &&\n        v.holder.ringCount <= 16)) &&\n    (!v.seekers ||\n      (Array.isArray(v.seekers) &&\n        v.seekers.length <= 4 &&\n        v.seekers.every(\n          (s) =>\n            configured.has(s.login) &&\n            Number.isInteger(s.viewers) &&\n            s.viewers >= 0 &&\n            s.viewers <= 1000000,\n        )))\n  );\n}\nif (root) {\n  const content = document.getElementById('receiving-content'),\n    status = document.getElementById('receiving-status');\n  const login = /^\\/keeper\\/([a-z0-9_]{1,25})$/.exec(location.pathname)?.[1];\n  let generation = 0,\n    controller,\n    busy = false;\n  async function refresh() {\n    const own = ++generation;\n    controller?.abort();\n    controller = new AbortController();\n    const active = controller;\n    const timer = setTimeout(() => active.abort(), 8000);\n    content.replaceChildren();\n    status.textContent = 'Reading the current public record…';\n    try {\n      const r = await fetch(login ? '/api/keeper/' + login : '/api/receiving', {\n        signal: active.signal,\n        credentials: 'omit',\n        cache: 'no-store',\n      });\n      if (!r.ok) throw Error('Unavailable');\n  try {\n    await new Promise((r, j) => {\n      server.once('error', j);\n      server.listen(5191, '127.0.0.1', r);\n    });\n    const { chromium } = await import('playwright');\n    browser = await chromium.launch({\n      executablePath: '/snap/bin/chromium',\n      headless: true,\n      chromiumSandbox: true,\n    });\n    context = await browser.newContext({\n      ignoreHTTPSErrors: true,\n"
+      }
+    }
+  ]
+}
+````
+
+### 4907. 2026-10-27T09:04:42.588Z — tool call (source line 18418)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_3b46cf5548c740c2b7ac5654316fe5e8",
+  "input": "text(await tools.exec_command({cmd:\"rg -n \\\"import\\\\('playwright'|from 'playwright'\\\" test test-support | head -20; sed -n '75,112p' public/receiving.js; sed -n '210,238p' public/control.js; sed -n '90,103p' public/atlas.html; sed -n '139,160p' public/journey-map.js; sed -n '100,125p' public/journey-map.js\",\"max_output_tokens\":1200}));\n"
+}
+````
+
+### 4908. 2026-10-27T09:04:42.679Z — tool result (source line 18421)
+
+````text
+{
+  "call_id": "call_3b46cf5548c740c2b7ac5654316fe5e8",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "7859e6",
+        "wall_time_seconds": 0.000005,
+        "exit_code": 0,
+        "original_token_count": 1189,
+        "output": "test-support/visual-review.js:32:    const { chromium } = await import('playwright');\n        }\n      }\n      if (v.holder) {\n        const card = node('article');\n        card.className = 'holder-spotlight';\n        card.append(\n          node('h3', '@' + v.holder.login + ' holds the relic'),\n          node('p', 'Ring ' + v.holder.ringCount + ' · Held since: ' + utc(v.holder.heldSince)),\n        );\n        card.append(\n          node(\n            'p',\n            v.live === true\n              ? 'Live · observed within the last minute'\n              : v.live === false\n                ? 'Offline at the last observation'\n                : 'Live status unknown',\n          ),\n        );\n        card.append(\n          link('Watch @' + v.holder.login + ' on Twitch', 'https://twitch.tv/' + v.holder.login),\n          document.createTextNode(' · '),\n          link('Keeper record', '/keeper/' + v.holder.login),\n        );\n        content.append(card);\n      } else content.append(node('p', 'The current holder is not recorded.'));\n      if (!login) {\n        content.append(node('h3', 'Live Seekers · authorised Keeper pilot'));\n        content.append(\n          node(\n            'p',\n            v.enabled\n              ? 'Opted-in eligible recipients, lowest Twitch-reported viewer count first. Eligibility is checked again before Send Off.'\n              : 'Seeker suggestions are off. Operator admission and broadcaster consent are required.',\n          ),\n        );\n        const list = node('ul');\n        for (const s of v.seekers ?? []) {\n        dt.textContent = key;\n        const dd = document.createElement('dd');\n        dd.textContent = JSON.stringify(value.pilot[key], null, 2);\n        document.getElementById('ledger').append(dt, dd);\n      }\n    for (const group of ['setup', 'keeper', 'raid'])\n      document.getElementById(group).replaceChildren();\n    candidates = (value.pilot.candidates ?? []).filter(\n      (c) => c.id !== id && names[c.id] && c.observedOnline && c.optedIn && c.eligible,\n    );\n    for (const candidate of candidates) {\n      const option = document.createElement('option');\n      option.value = candidate.id;\n      option.textContent = `${candidate.login} · observed online${Number.isSafeInteger(candidate.viewers) && candidate.viewers >= 0 ? ' · ' + candidate.viewers + ' Twitch-reported viewers' : ''}`;\n      target.append(option);\n    }\n    target.disabled = busy || !candidates.length;\n    empty.hidden = candidates.length > 0;\n    if (candidates.length) {\n      const send = document.createElement('button');\n      const label = () => {\n        send.className = 'send-off';\n        send.textContent = `Send Off to ${names[target.value]}`;\n      };\n      label();\n      target.onchange = label;\n      send.onclick = () => run(`send:${target.value}`);\n      document.getElementById('raid').append(send);\n    }\n        <div class=\"map-controls\">\n          <button id=\"map-play\" type=\"button\" disabled>Replay journey</button\n          ><button id=\"map-restart\" type=\"button\" disabled>Restart</button\n          ><label for=\"map-range\">Recorded stop</label\n          ><input\n            id=\"map-range\"\n            type=\"range\"\n            min=\"0\"\n            max=\"0\"\n            value=\"0\"\n            step=\"0.01\"\n            disabled\n          /><output id=\"map-caption\" for=\"map-range\">No recorded stops</output\n          ><button id=\"map-refresh\" type=\"button\">Refresh map</button\n    mini = null,\n    bands = null,\n    controller = null,\n    generation = 0,\n    raf = 0,\n    playing = false,\n    last = 0,\n    lastDraw = 0,\n    value = 0,\n    layoutWidth = 0,\n    layoutHeight = 440;\n  function pause() {\n    playing = false;\n    cancelAnimationFrame(raf);\n    raf = 0;\n    play.textContent = 'Replay journey';\n    root.dataset.playing = 'false';\n    last = 0;\n  }\n  function clear() {\n    pause();\n    data = null;\n  const dx = b.x - a.x,\n    dy = b.y - a.y,\n    len = Math.hypot(dx, dy) || 1,\n    offset = 24 + index * 10;\n  return {\n    a,\n    b,\n    c: { x: (a.x + b.x) / 2 - (dy / len) * offset, y: (a.y + b.y) / 2 + (dx / len) * offset },\n  };\n}\nexport function curvePoint({ a, b, c }, t) {\n  return {\n    x: (1 - t) ** 2 * a.x + 2 * (1 - t) * t * c.x + t * t * b.x,\n    y: (1 - t) ** 2 * a.y + 2 * (1 - t) * t * c.y + t * t * b.y,\n  };\n}\nconst NS = 'http://www.w3.org/2000/svg';\nconst svg = (tag, attrs = {}) => {\n  const n = document.createElementNS(NS, tag);\n  for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, String(v));\n  return n;\n};\nif (typeof document !== 'undefined' && document.querySelector('#journey-map')) {\n  const root = document.querySelector('#journey-map'),\n    stage = document.querySelector('#map-svg'),\n    status = document.querySelector('#map-status'),\n"
+      }
+    }
+  ]
+}
+````
+
+### 4909. 2026-10-27T09:06:15.730Z — tool call (source line 18431)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_2f12cd4694bf47e9955aef8805147258",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\nimport json\\np='package.json';v=json.load(open(p));v['devDependencies']['playwright-core']='1.58.2';open(p,'w').write(json.dumps(v,indent=2)+'\\\\n')\\np='package-lock.json';v=json.load(open(p));v['packages']['']['devDependencies']['playwright-core']='1.58.2';entry=json.load(open('/home/ubuntu/.openclaw/workspace/node_modules/.package-lock.json'))['packages']['node_modules/playwright-core'];assert entry['version']=='1.58.2';entry['dev']=True;v['packages']['node_modules/playwright-core']=entry;v['packages']=dict(sorted(v['packages'].items()));open(p,'w').write(json.dumps(v,indent=2)+'\\\\n')\\nPY\",\"max_output_tokens\":1000}));\ntext(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/test-support/visual-review.js\\n@@\\n import { pilotFixture } from './pilot-fixture.js';\\n+import { access, constants, realpath } from 'node:fs/promises';\\n+import { isAbsolute, sep } from 'node:path';\\n+export async function localChromiumOptions(chromium) {\\n+  try {\\n+    await access('/snap/bin/chromium', constants.X_OK);\\n+    return { executablePath: '/snap/bin/chromium', headless: true, chromiumSandbox: true };\\n+  } catch {\\n+    const cache = process.env.PLAYWRIGHT_BROWSERS_PATH;\\n+    if (!cache || !isAbsolute(cache) || cache === '/') throw Error('Explicit local browser cache required');\\n+    const root = await realpath(cache), executablePath = await realpath(chromium.executablePath());\\n+    if (!executablePath.startsWith(root + sep)) throw Error('Browser outside toolchain cache');\\n+    await access(executablePath, constants.X_OK);\\n+    return { executablePath, headless: true, chromiumSandbox: true };\\n+  }\\n+}\\n@@\\n-    const { chromium } = await import('playwright');\\n-    browser = await chromium.launch({\\n-      executablePath: '/snap/bin/chromium',\\n-      headless: true,\\n-      chromiumSandbox: true,\\n-    });\\n+    const { chromium } = await import('playwright-core');\\n+    browser = await chromium.launch(await localChromiumOptions(chromium));\\n*** End Patch\"));\n"
+}
+````
+
+### 4910. 2026-10-27T09:06:15.886Z — tool result (source line 18435)
+
+````text
+{
+  "call_id": "call_2f12cd4694bf47e9955aef8805147258",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "03b898",
+        "wall_time_seconds": 0.0000038,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 4911. 2026-10-27T09:06:49.550Z — tool call (source line 18441)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_81bcf5d0c759487dbbc861de30c5972d",
+  "input": "text(await tools.exec_command({cmd:\"head -44 test-support/pilot-fixture.js; sed -n '240,254p' public/journey-map.js; rg -n 'SIMULATOR|mode' src/recap.js src/public-view.js | head -12; sed -n '260,287p' public/control.js; rg -n 'status' public/receiving.js | tail -7\",\"max_output_tokens\":1500}));\n"
+}
+````
+
+### 4912. 2026-10-27T09:06:49.643Z — tool result (source line 18444)
+
+````text
+{
+  "call_id": "call_81bcf5d0c759487dbbc861de30c5972d",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "0957cd",
+        "wall_time_seconds": 0.00000444,
+        "exit_code": 0,
+        "original_token_count": 922,
+        "output": "import assert from 'node:assert/strict';\nimport { createHmac } from 'node:crypto';\nimport { createRuntime } from '../src/runtime.js';\nimport { fakeFirestore } from './fake-firestore.js';\nexport const HOME = '1591805230',\n  OTHER = '1591806023',\n  BOT = '1591804828';\nexport async function pilotFixture(\n  kind = 'memory',\n  {\n    simulator = true,\n    rotateTokens = false,\n    extraKeeperScopes = [],\n    extraBotScopes = [],\n    p7HTTP,\n    chronicleEnv = {},\n    chronicleHTTP,\n    forgeHTTP,\n    origin = 'https://pilot.example',\n    initialNow,\n    keepers = { [HOME]: 'raidrelichq', [OTHER]: 'olsols2' },\n  } = {},\n) {\n  const ids = Object.keys(keepers);\n  const db = kind === 'firestore' ? fakeFirestore() : undefined;\n  let time = initialNow ?? Date.parse('2026-10-25T12:00:00Z');\n  if (!Number.isSafeInteger(time) || time < 0 || time > Date.now())\n    throw Error('Synthetic fixture clock rejected');\n  let seq = 0;\n  let validationOverride = null;\n  let refreshFailure = null;\n  const issued = new Map(),\n    versions = new Map(),\n    currentAccess = new Map();\n  const secret = 'synthetic-pilot-hmac-secret';\n  const streams = new Map(\n    ids.map((id, index) => [\n      id,\n      {\n        user_id: id,\n        id: String(9001 + index),\n        type: 'live',\n        started_at: new Date(time - 10000).toISOString(),\n      },\n      pause();\n      return;\n    }\n    raf = requestAnimationFrame(frame);\n  }\n  function start() {\n    if (!data?.hops.length || motion.matches || document.hidden) return;\n    if (value >= data.hops.length) draw(0);\n    playing = true;\n    root.dataset.playing = 'true';\n    play.textContent = 'Pause replay';\n    last = 0;\n    raf = requestAnimationFrame(frame);\n  }\n  function build(relist = true) {\nsrc/recap.js:96:      '>SIMULATOR · Raid Relic journey recap</title>',\nsrc/recap.js:102:    simulator ? 'SIMULATOR · LOCAL MEMORY · NOT REAL TWITCH' : 'RAID RELIC · JOURNEY SNAPSHOT',\nsrc/recap.js:165:      ? 'SIMULATOR SNAPSHOT · template fiction only · no real raid or AI'\n    expiryRecovery = null;\n    document.getElementById('expire-handoff').disabled = true;\n    csrf = null;\n    recovery = null;\n    document.getElementById('cancel-queued').disabled = true;\n    document.getElementById('recovery-status').textContent =\n      'Recovery status unavailable. Reconnect and refresh; never repeat dispatch.';\n    status.textContent =\n      error?.code === 'timeout'\n        ? 'Status timed out. Retry Refresh status; reconnect only this matching Keeper if authorization expired.'\n        : error?.code === 'authorization'\n          ? 'Control session expired or unauthorized. Reconnect this matching Keeper, then Retry Refresh status.'\n          : 'Status unavailable or invalid. Retry Refresh status; actions are disabled until a fresh authorized status is read.';\n  } finally {\n    if (generation === readGeneration) disable(false);\n  }\n}\nasync function run(action) {\n  if (busy || !csrf) return;\n  if (action.startsWith('send:')) {\n    if (!candidates.some((c) => c.id === action.slice(5))) {\n      status.textContent = 'Refresh status to choose an observed eligible Keeper.';\n      return;\n    }\n    if (\n      !confirm(\n        `Request a real Twitch raid to ${names[action.slice(5)]}? This can affect your live broadcast.`,\n      )\n58:    status.textContent = 'Reading the current public record…';\n91:                : 'Live status unknown',\n203:              status.textContent = 'Checking the current record and preparing PNG…';\n209:                status.textContent = 'Card downloaded. Saved files cannot be recalled.';\n211:                status.textContent =\n224:      status.textContent =\n229:        status.textContent =\n"
+      }
+    }
+  ]
+}
+````
+
+### 4913. 2026-10-27T09:07:09.417Z — tool call (source line 18448)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_f0bc8597fbb04ee2a73f8be3bc632b9a",
+  "input": "text(await tools.exec_command({cmd:\"rg -n 'mode:' public/ring-card-client.js public/ring-card.js | head -15; sed -n '85,100p' public/ring-card-client.js; rg -n 'SIMULAT|DEMO' public/ring-card.js | head -12; sed -n '118,138p' public/receiving.js\",\"max_output_tokens\":800}));\n"
+}
+````
+
+### 4914. 2026-10-27T09:07:09.506Z — tool result (source line 18451)
+
+````text
+{
+  "call_id": "call_f0bc8597fbb04ee2a73f8be3bc632b9a",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "ccc032",
+        "wall_time_seconds": 0.00000492,
+        "exit_code": 0,
+        "original_token_count": 465,
+        "output": "public/ring-card-client.js:32:      { mode: v.mode, share: snapshot.share, ...(s.kind === 'wander' ? { kind: 'wander' } : {}) },\npublic/ring-card-client.js:154:    { mode: exact.mode, share, ...(exact.stop.kind === 'wander' ? { kind: 'wander' } : {}) },\npublic/ring-card-client.js:160:      mode: exact.mode,\n    }\n    if (page.marks.length === 0 || page.nextOffset !== marks.length)\n      throw Error('Share mark cursor');\n    page = await read('/api/atlas/stops/' + stopId + '?offset=' + marks.length + '&limit=20');\n  }\n  const recap = await read('/api/recap');\n  const receiving = await read('/api/receiving');\n  if (\n    !['live', 'simulator'].includes(exact.mode) ||\n    recap.mode !== exact.mode ||\n    receiving.mode !== exact.mode ||\n    !exact.stop ||\n    exact.stop.approvedCount !== exact.total ||\n    !Array.isArray(recap.route) ||\n    recap.route.length < 1 ||\n    recap.route.length > 16 ||\n61:      ? 'SIMULATED DEMO—no Twitch connection'\n64:          ? 'SIMULATOR—wandered; no raid or audience transfer'\n65:          : 'SIMULATOR—mock recorded stop; no real Twitch'\n          list.append(li);\n        }\n        content.append(list);\n        if (v.enabled && !list.childElementCount)\n          content.append(node('p', 'No live eligible Seekers are currently confirmed.'));\n        const recent = node('p', 'Recent recorded Keepers: ');\n        for (const name of v.recent ?? [])\n          if (configured.has(name))\n            recent.append(link('@' + name, '/keeper/' + name), document.createTextNode(' '));\n        content.append(recent);\n      } else {\n        const p = v.profile;\n        if (\n          !p ||\n          p.login !== login ||\n          !configured.has(login) ||\n          !Array.isArray(p.received) ||\n          p.received.length > 16 ||\n          !Array.isArray(p.glyphs) ||\n          p.glyphs.length > 20\n        )\n"
+      }
+    }
+  ]
+}
+````
+
+### 4915. 2026-10-27T09:07:45.926Z — tool call (source line 18455)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_81165d17d6dd4305a88e1de94336b3fd",
+  "input": "text(await tools.exec_command({cmd:\"cat > scripts/browser-smoke-journey-ci.js <<'EOF'\\n// Entire real runtime path, entirely LOCAL signed/mock identities and transport.\\nimport assert from 'node:assert/strict';\\nimport { mkdir, writeFile } from 'node:fs/promises';\\nimport { visualReview, growthPixels } from '../test-support/visual-review.js';\\nimport { HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\\nlet review, timer, stage = 'setup', passed = false, failureCategory = null;\\nconst checks = [], diagnostic = { syntheticFixture: true };\\ntry {\\n  review = await visualReview({ seekers: true, durable: true });\\n  const { page, context, fixture: f, origin } = review;\\n  timer = setTimeout(() => { void context.close().catch(() => {}); }, 140000);\\n  await context.routeWebSocket('**/*', (r) => new URL(r.url()).origin === origin.replace('https:', 'wss:')\\n    ? r.connectToServer() : r.close());\\n  await context.addInitScript(() => {\\n    window.__journeyCard = { approved: false, held: false, simulated: false };\\n    const draw = CanvasRenderingContext2D.prototype.fillText;\\n    CanvasRenderingContext2D.prototype.fillText = function(text, ...args) {\\n      if (text === 'moon') window.__journeyCard.approved = true;\\n      if (text === 'private') window.__journeyCard.held = true;\\n      if (typeof text === 'string' && text.includes('SIMULATOR')) window.__journeyCard.simulated = true;\\n      return draw.call(this, text, ...args);\\n    };\\n  });\\n  for (const id of [BOT, HOME, OTHER]) await f.login(id);\\n  for (const id of [HOME, OTHER]) {\\n    f.streams.get(id).viewer_count = 4;\\n    await f.control(id, 'bootstrap'); f.advance(); await f.control(id, 'keep'); f.advance();\\n  }\\n  await f.chat(HOME, '301', '!mark moon');\\n  const doc = await f.runtime.state.getPrivateMarks(HOME, { broadcasterId: HOME, chatterId: HOME });\\n  const moon = doc.sessions.flatMap((s) => s.marks).find((m) => m.text === 'moon');\\n  assert.ok(moon);\\n  await f.chat(HOME, HOME, `!relic approve ${moon.id}`);\\n  await f.chat(HOME, '302', '!mark private');\\n  const [name, value] = f.cookies[HOME].split('=');\\n  await context.addCookies([{ name, value, url: origin, secure: true, httpOnly: true, sameSite: 'Lax' }]);\\n  stage = 'own-control-send';\\n  await page.goto(origin + '/control/' + HOME);\\n  await page.waitForFunction(() => !document.querySelector('#refresh').disabled &&\\n    document.querySelector('#raid-target').options.length > 0);\\n  await page.locator('#raid-target').selectOption(OTHER);\\n  page.once('dialog', (dialog) => { void dialog.accept(); });\\n  const [response] = await Promise.all([\\n    page.waitForResponse((r) => new URL(r.url()).pathname === '/control/' + HOME && r.request().method() === 'POST'),\\n    page.getByRole('button', { name: 'Send Off to olsols2', exact: true }).click(),\\n  ]);\\n  assert.equal(response.status(), 200); assert.equal((await response.json()).status, 'accepted');\\n  assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, HOME);\\n  assert.equal((await f.runtime.state.getPublicJourney()).rings, 0);\\n  const raids = () => f.calls.filter((c) => c.url.includes('/raids?') && c.method === 'POST');\\n  assert.equal(raids().length, 1);\\n  assert.equal(new URL(raids()[0].url).searchParams.get('from_broadcaster_id'), HOME);\\n  checks.push({ name: 'Mock OAuth/session/own CSRF control requests one principal-bound Raid POST; acceptance does not transfer', passed: true });\\n  stage = 'signed-arrival';\\n  const overlay = await context.newPage(); review.observe(overlay);\\n  await overlay.setViewportSize({ width: 480, height: 800 });\\n  await overlay.goto(origin + '/overlay/' + OTHER); await overlay.bringToFront();\\n  await overlay.waitForFunction(() => document.body.dataset.connection === 'connected');\\n  await f.raid(HOME, OTHER, 4);\\n  const receipt = (await f.runtime.state.getKeeperRegistry()).pendingHop;\\n  assert.equal(receipt.verified, true);\\n  await overlay.waitForFunction(() => Number(document.querySelector('.archive')?.dataset.cinematicElapsed) >= 0 &&\\n    Number(document.querySelector('canvas.relic3d')?.dataset.frames) > 0);\\n  assert.equal(await growthPixels(overlay, async () => {}), true);\\n  await f.chat(HOME, '101', '!offer', { messageId: 'journey-source-one' });\\n  await f.chat(OTHER, '201', '!accept', { messageId: 'journey-host-one' });\\n  assert.equal((await f.runtime.state.getPublicJourney()).rings, 0);\\n  await overlay.waitForFunction(() => /Offer 1\\\\/2.*Accept 1\\\\/2/.test(document.querySelector('#claim-label').textContent));\\n  await f.chat(HOME, '102', '!offer', { messageId: 'journey-source-two' });\\n  await f.chat(OTHER, '202', '!accept', { messageId: 'journey-host-two' });\\n  const registry = await f.runtime.state.getKeeperRegistry();\\n  assert.equal(registry.holderId, OTHER); assert.equal(registry.pendingHop.arrivalStartedAt, receipt.arrivalStartedAt);\\n  const journey = await f.runtime.state.getPublicJourney();\\n  assert.equal(journey.rings, 1);\\n  assert.ok(journey.stops[0].marks.some((m) => m.text === 'moon'));\\n  assert.equal(journey.stops[0].marks.some((m) => m.text === 'private'), false);\\n  await f.chat(OTHER, '202', '!accept', { messageId: 'journey-host-two' });\\n  assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);\\n  for (const host of [HOME, OTHER]) assert.equal((await f.runtime.state.getPrivateClaimAcks(host))\\n    .rows.filter((r) => r.completionReceipt).length, 1);\\n  assert.equal(raids().length, 1);\\n  await overlay.close(); await page.bringToFront();\\n  checks.push({ name: 'HMAC raid opens real local arrival/WSS pixels; distinct two-chat quorum commits one ring and deduplicated notices with approved archive', passed: true });\\n  stage = 'spotlight-replay-export';\\n  await page.goto(origin + '/keeper/olsols2');\\n  await page.locator('.holder-spotlight h3').filter({ hasText: '@olsols2 holds the relic' }).waitFor();\\n  assert.match(await page.locator('.holder-spotlight').innerText(), /Live.*observed/);\\n  const projected = JSON.parse((await f.request('/api/receiving')).body);\\n  assert.equal(projected.holder.login, 'olsols2'); assert.equal(projected.holder.ringCount, 1);\\n  await page.goto(origin + '/atlas/');\\n  await page.locator('#map-play').waitFor({ state: 'visible' });\\n  await page.waitForFunction(() => !document.querySelector('#map-play').disabled);\\n  await page.locator('#map-play').click();\\n  assert.equal(await page.locator('#journey-map').getAttribute('data-playing'), 'true');\\n  await page.getByRole('button', { name: 'Pause replay', exact: true }).click();\\n  assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);\\n  const [download] = await Promise.all([page.waitForEvent('download'),\\n    page.getByRole('button', { name: 'Download ring card Stop 1', exact: true }).click()]);\\n  assert.equal(download.suggestedFilename(), 'raid-relic-stop-1-olsols2.png');\\n  const chunks = []; let size = 0;\\n  for await (const bytes of await download.createReadStream()) { size += bytes.length; assert.ok(size <= 524288); chunks.push(bytes); }\\n  const bytes = Buffer.concat(chunks);\\n  assert.deepEqual([...bytes.subarray(0, 8)], [137,80,78,71,13,10,26,10]);\\n  assert.equal(bytes.readUInt32BE(16), 1200); assert.equal(bytes.readUInt32BE(20), 630);\\n  const pixels = await page.evaluate(async (raw) => {\\n    const img = await createImageBitmap(new Blob([Uint8Array.from(raw)], { type: 'image/png' }));\\n    const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;\\n    const x = c.getContext('2d'); x.drawImage(img, 0, 0); const data = x.getImageData(0, 0, c.width, c.height).data;\\n    let count = 0; for (let i = 0; i < data.length; i += 4)\\n      if (data[i+3] && Math.max(data[i], data[i+1], data[i+2]) > 80) count++;\\n    img.close(); c.width = c.height = 0; return count;\\n  }, [...bytes]);\\n  assert.ok(pixels > 1000);\\n  assert.deepEqual(await page.evaluate(() => window.__journeyCard), { approved: true, held: false, simulated: true });\\n  await download.delete();\\n  assert.deepEqual(review.stats(), { errors: 0, external: 0 });\\n  diagnostic.rings = 1; diagnostic.raidPosts = raids().length; diagnostic.pngBytes = size;\\n  checks.push({ name: 'Actual public Keeper/Atlas/replay and manual decoded simulator PNG carry approved moon, no held word and no extra raid', passed: true });\\n  passed = true;\\n} catch (e) {\\n  failureCategory = ['AssertionError','TimeoutError','TypeError'].includes(e?.name) ? e.name : 'fixture-or-browser';\\n  const line = /browser-smoke-journey-ci[.]js:(\\\\d+)/.exec(e?.stack ?? '');\\n  if (line) diagnostic.assertionLine = Number(line[1]);\\n} finally {\\n  clearTimeout(timer); await review?.close(); await mkdir('artifacts', { recursive: true });\\n  const report = JSON.stringify({ passed, stage, failureCategory, checks, diagnostic });\\n  assert.ok(Buffer.byteLength(report) <= 65536);\\n  await writeFile('artifacts/journey-ci-browser-results.json', report + '\\\\n');\\n}\\nif (!passed) process.exitCode = 1;\\nEOF\",\"max_output_tokens\":1000}));\n"
+}
+````
+
+### 4916. 2026-10-27T09:07:46.014Z — tool result (source line 18458)
+
+````text
+{
+  "call_id": "call_81165d17d6dd4305a88e1de94336b3fd",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "0177ec",
+        "wall_time_seconds": 0.00000376,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    }
+  ]
+}
+````
+
+### 4917. 2026-10-27T09:08:45.874Z — assistant (source line 18467)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "The local lockfile has complete metadata for `playwright-core` 1.58.2, so I’ll pin that dev dependency without fetching packages or inventing missing optional-package metadata. The launcher will keep sandboxing enabled, use the native Snap binary when present, and otherwise require an explicit Playwright browser cache for CI.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4918. 2026-10-27T09:09:06.427Z — tool call (source line 18468)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_2e7d8f9832244e658e47dafa301d05a7",
+  "input": "text(await tools.exec_command({cmd:\"cat > scripts/ci-journey.js <<'EOF'\\n// Trusted CI launcher. Toolchain download happens BEFORE this offline boundary.\\nimport { spawn } from 'node:child_process';\\nimport { constants } from 'node:fs';\\nimport { mkdir, mkdtemp, writeFile, realpath, open, rm } from 'node:fs/promises';\\nimport { dirname, join, resolve, isAbsolute } from 'node:path';\\nlet scratch, passed = false;\\ntry {\\n  const repo = await realpath(process.cwd());\\n  const selected = process.env.PLAYWRIGHT_BROWSERS_PATH;\\n  if (!selected || !isAbsolute(selected) || selected === '/') throw Error('Browser cache required');\\n  const browsers = await realpath(selected);\\n  if (browsers === '/' || browsers === repo || browsers.startsWith(repo + '/')) throw Error('Separate toolchain required');\\n  scratch = await mkdtemp('/tmp/raid-relic-ci-');\\n  await mkdir(join(scratch, 'artifacts'), { mode: 0o700 });\\n  await mkdir(resolve(repo, 'artifacts'), { recursive: true });\\n  await writeFile(join(scratch, 'hosts'), '127.0.0.1 localhost\\\\n::1 localhost\\\\n', { mode: 0o600 });\\n  const args = [\\n    '--cpu=120', '--data=1073741824', '--nproc=512', '--nofile=2048', '--fsize=16777216', '--',\\n    '/usr/bin/bwrap', '--unshare-all', '--die-with-parent', '--new-session',\\n    '--uid', '1000', '--gid', '1000', '--clearenv',\\n    '--ro-bind', '/usr', '/usr', '--symlink', 'usr/bin', '/bin', '--symlink', 'usr/sbin', '/sbin',\\n    '--symlink', 'usr/lib', '/lib', '--symlink', 'usr/lib64', '/lib64',\\n    '--dir', '/etc', '--ro-bind', '/etc/fonts', '/etc/fonts',\\n    '--ro-bind', '/etc/ld.so.cache', '/etc/ld.so.cache', '--ro-bind', join(scratch, 'hosts'), '/etc/hosts',\\n    '--proc', '/proc', '--dev', '/dev', '--size', '536870912', '--tmpfs', '/tmp',\\n    '--dir', '/tmp/home', '--dir', '/tmp/home/cache',\\n    '--ro-bind', dirname(process.execPath), '/tool-node',\\n    '--ro-bind', browsers, '/opt/playwright-browsers', '--ro-bind', repo, '/app',\\n    '--bind', join(scratch, 'artifacts'), '/app/artifacts', '--chdir', '/app',\\n    '--setenv', 'PATH', '/tool-node:/usr/bin:/bin', '--setenv', 'HOME', '/tmp/home',\\n    '--setenv', 'XDG_CACHE_HOME', '/tmp/home/cache', '--setenv', 'TMPDIR', '/tmp',\\n    '--setenv', 'OPENSSL_CONF', '/dev/null',\\n    '--setenv', 'PLAYWRIGHT_BROWSERS_PATH', '/opt/playwright-browsers',\\n    '--setenv', 'NODE_OPTIONS', '--max-old-space-size=256',\\n    '/tool-node/node', 'scripts/browser-smoke-journey-ci.js',\\n  ];\\n  const child = spawn('/usr/bin/prlimit', args, { env: { PATH: '/usr/bin:/bin' }, stdio: ['ignore','pipe','pipe'] });\\n  let bytes = 0, overflow = false, timedOut = false;\\n  for (const stream of [child.stdout, child.stderr]) stream.on('data', (b) => {\\n    bytes += b.length;\\n    if (bytes > 65536) { overflow = true; child.kill('SIGKILL'); }\\n  });\\n  const timeout = setTimeout(() => { timedOut = true; child.kill('SIGKILL'); }, 180000);\\n  let code;\\n  try { code = await new Promise((ok, fail) => { child.once('error', fail); child.once('close', ok); }); }\\n  finally { clearTimeout(timeout); }\\n  const handle = await open(join(scratch, 'artifacts', 'journey-ci-browser-results.json'),\\n    constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);\\n  let report;\\n  try {\\n    const before = await handle.stat();\\n    if (!before.isFile() || before.nlink !== 1 || before.size > 65536) throw Error('Report rejected');\\n    const buffer = Buffer.alloc(65537);\\n    const { bytesRead } = await handle.read(buffer, 0, buffer.length, 0);\\n    const after = await handle.stat();\\n    if (bytesRead !== before.size || after.size !== before.size || after.ino !== before.ino) throw Error('Report changed');\\n    report = JSON.parse(buffer.subarray(0, bytesRead).toString('utf8'));\\n  } finally { await handle.close(); }\\n  passed = code === 0 && !overflow && !timedOut && report.passed === true && report.checks?.length === 3;\\n  // Emit closed summary only; never child output, DOM, URLs or cookies.\\n  console.log(JSON.stringify({ passed, checks: report.checks?.length ?? 0,\\n    stage: ['setup','own-control-send','signed-arrival','spotlight-replay-export'].includes(report.stage) ? report.stage : 'other',\\n    assertionLine: Number.isSafeInteger(report.diagnostic?.assertionLine) ? report.diagnostic.assertionLine : 0,\\n    timedOut, outputOverflow: overflow }));\\n} catch {\\n  console.log(JSON.stringify({ passed: false, stage: 'sandbox-or-toolchain' }));\\n} finally {\\n  if (scratch) await rm(scratch, { recursive: true, force: true });\\n}\\nif (!passed) process.exitCode = 1;\\nEOF\",\"max_output_tokens\":1000}));\ntext(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/.github/workflows/ci.yml\\n@@\\n       - run: npm test\\n+  journey:\\n+    needs: test\\n+    runs-on: ubuntu-22.04\\n+    timeout-minutes: 10\\n+    steps:\\n+      - uses: actions/checkout@v4\\n+        with:\\n+          persist-credentials: false\\n+      - uses: actions/setup-node@v4\\n+        with:\\n+          node-version: '22'\\n+          cache: npm\\n+      - run: npm ci\\n+      # Toolchain setup may download; the journey itself runs in an offline namespace.\\n+      - run: sudo apt-get update && sudo apt-get install -y bubblewrap\\n+      - run: npx playwright-core install --with-deps chromium\\n+        env:\\n+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/raid-relic-browsers\\n+      - run: node scripts/ci-journey.js\\n+        env:\\n+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/raid-relic-browsers\\n*** End Patch\"));\n"
+}
+````
+
+### 4919. 2026-10-27T09:09:06.575Z — tool result (source line 18472)
+
+````text
+{
+  "call_id": "call_2e7d8f9832244e658e47dafa301d05a7",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "413195",
+        "wall_time_seconds": 0.00000376,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 4920. 2026-10-27T09:10:51.149Z — tool call (source line 18480)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_276b74d0705e4bfb90c8c5ab4bea6507",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/scripts/browser-smoke-journey-ci.js\\n@@\\n   await overlay.waitForFunction(() => Number(document.querySelector('.archive')?.dataset.cinematicElapsed) >= 0 &&\\n+    ['streak', 'impact', 'unfurl', 'settled'].includes(document.querySelector('.archive')?.dataset.phase) &&\\n     Number(document.querySelector('canvas.relic3d')?.dataset.frames) > 0);\\n*** End Patch\"));\ntext(await tools.exec_command({cmd:\"cat > docs/CI_JOURNEY.md <<'EOF'\\n# Headless runtime journey gate\\n\\nThe `journey` job in `.github/workflows/ci.yml` follows the existing Node 22 unit/format/evidence job. It uses the standard Ubuntu 22.04 runner to retain supported unprivileged Chromium namespaces without disabling host security. Toolchain setup installs pinned `playwright-core` 1.58.2 and its Chromium build before the test boundary. The dependency is development-only; production images still install with `--omit=dev --ignore-scripts` and exclude test scripts, browsers and fixtures.\\n\\n`node scripts/ci-journey.js` launches only `scripts/browser-smoke-journey-ci.js` through bubblewrap/prlimit: empty allowlisted child environment, separate user/PID/network namespaces, loopback-only synthetic TLS/WSS, read-only source/toolchain, writable temporary storage and one artifact directory. The launcher exposes no host home, credentials, provider settings or cloud authentication. It declares a 120-second CPU limit, 1 GiB per-process data limit, 256 MiB Node heap, 512-process limit, 2,048 descriptors, 16 MiB file limit, 512 MiB temporary filesystem and 180-second wall watchdog. These are local test budgets, not application or production limits or an aggregate RSS measurement. Chromium sandboxing stays enabled; unavailable namespace/browser support fails the job rather than skipping or falling back to no-sandbox.\\n\\nThe native operator can run the same browser workflow directly inside the existing approved offline harness:\\n\\n```sh\\nnode scripts/browser-smoke-journey-ci.js\\n```\\n\\nThe test uses the real runtime with fake Firestore, mock OAuth/Helix transport and signed local EventSub deliveries. Its configured fixture identities are synthetic uses of the pilot constants, not real logins or live operations. It crosses these boundaries:\\n\\n1. Mock provider identity validation issues an own Keeper session. The actual local control UI selects a ready recipient and submits its normal Origin/CSRF-protected Send Off. Exactly one source-principal-bound mock Raid POST is accepted; holder and ring count remain unchanged.\\n2. A verified HMAC raid delivery opens the actual arrival/WSS projection and original GL pixels. Distinct original source/host chat actors reach the real quorum. Exactly one ring, target holder and completion receipt per room commit; repeated chat does not cause a second ring or Raid POST.\\n3. A source engraving is explicitly approved before transfer and is present in the public retained stop; held sample text is absent. The actual Keeper spotlight/public DTO, Atlas replay controls and manual PNG download are exercised. The PNG signature/dimensions, decoded nonempty pixels, approved-word drawing and simulator label are checked; held text must not be drawn.\\n\\nThe report is closed JSON, capped at 64 KiB, with stage, check results and numerical diagnostics. No screenshots, raw DOM, cookies, tokens, provider bodies or actual mark-owner IDs are uploaded. The CI launcher reads one regular, single-link, no-follow bounded result after the isolated process exits and emits only a closed summary. Missing/malformed reports, absent browsers and failures are fatal. No external runtime network is permitted; browser request interception is an additional control, not the OS boundary.\\n\\nThis is application-authority verification, distinct from the pure fictional [45-second judge presentation](JUDGES.md) and from owner-operated physical Twitch/OBS tests. The workflow is now authored and wired; exact hosted execution and fresh native full-suite results remain publication gates, not source-author claims. The two-hour overlay soak is explicitly manual and is never scheduled or run by ordinary CI. Its failed first real-wall attempt, later clock repair and pending probe/wall evidence remain qualified in [accessibility/performance](ACCESSIBILITY_PERFORMANCE.md).\\n\\nNo new production service, scheduler, permission, scope, traffic change, repository visibility change or public submission is part of this CI increment. Existing Actions permissions remain contents-read and checkout does not persist credentials.\\nEOF\\npython3 - <<'PY'\\np='docs/JUDGES.md';s=open(p).read().replace('A dedicated full-journey CI increment is the next queue phase; it is not claimed wired by this change.', 'The dedicated [headless runtime journey](CI_JOURNEY.md) is now wired as a separate CI gate after unit tests. Exact hosted and fresh native execution remain publication gates; this documentation does not claim those runs already passed.');open(p,'w').write(s)\\np='README.md';s=open(p).read();s += '\\\\nThe [headless runtime journey CI gate](docs/CI_JOURNEY.md) exercises local mock OAuth, own controls, signed raid receipt, two-chat binding, public spotlight/replay and decoded PNG export. It is separate from the fictional judge film and owner-operated physical Twitch/OBS review. Fresh exact CI/native results remain the publication gate; the real two-hour overlay soak is separately tracked, never run on every commit.\\\\n';open(p,'w').write(s)\\nPY\",\"max_output_tokens\":1000}));\n"
+}
+````
+
+### 4921. 2026-10-27T09:10:51.294Z — tool result (source line 18484)
+
+````text
+{
+  "call_id": "call_276b74d0705e4bfb90c8c5ab4bea6507",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "77c8ee",
+        "wall_time_seconds": 0.0000042,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    }
+  ]
+}
+````
+
+### 4922. 2026-10-27T09:11:21.233Z — assistant (source line 18489)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "The runtime workflow now covers the local control POST through signed arrival, distinct-chat binding, public spotlight/replay and decoded PNG export. CI keeps the existing unit job first, then runs the journey in a separate offline namespace job with sandboxing enabled.\n\nThe soak files and running probe are untouched. Local native and exact hosted CI results are still pending.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4923. 2026-10-27T09:11:55.113Z — assistant (source line 18497)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Phase 4 is ready for parent validation.\n\n- Added the full local runtime journey browser workflow.\n- Added an offline bubblewrap/prlimit CI launcher and dependent Ubuntu 22.04 job.\n- Pinned dev-only `playwright-core` 1.58.2 from local lockfile metadata.\n- Added sandbox-preserving browser selection and [CI_JOURNEY.md](/home/ubuntu/.openclaw/workspace/apps/raid-relic/docs/CI_JOURNEY.md).\n\nNo installs, target tests, hosted CI or live actions ran locally. The running probe was untouched. Fresh native/hosted CI gates and the actual two-hour soak remain pending.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4924. 2026-10-27T11:19:24.409Z — user (source line 18505)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "237 URGENTNEWOWNERJOB1a4b31c7/11:14 supersedesprior777queuetemporarily. SAMEORIGINAL01a1705c-a87d-7143-80f6-021e47b78cedSOLEauthor/no fork/delegate/branches/Git/cloud/provider/creds/rawlogs/livecontrol/stream/chat/SendOff. UsageReset. User asksresume followup-0820-eventsub stream.online500 safety7ec6221; repairolsols2bootstrap+subscriptionsPRODafterSTATEBACKUP; shipONLYnew0hotfix. Parent owns Ops/backups/validation/Git. RuntimePRODactualreadstillraid-relic-seeker-state-on-1026@100; ownerpreviouslytestedraid-relic-safety-on-1027 thenrolledback. NO productioncodepromotion/trafficchangeauthorized. Preservealloldaliases/min0max1/scopes/P7/paid/no newservices.\nCURRENTREPOHEADf18a503 withSource235soakclockand236CIJOURNEY UNCOMMITTEDCHANGES. No activeprocesses(source236closednoGit). DoNOTmodify/clean/stash/resetANYthosefiles—theyareunfinishedprevious777taskandprotected. Parentbackedupexistingdiff+statusoutsideapp andwillisolatesafety7ec+minimalhotfixreleaseartifact; youwriteONLYcurrentrepo src/marks.js +NEWtest/stream-session-capacity.test.js +optionalNEWdocs/EVENTSUB_CAPACITY_INCIDENT.md. These3currentlyUNCHANGEDf18and7ec sourcebaseline src/marks.js SAME (Parentwillverifyexact). Don't edit store/runtime/app/CIfixture/tests unrelatedunlessrootprovesnecessary; reportneededpathsfirst no broadrefactor.No testexecutionambient; ParentNativeNode22offlinebwrap. Sourcequick3–5m implementation+tests onlythenSTOP.\nROOTFACTS: CloudRun actualstructuredwarnings08:17safety-on/08:21oldprod botholsols2 keeper1591806023 diagstage observation-commit. ParentboundedreadbackupALLSTATE at2026-10-27T11:17:05.371Z DONE401docs16collections81204B SHAea3e5e5e2abc229dbe619b511334851dbf8aae626e847408ace115263f920244; privateJSON0700/0600 notreadSource/keyCipheractualnotprinted. ShapesONLY: home+olsols2 markChannels.sessions EXACT16; third3. streamChannels.closedIds16 home+ol2 alloffline,currentstreamIdnull+retiredStream; lineage10stops; registryholder/pendingunchanged. src/marks.jssetMarkContext lines168–172 whenNEWstream andsessions.length>=MARK_LIMITS.sessions16 THROWS'Retained stream capacity reached', beforeoldcontextclosedline181. Bothsignedstream.onlineandactualbootstrapGetStreams reduceLifecyclecallsetMarkContext ->500 for17thstream. No codeSeverityguess / no fake signedliveprobes. Need reproducePURE/newrealruntimefixture with16closedEMPTYsessions then17thonline bothmemory+fakeFS/signaturebootstrap actualmock API route; oldtestneverhitpersistent16saturation. Tests no privateactualIDs/contentuse DUMMYvalidIDs/closedemptyfixture DataShape sourcepaths.\nMINIMALSAFEFIX lifecycleMUSTNOTbeDoSed byclosedEMPTYmarksessiontombstones. DropONLYclosedinactiveEMPTYsessions(unusedretainedmarkdata/viewersalreadycleared) whenboundedcapacityneedsnewroom; preservecurrentstream quota/session, validclosed/currentmarks pendingapproved/rejected/authorerasability/cooldowns, lineage16history andclosedThrough/closedIDsantiReplay, block/bans/optout, transactionatomicity.Idempotentonline/bootstrap17+ repeatedNo quotareset.DoubleoldstreamcannotReactivate.Sensibleboundedcompactionpolicy+tests ratherthanraise16 ordeletehistory. IfALL16retainedsessionscontainmarks, lifecyclemayupdatecontextWITHOUTpreallocatingNEWemptysession; markcollectioncapacitymustfailclosedboundedNOTthrow500ononline/forget/privacy actions. Onlyallocatewhenneededorboundedmarkdenial ifslotnotavailable; chooseminimumconsistentwithexistingmodel. Never silentlydiscardmarks/lineage tofitcap or refund/reopenquota. Avoidfalseonlineobservations/authoritystreamIDs—actualHelix/signedtimestampsmuststillgate.\nParentalsointendsPRODnarrowCAScompactionolsols2 closedEMPTYsessiondocs afterbackup(no historicalmarkdelete), thenactualexistingprodBOOTSTRAPreconcileusingexistingmanagedcredsONLYcanonical callbacks/missingrequiredsubs/no delete/scopes/raid/chat; directoperatoractionauthorizednewuserdon'treadrealgrantSource. NeeddocumentSafeeligibleemptyclosedinactiveonly/no current/actualproofabsence.CleanupNOTSourceappScriptAuthoroutsideyourSourceTask.Parentwillperformexactreadpreconditions+CAS/updateTime/freshbackup.Requiredifoldprodcodeunchangedcanrecoveraftercompactionnow.No productionfakedstreamIDs/holder/pendingHop/rings/history edits. SourceDocstatecleanup/promotionpending untilParentactualproof neverclaimcompleted.\nRELEASEISOLATION: Sourcefixshouldapplycleanly7ec6221safety baseline (srcmarks samef18). Parentwillpackagegitarchive7ec+exact3filepatch intoPRIVATEreviewedscratch(notdevelopmentfork/worktree), stage/commitfixONLYtreeparent7ec viaOPplumbing/tag/hotfixbranchuserSourceNo Git. DoNOTbundleuncommittedCI/soak/judgemodesorpromote f18whole underincidenthotfix. All900unitcohortcurrentdoesn'tprovebaseline7ecfresh898+newcasesActualParentwillreport. New0tag eventsub-fix/revraid-relic-eventsub-fix-1027 P5readonlytrue so deployed/eventsub403EXPECTED, actualsigneddelivery200verifiedNATIVEmockonlyunlessownerfuturepromotes. NEVERdisableP5guardto'retest500live' orreplayeventsintorealstate. Parentallrefscan/safeimage/CI/exactallpriortrafficpreserve/healthassetparityrequired.Simplecloseddiagnosticerrorcategoryoptionalbutno broadertelemetry/statecontrols.\nPrevious777whole4stillOPENafterthisurgentfix: Phase1safe7ecDONE/2perf001dcodeDONEreal2hFAILED8minrecorded/3judgef18DONE/4Source236CIcodeREADYunvalidated. Probe235justFAILEDreal10min stageRUNE-VISIBLE withbrowserconnectionCode4(SUSPENDED!) atlogical600000; backendapprovedMarkCount1DOM0onlineopted true/pausedfalse/GCbounded—likelyINTENTIONAL10minhumanidle policy notprodleak; doNOTtouchthatnowUrgentEventSubfirst.No pausedidle securitywaiver. LaterfixturetrustedinputcankeepSourceactive legitimatelyexplicittestnotprodautokeepalive. No new2hclaim. PreservepreviousworkallSource236files.HotfixscopeNOWonlymarks capacity15? exact16. Returnchangedpaths/contracts/testimplementationpendingNative.\n"
+  }
+]
+````
+
+### 4925. 2026-10-27T11:19:31.454Z — assistant (source line 18510)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll keep this hotfix to `src/marks.js`, one new test file and an incident note, leaving the unfinished soak/CI work untouched. I’ll inspect session allocation and quota handling first so compaction cannot erase marks, reopen an old stream or refund quota.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4926. 2026-10-27T11:19:33.222Z — tool call (source line 18511)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_7abf08c9cc26499d85c255a948eedf04",
+  "input": "text(await tools.exec_command({cmd:\"sed -n '140,215p' src/marks.js; sed -n '275,320p' src/marks.js; sed -n '78,110p' src/lifecycle.js; sed -n '1,75p' test/lifecycle.test.js; sed -n '1,80p' test/marks.test.js; rg -n 'observation|bootstrap|setMarkContext|closed stream|Closed stream' test/lifecycle.test.js test/marks.test.js test/pilot.test.js | head -28\",\"max_output_tokens\":3300}));\n"
+}
+````
+
+### 4927. 2026-10-27T11:19:33.403Z — tool result (source line 18514)
+
+````text
+{
+  "call_id": "call_7abf08c9cc26499d85c255a948eedf04",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "16b0f9",
+        "wall_time_seconds": 0.00000448,
+        "exit_code": 0,
+        "original_token_count": 3275,
+        "output": "const empty = () => ({\n  context: null,\n  paused: false,\n  blocked: [],\n  sessions: [],\n  cooldowns: [],\n  serial: 0,\n});\nexport const emptyMarkDocument = empty;\nfunction bounded(doc) {\n  if (Buffer.byteLength(JSON.stringify(doc)) > MARK_LIMITS.bytes)\n    throw new Error('Mark storage capacity reached');\n  return doc;\n}\nexport function setMarkContext(previous, host, context) {\n  if (\n    !userId(host) ||\n    typeof context?.streamId !== 'string' ||\n    !/^[A-Za-z0-9_-]{1,128}$/.test(context.streamId) ||\n    !userId(context.keeperId) ||\n    typeof context.optedIn !== 'boolean' ||\n    typeof context.holdsRelic !== 'boolean' ||\n    !Array.isArray(context.blockedUserIds) ||\n    context.blockedUserIds.length > MARK_LIMITS.blockedUsers ||\n    !context.blockedUserIds.every(userId)\n  )\n    throw new Error('Trusted Keeper context required');\n  const doc = structuredClone(previous ?? empty());\n  const selected = doc.sessions.find((session) => session.streamId === context.streamId);\n  if (selected?.closed) throw new Error('Closed stream cannot be reactivated');\n  if (!doc.sessions.some((session) => session.streamId === context.streamId)) {\n    if (doc.sessions.length >= MARK_LIMITS.sessions)\n      throw new Error('Retained stream capacity reached');\n    doc.sessions.push({\n      streamId: context.streamId,\n      spent: 0,\n      viewers: [],\n      marks: [],\n      closed: false,\n    });\n  }\n  if (doc.context && doc.context.streamId !== context.streamId) {\n    const ended = doc.sessions.find((session) => session.streamId === doc.context.streamId);\n    if (ended) {\n      ended.closed = true;\n      ended.viewers = [];\n    }\n  }\n  doc.context = {\n    streamId: context.streamId,\n    keeperId: context.keeperId,\n    optedIn: context.optedIn,\n    holdsRelic: context.holdsRelic,\n    blockedUserIds: [...new Set(context.blockedUserIds)],\n  };\n  return bounded(doc);\n}\nconst active = (doc, host) =>\n  doc.context?.optedIn === true && doc.context.holdsRelic === true && doc.context.keeperId === host;\n\n// Pure reducer shared by memory and Firestore; invoke only with trusted identities.\nexport function reduceMark(previous, host, actor, action, now, reviewPolicy) {\n  const doc = structuredClone(previous ?? empty());\n  if (\n    actor?.isBot ||\n    actor?.copied ||\n    !userId(host) ||\n    actor?.broadcasterId !== host ||\n    !userId(actor.chatterId) ||\n    !Number.isFinite(now) ||\n    !action\n  )\n    return doc;\n  doc.cooldowns = doc.cooldowns.filter((entry) => now - entry.at < MARK_LIMITS.cooldownMs);\n  if (\n    [\n    }\n    return bounded(doc);\n  }\n  const text = normalizeMark(action.text);\n  if (\n    !text ||\n    !active(doc, host) ||\n    doc.paused ||\n    doc.blocked.includes(actor.chatterId) ||\n    doc.context.blockedUserIds.includes(actor.chatterId)\n  )\n    return doc;\n  const session = doc.sessions.find((item) => item.streamId === doc.context.streamId);\n  if (!session || session.closed) return doc;\n  const viewer = session.viewers.find((entry) => entry.userId === actor.chatterId);\n  if (viewer?.spent >= MARK_LIMITS.perViewerPerStream) return doc;\n  if (doc.cooldowns.some((entry) => entry.userId === actor.chatterId)) return doc;\n  if (\n    (!viewer && session.viewers.length >= MARK_LIMITS.participantsPerStream) ||\n    session.marks.length >= MARK_LIMITS.marksPerStream ||\n    doc.sessions.reduce((count, item) => count + item.marks.length, 0) >= MARK_LIMITS.retainedMarks\n  )\n    return doc;\n  if (doc.cooldowns.length >= MARK_LIMITS.cooldowns || doc.serial >= 999999999)\n    throw new Error('Mark storage capacity reached');\n  if (viewer) viewer.spent++;\n  else session.viewers.push({ userId: actor.chatterId, spent: 1 });\n  session.spent++;\n  session.marks.push({\n    id: `m${++doc.serial}`,\n    userId: actor.chatterId,\n    text,\n    status:\n      trustedReviewPolicy(reviewPolicy).autoApprove &&\n      !trustedReviewPolicy(reviewPolicy).terms.some((term) => text.includes(term))\n        ? 'approved'\n        : 'pending',\n    createdAt: now,\n  });\n  doc.cooldowns.push({ userId: actor.chatterId, at: now });\n  return bounded(doc);\n}\n\nexport function publicMarks(doc, host) {\n  if (!doc || !active(doc, host)) return { marks: [] };\n  const session = doc.sessions.find((item) => item.streamId === doc.context.streamId);\n  if (channel.streamId && !channel.closedIds.includes(channel.streamId)) {\n    if (channel.closedIds.length >= LIFECYCLE_LIMITS.closedStreams)\n      throw new Error('Stream tombstone capacity reached');\n    channel.closedIds.push(channel.streamId);\n  }\n  const session = marks.sessions.find((item) => item.streamId === channel.streamId);\n  if (session) {\n    session.closed = true;\n    session.viewers = [];\n  }\n  if (marks.context) marks.context.holdsRelic = false;\n}\nfunction sync(registry, channel, marks, host) {\n  if (channel.online) {\n    marks = setMarkContext(marks, host, {\n      streamId: channel.streamId,\n      keeperId: host,\n      optedIn: channel.optedIn,\n      holdsRelic: registry.holderId === host && !channel.banned,\n      blockedUserIds: channel.blockedUserIds,\n    });\n  } else if (marks.context) {\n    marks.context.holdsRelic = false;\n    marks.context.optedIn = channel.optedIn;\n  }\n  marks.paused = channel.paused;\n  return marks;\n}\n\n// Called inside one store transaction, including event dedupe. No external effects.\nexport function reduceLifecycle({\n  registry,\n  channel,\nimport test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { createHmac } from 'node:crypto';\nimport { createMemoryState } from '../src/state.js';\nimport { createFirestoreStore } from '../src/store.js';\nimport { createApp } from '../src/app.js';\nimport { createRuntime } from '../src/runtime.js';\nimport { fakeFirestore } from '../test-support/fake-firestore.js';\nimport { INITIAL_HOME, LIFECYCLE_LIMITS } from '../src/lifecycle.js';\n\nconst home = INITIAL_HOME;\nconst other = '1591806023';\nconst bot = '1591804828';\nconst secret = 'synthetic-lifecycle-test-secret';\nconst base = Date.parse('2026-10-25T12:00:00Z');\nfunction fixture(kind) {\n  const db = kind === 'firestore' ? fakeFirestore() : null;\n  const options = { lifecycle: { channels: [home, other] } };\n  const state = db ? createFirestoreStore(db, options) : createMemoryState(options);\n  let time = base;\n  let sequence = 0;\n  const apps = new Map(\n    [home, other].map((host) => [\n      host,\n      createApp({\n        secret,\n        state: db ? createFirestoreStore(db, options) : state,\n        now: () => time,\n        chatContext: { streamerId: host, botId: bot },\n      }),\n    ]),\n  );\n  function request(\n    type,\n    event,\n    { host = home, sentAt = time, id = `event-${++sequence}`, condition } = {},\n  ) {\n    const timestamp = new Date(sentAt).toISOString();\n    const payload = {\n      subscription: {\n        type,\n        version: '1',\n        condition:\n          condition ??\n          (type === 'channel.chat.message'\n            ? { broadcaster_user_id: host, user_id: bot }\n            : { broadcaster_user_id: host }),\n      },\n      event: { broadcaster_user_id: host, ...event },\n    };\n    const rawBody = Buffer.from(JSON.stringify(payload));\n    const digest = createHmac('sha256', secret)\n      .update(id)\n      .update(timestamp)\n      .update(rawBody)\n      .digest('hex');\n    return {\n      method: 'POST',\n      path: '/eventsub',\n      rawBody,\n      headers: {\n        'twitch-eventsub-message-id': id,\n        'twitch-eventsub-message-timestamp': timestamp,\n        'twitch-eventsub-message-type': 'notification',\n        'twitch-eventsub-message-signature': `sha256=${digest}`,\n      },\n    };\n  }\n  const dispatch = (type, event, options = {}) =>\n    apps.get(options.host ?? home).dispatch(request(type, event, options));\n  const chat = (text, options = {}) =>\n    dispatch(\n      'channel.chat.message',\n      {\n        chatter_user_id: options.user ?? options.host ?? home,\nimport test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { createHmac } from 'node:crypto';\nimport { createApp } from '../src/app.js';\nimport { createMemoryState } from '../src/state.js';\nimport { createFirestoreStore } from '../src/store.js';\nimport { MARK_LIMITS, normalizeMark, runeSvg } from '../src/marks.js';\nimport { fakeFirestore } from '../test-support/fake-firestore.js';\n\nconst host = '111';\nconst bot = '222';\nconst user = '987654321';\nconst admin = { broadcasterId: host, chatterId: host };\nconst viewer = { broadcasterId: host, chatterId: user };\nconst context = {\n  streamId: 'trusted-stream-1',\n  keeperId: host,\n  optedIn: true,\n  holdsRelic: true,\n  blockedUserIds: [],\n};\nconst secret = 'synthetic-test-webhook-secret';\nfunction fixture(kind) {\n  const db = kind === 'firestore' ? fakeFirestore() : null;\n  const store = db ? createFirestoreStore(db) : createMemoryState();\n  let time = Date.parse('2026-10-25T12:00:00Z');\n  let sequence = 0;\n  const instance = createApp({\n    secret,\n    state: store,\n    chatContext: { streamerId: host, botId: bot },\n    now: () => time,\n  });\n  function request(text, { userId = user, badges = [], id = `chat-${++sequence}` } = {}) {\n    const timestamp = new Date(time).toISOString();\n    const payload = {\n      subscription: {\n        type: 'channel.chat.message',\n        version: '1',\n        condition: { broadcaster_user_id: host, user_id: bot },\n      },\n      event: {\n        broadcaster_user_id: host,\n        chatter_user_id: userId,\n        message_id: id,\n        badges,\n        message: { text, fragments: [{ type: 'text', text }] },\n      },\n    };\n    const rawBody = Buffer.from(JSON.stringify(payload));\n    const digest = createHmac('sha256', secret)\n      .update(id)\n      .update(timestamp)\n      .update(rawBody)\n      .digest('hex');\n    return {\n      method: 'POST',\n      path: '/eventsub',\n      rawBody,\n      headers: {\n        'twitch-eventsub-message-id': id,\n        'twitch-eventsub-message-timestamp': timestamp,\n        'twitch-eventsub-message-signature': `sha256=${digest}`,\n        'twitch-eventsub-message-type': 'notification',\n      },\n    };\n  }\n  return {\n    instance,\n    db,\n    store,\n    request,\n    advance: (ms) => {\n      time += ms;\n    },\n    send: (text, options) => instance.dispatch(request(text, options)),\n    view: () => instance.marks.moderationView(host, admin),\n    setup: (override) => instance.marks.setKeeperContext(host, { ...context, ...override }),\n  };\n}\ntest/pilot.test.js:14:    assert.equal((await f.control(id, 'bootstrap')).status, 200);\ntest/pilot.test.js:72:  test(`${kind}: bootstrap lease, idempotency, 409 recovery and offline during observation win without quota reset`, async () => {\ntest/pilot.test.js:77:      f.control(HOME, 'bootstrap'),\ntest/pilot.test.js:78:      f.control(HOME, 'bootstrap'),\ntest/pilot.test.js:84:    await f.control(HOME, 'bootstrap');\ntest/pilot.test.js:98:    const result = JSON.parse((await f.control(HOME, 'bootstrap')).body);\ntest/pilot.test.js:99:    assert.equal(result.observation, 'superseded');\ntest/pilot.test.js:103:    await f.control(HOME, 'bootstrap');\ntest/pilot.test.js:116:      assert.equal((await f.control(HOME, 'bootstrap', headers)).status, 403);\ntest/pilot.test.js:124:      `{\"action\":\"bootstrap\",\"action\":\"bootstrap\",\"csrf\":\"${privateStatus.csrf}\"}`,\ntest/pilot.test.js:148:    assert.equal((await f.control(HOME, 'bootstrap')).status, 403);\ntest/pilot.test.js:150:  test(`${kind}: empty stream observation is offline; inconsistent GetStreams account rejected`, async () => {\ntest/pilot.test.js:154:    await f.control(HOME, 'bootstrap');\ntest/pilot.test.js:162:    assert.equal((await f.control(HOME, 'bootstrap')).status, 502);\ntest/pilot.test.js:237:test('Firestore observation commit failure rolls back channel, marks, registry and dedupe without HTTP in transaction', async () => {\ntest/pilot.test.js:241:    [...f.db.docs].filter(([key]) => !key.startsWith('bootstrapJobs/')),\ntest/pilot.test.js:246:  await f.control(HOME, 'bootstrap');\ntest/pilot.test.js:249:    [...f.db.docs].filter(([key]) => !key.startsWith('bootstrapJobs/')),\ntest/pilot.test.js:257:  test(`${kind}: abandoned bootstrap lease is channel-scoped and expires without stale owner overwriting results`, async () => {\ntest/pilot.test.js:262:    assert.equal((await f.control(HOME, 'bootstrap')).status, 409);\ntest/pilot.test.js:264:    assert.equal((await f.control(OTHER, 'bootstrap')).status, 200);\ntest/pilot.test.js:266:    assert.equal((await f.control(HOME, 'bootstrap')).status, 200);\ntest/pilot.test.js:307:      const result = JSON.parse((await f.control(channel, 'bootstrap')).body);\ntest/pilot.test.js:325:      assert.equal(JSON.parse((await f.control(channel, 'bootstrap')).body).ready, true);\ntest/pilot.test.js:424:  test(`${kind}: bootstrap failures persist safe stage-only diagnostics without upstream text`, async () => {\ntest/pilot.test.js:432:    const failed = await f.control(HOME, 'bootstrap');\ntest/pilot.test.js:443:test('failed explicit bootstrap logs exactly one bounded structured warning; logger failures cannot change outcome', async () => {\ntest/pilot.test.js:472:    const result = await pilot.execute(HOME, 'bootstrap');\n"
+      }
+    }
+  ]
+}
+````
+
+### 4928. 2026-10-27T11:20:22.719Z — tool call (source line 18520)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_7ae0ea91a8d747a0a70c3436b3bc5331",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/src/marks.js\\n@@\\n   if (selected?.closed) throw new Error('Closed stream cannot be reactivated');\\n   if (!doc.sessions.some((session) => session.streamId === context.streamId)) {\\n-    if (doc.sessions.length >= MARK_LIMITS.sessions)\\n-      throw new Error('Retained stream capacity reached');\\n-    doc.sessions.push({\\n-      streamId: context.streamId,\\n-      spent: 0,\\n-      viewers: [],\\n-      marks: [],\\n-      closed: false,\\n-    });\\n+    if (doc.sessions.length >= MARK_LIMITS.sessions) {\\n+      // Lifecycle owns closed-stream replay protection. Reclaim only an\\n+      // inactive, closed, content-free session whose viewer counters were\\n+      // already cleared at stream closure; never discard retained marks.\\n+      const disposable = doc.sessions.findIndex((session) =>\\n+        session.closed === true && session.streamId !== doc.context?.streamId &&\\n+        session.marks.length === 0 && session.viewers.length === 0);\\n+      if (disposable >= 0) doc.sessions.splice(disposable, 1);\\n+    }\\n+    // A full retained archive must not reject authoritative online/context or\\n+    // privacy transitions. Without a session, reduceMark declines collection.\\n+    if (doc.sessions.length < MARK_LIMITS.sessions)\\n+      doc.sessions.push({\\n+        streamId: context.streamId,\\n+        spent: 0,\\n+        viewers: [],\\n+        marks: [],\\n+        closed: false,\\n+      });\\n*** End Patch\"));\n"
+}
+````
+
+### 4929. 2026-10-27T11:20:22.937Z — tool result (source line 18523)
+
+````text
+{
+  "call_id": "call_7ae0ea91a8d747a0a70c3436b3bc5331",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 4930. 2026-10-27T11:20:33.757Z — tool call (source line 18527)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_20104a59ec3245e9afef50ff05f471b6",
+  "input": "text(await tools.exec_command({cmd:\"rg -n 'STREAMER|KEEPER|HOME|keepers' test-support/pilot-fixture.js | head -22; sed -n '1,42p' src/pilot.js; sed -n '72,96p' test/pilot.test.js; sed -n '158,178p' src/lifecycle.js\",\"max_output_tokens\":1400}));\n"
+}
+````
+
+### 4931. 2026-10-27T11:20:33.898Z — tool result (source line 18530)
+
+````text
+{
+  "call_id": "call_20104a59ec3245e9afef50ff05f471b6",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "47719e",
+        "wall_time_seconds": 0.00000456,
+        "exit_code": 0,
+        "original_token_count": 923,
+        "output": "5:export const HOME = '1591805230',\n21:    keepers = { [HOME]: 'raidrelichq', [OTHER]: 'olsols2' },\n24:  const ids = Object.keys(keepers);\n130:      const id = ids.find((id) => keepers[id] === u.searchParams.get('login'));\n181:    KEEPER_CHANNEL_IDS: ids.join(','),\n182:    ...(ids.length !== 2 ? { PILOT_KEEPERS_JSON: JSON.stringify(keepers) } : {}),\n183:    TWITCH_STREAMER_ID: HOME,\n266:  const raid = (from = HOME, to = OTHER, viewers = 1) =>\nimport { boundedCall } from './bounded.js';\nimport { reservationReason } from './send-state.js';\nimport { subscriptionFailureDiagnostic } from './subscriptions.js';\nimport { randomBytes } from 'node:crypto';\nimport { hash } from './crypto.js';\nimport { parseLifecycle } from './lifecycle.js';\nimport { handoffView } from './public-view.js';\nimport { httpTransport } from './oauth.js';\n\nexport const KEEPERS = Object.freeze({ 1591805230: 'raidrelichq', 1591806023: 'olsols2' });\nexport function createPilot({\n  keepers = KEEPERS,\n  streamerId = '1591805230',\n  receiving,\n  p7,\n  replies,\n  forge,\n  chronicle,\n  state,\n  store,\n  oauth,\n  subscriptions,\n  sends,\n  now = Date.now,\n  simulator = false,\n  clientId,\n  transport = httpTransport,\n  logger = (line) => console.warn(line),\n}) {\n  const ids = Object.keys(keepers);\n  const actions = (id) => [\n    ...(chronicle ? ['chronicle'] : []),\n    ...(receiving?.enabled ? ['seek-on', 'seek-off', 'seek-status'] : []),\n    'bootstrap',\n    'refresh-authorization',\n    'keep',\n    'pause',\n    'resume',\n    'opt-out',\n    'process',\n    ...(replies ? ['mark-links'] : []),\n    ...ids.filter((other) => other !== id).map((other) => `send:${other}`),\n  test(`${kind}: bootstrap lease, idempotency, 409 recovery and offline during observation win without quota reset`, async () => {\n    const f = await pilotFixture(kind);\n    for (const id of [BOT, HOME, OTHER]) await f.login(id);\n    f.conflict();\n    const concurrent = await Promise.all([\n      f.control(HOME, 'bootstrap'),\n      f.control(HOME, 'bootstrap'),\n    ]);\n    assert.ok(concurrent.some((result) => result.status === 409));\n    assert.equal(f.subscriptions.length, 5);\n    await f.control(HOME, 'keep');\n    await f.chat(HOME, '811', '!mark moon');\n    await f.control(HOME, 'bootstrap');\n    assert.equal(f.subscriptions.length, 5);\n    const doc = await f.runtime.marks.moderationView(HOME, {\n      broadcasterId: HOME,\n      chatterId: HOME,\n    });\n    assert.equal(doc.sessions[0].spent, 1);\n    assert.equal((await f.runtime.state.getStreamStatus(HOME)).streamId, '9001');\n    f.advance();\n    f.hook(async () => {\n      f.hook(null);\n      f.advance();\n      await f.signed('stream.offline', { broadcaster_user_id: HOME }, HOME);\n    if (channel.blockedUserIds.length > 128) throw Error('Policy capacity reached');\n  }\n  // Twitch start times may be second-precision. A later signed receipt can\n  // establish a distinct stream in the same second as the offline watermark.\n  // A CAS-verified fresh Helix read may also recover a distinct stream whose\n  // delayed offline delivery crossed its start; known closed IDs never revive.\n  if (\n    event?.type === 'online' &&\n    event.sentAt > channel.lifecycleAt &&\n    (event.startedAt > channel.closedThrough ||\n      event.startedAt >= Math.floor(channel.closedThrough / 1000) * 1000 ||\n      (observed &&\n        !channel.online &&\n        (!channel.retiredStream || event.startedAt > channel.retiredStream.startedAt))) &&\n    !channel.closedIds.includes(event.streamId) &&\n    event.streamId !== channel.streamId &&\n    (!channel.online || event.startedAt > channel.startedAt)\n  ) {\n    if (channel.online) {\n      countHolderClosure();\n      closeStream(channel, marks);\n"
+      }
+    }
+  ]
+}
+````
+
+### 4932. 2026-10-27T11:20:45.615Z — tool call (source line 18534)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_597a67ecdb6d4c288224f14d3a3b866a",
+  "input": "text(await tools.exec_command({cmd:\"rg -n 'async function bootstrap|function bootstrap|reconcile\\\\(' src/pilot.js; sed -n '160,258p' src/pilot.js; head -27 src/app.js; sed -n '103,128p' src/app.js\",\"max_output_tokens\":2400}));\n"
+}
+````
+
+### 4933. 2026-10-27T11:20:45.753Z — tool result (source line 18537)
+
+````text
+{
+  "call_id": "call_597a67ecdb6d4c288224f14d3a3b866a",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "1b81d9",
+        "wall_time_seconds": 0.00000424,
+        "exit_code": 0,
+        "original_token_count": 1370,
+        "output": "121:  async function bootstrap(id) {\n130:      const reconciled = await subscriptions[id].reconcile({ readiness: true });\n            event: {\n              broadcaster_user_id: id,\n              id: stream.id,\n              type: stream.type,\n              started_at: stream.started_at,\n            },\n          },\n          id,\n          started,\n        );\n      }\n      event.provenance = 'helix-observation';\n      stage = 'observation-commit';\n      const observation = await state.accept({\n        id: `observation:${owner}`,\n        now: now(),\n        sentAt: started,\n        expiresAt: now() + 600000,\n        observation: { baseline, event },\n      });\n      result = {\n        status: 'reconciled',\n        subscriptions: reconciled.results,\n        conditions: reconciled.conditions,\n        ready: reconciled.ready,\n        observation,\n        banCapability: banGranted\n          ? { scope: 'channel:moderate', expiresAt: started + 300000 }\n          : null,\n      };\n    } catch (error) {\n      result = {\n        status: 'failed',\n        ready: false,\n        message: 'Bootstrap failed; review grants and retry explicitly',\n        diagnostic: subscriptionFailureDiagnostic(error) ?? { stage },\n      };\n      // One JSON warning per failed explicit attempt. Never reflect an error,\n      // upstream body, request URL/header or token. Logging cannot fail the job.\n      try {\n        await logger(\n          JSON.stringify({\n            severity: 'WARNING',\n            event: 'raid_relic_bootstrap_failed',\n            keeperId: id,\n            diagnostic: result.diagnostic,\n          }),\n        );\n      } catch {\n        /* Preserve bootstrap outcome. */\n      }\n    }\n    await store.finishJob(id, owner, result);\n    return result;\n  }\n  return {\n    forgeEnabled: forge?.enabled === true,\n    async forgeDesign(id, description, acknowledge) {\n      if (!ids.includes(id) || !forge) throw Error('Unavailable');\n      return forge.write(id, description, acknowledge);\n    },\n    async expireHandoff(id, intentId, hopId) {\n      if (\n        !ids.includes(id) ||\n        !/^[a-f0-9]{64}$/.test(intentId ?? '') ||\n        !/^[a-f0-9]{64}$/.test(hopId ?? '')\n      )\n        return { status: 'blocked', reason: 'handoff-expiry-proof' };\n      return state.sendOffStep(\n        { type: 'expire-handoff', source: id, actor: id, id: intentId, hopId },\n        now(),\n      );\n    },\n    actions,\n    async authorizeSend(source, target) {\n      await readiness(source, target);\n      if (target) await receiving?.authorize(source, target);\n    },\n    async cancelQueued(id, intentId, generation) {\n      if (\n        !ids.includes(id) ||\n        !/^[a-f0-9]{64}$/.test(intentId ?? '') ||\n        !/^[a-f0-9]{64}$/.test(generation ?? '')\n      )\n        throw Error('Invalid intent confirmation');\n      return (\n        (await state.sendOffStep(\n          { type: 'cancel-queued', source: id, actor: id, id: intentId, generation },\n          now(),\n        )) ?? {\n          status: 'blocked',\n          message:\n            'Only the exact never-claimed queued intent can be cancelled. Stop for operator review.',\n        }\n      );\n    },\n    async execute(id, action) {\n      if (!ids.includes(id) || !actions(id).includes(action)) throw new Error('Action unavailable');\n      if (action === 'refresh-authorization') {\nimport { RECEIVING_KEEPERS } from './receiving.js';\nimport { boundedCall } from './bounded.js';\nimport { EDITION_CONFIG, validEditions, editionSVG } from '../public/editions.js';\nimport { canonicalLogin, shareRequestHash } from './my-marks.js';\nimport { parseBan } from './bans.js';\nimport { ackKey } from './claim-ack.js';\nimport { matchesSubscriptionCondition } from './subscriptions.js';\nimport { strictJSON, templateDesign, forgeResult } from './forge.js';\nimport { recapSVG } from './recap.js';\nimport { createHmac, timingSafeEqual } from 'node:crypto';\nimport { readFile } from 'node:fs/promises';\nimport { createMemoryState } from './state.js';\nimport { parseChat } from './bot.js';\nimport { createMarkService, normalizeMark } from './marks.js';\nimport { validateReleaseCommit } from './release.js';\nimport { parseLifecycle } from './lifecycle.js';\n\nexport const MAX_BODY_BYTES = 65536;\nexport const REPLAY_WINDOW_MS = 10 * 60 * 1000;\nconst assets = new Map([\n  ['/keeper-network.js', ['keeper-network.js', 'text/javascript; charset=utf-8']],\n  ['/growth.js', ['growth.js', 'text/javascript; charset=utf-8']],\n  ['/streak-view.js', ['streak-view.js', 'text/javascript; charset=utf-8']],\n  ['/ring-card.js', ['ring-card.js', 'text/javascript; charset=utf-8']],\n  ['/ring-card-client.js', ['ring-card-client.js', 'text/javascript; charset=utf-8']],\n  ['/editions.js', ['editions.js', 'text/javascript; charset=utf-8']],\n  ['/edition-view.js', ['edition-view.js', 'text/javascript; charset=utf-8']],\n  keeperNames = RECEIVING_KEEPERS,\n  scoreAcks,\n  claimAcks,\n  receiving,\n  wander,\n  secret,\n  state = createMemoryState(),\n  now = Date.now,\n  oauth,\n  chatContext,\n  overlayFeed,\n  overlayFeeds,\n  raidPilot = false,\n  previewReadOnly = false,\n  releaseCommit,\n  shares,\n  replies,\n  banAuthorized,\n  publicBudget = { burst: 60, perSecond: 1 },\n} = {}) {\n  const keepers = chatContext?.keeperIds ?? (chatContext ? [chatContext.streamerId] : []);\n  if (\n    !Array.isArray(keepers) ||\n    keepers.length > 4 ||\n    (chatContext && !keepers.length) ||\n    !keepers.every((id) => typeof id === 'string' && /^\\d{1,32}$/.test(id)) ||\n"
+      }
+    }
+  ]
+}
+````
+
+### 4934. 2026-10-27T11:20:49.656Z — tool call (source line 18539)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_6c82a06ec504478cbc17f864c83d5973",
+  "input": "text(await tools.exec_command({cmd:\"sed -n '119,160p' src/pilot.js; rg -n 'pilot|control' src/app.js | head -13; rg -n \\\"async observe|observation\\\" src/state.js | head; sed -n '175,192p' src/marks.js\",\"max_output_tokens\":1200}));\n"
+}
+````
+
+### 4935. 2026-10-27T11:20:49.803Z — tool result (source line 18542)
+
+````text
+{
+  "call_id": "call_6c82a06ec504478cbc17f864c83d5973",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "768756",
+        "wall_time_seconds": 0.00000496,
+        "exit_code": 0,
+        "original_token_count": 946,
+        "output": "    };\n  }\n  async function bootstrap(id) {\n    const owner = randomBytes(24).toString('hex');\n    if (!(await store.acquireJob(id, owner, now()))) return { status: 'busy' };\n    // Capture both baseline and observation start before ANY network effects.\n    const started = now();\n    const baseline = hash(JSON.stringify((await state.getStreamStatus(id)) ?? null));\n    let result;\n    let stage = 'subscriptions';\n    try {\n      const reconciled = await subscriptions[id].reconcile({ readiness: true });\n      stage = 'ban-capability';\n      const banGranted = oauth.hasBanGrant ? await oauth.hasBanGrant(id) : false;\n      stage = 'keeper-grant';\n      const token = await oauth.accessTokenForKeeper(id);\n      stage = 'stream-observation';\n      const response = await boundedCall((signal) =>\n        transport(`https://api.twitch.tv/helix/streams?user_id=${id}`, {\n          signal,\n          headers: { Authorization: `Bearer ${token}`, 'Client-Id': clientId },\n        }),\n      );\n      if (\n        response.status !== 200 ||\n        !Array.isArray(response.data?.data) ||\n        response.data.data.length > 1\n      )\n        throw new Error('Stream observation failed');\n      const stream = response.data.data[0];\n      let event;\n      if (!stream) event = { host: id, type: 'offline', sentAt: started };\n      else {\n        if (stream.user_id !== id) throw new Error('Stream account mismatch');\n        event = parseLifecycle(\n          {\n            subscription: {\n              type: 'stream.online',\n              version: '1',\n              condition: { broadcaster_user_id: id },\n            },\n            event: {\n34:  ['/control-view.js', ['control-view.js', 'text/javascript; charset=utf-8']],\n35:  ['/control-read.js', ['control-read.js', 'text/javascript; charset=utf-8']],\n54:  ['/control.js', ['control.js', 'text/javascript; charset=utf-8']],\n55:  ['/control.css', ['control.css', 'text/css; charset=utf-8']],\n190:        headers: { 'cache-control': 'no-store' },\n202:          'cache-control': 'public, max-age=3600',\n216:        headers: { 'cache-control': 'no-store', 'content-security-policy': \"default-src 'none'\" },\n233:          'cache-control': 'public, max-age=3600',\n261:        path.startsWith('/control/') ||\n271:        headers: { 'cache-control': 'no-store' },\n274:      (path.startsWith('/control/') ||\n305:          headers: { 'cache-control': 'no-store' },\n317:    if (path.startsWith('/control/')) {\n31:import { hash as observationHash } from './crypto.js';\n96:      observation,\n112:      const event = observation?.event ?? providedEvent;\n120:      if (config && chat && !chat.copied && !chat.markAction && !raid && !event && !observation) {\n157:      if (observation) {\n160:          observationHash(JSON.stringify(channels.get(host) ?? null)) !== observation.baseline\n180:              observed: Boolean(observation),\n438:          : observation\n440:              transition.channel.lifecycleSource === 'helix-observation'\n      const disposable = doc.sessions.findIndex((session) =>\n        session.closed === true && session.streamId !== doc.context?.streamId &&\n        session.marks.length === 0 && session.viewers.length === 0);\n      if (disposable >= 0) doc.sessions.splice(disposable, 1);\n    }\n    // A full retained archive must not reject authoritative online/context or\n    // privacy transitions. Without a session, reduceMark declines collection.\n    if (doc.sessions.length < MARK_LIMITS.sessions)\n      doc.sessions.push({\n        streamId: context.streamId,\n        spent: 0,\n        viewers: [],\n        marks: [],\n        closed: false,\n      });\n  }\n  if (doc.context && doc.context.streamId !== context.streamId) {\n    const ended = doc.sessions.find((session) => session.streamId === doc.context.streamId);\n"
+      }
+    }
+  ]
+}
+````
+
+### 4936. 2026-10-27T11:21:00.973Z — tool call (source line 18546)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_3e4dd87f07304799a334fb070bd060cd",
+  "input": "text(await tools.exec_command({cmd:\"head -45 src/control.js; sed -n '315,331p' src/app.js; rg -n 'return \\\\{|issue\\\\(|async route' src/control.js | tail -8; sed -n '261,278p' src/pilot.js\",\"max_output_tokens\":1000}));\n"
+}
+````
+
+### 4937. 2026-10-27T11:21:01.190Z — tool result (source line 18549)
+
+````text
+{
+  "call_id": "call_3e4dd87f07304799a334fb070bd060cd",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "ea468e",
+        "wall_time_seconds": 0.00000424,
+        "exit_code": 0,
+        "original_token_count": 882,
+        "output": "import { boundedCall } from './bounded.js';\nimport { strictJSON, forgeDescription } from './forge.js';\nimport { readFile } from 'node:fs/promises';\nimport { randomBytes } from 'node:crypto';\nimport { hash } from './crypto.js';\n\nexport function createControl({\n  store,\n  keeperIds,\n  origin,\n  secure,\n  now = Date.now,\n  activityTimeoutMs = 8000,\n}) {\n  let pilot;\n  const name = (id) => `${secure ? '__Host-' : ''}rr_control_${id}`;\n  const cookie = (id, value, age) =>\n    `${name(id)}=${value}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${age}${secure ? '; Secure' : ''}`;\n  const csrf = (secret) => hash(`control-csrf:${secret}`);\n  async function session(id, headers) {\n    if (!keeperIds.includes(id)) return null;\n    const entries = (headers.cookie ?? '')\n      .split(';')\n      .map((s) => s.trim())\n      .filter((s) => s.startsWith(`${name(id)}=`));\n    const secret = entries.length === 1 ? entries[0].slice(name(id).length + 1) : '';\n    if (!/^[\\w-]{43}$/.test(secret)) return null;\n    const record = await store.getControlSession(id, hash(secret), now());\n    return record?.keeperId === id && record.role === 'keeper' ? { ...record, secret } : null;\n  }\n  async function authorizePost({ keeperId, headers = {}, rawBody }, allowedActions = []) {\n    if (\n      headers.origin !== origin ||\n      headers['content-type'] !== 'application/json' ||\n      !Buffer.isBuffer(rawBody) ||\n      rawBody.length > 1024\n    )\n      return null;\n    const record = await session(keeperId, headers);\n    if (!record) return null;\n    let body;\n    try {\n      const text = new TextDecoder('utf-8', { fatal: true }).decode(rawBody);\n      if ((text.match(/\"(?:action|csrf)\"\\s*:/g) ?? []).length !== 2) return null;\n      body = JSON.parse(text);\n      return result(200, await publicHTML('keeper.html'), 'text/html; charset=utf-8');\n    }\n    if (path.startsWith('/control/')) {\n      if (!oauth?.control) return result(503, 'Control not configured');\n      return oauth.control.route({ path, method, headers, rawBody });\n    }\n    if (path.startsWith('/oauth/') || (oauth && path.split('?')[0] === oauth.callbackPath)) {\n      if (!oauth) return result(503, 'OAuth not configured');\n      return oauth.route({ method, path, headers });\n    }\n    if (path.startsWith('/api/journey-map')) {\n      if (path !== '/api/journey-map' || rawBody.length)\n        return result(400, 'Invalid journey request');\n      if (method !== 'GET') return result(405, 'Read only');\n      try {\n        const body = JSON.stringify({\n          ...(await state.getJourneyMap(now())),\n57:    return { keeperId, action: body.action, sessionHash: hash(record.secret) };\n71:  return {\n76:    async issue(id) {\n90:    async route({ path, method, headers = {}, rawBody }) {\n          return { status: 'processed', authorization: 'ready' };\n        } catch (error) {\n          return {\n            status: 'processed',\n            authorization: ['reconsent-required', 'authorization-required'].includes(error?.code)\n              ? 'needs-reconnect'\n              : 'retry-later',\n          };\n        }\n      }\n      if (action === 'seek-status') {\n        const seekerStatus = await receiving.status(id);\n        return { status: 'processed', seeking: seekerStatus.member, seekerStatus };\n      }\n      if (action === 'chronicle') return chronicle.write(id);\n      if (action === 'mark-links') return replies.processPending(id);\n      if (action === 'bootstrap') return bootstrap(id);\n      if (action === 'process' || action.startsWith('send:')) {\n"
+      }
+    }
+  ]
+}
+````
+
+### 4938. 2026-10-27T11:21:04.995Z — tool call (source line 18553)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_29ba8e15530944bc9f34eb5e9cddbc6c",
+  "input": "text(await tools.exec_command({cmd:\"sed -n '70,90p' src/control.js; sed -n '42,78p' src/pilot.js; sed -n '96,119p' src/pilot.js\",\"max_output_tokens\":1000}));\n"
+}
+````
+
+### 4939. 2026-10-27T11:21:05.171Z — tool result (source line 18556)
+
+````text
+{
+  "call_id": "call_29ba8e15530944bc9f34eb5e9cddbc6c",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.2 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "6e4b37",
+        "wall_time_seconds": 0.0000044,
+        "exit_code": 0,
+        "original_token_count": 682,
+        "output": "  });\n  return {\n    bindPilot(service) {\n      if (pilot) throw new Error('Control already bound');\n      pilot = service;\n    },\n    async issue(id) {\n      if (!keeperIds.includes(id)) throw new Error('Control authorization failed');\n      const secret = randomBytes(32).toString('base64url');\n      await store.createControlSession(id, {\n        keeperId: id,\n        role: 'keeper',\n        sessionHash: hash(secret),\n        csrfHash: hash(csrf(secret)),\n        renewedAt: now(),\n        expiresAt: now() + 43200000,\n      });\n      return cookie(id, secret, 43200);\n    },\n    authorizePost,\n    async route({ path, method, headers = {}, rawBody }) {\n    ...ids.filter((other) => other !== id).map((other) => `send:${other}`),\n  ];\n  async function mutate(id, action) {\n    const time = now();\n    return state.accept({\n      id: `owner:${randomBytes(24).toString('hex')}`,\n      now: time,\n      sentAt: time,\n      expiresAt: time + 600000,\n      chat: { broadcasterId: id, chatterId: id, markAction: action },\n    });\n  }\n  async function blocked(id, reason, diagnostic) {\n    try {\n      await logger(\n        JSON.stringify({\n          severity: 'WARNING',\n          event: 'raid_relic_send_blocked',\n          keeperId: id,\n          reason,\n        }),\n      );\n    } catch {}\n    return {\n      status: 'blocked',\n      reason,\n      ...(diagnostic ? { diagnostic } : {}),\n      message:\n        (diagnostic?.nextStep ? diagnostic.nextStep + ' ' : '') +\n        'Send Off blocked: ' +\n        reason +\n        '. Refresh both channel statuses; do not retry accepted/unknown dispatches.',\n    };\n  }\n  async function readiness(id, other = ids.find((candidate) => candidate !== id)) {\n    if (!ids.includes(id) || !ids.includes(other) || id === other)\n      throw Error('Both channels must be configured');\n    for (const key of ids) {\n      channels[key] = await state.getStreamStatus(key);\n      marks[key] = await state.getPrivateMarks(key, { broadcasterId: key, chatterId: key });\n    }\n    const awaitRegistry = await state.getKeeperRegistry();\n    const reasons = ids\n      .filter((key) => key !== id)\n      .map((target) =>\n        reservationReason(\n          awaitRegistry,\n          channels,\n          marks,\n          { channels: ids, logins: Object.fromEntries(ids.map((key) => [keepers[key], key])) },\n          { source: id, actor: id, login: keepers[target], sentAt: now() },\n          now(),\n        ),\n      );\n    return {\n      eligible: reasons.some((reason) => reason === null),\n      reason: reasons.some((reason) => reason === null) ? null : reasons[0],\n      observedOnline: Object.fromEntries(\n        ids.map((key) => [keepers[key], channels[key]?.online === true]),\n      ),\n    };\n"
+      }
+    }
+  ]
+}
+````
+
+### 4940. 2026-10-27T11:21:09.953Z — tool call (source line 18560)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_50869cc06b624613961cbf26df52ee3b",
+  "input": "text(await tools.exec_command({cmd:\"rg -n 'async status|subscriptions\\\\[|getJob' src/pilot.js; sed -n '309,348p' src/pilot.js; sed -n '90,128p' src/control.js\",\"max_output_tokens\":1500}));\n"
+}
+````
+
+### 4941. 2026-10-27T11:21:10.154Z — tool result (source line 18563)
+
+````text
+{
+  "call_id": "call_50869cc06b624613961cbf26df52ee3b",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "a82c4e",
+        "wall_time_seconds": 0.00000468,
+        "exit_code": 0,
+        "original_token_count": 838,
+        "output": "79:    if ((await store.getJob(id))?.ready !== true || (await store.getJob(other))?.ready !== true)\n130:      const reconciled = await subscriptions[id].reconcile({ readiness: true });\n334:    async status(id) {\n387:              (await store.getJob(keeper))?.ready === true,\n446:        subscriptions: await store.getJob(id),\n          if (outcome.status !== 'accepted')\n            return blocked(\n              id,\n              outcome.status === 'unknown'\n                ? 'dispatch-unknown'\n                : outcome.status === 'rejected-preflight'\n                  ? 'preflight-rejected'\n                  : outcome.status === 'rejected'\n                    ? 'dispatch-rejected'\n                    : 'worker-reconcile-only',\n              outcome.diagnostic,\n            );\n          return outcome;\n        } catch {\n          return blocked(id, 'request-outcome-unavailable');\n        }\n      }\n      await mutate(\n        id,\n        action === 'pause' || action === 'resume'\n          ? { type: 'pause', paused: action === 'pause' }\n          : { type: action },\n      );\n      return { status: 'processed', action };\n    },\n    async status(id) {\n      if (!ids.includes(id)) throw new Error('Unconfigured Keeper');\n      const channel = await state.getStreamStatus(id);\n      let registry = await state.getKeeperRegistry();\n      if (\n        registry.holderId === id &&\n        registry.send?.sourceId === id &&\n        registry.send.status === 'confirmed' &&\n        registry.pendingHop &&\n        !registry.pendingHop.finalized &&\n        now() >= registry.pendingHop.endsAt\n      ) {\n        await state.sendOffStep(\n          {\n            type: 'reconcile-ended',\n    async route({ path, method, headers = {}, rawBody }) {\n      const match =\n        /^\\/control\\/(\\d{1,32})(\\/(?:status|forge|cancel-queued|expire-handoff))?$/.exec(path);\n      if (!match || !keeperIds.includes(match[1])) return baseReply(404, 'Not found');\n      const id = match[1];\n      let renewedCookie;\n      const reply = (...args) => {\n        const result = baseReply(...args);\n        if (renewedCookie && !Object.hasOwn(result.headers, 'set-cookie'))\n          result.headers['set-cookie'] = renewedCookie;\n        return result;\n      };\n      async function activity(record) {\n        const time = now(),\n          sessionHash = hash(record.secret);\n        const fresh = await boundedCall(\n          async (signal) => {\n            let current;\n            if (time - (record.renewedAt ?? 0) >= 300000)\n              current = await store.renewControlSession(id, sessionHash, record.expiresAt, time, {\n                signal,\n              });\n            if (signal.aborted) throw Error('Session unavailable');\n            // One shared deadline covers CAS and fallback, with no retries.\n            current ??= await store.getControlSession(id, sessionHash, time);\n            if (\n              signal.aborted ||\n              current?.keeperId !== id ||\n              current.role !== 'keeper' ||\n              current.expiresAt <= time\n            )\n              throw Error('Session unavailable');\n            return current;\n          },\n          Math.min(8000, Math.max(1, activityTimeoutMs)),\n        );\n        // Only the winning, completed await may issue a cookie or permit action.\n        renewedCookie = cookie(\n          id,\n"
+      }
+    }
+  ]
+}
+````
+
+### 4942. 2026-10-27T11:21:26.012Z — tool call (source line 18567)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_c9705fbd132a4b7d9cc09bee7826caa3",
+  "input": "text(await tools.exec_command({cmd:\"rg -n 'status, (200|202)|status ===' test/lifecycle.test.js | head -10; sed -n '145,166p' src/control.js\"}));\n"
+}
+````
+
+### 4943. 2026-10-27T11:21:26.232Z — tool result (source line 18570)
+
+````text
+{
+  "call_id": "call_c9705fbd132a4b7d9cc09bee7826caa3",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "4afd3c",
+        "wall_time_seconds": 0.00000472,
+        "exit_code": 0,
+        "original_token_count": 306,
+        "output": "120:    assert.equal((await f.apps.get(home).dispatch({ method: 'GET', path: '/health' })).status, 200);\n426:  assert.equal((await runtime.dispatch({ method: 'GET', path: '/health' })).status, 200);\n          if (\n            !body ||\n            Object.keys(body).sort().join(',') !== 'csrf,generation,intentId' ||\n            !/^[a-f0-9]{64}$/.test(body.intentId ?? '') ||\n            !/^[a-f0-9]{64}$/.test(body.generation ?? '')\n          )\n            return reply(403, 'Control authorization required');\n          const record = await boundedCall(() => session(id, headers));\n          if (!record || typeof body.csrf !== 'string' || hash(body.csrf) !== record.csrfHash)\n            return reply(403, 'Control authorization required');\n          await activity(record);\n          return reply(\n            200,\n            JSON.stringify(await pilot.cancelQueued(id, body.intentId, body.generation)),\n            'application/json',\n          );\n        }\n        if (method === 'POST' && match[2] === '/forge') {\n          if (!pilot || headers.origin !== origin || headers['content-type'] !== 'application/json')\n            return reply(403, 'Control authorization required');\n          let body;\n          try {\n"
+      }
+    }
+  ]
+}
+````
+
+### 4944. 2026-10-27T11:21:30.207Z — tool call (source line 18574)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_279a9d6b52264b56aa01167a4f3a2eff",
+  "input": "text(await tools.exec_command({cmd:\"sed -n '824,835p' src/app.js; rg -n \\\"result\\\\((200|202|204)\\\" src/app.js | tail -12; rg -n 'body.*pilot|csrf:|pilot.status' src/control.js | tail -8\",\"max_output_tokens\":700}));\n"
+}
+````
+
+### 4945. 2026-10-27T11:21:30.471Z — tool result (source line 18577)
+
+````text
+{
+  "call_id": "call_279a9d6b52264b56aa01167a4f3a2eff",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "53de39",
+        "wall_time_seconds": 0.0000046,
+        "exit_code": 0,
+        "original_token_count": 386,
+        "output": "            skipped: Math.min(2, accepted.completionSkipped),\n          }),\n        );\n      } catch {}\n    }\n    // Exact proven request only; duplicates can recover an unclaimed row, never another viewer's.\n    if (share && replies) {\n      try {\n        await replies.processPending(chat.broadcasterId, shareRequestHash(chat));\n      } catch {\n        /* No sensitive diagnostics or post-response worker. */\n      }\n215:        ...result(200, editionSVG(edition), 'image/svg+xml'),\n231:        ...result(200, await readFile(new URL(`../public/${file}`, import.meta.url)), type),\n304:          ...result(200, body, 'application/json'),\n315:      return result(200, await publicHTML('keeper.html'), 'text/html; charset=utf-8');\n336:          ...result(200, body, 'application/json'),\n495:            ...result(200, svg, 'image/svg+xml'),\n598:      return result(200, await publicHTML('atlas.html'), 'text/html; charset=utf-8');\n630:        return result(200, JSON.stringify(await selected.snapshot()), 'application/json');\n631:      return result(200, await publicHTML('overlay-live.html'), 'text/html; charset=utf-8');\n638:      return result(200, bytes, type);\n678:      return result(200, payload.challenge);\n853:    return result(204);\n19:  const csrf = (secret) => hash(`control-csrf:${secret}`);\n209:              rawBody: Buffer.from(JSON.stringify({ action: 'expire-handoff', csrf: body.csrf })),\n262:            pilotStatus = pilot ? await boundedCall(() => pilot.status(id)) : undefined;\n274:              csrf: csrf(record.secret),\n"
+      }
+    }
+  ]
+}
+````
+
+### 4946. 2026-10-27T11:21:59.245Z — assistant (source line 18582)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "The patch now reclaims one closed, inactive, empty session only when a new stream needs space. If all 16 sessions retain marks, it still updates the authoritative context; mark collection declines because no session is available. I’ll test both cases.\n\nI also found a separate existing guard: closing a further stream when all 16 `closedIds` slots are occupied can still throw. I’ll leave it unchanged and document it, since changing replay tombstones needs a separate policy decision.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4947. 2026-10-27T11:22:31.290Z — tool call (source line 18583)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_92e93c54f09b4a62a9ce5f4754a50525",
+  "input": "text(await tools.exec_command({cmd:\"cat > test/stream-session-capacity.test.js <<'EOF'\\nimport test from 'node:test';\\nimport assert from 'node:assert/strict';\\nimport { createHmac } from 'node:crypto';\\nimport { setMarkContext, reduceMark, markReviewPolicy, MARK_LIMITS } from '../src/marks.js';\\nimport { createMemoryState } from '../src/state.js';\\nimport { createFirestoreStore, createMemoryAuthStore } from '../src/store.js';\\nimport { createApp } from '../src/app.js';\\nimport { createControl } from '../src/control.js';\\nimport { createPilot } from '../src/pilot.js';\\nimport { fakeFirestore } from '../test-support/fake-firestore.js';\\n\\nconst host = '201', other = '202', bot = '203', origin = 'https://local.example';\\nconst secret = 'synthetic-capacity-signature';\\nconst context = (streamId) => ({ streamId, keeperId: host, optedIn: true,\\n  holdsRelic: true, blockedUserIds: [] });\\nconst actor = { broadcasterId: host, chatterId: '101' };\\n\\ntest('full retained marked sessions update context without collection, loss, quota reset or privacy failure', () => {\\n  let doc;\\n  let now = 1000000;\\n  const policy = markReviewPolicy({ MARK_AUTO_APPROVE_ENABLED: 'true' });\\n  for (let i = 0; i < 16; i++) {\\n    now += 31000;\\n    doc = setMarkContext(doc, host, context(String(1000 + i)));\\n    doc = reduceMark(doc, host, actor, { type: 'mark', text: 'moon' }, now, i % 2 ? policy : undefined);\\n  }\\n  const retained = doc.sessions.flatMap((s) => s.marks);\\n  assert.equal(retained.length, 16);\\n  assert.ok(retained.some((m) => m.status === 'approved'));\\n  assert.ok(retained.some((m) => m.status === 'pending'));\\n  const serial = doc.serial, cooldowns = structuredClone(doc.cooldowns);\\n  doc = setMarkContext(doc, host, context('1016'));\\n  assert.equal(doc.context.streamId, '1016');\\n  assert.equal(doc.sessions.length, MARK_LIMITS.sessions);\\n  assert.equal(doc.sessions.some((s) => s.streamId === '1016'), false);\\n  assert.deepEqual(doc.sessions.flatMap((s) => s.marks), retained);\\n  assert.equal(doc.serial, serial);\\n  assert.deepEqual(doc.cooldowns, cooldowns);\\n  assert.deepEqual(setMarkContext(doc, host, context('1016')), doc);\\n  const denied = reduceMark(doc, host, { broadcasterId: host, chatterId: '102' },\\n    { type: 'mark', text: 'star' }, now + 1, policy);\\n  assert.equal(denied.serial, serial);\\n  assert.equal(denied.sessions.flatMap((s) => s.marks).length, 16);\\n  assert.throws(() => setMarkContext(doc, host, context('1015')), /Closed stream/);\\n  const erased = reduceMark(doc, host, actor, { type: 'forgetme' }, now + 1, policy);\\n  assert.equal(erased.sessions.flatMap((s) => s.marks).length, 0);\\n  assert.deepEqual(erased.cooldowns, cooldowns);\\n  assert.equal(erased.sessions.reduce((n, s) => n + s.spent, 0), 16);\\n  const recovered = setMarkContext(erased, host, context('1016'));\\n  assert.equal(recovered.sessions.length, 16);\\n  assert.ok(recovered.sessions.some((s) => s.streamId === '1016'));\\n});\\n\\ntest('compaction never discards an open, current, marked or nonempty-viewer session', () => {\\n  const sessions = Array.from({ length: 16 }, (_, i) => ({\\n    streamId: String(2000 + i), closed: false, spent: 0, marks: [], viewers: [],\\n  }));\\n  sessions[0].closed = true; sessions[0].viewers = [{ userId: '101', spent: 1 }];\\n  const original = { context: context('2015'), paused: false, blocked: ['103'],\\n    sessions, cooldowns: [{ userId: '101', at: 1000 }], serial: 0 };\\n  const next = setMarkContext(original, host, context('2016'));\\n  assert.equal(next.sessions.length, 16);\\n  assert.deepEqual(next.sessions[0], original.sessions[0]);\\n  assert.deepEqual(next.blocked, ['103']);\\n  assert.deepEqual(next.cooldowns, original.cooldowns);\\n  assert.equal(next.sessions.some((s) => s.streamId === '2016'), false);\\n});\\n\\nasync function fixture(kind) {\\n  const db = kind === 'firestore' ? fakeFirestore() : null;\\n  const options = { lifecycle: { channels: [host, other], logins: { sample_a: host, sample_b: other } } };\\n  const state = db ? createFirestoreStore(db, options) : createMemoryState(options);\\n  const auth = createMemoryAuthStore();\\n  let now = Date.parse('2026-10-25T12:00:00Z'), seq = 0, observed = null, calls = 0;\\n  const control = createControl({ store: auth, keeperIds: [host, other], origin, secure: true, now: () => now });\\n  const pilot = createPilot({ keepers: { [host]: 'sample_a', [other]: 'sample_b' }, streamerId: host,\\n    state, store: auth, oauth: { accessTokenForKeeper: async (id) => {\\n      assert.equal(id, host); return 'synthetic-token';\\n    } }, subscriptions: { [host]: { reconcile: async () => ({ ready: true, results: [], conditions: [] }) } },\\n    clientId: 'public-dummy-client', now: () => now, logger: () => {},\\n    transport: async (url) => {\\n      assert.equal(url, `https://api.twitch.tv/helix/streams?user_id=${host}`);\\n      calls++; return { status: 200, data: { data: observed ? [observed] : [] } };\\n    },\\n  });\\n  // Own HTTP/CSRF boundary is real; status is intentionally minimal because this\\n  // fixture exposes bootstrap only, not unrelated candidate/dispatch services.\\n  control.bindPilot({ actions: () => ['bootstrap'], status: async () => ({}), execute: pilot.execute });\\n  const app = createApp({ secret, state, oauth: { control }, now: () => now,\\n    chatContext: { streamerId: host, botId: bot, keeperIds: [host, other] } });\\n  const signed = async (type, streamId, sentAt = now) => {\\n    const id = `capacity-event-${++seq}`, timestamp = new Date(sentAt).toISOString();\\n    const rawBody = Buffer.from(JSON.stringify({ subscription: { type, version: '1',\\n      condition: { broadcaster_user_id: host } }, event: { broadcaster_user_id: host,\\n      ...(type === 'stream.online' ? { id: streamId, type: 'live', started_at: timestamp } : {}) } }));\\n    return app.dispatch({ method: 'POST', path: '/eventsub', rawBody, headers: {\\n      'twitch-eventsub-message-id': id, 'twitch-eventsub-message-timestamp': timestamp,\\n      'twitch-eventsub-message-type': 'notification',\\n      'twitch-eventsub-message-signature': 'sha256=' + createHmac('sha256', secret)\\n        .update(id).update(timestamp).update(rawBody).digest('hex'),\\n    } });\\n  };\\n  for (let i = 0; i < 16; i++) {\\n    now += 1000;\\n    assert.equal((await signed('stream.online', String(3000 + i))).status, 204);\\n    now += 1000;\\n    assert.equal((await signed('stream.offline')).status, 204);\\n  }\\n  const cookie = (await control.issue(host)).split(';')[0];\\n  return { state, app, signed, db, calls: () => calls, advance: () => { now += 1000; },\\n    observe(streamId) { observed = { user_id: host, id: streamId, type: 'live', started_at: new Date(now).toISOString() }; },\\n    async bootstrap() {\\n      const status = await app.dispatch({ method: 'GET', path: `/control/${host}/status`, headers: { cookie } });\\n      assert.equal(status.status, 200);\\n      const csrf = JSON.parse(status.body).csrf;\\n      return app.dispatch({ method: 'POST', path: `/control/${host}`, headers: {\\n        cookie, origin, 'content-type': 'application/json',\\n      }, rawBody: Buffer.from(JSON.stringify({ action: 'bootstrap', csrf })) });\\n    },\\n  };\\n}\\nfor (const kind of ['memory', 'firestore']) {\\n  for (const entry of ['signed-online', 'own-bootstrap']) {\\n    test(`${kind}: seventeenth stream via ${entry} reclaims only inactive empty sessions and remains idempotent`, async () => {\\n      const f = await fixture(kind);\\n      const before = await f.state.getPrivateMarks(host, { broadcasterId: host, chatterId: host });\\n      assert.equal(before.sessions.length, 16);\\n      assert.ok(before.sessions.every((s) => s.closed && s.marks.length === 0 && s.viewers.length === 0));\\n      const tombstones = (await f.state.getStreamStatus(host)).closedIds;\\n      assert.equal(tombstones.length, 16);\\n      const registry = await f.state.getKeeperRegistry(), journey = await f.state.getPublicJourney();\\n      f.advance();\\n      if (entry === 'signed-online') assert.equal((await f.signed('stream.online', '3016')).status, 204);\\n      else {\\n        f.observe('3016'); const response = await f.bootstrap();\\n        assert.equal(response.status, 200);\\n        assert.equal(JSON.parse(response.body).status, 'reconciled');\\n        assert.equal(JSON.parse(response.body).ready, true);\\n      }\\n      const channel = await f.state.getStreamStatus(host);\\n      assert.equal(channel.online, true); assert.equal(channel.streamId, '3016');\\n      assert.deepEqual(channel.closedIds, tombstones);\\n      const after = await f.state.getPrivateMarks(host, { broadcasterId: host, chatterId: host });\\n      assert.equal(after.sessions.length, 16); assert.equal(after.context.streamId, '3016');\\n      assert.equal(after.sessions.some((s) => s.streamId === '3000'), false);\\n      assert.ok(after.sessions.some((s) => s.streamId === '3015' && s.closed));\\n      f.advance();\\n      assert.equal((await f.signed('stream.online', '3016')).status, 204);\\n      assert.deepEqual(await f.state.getPrivateMarks(host, { broadcasterId: host, chatterId: host }), after);\\n      f.advance();\\n      assert.equal((await f.signed('stream.online', '3000')).status, 204);\\n      assert.equal((await f.state.getStreamStatus(host)).streamId, '3016');\\n      assert.deepEqual(await f.state.getKeeperRegistry(), registry);\\n      assert.deepEqual(await f.state.getPublicJourney(), journey);\\n    });\\n  }\\n}\\nEOF\",\"max_output_tokens\":1000}));\n"
+}
+````
+
+### 4948. 2026-10-27T11:22:31.407Z — tool result (source line 18586)
+
+````text
+{
+  "call_id": "call_92e93c54f09b4a62a9ce5f4754a50525",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "529a50",
+        "wall_time_seconds": 0.00000428,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    }
+  ]
+}
+````
+
+### 4949. 2026-10-27T11:23:52.297Z — tool call (source line 18592)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_54f2edc488284bc9803abcf85900fa30",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/test/stream-session-capacity.test.js\\n@@\\n   const retained = doc.sessions.flatMap((s) => s.marks);\\n@@\\n   const serial = doc.serial, cooldowns = structuredClone(doc.cooldowns);\\n+  assert.deepEqual(setMarkContext(doc, host, context('1015')), doc);\\n*** End Patch\"));\ntext(await tools.exec_command({cmd:\"cat > docs/EVENTSUB_CAPACITY_INCIDENT.md <<'EOF'\\n# Closed empty mark-session capacity incident\\n\\n## Observed scope\\n\\nThe parent operator reported stream.online observation-commit failures on both the safety preview's owner-activated revision and the previous canonical runtime. The bounded state-shape review found 16 mark sessions for Home and the second Keeper, with their stream channels offline and 16 retained closed-stream IDs. The source path allocated a seventeenth mark session inside `setMarkContext` before lifecycle observation could commit, throwing at the existing 16-session limit. This affected signed stream.online and the same context update reached by explicit bootstrap/Get Streams observation.\\n\\nThe parent reported a complete private state backup at 2026-10-27T11:17:05.371Z: 401 documents in 16 collections, 81,204 bytes. The source author has not read that backup, credentials, private logs or actual state contents. This note does not claim operational repair, subscription reconciliation or promotion has completed.\\n\\n## Narrow source correction\\n\\n`src/marks.js` retains the limit of 16 sessions. Only when a new stream needs room, it can reclaim one session that is explicitly closed, is not the previous current context, has zero retained marks and has zero viewer counters. Open sessions, current-session quota, approved or pending retained marks, blocks and cooldowns are not discarded to make space. The previous context is closed through the existing transition logic. Same-stream context refresh remains idempotent.\\n\\nIf every session retains data, authoritative lifecycle/context can still advance without preallocating an empty mark session. Existing `reduceMark` returns a bounded refusal when the current context has no available session; it does not collect marks, reset another stream's quota or throw merely because the retained session list is full. Privacy erasure can still remove retained content. A later context synchronization can allocate space only after a qualifying empty inactive session exists. No mark/history truncation or session-limit increase is introduced.\\n\\nProduction replay protection remains in the existing lifecycle stream IDs, ordering, closed-through boundary and closed-ID set. Compacting empty mark-session containers is not permission to revive an old stream. The trusted raw context setter is not an untrusted stream-event authorization interface. Tests explicitly deliver an old compacted stream ID through the signed application route and require the current stream to remain unchanged.\\n\\nA separate pre-existing limit still applies when closing a further stream after all 16 lifecycle `closedIds` slots are occupied: `closeStream` can reject at that tombstone capacity. This patch deliberately does not drop or roll over replay tombstones. That requires a separate replay-retention policy and authorization; the present correction addresses admission/observation of the seventeenth stream. It does not claim indefinite stream cycling or solve every capacity boundary.\\n\\n## Regression scope and release isolation\\n\\n`test/stream-session-capacity.test.js` uses dummy identities and locally signed provider-shaped events. Both memory and fake Firestore fixtures construct 16 genuinely closed empty stream sessions through actual online/offline transitions, then exercise a seventeenth signed online or the own-session/Origin/CSRF-protected bootstrap HTTP path with mocked stream observation. Assertions cover the unchanged holder/journey, preserved lifecycle tombstones, bounded compaction, repeated online idempotency and stale stream rejection. Pure mark-constructor/reducer cases cover 16 marked sessions, bounded collection refusal, preserved content/status/counters/cooldowns, privacy erasure and recovery of allocation after erasure. These new tests are authored but await the parent's offline native execution; no live webhook replay or provider test was performed by the source author.\\n\\nOnly `src/marks.js`, the new regression test and this note belong to the urgent hotfix. The parent must verify these changes apply to the isolated `7ec622148d6eb3a78d2bdd24ed6c9ddcaca4bdfd` safety baseline. Unfinished soak/CI/judge development must not be bundled into the incident artifact. Parent-only state backup, exact read preconditions, update-time/CAS checks, approved empty-session compaction and existing canonical subscription reconcile remain operational steps. Source code supplies no production cleanup script and changes no grants, scopes, timers, provider configuration or traffic.\\n\\nAny operator compaction must preserve the current context/session, every retained mark and nonempty viewer record, and all lineage, registry, pending handoff, stream anti-replay fields, blocks and bans. The observed predicate must be checked again against the exact document version; uncertainty means no write. A separately reviewed hotfix preview stays zero traffic and master read-only: live EventSub rejection there is expected and must not be bypassed to reproduce an incident. Signed-delivery acceptance is validated only in local fixtures until an owner separately authorizes any promotion. All earlier tags and canonical production traffic remain protected.\\nEOF\",\"max_output_tokens\":1000}));\n"
+}
+````
+
+### 4950. 2026-10-27T11:23:52.588Z — tool result (source line 18596)
+
+````text
+{
+  "call_id": "call_54f2edc488284bc9803abcf85900fa30",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "0d8373",
+        "wall_time_seconds": 0.000004,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    }
+  ]
+}
+````
+
+### 4951. 2026-10-27T11:24:32.307Z — tool call (source line 18602)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_c88c9946faee4a4e8e23934df321b2e8",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/test/stream-session-capacity.test.js\\n@@\\n       f.advance();\\n       assert.equal((await f.signed('stream.online', '3016')).status, 204);\\n       assert.deepEqual(await f.state.getPrivateMarks(host, { broadcasterId: host, chatterId: host }), after);\\n+      if (entry === 'own-bootstrap') {\\n+        f.advance();\\n+        const repeated = await f.bootstrap();\\n+        assert.equal(repeated.status, 200);\\n+        assert.equal(JSON.parse(repeated.body).status, 'reconciled');\\n+        assert.equal(f.calls(), 2);\\n+        assert.deepEqual(await f.state.getPrivateMarks(host, { broadcasterId: host, chatterId: host }), after);\\n+      }\\n*** End Patch\"));\n"
+}
+````
+
+### 4952. 2026-10-27T11:24:32.440Z — tool result (source line 18605)
+
+````text
+{
+  "call_id": "call_c88c9946faee4a4e8e23934df321b2e8",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 4953. 2026-10-27T11:24:40.851Z — assistant (source line 18608)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Hotfix ready in only these three files:\n\n- [src/marks.js](/home/ubuntu/.openclaw/workspace/apps/raid-relic/src/marks.js): reclaim one closed, inactive, empty session when needed; if all sessions retain marks, allow context updates while declining new mark collection.\n- [test/stream-session-capacity.test.js](/home/ubuntu/.openclaw/workspace/apps/raid-relic/test/stream-session-capacity.test.js): dummy signed online and own-bootstrap cases for memory/Firestore, plus retention, quota and stale-stream checks.\n- [Incident note](/home/ubuntu/.openclaw/workspace/apps/raid-relic/docs/EVENTSUB_CAPACITY_INCIDENT.md).\n\n**Remaining limit:** closing another stream with 16 occupied lifecycle tombstones can still fail. That separate guard is unchanged.\n\nNo tests or operations ran locally. Soak/CI work is untouched; parent isolated-baseline validation remains pending.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4954. 2026-10-27T11:27:22.707Z — user (source line 18618)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "238 SAMEURGENT1a4b31c7 ORIGINAL2373filefixready/no testsrunyet. ParentPRODREPAIRcompleted11:22:05 fromEXACT3dproductionruntime after401docbackupSHAea3... CASpruned15closedemptyINACTIVEolsols2marksession16→1, currentclosedkept, totalmarks0.NarrowactualbootstrapEXISTINGprod code sameexactenv/managedSecretsRAM only/providerALLOWLISTvalidate/token/subscriptionsGET/streamsGETol2. RESULTreconciled readytrue observationapplied actualOFFLINE; all5conditionsenabled; NOsubscriptioncreates/deletes/no raid/chat/holderorPendingchange/no traffic/promotion. No needSourceOps. New0fix237NOTpublishedyet; CI/soakuncommittedprotectallfileothers.\nYour237warned lifecycleclosedIds16 guard stillthrowswhenCLOSING17thstream (src/lifecycle.js77–81). ActualprodOl2closedIds16already! Thusonlymarkssessionfixletsnextonlinepassbutnex…ent offline500 again. NeedminimalBOUNDEDsafeTOMBSTONEROLLOVERsameincidentbeforepublication—notraise16/dropprivacy/history/streamProof. AllowedADDsrc/lifecycle.js+UPDATEtest/stream-session-capacity.test.js/docsincident andonlyEXACTexistingtestsifliteraloldthrow-contractsupersededmustretainreplay/quotabudget assertions, NO blanketwaiver. SourceNodeonlynoGit/cloud/provider/creds/live.\nImportantREPLAYGUARD: ExistingonlinepermitsstartedAt>=floor(closedThrough/1000)*1000 fordistinctsame-secondstreams ORfreshCASHelix observednewerthanretiredStart. IfsimplyshiftoldclosedIdsarrayOLDESToldstreamstartsameSecondmightREOPENwithnewersignedreceipt whenIDevicted! Needpersistmonotonicconservativeevictionfloor/closedStartFence sufficient torejectALLforgottenIDs/timestamps evenfreshreceiptwithinSameSecond OR separateboundedopaque marker design. Failclosedonambiguoussame-secondafteroverflowacceptable(not500), butdon'tauthorizenewfakeonline/forceoffline inread. ExistingnewerfreshStream normalstartmustwork/postoffline after32+realcycles allstatebounds≤16. Keepcurrentstream quota/postStreamclosureclosedmarkviewercounters rules/savedmarkhistory/lineage16/hashes, no capraise or droppedretainedword. Watermarkmayconservativelycoverolderstart timestamps; whatLegacyclosedIdslackstarttimes? conservativelyadvanceoverflowfloor tocurrentmaxclosedStartedAt/time suchthatallejectedolderknownIDsarecovered—includingfirst16unknownstartdatasafe; documentpotentialfailclosed notassumetimes. CurrentstreambeingclosedknownstartedAt, channel.retiredStream maybealreadysetinOfflineblockbeforeclose; Online-replacementclose patholdstreamstartknown. Persistmonotonicfloor mustnotbeinflatedbydup/offlineheartbeat sofuturelegitstreamswork. Serverreceivedevent freshnesschannel.lifecycleAt +HMAC stillstrict.PublicprojectionNo IDsnewfieldprivateonly.ReadonlyCASobservationcan'tbypassfloor.BootstrapfreshactualstreamstartafterfloorcanrecoverwithoutinventingstreamIDs.None ofthispermitsrealdatareset/IDmanualedit.\nAddSIGNEDHTTP online/offline >32consecutiveuniquevalidstreams memory+fakeFS/retainedsession/prune boundaries, repeateddeliverydedupe/offlinewatermarknoincreaseonduplicate, sameSecond(16+events)evictedoldIDfreshsignedreceiptcannotreturn, newdistinctolderstream viaCASobsdenied; liveoldmarkscontextclosed,5quota notreset whilecurrentpersistent.Enablefreshnormalnewerstream. ExistingCase237full16markedcontextmustdenycollectionwithoutlosingwords andforgetstillworks. Oldtestsmarks mayexpect17thsetContextthrows—updatetoactuallypreservedfullbudgetdeclinescollection no500 ifneeded ratherthanremovebounds.SkipNOtests. SourceFIXAPPLYCLEAN7ecbaselinesafety srcmarks/lifecycleidenticalf18confirmedbyParentbeforepackaging. DoNOTtouchuncommittedCIfiles(scriptsci,package,visualReview,workflow)/235soak; alluntouchedHEADf18worktreeothers preserved. Snapshotoriginal237/codeauthor237+238knownsameoriginal; ParenttempGitINDEXcommit-treebase7ec +ONLYexactfixpathsbuildartifact (notworktree/newdevrepo), freshNative22unit +41browser serial/CIheadfixbranch/preview eventsub-fix0 beforefinaluserStatus. ThisfurtherclosingguardINscopebecauseotherwiseimmediateknownrepeat500 afternextstream, notnewfeature. ~4min smallsafechangesSTOPdon'tclaimNativepassed. Ifcannotdesignprovablyboundedfloorreportpreciseblockerbutoriginal2370muststillpublishqualified.No Sourcehosttargettestexec. ProductionoldcodeUNCHANGED/trafficstill3d100newuserpreviewonly.Role.Source_Field_Meta.\n"
+  }
+]
+````
+
+### 4955. 2026-10-27T11:27:28.717Z — assistant (source line 18621)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll add a bounded tombstone rollover with a monotonic start-time fence that neither signed events nor CAS observations can bypass. I’ll keep changes within the hotfix files and add replay tests across more than 32 stream closures.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4956. 2026-10-27T11:27:30.335Z — tool call (source line 18622)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_4a62b354cb2d4081ad7a653c82ad7541",
+  "input": "text(await tools.exec_command({cmd:\"sed -n '35,57p' src/lifecycle.js; sed -n '76,96p' src/lifecycle.js; sed -n '164,210p' src/lifecycle.js; rg -n 'tombstone|closedIds|capacity' test/lifecycle.test.js | tail -15; tail -40 test/stream-session-capacity.test.js\",\"max_output_tokens\":2400}));\n"
+}
+````
+
+### 4957. 2026-10-27T11:27:30.474Z — tool result (source line 18625)
+
+````text
+{
+  "call_id": "call_4a62b354cb2d4081ad7a653c82ad7541",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "e944cf",
+        "wall_time_seconds": 0.0000044,
+        "exit_code": 0,
+        "original_token_count": 1363,
+        "output": "  };\n}\nexport const emptyRegistry = () => ({ holderId: null, originated: false });\nconst emptyChannel = () => ({\n  online: false,\n  streamId: null,\n  startedAt: null,\n  lifecycleAt: -1,\n  closedThrough: -1,\n  closedIds: [],\n  optedIn: false,\n  consentAt: -1,\n  paused: false,\n  banned: false,\n  blockedUserIds: [],\n});\n\nexport function parseLifecycle(payload, host, sentAt) {\n  const subscription = payload.subscription;\n  const event = payload.event;\n  if (\n    !['stream.online', 'stream.offline'].includes(subscription?.type) ||\n    subscription.version !== '1' ||\n}\nfunction closeStream(channel, marks) {\n  if (channel.streamId && !channel.closedIds.includes(channel.streamId)) {\n    if (channel.closedIds.length >= LIFECYCLE_LIMITS.closedStreams)\n      throw new Error('Stream tombstone capacity reached');\n    channel.closedIds.push(channel.streamId);\n  }\n  const session = marks.sessions.find((item) => item.streamId === channel.streamId);\n  if (session) {\n    session.closed = true;\n    session.viewers = [];\n  }\n  if (marks.context) marks.context.holdsRelic = false;\n}\nfunction sync(registry, channel, marks, host) {\n  if (channel.online) {\n    marks = setMarkContext(marks, host, {\n      streamId: channel.streamId,\n      keeperId: host,\n      optedIn: channel.optedIn,\n      holdsRelic: registry.holderId === host && !channel.banned,\n  if (\n    event?.type === 'online' &&\n    event.sentAt > channel.lifecycleAt &&\n    (event.startedAt > channel.closedThrough ||\n      event.startedAt >= Math.floor(channel.closedThrough / 1000) * 1000 ||\n      (observed &&\n        !channel.online &&\n        (!channel.retiredStream || event.startedAt > channel.retiredStream.startedAt))) &&\n    !channel.closedIds.includes(event.streamId) &&\n    event.streamId !== channel.streamId &&\n    (!channel.online || event.startedAt > channel.startedAt)\n  ) {\n    if (channel.online) {\n      countHolderClosure();\n      closeStream(channel, marks);\n    }\n    channel.online = true;\n    channel.streamId = event.streamId;\n    channel.startedAt = event.startedAt;\n    channel.lifecycleAt = event.sentAt;\n    channel.lifecycleSource = event.provenance ?? 'eventsub';\n  }\n  if (event?.type === 'offline' && event.sentAt >= channel.lifecycleAt) {\n    // Retain only the last authoritative stream closure. Repeated offline\n    // deliveries must not extend its eligibility boundary.\n    if (channel.online && channel.streamId)\n      channel.retiredStream = {\n        streamId: channel.streamId,\n        startedAt: channel.startedAt,\n        offlineAt: event.sentAt,\n      };\n    countHolderClosure();\n    closeStream(channel, marks);\n    channel.closedThrough = Math.max(channel.closedThrough, event.sentAt);\n    channel.lifecycleAt = event.sentAt;\n    channel.lifecycleSource = event.provenance ?? 'eventsub';\n    channel.online = false;\n    channel.streamId = null;\n    channel.startedAt = null;\n  }\n  if (event?.type === 'ban') {\n    channel.observedBans ??= [];\n    if (!channel.observedBans.includes(event.userId)) {\n      if (\n        channel.observedBans.length >= 128 ||\n        channel.blockedUserIds.length >= 128 ||\n        marks.blocked.length >= 128\n      const before = await f.state.getPrivateMarks(host, { broadcasterId: host, chatterId: host });\n      assert.equal(before.sessions.length, 16);\n      assert.ok(before.sessions.every((s) => s.closed && s.marks.length === 0 && s.viewers.length === 0));\n      const tombstones = (await f.state.getStreamStatus(host)).closedIds;\n      assert.equal(tombstones.length, 16);\n      const registry = await f.state.getKeeperRegistry(), journey = await f.state.getPublicJourney();\n      f.advance();\n      if (entry === 'signed-online') assert.equal((await f.signed('stream.online', '3016')).status, 204);\n      else {\n        f.observe('3016'); const response = await f.bootstrap();\n        assert.equal(response.status, 200);\n        assert.equal(JSON.parse(response.body).status, 'reconciled');\n        assert.equal(JSON.parse(response.body).ready, true);\n      }\n      const channel = await f.state.getStreamStatus(host);\n      assert.equal(channel.online, true); assert.equal(channel.streamId, '3016');\n      assert.deepEqual(channel.closedIds, tombstones);\n      const after = await f.state.getPrivateMarks(host, { broadcasterId: host, chatterId: host });\n      assert.equal(after.sessions.length, 16); assert.equal(after.context.streamId, '3016');\n      assert.equal(after.sessions.some((s) => s.streamId === '3000'), false);\n      assert.ok(after.sessions.some((s) => s.streamId === '3015' && s.closed));\n      f.advance();\n      assert.equal((await f.signed('stream.online', '3016')).status, 204);\n      assert.deepEqual(await f.state.getPrivateMarks(host, { broadcasterId: host, chatterId: host }), after);\n      if (entry === 'own-bootstrap') {\n        f.advance();\n        const repeated = await f.bootstrap();\n        assert.equal(repeated.status, 200);\n        assert.equal(JSON.parse(repeated.body).status, 'reconciled');\n        assert.equal(f.calls(), 2);\n        assert.deepEqual(await f.state.getPrivateMarks(host, { broadcasterId: host, chatterId: host }), after);\n      }\n      f.advance();\n      assert.equal((await f.signed('stream.online', '3000')).status, 204);\n      assert.equal((await f.state.getStreamStatus(host)).streamId, '3016');\n      assert.deepEqual(await f.state.getKeeperRegistry(), registry);\n      assert.deepEqual(await f.state.getPublicJourney(), journey);\n    });\n  }\n}\n"
+      }
+    }
+  ]
+}
+````
+
+### 4958. 2026-10-27T11:28:39.665Z — tool call (source line 18633)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_3e9823bc0fda407a933ead0f99a6c148",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/src/lifecycle.js\\n@@\\n-function closeStream(channel, marks) {\\n+const closureFence = (channel) => Math.max(\\n+  channel.closedStartFence ?? -1, channel.closedThrough, channel.lifecycleAt,\\n+  channel.startedAt ?? -1,\\n+);\\n+function closeStream(channel, marks) {\\n   if (channel.streamId && !channel.closedIds.includes(channel.streamId)) {\\n-    if (channel.closedIds.length >= LIFECYCLE_LIMITS.closedStreams)\\n-      throw new Error('Stream tombstone capacity reached');\\n+    if (channel.closedIds.length >= LIFECYCLE_LIMITS.closedStreams) {\\n+      // Legacy IDs have no individual start timestamps. Fence through the\\n+      // authoritative ordering boundary before forgetting any opaque ID.\\n+      channel.closedStartFence = closureFence(channel);\\n+      channel.closedIds.shift();\\n+    }\\n@@\\n     event?.type === 'online' &&\\n     event.sentAt > channel.lifecycleAt &&\\n+    event.startedAt > (channel.closedStartFence ?? -1) &&\\n+    // Replacement must also satisfy the fence its own closure would establish.\\n+    (!channel.online || channel.closedIds.length < LIFECYCLE_LIMITS.closedStreams ||\\n+      channel.closedIds.includes(channel.streamId) || event.startedAt > closureFence(channel)) &&\\n*** End Patch\"));\ntext(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='test/stream-session-capacity.test.js';s=open(p).read().replace('async function fixture(kind) {','async function fixture(kind, initialStreams = 16) {').replace(\\\"const signed = async (type, streamId, sentAt = now) => {\\\", \\\"const signed = async (type, streamId, sentAt = now, startedAt = sentAt) => {\\\").replace(\\\"started_at: timestamp\\\", \\\"started_at: new Date(startedAt).toISOString()\\\").replace('for (let i = 0; i < 16; i++) {\\\\n    now += 1000;', 'for (let i = 0; i < initialStreams; i++) {\\\\n    now += 1000;').replace('advance: () => { now += 1000; },', 'now: () => now, advance: (ms = 1000) => { now += ms; },').replace('observe(streamId) { observed = { user_id: host, id: streamId, type: \\\\'live\\\\', started_at: new Date(now).toISOString() }; }', \\\"observe(streamId, startedAt = now) { observed = { user_id: host, id: streamId, type: 'live', started_at: new Date(startedAt).toISOString() }; }\\\")\\nopen(p,'w').write(s)\\nPY\",\"max_output_tokens\":1000}));\n"
+}
+````
+
+### 4959. 2026-10-27T11:28:39.790Z — tool result (source line 18637)
+
+````text
+{
+  "call_id": "call_3e9823bc0fda407a933ead0f99a6c148",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "08b390",
+        "wall_time_seconds": 0.00000412,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    }
+  ]
+}
+````
+
+### 4960. 2026-10-27T11:28:46.567Z — tool call (source line 18641)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_9fcedcc4129043769d2ebb4c4422e049",
+  "input": "text(await tools.exec_command({cmd:\"rg -n 'fixture\\\\(|const signed|started_at|initialStreams|advance:|observe\\\\(' test/stream-session-capacity.test.js; rg -n 'capacity|closedStreams|tombstone' test/lifecycle.test.js | tail -15; sed -n '167,185p' src/lifecycle.js\",\"max_output_tokens\":1000}));\n"
+}
+````
+
+### 4961. 2026-10-27T11:28:46.652Z — tool result (source line 18644)
+
+````text
+{
+  "call_id": "call_9fcedcc4129043769d2ebb4c4422e049",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "c3d9e2",
+        "wall_time_seconds": 0.00000464,
+        "exit_code": 0,
+        "original_token_count": 442,
+        "output": "70:async function fixture(kind, initialStreams = 16) {\n92:  const signed = async (type, streamId, sentAt = now, startedAt = sentAt) => {\n96:      ...(type === 'stream.online' ? { id: streamId, type: 'live', started_at: new Date(startedAt).toISOString() } : {}) } }));\n104:  for (let i = 0; i < initialStreams; i++) {\n111:  return { state, app, signed, db, calls: () => calls, now: () => now, advance: (ms = 1000) => { now += ms; },\n112:    observe(streamId, startedAt = now) { observed = { user_id: host, id: streamId, type: 'live', started_at: new Date(startedAt).toISOString() }; },\n126:      const f = await fixture(kind);\n136:        f.observe('3016'); const response = await f.bootstrap();\n  }\n  // Twitch start times may be second-precision. A later signed receipt can\n  // establish a distinct stream in the same second as the offline watermark.\n  // A CAS-verified fresh Helix read may also recover a distinct stream whose\n  // delayed offline delivery crossed its start; known closed IDs never revive.\n  if (\n    event?.type === 'online' &&\n    event.sentAt > channel.lifecycleAt &&\n    event.startedAt > (channel.closedStartFence ?? -1) &&\n    // Replacement must also satisfy the fence its own closure would establish.\n    (!channel.online || channel.closedIds.length < LIFECYCLE_LIMITS.closedStreams ||\n      channel.closedIds.includes(channel.streamId) || event.startedAt > closureFence(channel)) &&\n    (event.startedAt > channel.closedThrough ||\n      event.startedAt >= Math.floor(channel.closedThrough / 1000) * 1000 ||\n      (observed &&\n        !channel.online &&\n        (!channel.retiredStream || event.startedAt > channel.retiredStream.startedAt))) &&\n    !channel.closedIds.includes(event.streamId) &&\n    event.streamId !== channel.streamId &&\n"
+      }
+    }
+  ]
+}
+````
+
+### 4962. 2026-10-27T11:29:21.817Z — tool call (source line 18648)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_14aef0f8989549edb218d1b15db54de3",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='test/stream-session-capacity.test.js';s=open(p).read().replace('const signed = async (type, streamId, sentAt = now, startedAt = sentAt) => {','const signed = async (type, streamId, sentAt = now, startedAt = sentAt, deliveryId) => {').replace('const id = `capacity-event-${++seq}`, timestamp', 'const id = deliveryId ?? `capacity-event-${++seq}`, timestamp');open(p,'w').write(s)\\nPY\\ncat >> test/stream-session-capacity.test.js <<'EOF'\\n\\nfor (const kind of ['memory', 'firestore']) {\\n  test(`${kind}: signed lifecycle survives40 more closures with bounded sessions/tombstones and monotonic eviction fence`, async () => {\\n    const f = await fixture(kind);\\n    let floor = -1;\\n    for (let i = 16; i < 56; i++) {\\n      f.advance();\\n      assert.equal((await f.signed('stream.online', String(3000 + i))).status, 204);\\n      assert.equal((await f.state.getStreamStatus(host)).streamId, String(3000 + i));\\n      f.advance();\\n      assert.equal((await f.signed('stream.offline')).status, 204);\\n      const channel = await f.state.getStreamStatus(host);\\n      assert.equal(channel.online, false);\\n      assert.ok(channel.closedIds.length <= 16);\\n      assert.ok(channel.closedStartFence >= floor); floor = channel.closedStartFence;\\n      const doc = await f.state.getPrivateMarks(host, { broadcasterId: host, chatterId: host });\\n      assert.ok(doc.sessions.length <= 16);\\n      assert.ok(doc.sessions.every((s) => s.closed && s.marks.length === 0 && s.viewers.length === 0));\\n    }\\n    const before = await f.state.getStreamStatus(host);\\n    f.advance(); await f.signed('stream.offline');\\n    const heartbeat = await f.state.getStreamStatus(host);\\n    assert.equal(heartbeat.closedStartFence, before.closedStartFence);\\n    assert.deepEqual(heartbeat.closedIds, before.closedIds);\\n    f.advance(); await f.signed('stream.online', '3999');\\n    assert.equal((await f.state.getStreamStatus(host)).streamId, '3999');\\n  });\\n\\n  test(`${kind}: eviction rejects same-second forgotten IDs and stale CAS starts without blocking a genuinely newer stream`, async () => {\\n    const f = await fixture(kind, 0), start = f.now();\\n    for (let i = 0; i < 17; i++) {\\n      f.advance(10);\\n      assert.equal((await f.signed('stream.online', String(4000 + i), f.now(), start)).status, 204);\\n      assert.equal((await f.state.getStreamStatus(host)).streamId, String(4000 + i));\\n      f.advance(10);\\n      assert.equal((await f.signed('stream.offline', undefined, f.now(), f.now(), `close-${i}`)).status, 204);\\n    }\\n    const closed = await f.state.getStreamStatus(host);\\n    assert.equal(closed.closedIds.length, 16);\\n    assert.equal(closed.closedIds.includes('4000'), false);\\n    assert.ok(closed.closedStartFence >= start);\\n    const lastOfflineAt = f.now();\\n    f.advance(10);\\n    assert.equal((await f.signed('stream.offline', undefined, lastOfflineAt, lastOfflineAt, 'close-16')).status, 204);\\n    assert.deepEqual(await f.state.getStreamStatus(host), closed);\\n    f.advance(10);\\n    await f.signed('stream.online', '4000', f.now(), start);\\n    assert.equal((await f.state.getStreamStatus(host)).online, false);\\n    f.observe('4998', start);\\n    const observation = await f.bootstrap();\\n    assert.equal(observation.status, 200);\\n    assert.equal((await f.state.getStreamStatus(host)).online, false);\\n    assert.equal((await f.state.getStreamStatus(host)).closedStartFence, closed.closedStartFence);\\n    f.advance(1000);\\n    f.observe('4999');\\n    assert.equal((await f.bootstrap()).status, 200);\\n    assert.equal((await f.state.getStreamStatus(host)).streamId, '4999');\\n    assert.equal((await f.state.getKeeperRegistry()).holderId, null);\\n    assert.equal((await f.state.getPublicJourney()).rings, 0);\\n  });\\n}\\nEOF\",\"max_output_tokens\":1000}));\n"
+}
+````
+
+### 4963. 2026-10-27T11:29:21.911Z — tool result (source line 18651)
+
+````text
+{
+  "call_id": "call_14aef0f8989549edb218d1b15db54de3",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "a2fbe6",
+        "wall_time_seconds": 0.000004121,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    }
+  ]
+}
+````
+
+### 4964. 2026-10-27T11:30:05.017Z — assistant (source line 18658)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "The rollover now retains at most 16 IDs and fences evicted history using the existing authoritative ordering fields. Duplicate or offline-only deliveries do not advance that fence. Before replacing a live stream, admission also checks the fence that closing it would establish.\n\nThe new tests cover 40 further closures, same-second replay of an evicted ID, stale CAS observations, duplicate offline delivery and admission of a genuinely newer stream.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4965. 2026-10-27T11:30:21.661Z — tool call (source line 18659)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_6b3bfacb560c4e279a7434493281e2f2",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='docs/EVENTSUB_CAPACITY_INCIDENT.md';s=open(p).read();s=s.replace('This note does not claim operational repair, subscription reconciliation or promotion has completed.', 'At 11:22:05 UTC the parent reported an update-time/CAS-guarded second-Keeper repair on the unchanged canonical runtime: 15 closed empty inactive sessions were removed (16 to one, current closed session retained, zero marks removed). Existing bootstrap then reconciled ready=true with an applied offline observation and all five subscription conditions enabled, without subscription creates/deletes, chat, raids, holder/pending changes or traffic changes. Source-author actions did not perform this repair. The new hotfix is not yet published or promoted.')\\na=s.index('A separate pre-existing limit still applies');b=s.index('\\\\n## Regression scope',a)\\ns=s[:a]+'''## Bounded closed-ID rollover\\n\\nThe related lifecycle closure limit is addressed in `src/lifecycle.js`: when recording a new closed stream into a full 16-ID set, the oldest ID is removed only after persisting a monotonic private `closedStartFence`. It conservatively covers the prior fence, closed-through timestamp, latest authoritative lifecycle timestamp and closing stream's start. This covers legacy IDs whose individual start timestamps were never retained. Stream admission requires a start strictly newer than this fence, regardless of the same-second allowance or CAS/Helix observation path. A live replacement must also pass the fence that closing the old stream would establish before either transition occurs.\\n\\nThis intentionally declines ambiguous starts at or below the fence, even with a fresh delivery timestamp or a formerly unseen ID. A later genuinely newer authoritative stream can recover; no ID or start time is invented. The tradeoff can be conservative when a legacy or delayed observation's receipt is later than its stream start. Duplicate closure or offline heartbeat does not itself advance the eviction fence because no new closed ID is added. Existing closed-through/lifecycle ordering rules still apply. The set remains at most 16 IDs; marks, history, quota, registry and consent are not rolled over with it.\\n''' + s[b:]\\ns=s.replace('Pure mark-constructor/reducer cases cover', 'Additional signed cases cover 40 further online/offline cycles, bounded monotonic rollover, same-second replay of an evicted ID, duplicate delivery, unchanged eviction fence on offline heartbeat, stale CAS rejection and genuinely newer CAS recovery. Pure mark-constructor/reducer cases cover')\\ns=s.replace('Only `src/marks.js`, the new regression test and this note belong', 'Only `src/marks.js`, `src/lifecycle.js`, the new regression test and this note belong')\\ns=s.replace('Parent-only state backup, exact read preconditions, update-time/CAS checks, approved empty-session compaction and existing canonical subscription reconcile remain operational steps.', 'The dated backup, narrow empty-session compaction and existing canonical subscription reconciliation above are parent-reported completed operational steps; any further state operation still requires exact read preconditions and update-time/CAS checks.')\\nopen(p,'w').write(s)\\nPY\",\"max_output_tokens\":1000}));\n"
+}
+````
+
+### 4966. 2026-10-27T11:30:23.164Z — tool result (source line 18662)
+
+````text
+{
+  "call_id": "call_6b3bfacb560c4e279a7434493281e2f2",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "7adc40",
+        "wall_time_seconds": 0.00000368,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    }
+  ]
+}
+````
+
+### 4967. 2026-10-27T11:30:42.817Z — tool call (source line 18666)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_a49f8f197ed34ac7be5b6e8ebe88549d",
+  "input": "text(await tools.exec_command({cmd:\"rg -n 'Retained stream|tombstone capacity|sessions.*16|sessions:|sessions\\\\).*capacity' test/marks.test.js test/lifecycle.test.js; sed -n '88,100p' test/stream-session-capacity.test.js\",\"max_output_tokens\":700}));\n"
+}
+````
+
+### 4968. 2026-10-27T11:30:42.893Z — tool result (source line 18669)
+
+````text
+{
+  "call_id": "call_a49f8f197ed34ac7be5b6e8ebe88549d",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "efbd63",
+        "wall_time_seconds": 0.00000404,
+        "exit_code": 0,
+        "original_token_count": 285,
+        "output": "  // fixture exposes bootstrap only, not unrelated candidate/dispatch services.\n  control.bindPilot({ actions: () => ['bootstrap'], status: async () => ({}), execute: pilot.execute });\n  const app = createApp({ secret, state, oauth: { control }, now: () => now,\n    chatContext: { streamerId: host, botId: bot, keeperIds: [host, other] } });\n  const signed = async (type, streamId, sentAt = now, startedAt = sentAt, deliveryId) => {\n    const id = deliveryId ?? `capacity-event-${++seq}`, timestamp = new Date(sentAt).toISOString();\n    const rawBody = Buffer.from(JSON.stringify({ subscription: { type, version: '1',\n      condition: { broadcaster_user_id: host } }, event: { broadcaster_user_id: host,\n      ...(type === 'stream.online' ? { id: streamId, type: 'live', started_at: new Date(startedAt).toISOString() } : {}) } }));\n    return app.dispatch({ method: 'POST', path: '/eventsub', rawBody, headers: {\n      'twitch-eventsub-message-id': id, 'twitch-eventsub-message-timestamp': timestamp,\n      'twitch-eventsub-message-type': 'notification',\n      'twitch-eventsub-message-signature': 'sha256=' + createHmac('sha256', secret)\n"
+      }
+    }
+  ]
+}
+````
+
+### 4969. 2026-10-27T11:30:52.107Z — tool call (source line 18673)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_8da93214270c483abbcebab3c6242f01",
+  "input": "text(await tools.exec_command({cmd:\"cat >> test/stream-session-capacity.test.js <<'EOF'\\n\\ntest('same-stream context refresh cannot refund a five-mark quota; retained marks survive subsequent compaction', () => {\\n  let doc;\\n  for (let i = 0; i < 16; i++) doc = setMarkContext(doc, host, context(String(6000 + i)));\\n  let now = 2000000;\\n  for (let i = 0; i < 5; i++) {\\n    now += 31000;\\n    doc = reduceMark(doc, host, actor, { type: 'mark', text: 'moon' }, now);\\n  }\\n  assert.equal(doc.sessions.at(-1).viewers[0].spent, 5);\\n  const refreshed = setMarkContext(setMarkContext(doc, host, context('6015')), host, context('6015'));\\n  assert.deepEqual(refreshed, doc);\\n  const denied = reduceMark(refreshed, host, actor, { type: 'mark', text: 'star' }, now + 31000);\\n  assert.equal(denied.serial, 5);\\n  const moved = setMarkContext(denied, host, context('6016'));\\n  assert.equal(moved.sessions.length, 16);\\n  assert.equal(moved.sessions.flatMap((s) => s.marks).length, 5);\\n  assert.equal(moved.sessions.find((s) => s.streamId === '6015').closed, true);\\n  assert.throws(() => setMarkContext(moved, host, context('6015')), /Closed stream/);\\n});\\nEOF\",\"max_output_tokens\":500}));\n"
+}
+````
+
+### 4970. 2026-10-27T11:30:52.300Z — tool result (source line 18676)
+
+````text
+{
+  "call_id": "call_8da93214270c483abbcebab3c6242f01",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "998b58",
+        "wall_time_seconds": 0.00000384,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    }
+  ]
+}
+````
+
+### 4971. 2026-10-27T11:31:14.847Z — assistant (source line 18681)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Added bounded lifecycle tombstone rollover with a private monotonic start fence. Signed events and CAS observations must pass it; ambiguous old starts fail closed, and duplicate/offline-only deliveries do not advance it.\n\nExpanded tests cover 40 further closures, evicted same-second IDs, stale CAS starts, duplicate delivery and five-mark quota preservation. Updated the incident note with the parent-reported repair.\n\nOnly the four hotfix files changed. No tests or operations ran locally; isolated-baseline native validation remains pending.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4972. 2026-10-27T11:34:39.286Z — user (source line 18695)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "239 TINYTESTCONTRACTFOLLOWUP originalsame/noappotherchanges/noOps/Git/cloud/creds/live. 237+238fourfilesreadyNOtargetexec. Parentreadingexistingtest/marks.test.js test'kind stream and block capsfailclosedpreventhotdocumentgrowth' lines460..476 currentlyrequiresf.setup(streamIdoverflow)REJECT/capacity after16sessions5marks each. Ourauthorizedcontext/lifecycleoverflowMUSTNOT500 now, soexistingtestexpectationmustchangeINPLACEpreservingstrongbounds/privacy/markblocklimitsnotdelete/skiptest. AllowedONEEXTRAfile test/marks.test.js onlythiscase (otherwiseBaseline7ecidentical). After16retainedsessionswith80marks, snapshotretainedIDs/text/status/5quota spent/serial, allowf.setup overflow WITHOUTslot/no throw; verify16session<=bytes, retainedmarks/data unchanged; attemptnewmarkactorzeroFreeSlotmustdecline/no newmark/quota/serial growth. BlockedUsers128cap stillREJECTnext block EXACTexistingerror guard.Neverraisebounds/removeasserts, no broadtestweaken. Newtestsessioncapacity alreadycoversall16pendingapproved/privateforget safety.ReferenceSource238fenceClosed eventreplacement documentedfailclosedambiguousfuturestartsoldlegacy floor.Notproduction500. DoNOTtouchnewlifecyclealgorithmunlessyourtestfindsactualbugSourceNoexec.ParentfreshNativeall898+newmustPASS beforeisolated7ec0image no uncommittedCI/soak/judgefeaturesincluded. ~1minonlytest/marks.test.js STOP. ParentPRODrepairalreadyreadytrue/5enabled/offline.No newScope otherFile.No codingCIprevious236scopepausedforUrgentJob. No privateevidenceexportread.T_C_Context_Metadata.\n"
+  }
+]
+````
+
+### 4973. 2026-10-27T11:34:45.013Z — assistant (source line 18698)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll update only the existing capacity test to check successful context rollover, preserved retained data, and bounded refusal of new marks. The blocked-user cap assertion will stay intact.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4974. 2026-10-27T11:34:45.838Z — tool call (source line 18699)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_37591d796cc84f1db015693f7549b99f",
+  "input": "text(await tools.exec_command({cmd:\"sed -n '1,100p' test/marks.test.js\\nsed -n '420,500p' test/marks.test.js\",\"max_output_tokens\":6000}));\n"
+}
+````
+
+### 4975. 2026-10-27T11:34:46.146Z — tool result (source line 18702)
+
+````text
+{
+  "call_id": "call_37591d796cc84f1db015693f7549b99f",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "860651",
+        "wall_time_seconds": 0.00008472,
+        "exit_code": 0,
+        "original_token_count": 1654,
+        "output": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { createHmac } from 'node:crypto';\nimport { createApp } from '../src/app.js';\nimport { createMemoryState } from '../src/state.js';\nimport { createFirestoreStore } from '../src/store.js';\nimport { MARK_LIMITS, normalizeMark, runeSvg } from '../src/marks.js';\nimport { fakeFirestore } from '../test-support/fake-firestore.js';\n\nconst host = '111';\nconst bot = '222';\nconst user = '987654321';\nconst admin = { broadcasterId: host, chatterId: host };\nconst viewer = { broadcasterId: host, chatterId: user };\nconst context = {\n  streamId: 'trusted-stream-1',\n  keeperId: host,\n  optedIn: true,\n  holdsRelic: true,\n  blockedUserIds: [],\n};\nconst secret = 'synthetic-test-webhook-secret';\nfunction fixture(kind) {\n  const db = kind === 'firestore' ? fakeFirestore() : null;\n  const store = db ? createFirestoreStore(db) : createMemoryState();\n  let time = Date.parse('2026-10-25T12:00:00Z');\n  let sequence = 0;\n  const instance = createApp({\n    secret,\n    state: store,\n    chatContext: { streamerId: host, botId: bot },\n    now: () => time,\n  });\n  function request(text, { userId = user, badges = [], id = `chat-${++sequence}` } = {}) {\n    const timestamp = new Date(time).toISOString();\n    const payload = {\n      subscription: {\n        type: 'channel.chat.message',\n        version: '1',\n        condition: { broadcaster_user_id: host, user_id: bot },\n      },\n      event: {\n        broadcaster_user_id: host,\n        chatter_user_id: userId,\n        message_id: id,\n        badges,\n        message: { text, fragments: [{ type: 'text', text }] },\n      },\n    };\n    const rawBody = Buffer.from(JSON.stringify(payload));\n    const digest = createHmac('sha256', secret)\n      .update(id)\n      .update(timestamp)\n      .update(rawBody)\n      .digest('hex');\n    return {\n      method: 'POST',\n      path: '/eventsub',\n      rawBody,\n      headers: {\n        'twitch-eventsub-message-id': id,\n        'twitch-eventsub-message-timestamp': timestamp,\n        'twitch-eventsub-message-signature': `sha256=${digest}`,\n        'twitch-eventsub-message-type': 'notification',\n      },\n    };\n  }\n  return {\n    instance,\n    db,\n    store,\n    request,\n    advance: (ms) => {\n      time += ms;\n    },\n    send: (text, options) => instance.dispatch(request(text, options)),\n    view: () => instance.marks.moderationView(host, admin),\n    setup: (override) => instance.marks.setKeeperContext(host, { ...context, ...override }),\n  };\n}\nconst current = (doc) => doc.sessions.find((session) => session.streamId === doc.context.streamId);\n\ntest('NFKC and case normalization accept a word or single emoji grapheme deterministically', () => {\n  for (const [input, expected] of [\n    ['ＣＡＦÉ', 'café'],\n    ['CAFE\\u0301', 'café'],\n    ['Straße', 'strasse'],\n    ['ΣΟΣ', 'σοσ'],\n    ['👩🏽‍🚀', '👩🏽‍🚀'],\n    ['🇬🇧', '🇬🇧'],\n    ['1️⃣', '1️⃣'],\n  ])\n    assert.equal(normalizeMark(input), expected);\n  assert.equal(runeSvg('CAFE\\u0301'), runeSvg('ＣＡＦÉ'));\n  assert.equal(runeSvg('Straße'), runeSvg('STRASSE'));\n  assert.notEqual(runeSvg('orchid'), runeSvg('lantern'));\n});\ntest('conservative mark filter rejects controls, HTML, links, invisible text and abusive/oversized input', () => {\n  for (const input of [\n    '',\n    await f.instance.dispatch(forget);\n    await f.instance.dispatch(forget);\n    const doc = await f.view();\n    assert.ok(doc.sessions.every((session) => session.marks.every((mark) => mark.userId !== user)));\n    assert.deepEqual(\n      current(doc).viewers.find((entry) => entry.userId === user),\n      { userId: user, spent: 1 },\n    );\n    assert.deepEqual(Object.keys(doc.cooldowns.find((entry) => entry.userId === user)).sort(), [\n      'at',\n      'userId',\n    ]);\n    assert.ok(!JSON.stringify(doc).includes('orchid') && !JSON.stringify(doc).includes('lantern'));\n    assert.equal(doc.sessions[0].viewers.length, 0);\n    assert.deepEqual(\n      doc.sessions.map((session) => session.spent),\n      [1, 2],\n    );\n    assert.deepEqual(\n      current(doc).marks.map((mark) => mark.userId),\n      ['555'],\n    );\n    assert.deepEqual(await f.instance.marks.publicProjection(host), { marks: [] });\n    if (f.db)\n      assert.ok(\n        !JSON.stringify([...f.db.docs].filter(([key]) => key.startsWith('chatReceipts/'))).includes(\n          user,\n        ),\n      );\n    else assert.equal(f.store.getChatReceipt(host), undefined);\n    await f.instance.marks.approve(host, admin, 'm1');\n    await f.instance.marks.approve(host, admin, 'm2');\n    assert.deepEqual(await f.instance.marks.publicProjection(host), { marks: [] });\n    await f.send('!mark amber');\n    assert.equal(current(await f.view()).spent, 2);\n    f.advance(30000);\n    await f.send('!mark amber');\n    assert.equal(current(await f.view()).spent, 3);\n  });\n  test(`${kind}: stream and block caps fail closed and prevent hot-document growth`, async () => {\n    const f = fixture(kind);\n    for (let i = 0; i < MARK_LIMITS.sessions; i++) {\n      await f.setup({ streamId: `trusted-${i}` });\n      for (let j = 0; j < 5; j++)\n        await f.send('!mark orchid', { userId: String(500000 + i * 5 + j) });\n    }\n    await assert.rejects(\n      Promise.resolve().then(() => f.setup({ streamId: 'overflow' })),\n      /capacity/,\n    );\n    for (let i = 0; i < MARK_LIMITS.blockedUsers; i++)\n      await f.instance.marks.blockUser(host, admin, String(800000 + i));\n    await assert.rejects(\n      Promise.resolve().then(() => f.instance.marks.blockUser(host, admin, '999999')),\n      /capacity/,\n    );\n    assert.ok(Buffer.byteLength(JSON.stringify(await f.view())) < MARK_LIMITS.bytes);\n  });\n}\n\ntest('Firestore mark failure rolls back dedupe, cooldown and mark together; retry commits exactly once', async () => {\n  const f = fixture('firestore');\n  await f.setup();\n  const req = f.request('!mark orchid');\n  const before = structuredClone([...f.db.docs]);\n  f.db.failCommit = true;\n  await assert.rejects(f.instance.dispatch(req), /commit failure/);\n  assert.deepEqual([...f.db.docs], before);\n  f.db.failCommit = false;\n  f.db.retry = true;\n  assert.equal((await f.instance.dispatch(req)).status, 204);\n  assert.equal((await f.instance.dispatch(req)).status, 204);\n  const doc = await f.view();\n  assert.equal(current(doc).spent, 1);\n  assert.equal(doc.cooldowns.length, 1);\n});\ntest('memory event capacity failure cannot consume marks or cooldown', async () => {\n  const store = createMemoryState({ maxEvents: 0 });\n  await store.setKeeperContext(host, context);\n  assert.equal(\n    await store.accept({\n"
+      }
+    }
+  ]
+}
+````
+
+### 4976. 2026-10-27T11:34:50.235Z — tool call (source line 18706)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_3bffc109e86a4a628ba57e7139fea3e9",
+  "input": "text(await tools.exec_command({cmd:\"sed -n '130,215p' src/marks.js\\nrg -n 'serial|spent|viewers' src/marks.js\",\"max_output_tokens\":3000}));\n"
+}
+````
+
+### 4977. 2026-10-27T11:34:50.310Z — tool result (source line 18709)
+
+````text
+{
+  "call_id": "call_3bffc109e86a4a628ba57e7139fea3e9",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "ad5f92",
+        "wall_time_seconds": 0.0000044,
+        "exit_code": 0,
+        "original_token_count": 985,
+        "output": "    : /^!relic(?:\\s|$)/.test(text)\n      ? { type: 'help' }\n      : null;\n}\n\nexport function isModerator(actor, host) {\n  return isChatIdentity(actor, host) && (actor.chatterId === host || actor.isModerator === true);\n}\nexport const isChatIdentity = (actor, host) =>\n  userId(host) && actor?.broadcasterId === host && userId(actor.chatterId);\nconst empty = () => ({\n  context: null,\n  paused: false,\n  blocked: [],\n  sessions: [],\n  cooldowns: [],\n  serial: 0,\n});\nexport const emptyMarkDocument = empty;\nfunction bounded(doc) {\n  if (Buffer.byteLength(JSON.stringify(doc)) > MARK_LIMITS.bytes)\n    throw new Error('Mark storage capacity reached');\n  return doc;\n}\nexport function setMarkContext(previous, host, context) {\n  if (\n    !userId(host) ||\n    typeof context?.streamId !== 'string' ||\n    !/^[A-Za-z0-9_-]{1,128}$/.test(context.streamId) ||\n    !userId(context.keeperId) ||\n    typeof context.optedIn !== 'boolean' ||\n    typeof context.holdsRelic !== 'boolean' ||\n    !Array.isArray(context.blockedUserIds) ||\n    context.blockedUserIds.length > MARK_LIMITS.blockedUsers ||\n    !context.blockedUserIds.every(userId)\n  )\n    throw new Error('Trusted Keeper context required');\n  const doc = structuredClone(previous ?? empty());\n  const selected = doc.sessions.find((session) => session.streamId === context.streamId);\n  if (selected?.closed) throw new Error('Closed stream cannot be reactivated');\n  if (!doc.sessions.some((session) => session.streamId === context.streamId)) {\n    if (doc.sessions.length >= MARK_LIMITS.sessions) {\n      // Lifecycle owns closed-stream replay protection. Reclaim only an\n      // inactive, closed, content-free session whose viewer counters were\n      // already cleared at stream closure; never discard retained marks.\n      const disposable = doc.sessions.findIndex((session) =>\n        session.closed === true && session.streamId !== doc.context?.streamId &&\n        session.marks.length === 0 && session.viewers.length === 0);\n      if (disposable >= 0) doc.sessions.splice(disposable, 1);\n    }\n    // A full retained archive must not reject authoritative online/context or\n    // privacy transitions. Without a session, reduceMark declines collection.\n    if (doc.sessions.length < MARK_LIMITS.sessions)\n      doc.sessions.push({\n        streamId: context.streamId,\n        spent: 0,\n        viewers: [],\n        marks: [],\n        closed: false,\n      });\n  }\n  if (doc.context && doc.context.streamId !== context.streamId) {\n    const ended = doc.sessions.find((session) => session.streamId === doc.context.streamId);\n    if (ended) {\n      ended.closed = true;\n      ended.viewers = [];\n    }\n  }\n  doc.context = {\n    streamId: context.streamId,\n    keeperId: context.keeperId,\n    optedIn: context.optedIn,\n    holdsRelic: context.holdsRelic,\n    blockedUserIds: [...new Set(context.blockedUserIds)],\n  };\n  return bounded(doc);\n}\nconst active = (doc, host) =>\n  doc.context?.optedIn === true && doc.context.holdsRelic === true && doc.context.keeperId === host;\n\n// Pure reducer shared by memory and Firestore; invoke only with trusted identities.\nexport function reduceMark(previous, host, actor, action, now, reviewPolicy) {\n  const doc = structuredClone(previous ?? empty());\n  if (\n    actor?.isBot ||\n    actor?.copied ||\n146:  serial: 0,\n177:        session.marks.length === 0 && session.viewers.length === 0);\n185:        spent: 0,\n186:        viewers: [],\n195:      ended.viewers = [];\n299:  const viewer = session.viewers.find((entry) => entry.userId === actor.chatterId);\n300:  if (viewer?.spent >= MARK_LIMITS.perViewerPerStream) return doc;\n303:    (!viewer && session.viewers.length >= MARK_LIMITS.participantsPerStream) ||\n308:  if (doc.cooldowns.length >= MARK_LIMITS.cooldowns || doc.serial >= 999999999)\n310:  if (viewer) viewer.spent++;\n311:  else session.viewers.push({ userId: actor.chatterId, spent: 1 });\n312:  session.spent++;\n314:    id: `m${++doc.serial}`,\n"
+      }
+    }
+  ]
+}
+````
+
+### 4978. 2026-10-27T11:34:56.555Z — tool call (source line 18711)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_ff162404dbf5462092b83d3643c8af5e",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/test/marks.test.js\\n@@\\n-    await assert.rejects(\\n-      Promise.resolve().then(() => f.setup({ streamId: 'overflow' })),\\n-      /capacity/,\\n-    );\\n+    const before = await f.view();\\n+    const retained = (doc) => doc.sessions.map(({ streamId, spent, marks }) => ({\\n+      streamId, spent, marks,\\n+    }));\\n+    assert.equal(before.sessions.length, MARK_LIMITS.sessions);\\n+    assert.ok(before.sessions.every((session) => session.spent === 5 && session.marks.length === 5));\\n+    assert.equal(before.serial, MARK_LIMITS.sessions * 5);\\n+    await f.setup({ streamId: 'overflow' });\\n+    const overflow = await f.view();\\n+    assert.equal(overflow.context.streamId, 'overflow');\\n+    assert.equal(current(overflow), undefined);\\n+    assert.equal(overflow.sessions.length, MARK_LIMITS.sessions);\\n+    assert.deepEqual(retained(overflow), retained(before));\\n+    assert.equal(overflow.serial, before.serial);\\n+    assert.deepEqual(overflow.cooldowns, before.cooldowns);\\n+    assert.ok(overflow.sessions.every((session) => session.closed && session.viewers.length === 0));\\n+    assert.ok(Buffer.byteLength(JSON.stringify(overflow)) < MARK_LIMITS.bytes);\\n+    await f.send('!mark lantern', { userId: '700000' });\\n+    assert.deepEqual(await f.view(), overflow);\\n*** End Patch\"));\n"
+}
+````
+
+### 4979. 2026-10-27T11:34:56.615Z — tool result (source line 18714)
+
+````text
+{
+  "call_id": "call_ff162404dbf5462092b83d3643c8af5e",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 4980. 2026-10-27T11:35:02.206Z — assistant (source line 18717)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Updated only `test/marks.test.js`’s capacity case. It now verifies context rollover preserves all 80 retained marks, session spending, serial and cooldowns; allocates no overflow slot; and declines a new mark without mutation. Byte limits and the existing blocked-user capacity rejection remain asserted.\n\nNo tests or operations run. Parent native validation is pending.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4981. 2026-10-27T11:37:10.499Z — user (source line 18727)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "240 DOCSONLYFINAL sameoriginal; no app/test/code/Git/ops/cloud/provider/creds/live. ParentISOLATED7ecBASELINE+5files assembled, originalprotected12unfinishedCI/soak/judgeSHAUNCHANGED. ActualNativeNode22offline FULL909/909 ZEROskip PASS incl237/238cases+239legacyMarkscapcontract. NativeALL41browser serialRUNNINGnow; no finalbrowserpassingclaimyet. Parentprodrepairalready11:22readytrue5enabledTruthOFFLINE0creates/deletes/raids/chat, holder/pendingpreserved after401docbackup+15closed-emptyinactivecompaction ol2only. Onlyedit docs/EVENTSUB_CAPACITY_INCIDENT.md: correcthotfixpathlistfrom4to5includes test/marks.test.js limitedcontractupdate preservingblock128reject/session16/fullcontentquotalimit; originalrun239sourceclosedalready. Mention909actualnativeunitzero skips operatorreported;41browser/CI/new0publicationPENDING mustrefertoactuallaterParentproof notinventedready.DeployedlivecodeSTILL3dcanonical; previewfixwill7ec+only5files(noCI/judge/soakfeatures) pendingownerfuturepromotion.PhysicalTwitchWebhook200notasserted; actualsignedmockonline/bootstrapreplay/recovery testsgrounded.LogicalOldlimitconservativeclosedStartFenceunder legacytimestamps deniesambiguousstreamstart needgenuinelynewerProviderStart notmanualDBstate.YoumustSTOP~30secno broaderdocs/codeRawlogs.Source237238239240willcommittrailers.ParentGitindexisolatedhotfixbranchnotcurrentHEAD.No extraqualitygeneratedmetadata/evidencewrites. Keepeverythingelsebyte-identical.N_Task_Metadata_Root.\n"
+  }
+]
+````
+
+### 4982. 2026-10-27T11:37:14.766Z — assistant (source line 18730)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll update only the incident document with the five-file scope, the reported 909-test pass, and the still-pending browser and publication gates.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4983. 2026-10-27T11:37:14.977Z — tool call (source line 18731)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_fe160413f1ed4700a858747c969d2b30",
+  "input": "text(await tools.exec_command({cmd:\"cat docs/EVENTSUB_CAPACITY_INCIDENT.md\",\"max_output_tokens\":6000}));\n"
+}
+````
+
+### 4984. 2026-10-27T11:37:15.102Z — tool result (source line 18734)
+
+````text
+{
+  "call_id": "call_fe160413f1ed4700a858747c969d2b30",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "a96923",
+        "wall_time_seconds": 0.0000046,
+        "exit_code": 0,
+        "original_token_count": 1706,
+        "output": "# Closed empty mark-session capacity incident\n\n## Observed scope\n\nThe parent operator reported stream.online observation-commit failures on both the safety preview's owner-activated revision and the previous canonical runtime. The bounded state-shape review found 16 mark sessions for Home and the second Keeper, with their stream channels offline and 16 retained closed-stream IDs. The source path allocated a seventeenth mark session inside `setMarkContext` before lifecycle observation could commit, throwing at the existing 16-session limit. This affected signed stream.online and the same context update reached by explicit bootstrap/Get Streams observation.\n\nThe parent reported a complete private state backup at 2026-10-27T11:17:05.371Z: 401 documents in 16 collections, 81,204 bytes. The source author has not read that backup, credentials, private logs or actual state contents. At 11:22:05 UTC the parent reported an update-time/CAS-guarded second-Keeper repair on the unchanged canonical runtime: 15 closed empty inactive sessions were removed (16 to one, current closed session retained, zero marks removed). Existing bootstrap then reconciled ready=true with an applied offline observation and all five subscription conditions enabled, without subscription creates/deletes, chat, raids, holder/pending changes or traffic changes. Source-author actions did not perform this repair. The new hotfix is not yet published or promoted.\n\n## Narrow source correction\n\n`src/marks.js` retains the limit of 16 sessions. Only when a new stream needs room, it can reclaim one session that is explicitly closed, is not the previous current context, has zero retained marks and has zero viewer counters. Open sessions, current-session quota, approved or pending retained marks, blocks and cooldowns are not discarded to make space. The previous context is closed through the existing transition logic. Same-stream context refresh remains idempotent.\n\nIf every session retains data, authoritative lifecycle/context can still advance without preallocating an empty mark session. Existing `reduceMark` returns a bounded refusal when the current context has no available session; it does not collect marks, reset another stream's quota or throw merely because the retained session list is full. Privacy erasure can still remove retained content. A later context synchronization can allocate space only after a qualifying empty inactive session exists. No mark/history truncation or session-limit increase is introduced.\n\nProduction replay protection remains in the existing lifecycle stream IDs, ordering, closed-through boundary and closed-ID set. Compacting empty mark-session containers is not permission to revive an old stream. The trusted raw context setter is not an untrusted stream-event authorization interface. Tests explicitly deliver an old compacted stream ID through the signed application route and require the current stream to remain unchanged.\n\n## Bounded closed-ID rollover\n\nThe related lifecycle closure limit is addressed in `src/lifecycle.js`: when recording a new closed stream into a full 16-ID set, the oldest ID is removed only after persisting a monotonic private `closedStartFence`. It conservatively covers the prior fence, closed-through timestamp, latest authoritative lifecycle timestamp and closing stream's start. This covers legacy IDs whose individual start timestamps were never retained. Stream admission requires a start strictly newer than this fence, regardless of the same-second allowance or CAS/Helix observation path. A live replacement must also pass the fence that closing the old stream would establish before either transition occurs.\n\nThis intentionally declines ambiguous starts at or below the fence, even with a fresh delivery timestamp or a formerly unseen ID. A later genuinely newer authoritative stream can recover; no ID or start time is invented. The tradeoff can be conservative when a legacy or delayed observation's receipt is later than its stream start. Duplicate closure or offline heartbeat does not itself advance the eviction fence because no new closed ID is added. Existing closed-through/lifecycle ordering rules still apply. The set remains at most 16 IDs; marks, history, quota, registry and consent are not rolled over with it.\n\n## Regression scope and release isolation\n\n`test/stream-session-capacity.test.js` uses dummy identities and locally signed provider-shaped events. Both memory and fake Firestore fixtures construct 16 genuinely closed empty stream sessions through actual online/offline transitions, then exercise a seventeenth signed online or the own-session/Origin/CSRF-protected bootstrap HTTP path with mocked stream observation. Assertions cover the unchanged holder/journey, preserved lifecycle tombstones, bounded compaction, repeated online idempotency and stale stream rejection. Additional signed cases cover 40 further online/offline cycles, bounded monotonic rollover, same-second replay of an evicted ID, duplicate delivery, unchanged eviction fence on offline heartbeat, stale CAS rejection and genuinely newer CAS recovery. Pure mark-constructor/reducer cases cover 16 marked sessions, bounded collection refusal, preserved content/status/counters/cooldowns, privacy erasure and recovery of allocation after erasure. These new tests are authored but await the parent's offline native execution; no live webhook replay or provider test was performed by the source author.\n\nOnly `src/marks.js`, `src/lifecycle.js`, the new regression test and this note belong to the urgent hotfix. The parent must verify these changes apply to the isolated `7ec622148d6eb3a78d2bdd24ed6c9ddcaca4bdfd` safety baseline. Unfinished soak/CI/judge development must not be bundled into the incident artifact. The dated backup, narrow empty-session compaction and existing canonical subscription reconciliation above are parent-reported completed operational steps; any further state operation still requires exact read preconditions and update-time/CAS checks. Source code supplies no production cleanup script and changes no grants, scopes, timers, provider configuration or traffic.\n\nAny operator compaction must preserve the current context/session, every retained mark and nonempty viewer record, and all lineage, registry, pending handoff, stream anti-replay fields, blocks and bans. The observed predicate must be checked again against the exact document version; uncertainty means no write. A separately reviewed hotfix preview stays zero traffic and master read-only: live EventSub rejection there is expected and must not be bypassed to reproduce an incident. Signed-delivery acceptance is validated only in local fixtures until an owner separately authorizes any promotion. All earlier tags and canonical production traffic remain protected.\n"
+      }
+    }
+  ]
+}
+````
+
+### 4985. 2026-10-27T11:37:31.463Z — tool call (source line 18736)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_0d30a34027664732b25a2e826785dbcc",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/docs/EVENTSUB_CAPACITY_INCIDENT.md\\n@@\\n-This intentionally declines ambiguous starts at or below the fence, even with a fresh delivery timestamp or a formerly unseen ID. A later genuinely newer authoritative stream can recover; no ID or start time is invented. The tradeoff can be conservative when a legacy or delayed observation's receipt is later than its stream start. Duplicate closure or offline heartbeat does not itself advance the eviction fence because no new closed ID is added. Existing closed-through/lifecycle ordering rules still apply. The set remains at most 16 IDs; marks, history, quota, registry and consent are not rolled over with it.\\n+This intentionally declines ambiguous starts at or below the fence, even with a fresh delivery timestamp or a formerly unseen ID. Recovery requires a genuinely newer provider stream start, not a manual database-state edit; no ID or start time is invented. The tradeoff can be conservative when a legacy or delayed observation's receipt is later than its stream start. Duplicate closure or offline heartbeat does not itself advance the eviction fence because no new closed ID is added. Existing closed-through/lifecycle ordering rules still apply. The set remains at most 16 IDs; marks, history, quota, registry and consent are not rolled over with it.\\n@@\\n-Only `src/marks.js`, `src/lifecycle.js`, the new regression test and this note belong to the urgent hotfix. The parent must verify these changes apply to the isolated `7ec622148d6eb3a78d2bdd24ed6c9ddcaca4bdfd` safety baseline. Unfinished soak/CI/judge development must not be bundled into the incident artifact. The dated backup, narrow empty-session compaction and existing canonical subscription reconciliation above are parent-reported completed operational steps; any further state operation still requires exact read preconditions and update-time/CAS checks. Source code supplies no production cleanup script and changes no grants, scopes, timers, provider configuration or traffic.\\n+The existing capacity case in `test/marks.test.js` also updates its superseded context-rejection contract: all 80 retained marks, statuses, per-session spending, serial and cooldowns remain intact across context rollover; no seventeenth session is allocated and a new mark cannot grow content or quota. The 16-session/byte bounds and rejection beyond 128 blocked users remain asserted.\\n+\\n+The parent reports that the isolated safety-baseline artifact passed offline native Node.js 22 unit validation: **909/909 tests, zero skips**. The 41 serial browser workflows are running; their final result, exact hotfix CI and new zero-traffic publication remain pending and must be established by subsequent operator proof. This is local mocked-provider validation, not a claim of physical Twitch webhook HTTP 200 acceptance.\\n+\\n+Exactly five files belong to the urgent hotfix: `src/marks.js`, `src/lifecycle.js`, `test/stream-session-capacity.test.js`, the limited capacity-case update in `test/marks.test.js`, and `docs/EVENTSUB_CAPACITY_INCIDENT.md`. The parent reports assembling these onto the isolated `7ec622148d6eb3a78d2bdd24ed6c9ddcaca4bdfd` safety baseline while preserving the protected unfinished development files unchanged. Unfinished soak/CI/judge features are excluded from the incident artifact. Canonical deployed code remains `3d` (`raid-relic-seeker-state-on-1026`); the isolated preview is pending publication and any future production promotion requires separate owner authorization. The dated backup, narrow empty-session compaction and existing canonical subscription reconciliation above are parent-reported completed operational steps; any further state operation still requires exact read preconditions and update-time/CAS checks. Source code supplies no production cleanup script and changes no grants, scopes, timers, provider configuration or traffic.\\n*** End Patch\"));\n"
+}
+````
+
+### 4986. 2026-10-27T11:37:31.527Z — tool result (source line 18739)
+
+````text
+{
+  "call_id": "call_0d30a34027664732b25a2e826785dbcc",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 4987. 2026-10-27T11:37:34.959Z — tool call (source line 18743)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_8e46ef6e7cee4999b2aa4ab3124ee8fd",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\nfrom pathlib import Path\\np = Path('docs/EVENTSUB_CAPACITY_INCIDENT.md')\\ns = p.read_text()\\ns = s.replace(\\\"These new tests are authored but await the parent's offline native execution; no live webhook replay or provider test was performed by the source author.\\\", \\\"These cases are included in the parent-reported native unit result below; no live webhook replay or provider test was performed by the source author.\\\")\\np.write_text(s)\\nPY\",\"max_output_tokens\":1000}));\n"
+}
+````
+
+### 4988. 2026-10-27T11:37:35.086Z — tool result (source line 18746)
+
+````text
+{
+  "call_id": "call_8e46ef6e7cee4999b2aa4ab3124ee8fd",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "2f54e4",
+        "wall_time_seconds": 0.00000384,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    }
+  ]
+}
+````
+
+### 4989. 2026-10-27T11:37:39.910Z — assistant (source line 18749)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Updated only `docs/EVENTSUB_CAPACITY_INCIDENT.md` with the five-file isolation scope, preserved capacity/privacy assertions, and parent-reported **909/909 native unit pass, zero skips**.\n\nBrowser results, CI and zero-preview publication remain pending. Canonical production remains `3d`; no live Twitch acceptance is claimed.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4990. 2026-10-27T12:06:22.983Z — user (source line 18759)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "241 RESUME777/c7f2d47f whole4queue. SAMEoriginal01a1705c-a87d-7143-80f6-021e47b78ced solewriter/no fork/Git/cloud/provider/credentials/rawlogs/liveoperations. HEADf18 dirty236CI+235soak+237–240hotfix allprotected. Parentwillbackporthotfix5files selectivecommit preservingCI/soak. Urgenthotfix e30c8b5 separatelypublished0eventsub-fix/909unit41flows128CIgreen/prod3d100unchanged. Security7ecDONE/judgef18DONE/perf001dcodeDONEreal2hPENDING/CI236codeREADYunvalidated. DoNOTredoearlierfeatures.\nFIXONLYSOAKTESTHARNESS+docs: last235real10minprobe failed630951ms/rune-visible/cycles9/backendapproved1 DOM0 CONNECTIONCODE4=SUSPENDED, integerclock1, onlineoptedintrue, pausedbannedfalse, GLactive/resourcesbounded. INTENTIONAL10minTRUSTEDHUMANidle policy! First2hfailure8.5min+2minwarmup sameboundary. Neverweakenproductionidle/visibility/security/renderer/caps. Active-use2hfixturemustEXPLICITLYsupplyrealPlaywrighttrustedharmlessinputatbounded<10mininterval(e.g Shift key every5minutes) acceptedbyexistingidlewatcher; inspectlisteners. No dispatchEvent/isTrustedforgery/APIkeepalive/productionpolls. Documentactive-usewithsyntheticinputNOTphysicalOBS/noinputproof. Independentshortnativebrowserclocktestmustprove10minidle stillsuspends/closesWSS andtrustedinputresumesquietfreshprojection/noarrivalreplay. Preferexistinglifecyclebrowserworkflowtesttargetalreadycoversifsoaddfocusedcase/strengthenonlyneeded. Wallstillactualperformance.now>=7200000 excludes120swarmup, integergameclock235,120cycles/reconnects/25GCcheckpoints/no capsraise/64KclosednumericJSON. AddnumerictrustedInputCount+independentidleResumeChecks ifactuallymeasured; tellParentexactkeysforwhitelist. Defaults20smoke/logical2h/probe10m/wall2hexplicitunchanged. QualifieddocsACCESSIBILITY_PERFORMANCE oldfailureNOTpasses; noSourceexecution/npmfetch. Source241~4minsmalltest/docsSTOPparentfastnative+10minprobe+actual2hownedwatch while236CIgetsvalidated/published0journey-ci. Protecthotfixfivefiles/all236CIcode/READMEimages; no newservices/cron/scopes/Wander/paid/traffic/mainmerge. PhysicalTwitch/OBSowneronly. No speculationCIchangesuntilParentactualfailure. Returnprecisechangespendingnative. Whole4notdoneuntilactual2hresult+hostedjourneyCIgreen. \n"
+  }
+]
+````
+
+### 4991. 2026-10-27T12:06:28.873Z — assistant (source line 18762)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll inspect the overlay’s idle-input listeners, then add harmless trusted input to the soak harness and a separate check that idle suspension still works. Production code and the protected hotfix/CI files will stay untouched.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4992. 2026-10-27T12:06:30.576Z — tool call (source line 18763)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_cc89b6694af544bf925868a27d43475a",
+  "input": "text(await tools.exec_command({cmd:\"rg -n 'trusted|idle|keydown|pointer|suspend' public/overlay-client.js scripts/soak-overlay.js scripts/browser-smoke-overlay-lifecycle.js test-support/overlay-soak.js\\nsed -n '1,230p' scripts/soak-overlay.js\",\"max_output_tokens\":6500}));\n"
+}
+````
+
+### 4993. 2026-10-27T12:06:30.679Z — tool result (source line 18766)
+
+````text
+{
+  "call_id": "call_cc89b6694af544bf925868a27d43475a",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "9fd5d0",
+        "wall_time_seconds": 0.00000472,
+        "exit_code": 0,
+        "original_token_count": 2659,
+        "output": "rg: scripts/browser-smoke-overlay-lifecycle.js: No such file or directory (os error 2)\nscripts/soak-overlay.js:253:          connectionCode: ['connected', 'connecting', 'reconnecting', 'stale', 'suspended'].indexOf(\npublic/overlay-client.js:97:  idleMs = 600000,\npublic/overlay-client.js:106:    idle = null,\npublic/overlay-client.js:107:    suspended = Boolean(documentEvents?.hidden);\npublic/overlay-client.js:108:  const idleDelay = Number.isFinite(idleMs) && idleMs > 0 ? Math.min(idleMs, 600000) : 600000;\npublic/overlay-client.js:115:    if (stopped || suspended || documentEvents?.hidden || own !== epoch) return;\npublic/overlay-client.js:138:    if (stopped || suspended || documentEvents?.hidden || socket) return;\npublic/overlay-client.js:191:  function suspend() {\npublic/overlay-client.js:192:    suspended = true;\npublic/overlay-client.js:194:    clearTimer(idle);\npublic/overlay-client.js:195:    idle = null;\npublic/overlay-client.js:202:    status('suspended');\npublic/overlay-client.js:208:    clearTimer(idle);\npublic/overlay-client.js:209:    idle = setTimer(suspend, idleDelay);\npublic/overlay-client.js:213:    // Only visibility/focus/trusted local interaction resets the human idle window.\npublic/overlay-client.js:215:      if (suspended) return;\npublic/overlay-client.js:223:    if (['pointerdown', 'keydown'].includes(event?.type) && event.isTrusted !== true) return;\npublic/overlay-client.js:225:    suspended = false;\npublic/overlay-client.js:233:    documentEvents?.hidden ? suspend() : wake({ type: 'visibilitychange' });\npublic/overlay-client.js:237:  documentEvents?.addEventListener?.('pointerdown', wake);\npublic/overlay-client.js:238:  documentEvents?.addEventListener?.('keydown', wake);\npublic/overlay-client.js:239:  if (suspended) {\npublic/overlay-client.js:241:    status('suspended');\npublic/overlay-client.js:249:    clearTimer(idle);\npublic/overlay-client.js:250:    idle = null;\npublic/overlay-client.js:259:    documentEvents?.removeEventListener?.('pointerdown', wake);\npublic/overlay-client.js:260:    documentEvents?.removeEventListener?.('keydown', wake);\n// LOCAL synthetic TLS/WSS only. Never included in the default browser-smoke glob.\nimport assert from 'node:assert/strict';\nimport { mkdir, writeFile, stat } from 'node:fs/promises';\nimport { performance } from 'node:perf_hooks';\nimport { visualReview } from '../test-support/visual-review.js';\nimport { HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\nimport {\n  overlaySoakOptions,\n  overlaySoakBounds,\n  overlayFixtureElapsed,\n} from '../test-support/overlay-soak.js';\nimport { hash } from '../src/crypto.js';\nlet review,\n  deadline,\n  cdp,\n  options,\n  failureCategory = null,\n  passed = false;\nlet stage = 'options',\n  logicalElapsedMs = 0,\n  cycles = 0,\n  lastFrames = 0,\n  frames = 0;\nlet peakHeap = 0,\n  requests = 0,\n  sockets = 0,\n  forbidden = 0;\nlet observationStart = null;\nlet fixture,\n  requestedActor = null;\nconst diagnostic = {};\nconst started = performance.now(),\n  samples = [];\nconst assets = { files: 0, bytes: 0, largestBytes: 0 };\nasync function sample() {\n  stage = 'sample-gc';\n  await cdp.send('HeapProfiler.collectGarbage'); // Retained heap, explicitly forced GC.\n  stage = 'sample-metrics';\n  const [heap, dom, data] = await Promise.all([\n    cdp.send('Runtime.getHeapUsage'),\n    cdp.send('Memory.getDOMCounters'),\n    review.page.evaluate(() => {\n      const c = document.querySelector('canvas.relic3d');\n      return {\n        frames: Number(c?.dataset.frames ?? 0),\n        canvases: document.querySelectorAll('canvas.relic3d').length,\n        geometry: Number(c?.dataset.geometryCount ?? -1),\n        textures: Number(c?.dataset.textureCount ?? -1),\n        triangles: Number(c?.dataset.triangles ?? 0),\n        active: c?.dataset.contextStatus === 'active',\n        visible: !document.hidden && c?.getBoundingClientRect().width > 0,\n        connected: document.body.dataset.connection === 'connected',\n      };\n    }),\n  ]);\n  assert.ok(data.active && data.visible && data.connected);\n  assert.ok(data.frames > lastFrames, 'Actual GL frames must advance between samples');\n  frames += data.frames - lastFrames;\n  lastFrames = data.frames;\n  assert.ok(data.geometry >= 0 && data.textures >= 0);\n  samples.push({\n    heap: heap.usedSize,\n    frames,\n    canvases: data.canvases,\n    geometry: data.geometry,\n    textures: data.textures,\n    triangles: data.triangles,\n    nodes: dom.nodes,\n    listeners: dom.jsEventListeners,\n    documents: dom.documents,\n  });\n  assert.ok(samples.length <= 25);\n}\ntry {\n  options = overlaySoakOptions(process.argv.slice(2));\n  const maxWall = options.logical ? 150000 : options.warmupMs + options.durationMs + 120000;\n  review = await visualReview();\n  const { context, page, origin, fixture: f } = review;\n  fixture = f;\n  const advanceFixture = (delta = 1) => {\n    assert.ok(Number.isSafeInteger(delta) && delta >= 0 && Number.isSafeInteger(f.now()));\n    f.advance(delta);\n    assert.ok(Number.isSafeInteger(f.now()));\n  };\n  deadline = setTimeout(() => {\n    void context.close().catch(() => {});\n  }, maxWall);\n  await context.routeWebSocket('**/*', (route) => {\n    if (new URL(route.url()).origin !== origin.replace('https:', 'wss:')) {\n      forbidden++;\n      return route.close();\n    }\n    sockets++;\n    return route.connectToServer();\n  });\n  page.on('request', (r) => {\n    requests++;\n    if (\n      new URL(r.url()).origin !== origin ||\n      r.method() !== 'GET' ||\n      /^\\/(?:control|oauth|auth|internal|eventsub)(?:\\/|$)/.test(new URL(r.url()).pathname)\n    )\n      forbidden++;\n  });\n  for (const file of [\n    'public/overlay.js',\n    'public/overlay-client.js',\n    'public/relic3d.js',\n    'public/overlay.css',\n    'public/vendor/three.core.js',\n    'public/vendor/three.module.js',\n  ]) {\n    const value = await stat(file);\n    assets.files++;\n    assets.bytes += value.size;\n    assets.largestBytes = Math.max(assets.largestBytes, value.size);\n  }\n  stage = 'fixture';\n  for (const id of [BOT, HOME, OTHER]) await f.login(id);\n  for (const id of [HOME, OTHER]) {\n    f.streams.get(id).viewer_count = 1;\n    await f.control(id, 'bootstrap');\n    advanceFixture();\n    await f.control(id, 'keep');\n    advanceFixture();\n  }\n  await f.control(HOME, `send:${OTHER}`);\n  await f.raid();\n  await f.chat(HOME, '6500', '!offer');\n  await f.chat(OTHER, '6501', '!accept');\n  advanceFixture(240000); // Initial completed arrival is elapsed, not restarted on read.\n  await page.setViewportSize({ width: 480, height: 800 });\n  stage = 'overlay-navigation';\n  await page.goto(origin + '/overlay/' + OTHER);\n  await page.bringToFront();\n  stage = 'frame-ready';\n  await page.waitForFunction(\n    () =>\n      document.body.dataset.connection === 'connected' &&\n      Number(document.querySelector('canvas.relic3d')?.dataset.frames) > 2,\n  );\n  await page.locator('canvas.relic3d').evaluate((c) => c.setAttribute('data-render-profile', ''));\n  cdp = await context.newCDPSession(page);\n  stage = 'warmup';\n  await page.waitForTimeout(options.warmupMs);\n  advanceFixture(options.warmupMs);\n  await sample();\n  observationStart = performance.now();\n  let nextUpdate = options.mode === 'smoke' ? 2000 : 60000;\n  let nextCheckpoint = options.mode === 'smoke' ? 10000 : 300000;\n  while (logicalElapsedMs < options.durationMs) {\n    const previousLogical = logicalElapsedMs;\n    if (options.logical) {\n      advanceFixture(60000);\n      logicalElapsedMs = Math.min(options.durationMs, logicalElapsedMs + 60000);\n      stage = 'logical-wait';\n      await page.waitForTimeout(100);\n    } else {\n      stage = 'observation-wait';\n      await page.waitForTimeout(1000);\n      logicalElapsedMs = overlayFixtureElapsed(\n        performance.now() - observationStart,\n        options.durationMs,\n      );\n      advanceFixture(logicalElapsedMs - previousLogical);\n    }\n    stage = 'peak-heap';\n    const live = await cdp.send('Runtime.getHeapUsage');\n    peakHeap = Math.max(peakHeap, live.usedSize);\n    if (logicalElapsedMs >= nextUpdate) {\n      const actor = String(7000 + (cycles % 32));\n      requestedActor = actor;\n      stage = 'cycle-mark';\n      await f.chat(OTHER, actor, '!mark moon');\n      stage = 'cycle-mark-read';\n      const doc = await f.runtime.state.getPrivateMarks(OTHER, {\n        broadcasterId: OTHER,\n        chatterId: OTHER,\n      });\n      const mark = doc.sessions.flatMap((s) => s.marks).find((m) => m.userId === actor);\n      assert.ok(mark);\n      stage = 'cycle-approve';\n      await f.chat(OTHER, OTHER, `!relic approve ${mark.id}`);\n      stage = 'rune-visible';\n      await page.waitForFunction(() => document.querySelector('#runes').children.length > 0);\n      stage = 'cycle-forget';\n      await f.chat(OTHER, actor, '!relic forgetme');\n      stage = 'rune-cleared';\n      await page.waitForFunction(() => document.querySelector('#runes').children.length === 0);\n      cycles++;\n      f.calls.length = 0; // No retained growing provider-call history in this long fixture.\n      if (cycles % 5 === 0) {\n        stage = 'socket-drop';\n        review.dropConnections();\n        await page.waitForFunction(() => document.body.dataset.connection !== 'connected');\n        stage = 'socket-reconnect';\n        await page.waitForFunction(() => document.body.dataset.connection === 'connected');\n      }\n      nextUpdate += options.mode === 'smoke' ? 2000 : 60000;\n    }\n    if (logicalElapsedMs >= nextCheckpoint || logicalElapsedMs >= options.durationMs) {\n      stage = 'checkpoint-wait';\n      await page.waitForTimeout(150);\n      await sample();\n      nextCheckpoint += options.mode === 'smoke' ? 10000 : 300000;\n    }\n  }\n  assert.ok(overlaySoakBounds(samples));\n  assert.equal(forbidden, 0);\n  assert.deepEqual(review.stats(), { errors: 0, external: 0 });\n  assert.ok(cycles > 0 && cycles <= 120);\n  if (['wall', 'wall-probe'].includes(options.mode))\n    assert.ok(performance.now() - observationStart >= options.durationMs);\n  passed = true;\n  stage = 'complete';\n} catch (e) {\n  failureCategory = ['AssertionError', 'TimeoutError', 'TypeError'].includes(e?.name)\n    ? e.name\n    : 'fixture-or-browser';\n  const line = /soak-overlay[.]js:(\\d+)/.exec(e?.stack ?? '');\n  diagnostic.assertionLine = line ? Number(line[1]) : 0;\n  diagnostic.cycle = cycles;\n  diagnostic.logicalClockMs = logicalElapsedMs;\n  diagnostic.fixtureClockInteger = Number.isSafeInteger(fixture?.now()) ? 1 : 0;\n  try {\n    if (fixture) {\n      const channel = await fixture.runtime.state.getStreamStatus(OTHER);\n      const doc = await fixture.runtime.state.getPrivateMarks(OTHER, {\n        broadcasterId: OTHER,\n        chatterId: OTHER,\n"
+      }
+    }
+  ]
+}
+````
+
+### 4994. 2026-10-27T12:06:36.755Z — tool call (source line 18768)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_4871b9f01009483bb8ddb9655d6c6aaf",
+  "input": "text(await tools.exec_command({cmd:\"sed -n '190,242p' public/overlay-client.js\\nsed -n '275,340p' scripts/soak-overlay.js\\nrg -n 'idle|suspend|clock.install|clock.fastForward' scripts/browser-smoke* | head -60\\ncat test-support/overlay-soak.js\\ncat docs/ACCESSIBILITY_PERFORMANCE.md\",\"max_output_tokens\":6500}));\n"
+}
+````
+
+### 4995. 2026-10-27T12:06:36.892Z — tool result (source line 18771)
+
+````text
+{
+  "call_id": "call_4871b9f01009483bb8ddb9655d6c6aaf",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "0664e7",
+        "wall_time_seconds": 0.00001228,
+        "exit_code": 0,
+        "original_token_count": 3665,
+        "output": "  }\n  function suspend() {\n    suspended = true;\n    epoch++;\n    clearTimer(idle);\n    idle = null;\n    clearTimer(retry);\n    retry = null;\n    clear();\n    const old = socket;\n    socket = null;\n    render(null);\n    status('suspended');\n    try {\n      old?.close();\n    } catch {}\n  }\n  function armIdle() {\n    clearTimer(idle);\n    idle = setTimer(suspend, idleDelay);\n  }\n  const wake = (event) => {\n    if (stopped || documentEvents?.hidden) return;\n    // Only visibility/focus/trusted local interaction resets the human idle window.\n    if (event?.type === 'online') {\n      if (suspended) return;\n      if (!socket) {\n        clearTimer(retry);\n        retry = null;\n        connect();\n      }\n      return;\n    }\n    if (['pointerdown', 'keydown'].includes(event?.type) && event.isTrusted !== true) return;\n    if (event?.type === 'focus' && event.isTrusted === false) return;\n    suspended = false;\n    armIdle();\n    if (socket) return;\n    clearTimer(retry);\n    retry = null;\n    connect();\n  };\n  const visibility = () =>\n    documentEvents?.hidden ? suspend() : wake({ type: 'visibilitychange' });\n  windowEvents?.addEventListener?.('online', wake);\n  windowEvents?.addEventListener?.('focus', wake);\n  documentEvents?.addEventListener?.('visibilitychange', visibility);\n  documentEvents?.addEventListener?.('pointerdown', wake);\n  documentEvents?.addEventListener?.('keydown', wake);\n  if (suspended) {\n    render(null);\n    status('suspended');\n  } else {\n    await review?.close();\n  } catch {\n    diagnostic.cleanupFailed = 1;\n    passed = false;\n    failureCategory ??= 'cleanup';\n  }\n  const report = {\n    passed,\n    mode: options?.mode ?? 'invalid',\n    stage,\n    failureCategory,\n    requestedDurationMs: options?.durationMs ?? 0,\n    actualElapsedMs,\n    totalElapsedMs: Math.round(performance.now() - started),\n    logicalElapsedMs: Math.round(logicalElapsedMs),\n    warmupMs: options?.warmupMs ?? 0,\n    forcedGarbageCollection: true,\n    checkpoints: samples.length,\n    samples,\n    cycles,\n    frames,\n    peakHeap,\n    requests,\n    sockets,\n    forbidden,\n    errors: review?.stats().errors ?? 0,\n    assets,\n    diagnostic,\n  };\n  const encoded = JSON.stringify(report);\n  assert.ok(Buffer.byteLength(encoded) <= 65536);\n  await mkdir('artifacts', { recursive: true });\n  await writeFile('artifacts/overlay-soak-results.json', encoded + '\\n');\n}\nif (!passed) process.exitCode = 1;\nscripts/browser-smoke-combined-review.js:248:  await page.clock.install();\nscripts/browser-smoke-film.js:56:  await page.clock.install({ time: new Date('2026-10-31T12:00:00Z') });\nscripts/browser-smoke-judge.js:67:  await page.clock.install({ time: new Date('2026-10-31T12:00:00Z') });\nscripts/browser-smoke-onboarding.js:31:  await page.clock.install();\nscripts/browser-smoke-pilot.js:52:      'idle-or-reconcile-only',\nscripts/browser-smoke-pilot.js:130:                'idle-or-reconcile-only',\nscripts/browser-smoke-pilot.js:280:        'idle-or-reconcile-only',\nscripts/browser-smoke-relic3d.js:114:    throw Error('idle fps');\nscripts/browser-smoke-relic3d.js:139:            document.querySelector('.archive').dataset.phase === 'idle' &&\nscripts/browser-smoke-relic3d.js:144:        throw Error('acceptance must stay idle30fps');\nscripts/browser-smoke-relic3d.js:209:    archive.dataset.phase = 'idle';\nscripts/browser-smoke-relic3d.js:421:  const idleBudget = await small.evaluate(\nscripts/browser-smoke-relic3d.js:448:    idleBudget.frames < 1 ||\nscripts/browser-smoke-relic3d.js:449:    idleBudget.frames > 12 ||\nscripts/browser-smoke-relic3d.js:450:    idleBudget.mutations !== 0 ||\nscripts/browser-smoke-relic3d.js:451:    idleBudget.resume !== 0\nscripts/browser-smoke-relic3d.js:453:    throw Error('small idle cadence or unchanged DOM churn');\nscripts/browser-smoke-judge-track.js:179:  await page.clock.install();\nscripts/browser-smoke-judge-track.js:342:  await page.waitForFunction(() => document.body.dataset.connection === 'suspended');\nscripts/browser-smoke-judge-track.js:550:        connectionState: ['connected', 'connecting', 'disconnected', 'suspended'].includes(\nscripts/browser-smoke-judge-track.js:555:        phase: ['idle', 'streak', 'impact', 'unfurl', 'settled'].includes(phase) ? phase : 'other',\nscripts/browser-smoke-wander.js:102:    name: 'SIMULATOR typed idle notice, no receipt/quorum, real renderer frames and bounded corner',\nscripts/browser-smoke-preclaim.js:88:    if ((await page.locator('.archive').getAttribute('data-phase')) !== 'idle')\nscripts/browser-smoke-preclaim.js:144:      document.querySelector('.archive').dataset.phase === 'idle' &&\nscripts/browser-smoke-preclaim.js:173:        document.querySelector('.archive').dataset.phase !== 'idle',\nscripts/browser-smoke-preclaim.js:195:      document.querySelector('.archive').dataset.phase !== 'idle',\nscripts/browser-smoke-cinematic.js:51:        this.state = 'suspended';\nscripts/browser-smoke-cinematic.js:179:    (await gl.locator('.archive').getAttribute('data-phase')) !== 'idle' ||\nscripts/browser-smoke-tier1.js:57:  stage = 'idle-holder';\nscripts/browser-smoke-tier1.js:106:    name: 'Registry-backed idle holder / previous room, actual GL pixels and bounded corner',\nexport const OVERLAY_WALL_MS = 7200000;\nexport function overlaySoakOptions(args = []) {\n  if (\n    args.some(\n      (a) =>\n        !/^--(?:mode=(?:smoke|wall|wall-probe|logical)|duration-ms=(?:7200000|600000))$/.test(a),\n    ) ||\n    new Set(args.map((a) => a.split('=')[0])).size !== args.length\n  )\n    throw Error('Invalid soak options');\n  const mode = args.find((a) => a.startsWith('--mode='))?.slice(7) ?? 'smoke';\n  const requested = args.find((a) => a.startsWith('--duration-ms='));\n  const required = { wall: '--duration-ms=7200000', 'wall-probe': '--duration-ms=600000' }[mode];\n  if (requested !== required) throw Error('Wall modes require their exact explicit duration');\n  return {\n    mode,\n    durationMs: mode === 'smoke' ? 20000 : mode === 'wall-probe' ? 600000 : OVERLAY_WALL_MS,\n    warmupMs: mode === 'wall' ? 120000 : 2000,\n    logical: mode === 'logical',\n  };\n}\n// Floor cumulative elapsed time, not each interval: preserve sub-ms remainder\n// without passing fractional timestamps into a Date.now()-based fixture.\nexport function overlayFixtureElapsed(elapsed, duration) {\n  if (!Number.isFinite(elapsed) || elapsed < 0 || !Number.isSafeInteger(duration) || duration < 1)\n    throw Error('Invalid fixture clock');\n  return Math.floor(Math.min(elapsed, duration));\n}\nexport function overlaySoakBounds(samples) {\n  if (samples.length < 2 || samples.length > 25) return false;\n  const a = samples[0],\n    b = samples.at(-1);\n  return (\n    samples.every(\n      (s) =>\n        Object.values(s).every(Number.isFinite) &&\n        s.canvases === 1 &&\n        s.geometry <= a.geometry + 2 &&\n        s.textures <= a.textures + 2 &&\n        s.nodes <= a.nodes + 64 &&\n        s.listeners <= a.listeners + 8 &&\n        s.documents <= a.documents + 1 &&\n        s.triangles < 20000,\n    ) &&\n    b.heap <= a.heap * 1.1 + 8 * 1024 * 1024 &&\n    b.frames > a.frames\n  );\n}\n# Accessibility and OBS performance checks\n\nThis increment adds a Keeper-control skip link and suppresses unchanged overlay live-region text replacements. It preserves the original navy/gold artwork, shaders, geometry, resolution/DPR limits, frame cadences, privacy and claim authority. Existing Atlas/Keeper skip links, focus outlines, reduced-motion SVG fallback, hidden-page suspension and renderer disposal remain in use. No graphics-quality reduction or new production polling/service was introduced.\n\n## Bounded accessibility workflow\n\nThe operator runs `node scripts/browser-smoke-accessibility.js` inside the existing offline Node 22/Chromium sandbox. It visits only local mock Atlas, Keeper and signed own-control pages. Checks cover keyboard skip/focus, named buttons, contrast from actual computed colors (including transparent overlay text over black and white), and horizontal layout at 320, 390, 1280 and 1920 pixels. The overlay portion requires actual GL pixels and advancing frames, observes live-region DOM mutations, then verifies permanent GL disposal under reduced motion, decoded visible SVG and fresh GL recovery. Existing workflows separately cover film keyboard handling, mobile controls, privacy, export pixels and motion lifecycle.\n\nThis is a focused check, not a complete WCAG audit or assistive-technology certification. Computed-color checks do not measure all image backgrounds, antialiasing or every transient state. No real control page, Twitch account or physical OBS installation is operated. Fresh native results are pending; consult the dated [quality record](QUALITY.md) after operator publication.\n\n## Local overlay soak\n\nThe driver is deliberately named `scripts/soak-overlay.js`, outside the default browser-smoke glob. It never runs for two hours as part of ordinary unit tests or every CI commit. All commands require the parent-approved offline OS sandbox; do not run them against a deployed service.\n\n```sh\nnode scripts/soak-overlay.js\nnode scripts/soak-overlay.js --mode=logical\nnode scripts/soak-overlay.js --mode=wall-probe --duration-ms=600000\nnode scripts/soak-overlay.js --mode=wall --duration-ms=7200000\n```\n\n- Default smoke observes 20 seconds after two seconds of warm-up.\n- Logical mode advances two hours of synthetic server/game time in bounded steps. Browser rendering and allocations are real, but elapsed browser time is shorter: **this is not a two-hour wall-clock pass**.\n- Wall-probe mode requires the explicit 600,000 ms argument and measures ten real minutes after two seconds of warm-up. It is a diagnostic probe, never a two-hour pass. It retains the same per-minute engraving/approval/forget and reconnect sequence.\n- Wall mode requires the explicit two-hour argument, observes at least 7,200,000 real milliseconds, and excludes a separate two-minute warm-up from the observation. Setup/cleanup add time. The parent must provide a dedicated long-running sandbox budget; general test caps are unchanged.\n\nThe actual `/overlay/:id` client connects through local canonical TLS/WSS to the mocked fixture. One completed synthetic hop is retained; up to 120 cycles create, explicitly approve and forget a sample engraving, with bounded reconnects. At most 32 synthetic mark participants recur within the existing per-stream quota. Provider-call history is discarded between cycles; no real provider requests, streams, chat or raids occur. The fixture clock advances with the selected mode. Real-time modes floor cumulative elapsed milliseconds before advancing the synthetic server clock; they do not independently floor every interval or alter real observation duration. Each fixture advance asserts integer milliseconds, matching Date.now() and signed ISO timestamp precision. The driver does not simulate an unlimited journey beyond the retained archive cap or claim this is the worst-case 160-rune GPU workload. Reduced-motion disposal/recovery is exercised separately by the accessibility workflow.\n\nAt most 25 checkpoints record forced-GC retained JS heap, DOM nodes/documents/listeners, actual cumulative GL frames, canvas count and existing opt-in Three geometry/texture/triangle counters. Active visible connected rendering must advance between samples. Retained heap growth must stay within baseline plus 10% and 8 MiB; nodes may rise by 64, listeners by eight, documents by one, and geometry/textures by two. One canvas and fewer than 20,000 triangles are required. These are declared regression budgets, not observed results or universal memory guarantees. Forced GC is an explicit measurement intervention; this does not establish naturally flat RSS, material/GPU-driver memory, physical OBS performance or an SLA.\n\nThe closed `artifacts/overlay-soak-results.json` is capped at 64 KiB. It distinguishes requested, actual and logical elapsed time and includes bounded numerical samples, peak sampled JS heap, frames, connection/request counts, errors and failure category. A small explicit static-asset list reports local source byte totals and largest file size; it is not network transfer size or a full production asset audit. Nothing includes words, users, tokens, cookies, provider bodies or raw errors. General screenshots retain their existing raw/PNG/tile limits; this soak does not capture images.\n\n## Incomplete real-wall observation and follow-up\n\nThe parent reported the first frozen source232 real-wall attempt failed with TimeoutError: requested 7,200,000 ms, actual observation 510,034 ms, total including warm-up/setup 633,345 ms, last logical elapsed 480,025 ms and seven completed cycles. The generic observe stage could not identify which transition timed out. Two retained-heap checkpoints were 4,879,920 and 5,042,364 bytes; geometry four, texture one and triangles 866 remained stable. This was an incomplete failed run, not a two-hour pass or a demonstrated memory-budget failure. Earlier smoke and accelerated logical runs passed, but do not replace real-wall evidence.\n\nSource review found fractional performance-clock deltas were entering an integer-millisecond fixture clock, unlike the logical mode. The harness now canonicalizes cumulative elapsed time and adds a ten-minute probe; this corrects a fixture-contract violation but does not establish the cause of the observed timeout. Fresh smoke, logical, ten-minute probe and eventually two-hour wall execution remain parent validation gates.\n\nFailure stages now distinguish mark creation/read, approval, rune visibility, forgetting, rune clearance, socket drop/reconnect, sample GC/metrics and observation waits. Catch diagnostics project only numeric fixture/DOM facts: cycle, logical clock, integer-clock flag, channel online/opt-in/pause/ban flags, approved/pending counts, requested participant's spent quota, available privacy floor, rune count, connection/context enums and assertion line. A -1 floor denotes unavailable private presence inspection in the memory fixture, not a measured floor. Diagnostic collection failure is itself a closed numeric flag; no text, participant ID, URL, token, provider body or raw error is reported. Failure does not change the visibility, privacy or resource gates.\n\nNo two-hour observation has been performed by the source author. Operator short/logical and real-wall results must be reported separately, against the exact immutable snapshot. A two-hour Chrome fixture pass would still be proxy evidence, not a physical OBS/Twitch stream test. Cloud min-instances zero/max one, scopes, schedulers, admission and paid features remain unchanged; no global zero-bill promise is made.\n"
+      }
+    }
+  ]
+}
+````
+
+### 4996. 2026-10-27T12:06:42.230Z — tool call (source line 18775)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_b255bd6390c74430b4a2f49c03768a90",
+  "input": "text(await tools.exec_command({cmd:\"sed -n '300,370p' scripts/browser-smoke-judge-track.js\\nsed -n '150,190p' scripts/browser-smoke-judge-track.js\\nsed -n '1,100p' scripts/browser-smoke-reliability.js\",\"max_output_tokens\":4000}));\n"
+}
+````
+
+### 4997. 2026-10-27T12:06:42.338Z — tool result (source line 18778)
+
+````text
+{
+  "call_id": "call_b255bd6390c74430b4a2f49c03768a90",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "a2d903",
+        "wall_time_seconds": 0.000004361,
+        "exit_code": 0,
+        "original_token_count": 2320,
+        "output": "  await page.waitForFunction(() => document.body.dataset.demoPlaying === 'false');\n  await page.evaluate(() => {\n    delete document.hidden;\n    document.dispatchEvent(new Event('visibilitychange'));\n  });\n  await page.locator('#demo-reset').click();\n  assert.equal(await page.locator('body').getAttribute('data-demo-clock'), '0');\n  assert.equal(await page.evaluate(() => window.__demoIO), 0);\n  assert.equal(errors.length, 0);\n  await context.close();\n  checks.push({\n    name: 'PERMANENT SIMULATED DEMO reducedSVG/393+375bounds, reset and injected-hidden pause; no physical tab/audio claim',\n    passed: true,\n  });\n  stage = 'overlay-hidden-close';\n  const live = await browser.newContext({\n    ignoreHTTPSErrors: true,\n    viewport: { width: 1280, height: 720 },\n    serviceWorkers: 'block',\n  });\n  await live.route('**/*', (r) =>\n    new URL(r.request().url()).origin === origin ? r.continue() : r.abort(),\n  );\n  await live.routeWebSocket('**/*', (r) =>\n    new URL(r.url()).origin === origin.replace('https:', 'wss:') ? r.connectToServer() : r.close(),\n  );\n  await live.addInitScript(() => {\n    window.__judgePerf = 0;\n    Object.defineProperty(performance, 'now', {\n      configurable: true,\n      value: () => window.__judgePerf,\n    });\n  });\n  page = await live.newPage();\n  const overlayResponse = await page.goto(origin + '/overlay/' + OTHER);\n  assert.equal((await overlayResponse.allHeaders())['cache-control'], 'no-store');\n  await page.waitForFunction(() => document.body.dataset.connection === 'connected');\n  assert.equal(sockets.clients.size, 1);\n  await page.evaluate(() => {\n    Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });\n    document.dispatchEvent(new Event('visibilitychange'));\n  });\n  await page.waitForFunction(() => document.body.dataset.connection === 'suspended');\n  for (let i = 0; i < 50 && sockets.clients.size; i++) await new Promise((r) => setTimeout(r, 20));\n  assert.equal(sockets.clients.size, 0);\n  assert.equal(await page.locator('.rune').count(), 0);\n  stage = 'overlay-resume';\n  await page.evaluate(() => {\n    delete document.hidden;\n    document.dispatchEvent(new Event('visibilitychange'));\n    dispatchEvent(new Event('focus'));\n  });\n  await page.waitForFunction(() => document.body.dataset.connection === 'connected');\n  assert.equal(sockets.clients.size, 1);\n  const corner = await live.newPage();\n  await corner.setViewportSize({ width: 160, height: 160 });\n  await corner.emulateMedia({ reducedMotion: 'reduce' });\n  await corner.goto(origin + '/overlay/' + OTHER + '?corner=1');\n  await corner.waitForFunction(() => document.body.dataset.connection === 'connected');\n  await page.bringToFront();\n  await page.evaluate(() => document.fonts.ready);\n  await corner.evaluate(() => document.fonts.ready);\n  await f.control(HOME, `send:${OTHER}`);\n  f.advance();\n  await f.raid(HOME, OTHER, 1);\n  const start = (await f.runtime.state.getKeeperRegistry()).pendingHop.startedAt;\n  for (const ms of [200, 1500, 5500, 12000, 19000]) {\n    stage = `desktop-caption-${ms}`;\n    await page.evaluate((ms) => {\n      window.__judgePerf = ms;\n    }, ms);\n      () => document.querySelector('#demo-art canvas') === window.__judgeDemoCanvas,\n    ),\n  );\n  await page.locator('#demo-pause').click();\n  assert.ok(\n    await page\n      .locator('#demo-art canvas')\n      .evaluate(\n        (c) =>\n          c.hidden &&\n          getComputedStyle(c).display === 'none' &&\n          c.getBoundingClientRect().width === 0,\n      ),\n  );\n  assert.equal(await page.locator('#demo-bands span').count(), 1);\n  await page.evaluate(() => scrollTo(0, 0));\n  await capture('judge-demo-desktop.png');\n  assert.equal(await page.evaluate(() => window.__demoIO), 0);\n  assert.equal(denied, 0);\n  assert.equal(f.calls.length, calls);\n  assert.equal(f.db.writes.length, writes);\n  checks.push({\n    name: 'PERMANENT SIMULATED DEMO actualWebGL, earlyoffer/no pre-receipt transfer, one fictional ring, pause and zero API/SDK/socket calls',\n    passed: true,\n  });\n  stage = 'demo-mobile-fallback';\n  await page.setViewportSize({ width: 390, height: 800 });\n  await page.emulateMedia({ reducedMotion: 'reduce' });\n  await page.locator('#demo-reset').click();\n  await page.clock.install();\n  await page.locator('#demo-send').click();\n  assert.match(await page.locator('#demo-progress').textContent(), /Step 2\\/5/);\n  stage = 'mobile-countdown-first-tick';\n  await page.clock.runFor(1100);\n  assert.match(await page.locator('#demo-clock').textContent(), /countdown 9s/);\n  stage = 'mobile-countdown-five';\n  await page.clock.runFor(4000);\n  assert.match(await page.locator('#demo-clock').textContent(), /countdown 5s/);\n  await page.locator('#demo-raid').click();\n  assert.match(await page.locator('#demo-progress').textContent(), /Step 3\\/5/);\n  await page.locator('#demo-fill').click();\n// Canonical-origin LOCAL TLS/WSS only. No upstream EventSub WebSocket exists.\nimport assert from 'node:assert/strict';\nimport { mkdir, writeFile } from 'node:fs/promises';\nimport { visualReview, growthPixels } from '../test-support/visual-review.js';\nimport { HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\nlet review,\n  stage = 'setup',\n  passed = false,\n  failureCategory = null,\n  connections = 0;\nconst checks = [],\n  diagnostic = {};\ntry {\n  review = await visualReview({ durable: true });\n  const { page, context, fixture: f, origin } = review;\n  await context.routeWebSocket('**/*', (route) =>\n    new URL(route.url()).origin === origin.replace('https:', 'wss:')\n      ? route.connectToServer()\n      : route.close(),\n  );\n  page.on('websocket', () => connections++);\n  for (const id of [BOT, HOME, OTHER]) await f.login(id);\n  for (const id of [HOME, OTHER]) {\n    await f.control(id, 'bootstrap');\n    f.advance();\n    await f.control(id, 'keep');\n    f.advance();\n  }\n  await f.chat(HOME, '9600', '!mark moon');\n  await f.chat(HOME, HOME, '!relic approve m1');\n  f.advance(31000);\n  assert.equal(JSON.parse((await f.control(HOME, 'send:' + OTHER)).body).status, 'accepted');\n  await f.raid(HOME, OTHER, 4);\n  await f.chat(HOME, '9601', '!offer');\n  await f.chat(OTHER, '9701', '!accept');\n  const hop = (await f.runtime.state.getKeeperRegistry()).pendingHop;\n  f.advance(23000);\n  stage = 'late-initial-snapshot';\n  await page.setViewportSize({ width: 1280, height: 800 });\n  await page.goto(origin + '/overlay/' + OTHER);\n  await page.bringToFront();\n  await page.waitForFunction(() => document.body.dataset.connection === 'connected');\n  await page.waitForFunction(\n    () => Number(document.querySelector('.archive').dataset.cinematicElapsed) >= 23000,\n  );\n  assert.match(await page.locator('#claim-label').innerText(), /Offer 1\\/2.*Accept 1\\/2/);\n  assert.equal(\n    Number(await page.locator('.p3-flash').evaluate((el) => getComputedStyle(el).opacity)),\n    0,\n  );\n  await page.waitForFunction(\n    () => Number(document.querySelector('canvas.relic3d')?.dataset.frames) > 0,\n  );\n  assert.equal(await growthPixels(page, async () => {}), true);\n  stage = 'offline-reconnect';\n  await context.setOffline(true);\n  review.dropConnections();\n  await page.waitForFunction(() => document.body.dataset.connection !== 'connected');\n  const attempts = connections;\n  // Bounded real observation of existing 500/1000ms backoff, not a catch-up clock.\n  await page.waitForTimeout(1200);\n  assert.ok(connections - attempts <= 3);\n  await context.setOffline(false);\n  await page.waitForFunction(() => document.body.dataset.connection === 'connected');\n  assert.match(await page.locator('#claim-label').innerText(), /Offer 1\\/2.*Accept 1\\/2/);\n  assert.equal((await f.runtime.state.getKeeperRegistry()).pendingHop.startedAt, hop.startedAt);\n  assert.equal(\n    Number(await page.locator('.p3-flash').evaluate((el) => getComputedStyle(el).opacity)),\n    0,\n  );\n  checks.push({\n    name: 'Actual local WSS offline/backoff/reconnect seeks an elapsed receipt and preserves partial quorum without replay flash',\n    passed: true,\n  });\n  stage = 'runtime-reconstruction';\n  f.advance(1000);\n  const calls = f.calls.length;\n  await review.restartRuntime();\n  assert.equal(f.calls.length, calls);\n  await page.waitForFunction(() => document.body.dataset.connection === 'connected');\n  await page.waitForFunction(\n    () => Number(document.querySelector('.archive').dataset.cinematicElapsed) >= 24000,\n  );\n  const restored = await f.runtime.overlayFeeds[OTHER].snapshot();\n  assert.equal(restored.handoff.startedAt, hop.startedAt);\n  assert.equal(restored.handoff.endsAt, hop.endsAt);\n  assert.match(await page.locator('#claim-label').innerText(), /Offer 1\\/2.*Accept 1\\/2/);\n  await f.chat(HOME, '9602', '!offer');\n  await f.chat(OTHER, '9702', '!accept');\n  await page.waitForFunction(\n    () => document.querySelector('.growth-fallback')?.dataset.total === '1',\n  );\n  assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, OTHER);\n  assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);\n  checks.push({\n    name: 'New runtime and hub over shared fake Firestore restore original partial clock, then genuine signed fixture votes bind exactly once',\n    passed: true,\n  });\n  stage = 'privacy-after-disconnect';\n  await page.waitForFunction(() => document.querySelectorAll('#runes img').length > 0);\n"
+      }
+    }
+  ]
+}
+````
+
+### 4998. 2026-10-27T12:06:47.601Z — tool call (source line 18782)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_c7faec1bd01d461d86baef63cb8500fc",
+  "input": "text(await tools.exec_command({cmd:\"rg -n 'return \\\\{|sockets|dropConnections' test-support/visual-review.js | tail -20\\nsed -n '100,190p' scripts/browser-smoke-reliability.js\\nrg -n 'render\\\\(null|cinematicElapsed|snapshot' public/overlay.js | head -20\",\"max_output_tokens\":3000}));\n"
+}
+````
+
+### 4999. 2026-10-27T12:06:47.685Z — tool result (source line 18785)
+
+````text
+{
+  "call_id": "call_c7faec1bd01d461d86baef63cb8500fc",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "ea824d",
+        "wall_time_seconds": 0.00000512,
+        "exit_code": 0,
+        "original_token_count": 955,
+        "output": "4:import { attachOverlaySockets } from '../src/overlay-sockets.js';\n11:    return { executablePath: '/snap/bin/chromium', headless: true, chromiumSandbox: true };\n18:    return { executablePath, headless: true, chromiumSandbox: true };\n34:  let sockets = attachOverlaySockets(server, fixture.runtime.overlayFeeds, {\n63:    return {\n66:      dropConnections() {\n67:        for (const socket of sockets.clients) socket.terminate();\n71:        sockets.close();\n73:        sockets = attachOverlaySockets(server, fixture.runtime.overlayFeeds, {\n83:        sockets.close();\n91:    sockets.close();\n  await page.waitForFunction(() => document.querySelectorAll('#runes img').length > 0);\n  await context.setOffline(true);\n  review.dropConnections();\n  await f.chat(HOME, '9600', '!relic forgetme');\n  f.advance(5000);\n  await context.setOffline(false);\n  await page.waitForFunction(() => document.body.dataset.connection === 'connected');\n  await page.waitForFunction(() => document.querySelectorAll('#runes img').length === 0);\n  assert.equal((await f.runtime.overlayFeeds[OTHER].snapshot()).approvedCount, 0);\n  await page.emulateMedia({ reducedMotion: 'reduce' });\n  await page.waitForFunction(() => document.querySelectorAll('.archive canvas').length === 0);\n  assert.equal(await page.locator('.archive > img.crystal').isVisible(), true);\n  assert.ok(\n    await page.locator('.archive > img.crystal').evaluate(async (img) => {\n      await img.decode();\n      return img.naturalWidth > 0;\n    }),\n  );\n  assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);\n  assert.equal(\n    f.calls.filter((c) => new URL(c.url).pathname.endsWith('/raids') && c.method === 'POST').length,\n    1,\n  );\n  assert.ok(connections >= 4 && connections <= 10);\n  assert.deepEqual(review.stats(), { errors: 0, external: 0 });\n  checks.push({\n    name: 'Fresh post-disconnect erasure removes carried words; decoded reduced SVG, no extra Raid POST or unbounded reconnect loop',\n    passed: true,\n  });\n  diagnostic.connections = connections;\n  passed = true;\n} catch (e) {\n  failureCategory = ['AssertionError', 'TimeoutError', 'TypeError'].includes(e?.name)\n    ? e.name\n    : 'browser-or-fixture';\n  const line = /browser-smoke-reliability[.]js:(\\d+)/.exec(e?.stack ?? '');\n  if (line) diagnostic.assertionLine = Number(line[1]);\n  diagnostic.connections = connections;\n  diagnostic.browserErrors = review?.stats().errors ?? 0;\n} finally {\n  await review?.close();\n  await mkdir('artifacts', { recursive: true });\n  const report = JSON.stringify({ passed, stage, failureCategory, checks, diagnostic });\n  assert.ok(Buffer.byteLength(report) <= 65536);\n  await writeFile('artifacts/reliability-browser-results.json', report + '\\n');\n}\nif (!passed) process.exitCode = 1;\n183:function render(snapshot) {\n184:  const cue = cueFor(snapshot);\n186:    !snapshot ||\n187:    !['ready', 'incoming', 'waiting'].includes(snapshot.status) ||\n188:    (snapshot.status === 'waiting' && !snapshot.handoff?.completed)\n191:  cinema.observe(snapshot);\n194:    cinema.pending(snapshot, snapshot?.serverNow ?? 0, motion.matches),\n199:    !(cue === 'claim' && snapshot?.handoff?.completedAt !== undefined) &&\n204:  document.body.dataset.state = snapshot?.status ?? 'connecting';\n206:    snapshot?.status !== 'waiting' || Boolean(snapshot?.movedToLogin || snapshot?.holderLogin);\n207:  relic3d?.update(snapshot);\n208:  current = snapshot;\n210:  receiptServerTime = snapshot?.serverNow ?? Date.now();\n212:  for (let i = 0; i < Math.min(16, snapshot?.lineageRings ?? 0); i++) {\n218:  document.querySelector('#lineage').textContent = snapshot\n219:    ? snapshot.mode === 'simulator'\n220:      ? ringSummary(snapshot.lineageRings).text\n221:      : `Ring ${snapshot.lineageRings}`\n223:  if (snapshot?.streak) {\n225:    line.title = streakText(snapshot.streak);\n"
+      }
+    }
+  ]
+}
+````
+
+### 5000. 2026-10-27T12:07:11.356Z — assistant (source line 18790)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "The client accepts trusted `keydown` events and suspends after ten minutes without input. I’ll send Shift every five real minutes during the active-use soak, and separately fast-forward an idle check to verify WSS closure and quiet recovery.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 5001. 2026-10-27T12:07:22.737Z — tool call (source line 18791)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_baa6da9d304a49b0957e3453da8a244f",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/scripts/soak-overlay.js\\n@@\\n let observationStart = null;\\n+let trustedInputCount = 0;\\n@@\\n   await page.bringToFront();\\n+  // Playwright keyboard input is browser-trusted; never forge isTrusted or\\n+  // change the production ten-minute human-idle policy.\\n+  const activeInput = async () => {\\n+    stage = 'trusted-input';\\n+    await page.keyboard.press('Shift');\\n+    trustedInputCount++;\\n+  };\\n@@\\n   stage = 'warmup';\\n+  await activeInput();\\n+  stage = 'warmup';\\n   await page.waitForTimeout(options.warmupMs);\\n@@\\n   observationStart = performance.now();\\n+  await activeInput();\\n+  let nextInputAt = performance.now() + 300000;\\n@@\\n   while (logicalElapsedMs < options.durationMs) {\\n+    if (performance.now() >= nextInputAt) {\\n+      await activeInput();\\n+      nextInputAt = performance.now() + 300000;\\n+    }\\n@@\\n     sockets,\\n+    trustedInputCount,\\n*** End Patch\"));\ntext(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/scripts/browser-smoke-reliability.js\\n@@\\n-  connections = 0;\\n+  connections = 0,\\n+  closedConnections = 0;\\n@@\\n-  page.on('websocket', () => connections++);\\n+  page.on('websocket', (socket) => {\\n+    connections++;\\n+    socket.on('close', () => closedConnections++);\\n+  });\\n@@\\n   checks.push({\\n     name: 'Fresh post-disconnect erasure removes carried words; decoded reduced SVG, no extra Raid POST or unbounded reconnect loop',\\n     passed: true,\\n   });\\n+  stage = 'human-idle-suspend';\\n+  await page.clock.install();\\n+  await page.keyboard.press('Shift');\\n+  const closedBeforeIdle = closedConnections;\\n+  await page.clock.fastForward(600001);\\n+  await page.waitForFunction(() => document.body.dataset.connection === 'suspended');\\n+  // The browser's actual WebSocket close event must arrive, not just a label.\\n+  for (let i = 0; i < 50 && closedConnections === closedBeforeIdle; i++)\\n+    await new Promise((resolve) => setTimeout(resolve, 20));\\n+  assert.equal(closedConnections, closedBeforeIdle + 1);\\n+  assert.equal(await page.locator('#runes img').count(), 0);\\n+  const idleConnections = connections;\\n+  await page.clock.fastForward(10000);\\n+  assert.equal(connections, idleConnections);\\n+  assert.equal(await page.locator('body').getAttribute('data-connection'), 'suspended');\\n+  stage = 'human-idle-trusted-resume';\\n+  await page.keyboard.press('Shift');\\n+  await page.waitForFunction(() => document.body.dataset.connection === 'connected');\\n+  assert.equal(connections, idleConnections + 1);\\n+  assert.equal(await page.locator('#runes img').count(), 0);\\n+  assert.equal((await f.runtime.overlayFeeds[OTHER].snapshot()).approvedCount, 0);\\n+  assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);\\n+  assert.equal(\\n+    Number(await page.locator('.p3-flash').evaluate((el) => getComputedStyle(el).opacity)),\\n+    0,\\n+  );\\n+  assert.deepEqual(review.stats(), { errors: 0, external: 0 });\\n+  diagnostic.independentIdleResumeChecks = 1;\\n+  checks.push({\\n+    name: 'Browser-clock ten-minute human idle closes actual WSS; trusted Shift resumes fresh erased projection without arrival replay',\\n+    passed: true,\\n+  });\\n*** End Patch\"));\n"
+}
+````
+
+### 5002. 2026-10-27T12:07:22.843Z — tool result (source line 18795)
+
+````text
+{
+  "call_id": "call_baa6da9d304a49b0957e3453da8a244f",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 5003. 2026-10-27T12:07:27.196Z — tool call (source line 18799)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_8a4f7520072642199af33709f730d468",
+  "input": "text(await tools.exec_command({cmd:\"sed -n '140,190p' public/overlay-client.js\\nsed -n '160,210p' public/overlay.js\",\"max_output_tokens\":2000}));\n"
+}
+````
+
+### 5004. 2026-10-27T12:07:27.276Z — tool result (source line 18802)
+
+````text
+{
+  "call_id": "call_8a4f7520072642199af33709f730d468",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "8b70f3",
+        "wall_time_seconds": 0.00000408,
+        "exit_code": 0,
+        "original_token_count": 696,
+        "output": "    let revision = -1;\n    status('connecting');\n    opening = setTimer(() => lost(own, 'stale'), 8000); // socket AND first valid snapshot\n    let active;\n    try {\n      active = new WebSocketImpl(url);\n      socket = active;\n    } catch {\n      lost(own);\n      return;\n    }\n    const current = () => !stopped && own === epoch && socket === active;\n    const alive = () => {\n      if (!current()) return;\n      clearTimer(watchdog);\n      watchdog = setTimer(() => lost(own, 'stale'), 35000);\n    };\n    active.onopen = alive;\n    active.onmessage = (event) => {\n      if (!current()) return;\n      if (typeof event.data !== 'string' || event.data.length > 131072) {\n        lost(own);\n        return;\n      }\n      let value;\n      try {\n        value = JSON.parse(event.data);\n      } catch {\n        lost(own);\n        return;\n      }\n      if (value?.type === 'heartbeat') {\n        alive();\n        return;\n      }\n      if (!validSnapshot(value)) {\n        lost(own);\n        return;\n      }\n      clearTimer(opening);\n      opening = null;\n      alive();\n      if (value.revision <= revision) return;\n      revision = value.revision;\n      backoff = 500;\n      status('connected');\n      render(value);\n    };\n    active.onerror = () => lost(own);\n    active.onclose = () => lost(own);\n  }\n  }).then((view) => {\n    if (relic3dClosed || own !== relic3dEpoch) {\n      view?.dispose();\n      return;\n    }\n    relic3d = view;\n    view?.update(current);\n  });\n}\nloadRelicView();\nfunction syncRelicMotion() {\n  relic3d?.dispose();\n  relic3d = null;\n  relic3dAbort.abort();\n  if (!relic3dClosed) loadRelicView();\n}\nmotion.addEventListener('change', syncRelicMotion);\naddEventListener('pagehide', () => {\n  clearCinema();\n  relic3dClosed = true;\n  relic3dAbort.abort();\n  relic3d?.dispose();\n});\nfunction render(snapshot) {\n  const cue = cueFor(snapshot);\n  if (\n    !snapshot ||\n    !['ready', 'incoming', 'waiting'].includes(snapshot.status) ||\n    (snapshot.status === 'waiting' && !snapshot.handoff?.completed)\n  )\n    audio.silence();\n  cinema.observe(snapshot);\n  clearCinema();\n  archiveNode.dataset.fusionPending = String(\n    cinema.pending(snapshot, snapshot?.serverNow ?? 0, motion.matches),\n  );\n  archiveNode.style.setProperty('--p3-fusion', '0');\n  if (\n    cue &&\n    !(cue === 'claim' && snapshot?.handoff?.completedAt !== undefined) &&\n    !motion.matches &&\n    !document.hidden\n  )\n    audio.cue(cue);\n  document.body.dataset.state = snapshot?.status ?? 'connecting';\n  document.querySelector('#waiting-note').hidden =\n    snapshot?.status !== 'waiting' || Boolean(snapshot?.movedToLogin || snapshot?.holderLogin);\n  relic3d?.update(snapshot);\n  current = snapshot;\n  receivedAt = performance.now();\n  receiptServerTime = snapshot?.serverNow ?? Date.now();\n"
+      }
+    }
+  ]
+}
+````
+
+### 5005. 2026-10-27T12:07:57.355Z — tool call (source line 18806)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_a881209c612049589e1bd97248dca985",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/docs/ACCESSIBILITY_PERFORMANCE.md\\n@@\\n The actual `/overlay/:id` client connects through local canonical TLS/WSS to the mocked fixture. One completed synthetic hop is retained; up to 120 cycles create, explicitly approve and forget a sample engraving, with bounded reconnects. At most 32 synthetic mark participants recur within the existing per-stream quota. Provider-call history is discarded between cycles; no real provider requests, streams, chat or raids occur. The fixture clock advances with the selected mode. Real-time modes floor cumulative elapsed milliseconds before advancing the synthetic server clock; they do not independently floor every interval or alter real observation duration. Each fixture advance asserts integer milliseconds, matching Date.now() and signed ISO timestamp precision. The driver does not simulate an unlimited journey beyond the retained archive cap or claim this is the worst-case 160-rune GPU workload. Reduced-motion disposal/recovery is exercised separately by the accessibility workflow.\\n+\\n+This is an **active-use** soak: Playwright sends a harmless browser-trusted Shift key at warm-up/observation entry and every five real minutes during observation. Scheduling uses the real performance clock, including in accelerated logical mode. This exercises the existing trusted-key listener without forged events, API keepalives or production polling. It intentionally resets the unchanged ten-minute human-idle window. It is not evidence of two-hour unattended/no-input operation or physical OBS input behavior. The separately bounded reliability workflow uses the browser clock to reach ten minutes without input, requires actual WSS closure and continued suspension, then sends trusted Shift and checks fresh erased-content projection recovery without an arrival flash. Its result is separate from real-wall performance measurement.\\n@@\\n-The closed `artifacts/overlay-soak-results.json` is capped at 64 KiB. It distinguishes requested, actual and logical elapsed time and includes bounded numerical samples, peak sampled JS heap, frames, connection/request counts, errors and failure category. A small explicit static-asset list reports local source byte totals and largest file size; it is not network transfer size or a full production asset audit. Nothing includes words, users, tokens, cookies, provider bodies or raw errors. General screenshots retain their existing raw/PNG/tile limits; this soak does not capture images.\\n+The closed `artifacts/overlay-soak-results.json` is capped at 64 KiB. It distinguishes requested, actual and logical elapsed time and includes bounded numerical samples, peak sampled JS heap, frames, connection/request counts, `trustedInputCount`, errors and failure category. The independent reliability report sets numeric `diagnostic.independentIdleResumeChecks` to one only after its idle/resume assertions pass; it is not a soak measurement. A small explicit static-asset list reports local source byte totals and largest file size; it is not network transfer size or a full production asset audit. Nothing includes words, users, tokens, cookies, provider bodies or raw errors. General screenshots retain their existing raw/PNG/tile limits; this soak does not capture images.\\n@@\\n Source review found fractional performance-clock deltas were entering an integer-millisecond fixture clock, unlike the logical mode. The harness now canonicalizes cumulative elapsed time and adds a ten-minute probe; this corrects a fixture-contract violation but does not establish the cause of the observed timeout. Fresh smoke, logical, ten-minute probe and eventually two-hour wall execution remain parent validation gates.\\n+\\n+The parent subsequently reported that the integer-clock ten-minute probe failed at rune visibility after 630,951 ms, with nine completed cycles: the backend had one approved mark while the DOM had none and connection code four meant suspended. Online/consent and integer-clock checks held, with bounded GL resources. This matches the intentional ten-minute human-idle suspension; it is not a two-hour pass. The active-use trusted-input follow-up and independent idle/resume assertions are authored but await fresh native execution. No production idle, visibility, security, renderer or resource limit was changed.\\n@@\\n-Failure stages now distinguish mark creation/read, approval, rune visibility, forgetting, rune clearance, socket drop/reconnect, sample GC/metrics and observation waits. Catch diagnostics project only numeric fixture/DOM facts: cycle, logical clock, integer-clock flag, channel online/opt-in/pause/ban flags, approved/pending counts, requested participant's spent quota, available privacy floor, rune count, connection/context enums and assertion line. A -1 floor denotes unavailable private presence inspection in the memory fixture, not a measured floor. Diagnostic collection failure is itself a closed numeric flag; no text, participant ID, URL, token, provider body or raw error is reported. Failure does not change the visibility, privacy or resource gates.\\n+Failure stages now distinguish trusted input, mark creation/read, approval, rune visibility, forgetting, rune clearance, socket drop/reconnect, sample GC/metrics and observation waits. Catch diagnostics project only numeric fixture/DOM facts: cycle, logical clock, integer-clock flag, channel online/opt-in/pause/ban flags, approved/pending counts, requested participant's spent quota, available privacy floor, rune count, connection/context enums and assertion line. A -1 floor denotes unavailable private presence inspection in the memory fixture, not a measured floor. Diagnostic collection failure is itself a closed numeric flag; no text, participant ID, URL, token, provider body or raw error is reported. Failure does not change the visibility, privacy or resource gates.\\n*** End Patch\"));\n"
+}
+````
+
+### 5006. 2026-10-27T12:07:57.470Z — tool result (source line 18809)
+
+````text
+{
+  "call_id": "call_a881209c612049589e1bd97248dca985",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 5007. 2026-10-27T12:08:12.718Z — tool call (source line 18813)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_1aca291a47984c62b4fb88a9e92a00ed",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/scripts/browser-smoke-reliability.js\\n@@\\n   });\\n   stage = 'human-idle-suspend';\\n+  await page.emulateMedia({ reducedMotion: 'no-preference' });\\n+  await page.waitForFunction(\\n+    () => Number(document.querySelector('canvas.relic3d')?.dataset.frames) > 2,\\n+  );\\n+  f.advance(240000); // Resume must seek an elapsed completed receipt, not replay arrival.\\n   await page.clock.install();\\n*** End Patch\"));\n"
+}
+````
+
+### 5008. 2026-10-27T12:08:12.814Z — tool result (source line 18816)
+
+````text
+{
+  "call_id": "call_1aca291a47984c62b4fb88a9e92a00ed",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 5009. 2026-10-27T12:08:17.742Z — assistant (source line 18819)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Changed only the soak driver, reliability browser workflow and accessibility/performance document.\n\n- Active-use soak sends trusted Shift input every five real minutes; production idle policy is unchanged.\n- Independent browser-clock checks cover idle WSS closure and trusted-input recovery without arrival replay.\n- New numeric report fields: `trustedInputCount` and `diagnostic.independentIdleResumeChecks`.\n\nNo tests run by source. Native smoke, ten-minute probe, real two-hour soak and hosted journey CI remain pending.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 5010. 2026-10-27T12:11:11.309Z — user (source line 18829)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "242 sameoriginal/noGit/cloud/provider/creds/raw/live. ParentbackportedhotfixONLY5file onf18->1e9feea9f11daa3cb7f4f3b08148fa716a4a8722; allCIsoakunstagedpreserved. Source241closedsnapshotformat/secondaryscan0; Native241SMOKEpassed21300ms10cyclesGC4507464→5225844geom4tex1listeners52/trustedInputCount2. NEWreal10minACTIVE-USEprobeoceanic-crustaceanPID1505551runningfrozen241; DO NOT touchdriver/killprocesses/ports/browsercleanup. Parentalsoindependentreliabilitytestnext.\nACTUALNATIVE236JOURNEYFAIL: browser-smoke-journey-ci.js stage own-control-send TimeoutError assertionLine53 formatted file. checks0. Nativeconsolebeforefailure WARNING raid_relic_receiving_unavailable reason streams-shape stage observation, thenmark/approve/mark normal200. ThisisLOCALFAKE receivingnetwork/streamsDTOfixture mismatch, no realAPI. qNativeClearEnv/browserSandboxTCPoffline. visualReview seekers:true durable:true; pilotFixture twoHOME/OTHER provider mocks needexactreceivingconfiguredKeeperNetwork/pilotmapping/correctmulti-user streams support. InspectactualSource notguess. FixONLYnewjourneytest/fixtureoption ifneeded notproductionpolicy: seedconsistentDUMMYorcanonicalpilot2 mapping infixtureEnv(notthirdRealKeeperdiscovery) +supportmockGETstreams requestedIDsandrequiredshape/RoleModeratedScope asexistingnativeSeekertests. ActualruntimeSendOffmustcrossCSRF/UI/onePOSTraid; don'tbypassreceivingauthorize readiness/mockalreadyacceptedresponse/fakeDOM/disableSeekersguardtoforcepass. Don't changeLiveconfig/providerallowlists/defaultparticipantnetwork. IfhelperneededoptionalTestOnlyparameterbounded2networkexistingtestsupport safeallold43flows. FrameTargetbuttonmaylabelstringcase routeName; useactualnamedbuttons notbrittlehardcodedifwrong butno genericclickfirstunsafe. Need closednumericstage/statusdiag for nextNativeFailure, no cookies/tokens/rawDOM/providerbodies/IDslogs. Current Source241allotherfilesprotect; no speculativefeature. Parentwillsnapshot242runfocusedjourneyandseparatereliability thenall44serial/fullunit+hostedCI/new0journey-ci. Test maynextfailPNGsimulatormarker becauseactualruntimefixturemode; fixonlywithlegitimatefixtureclassificationnotfakingpassmarkers. PublicPNGactualapprovedmoon/heldprivateabsent/preconditionactualserver/readOnlyDTOscope required. No productionAPI/#ifCIbypass hooks. Source~3mincoherentfixthenSTOPpendingnative.Don'tclaim2hpass/probeuntilParentactualresult. CI wrapperos/env/readOnly/sandbox stayenabled; no depfetchlocally.No alltaskcompleteyet.\n"
+  }
+]
+````
+
+### 5011. 2026-10-27T12:11:15.182Z — assistant (source line 18832)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll trace the journey fixture’s receiving configuration and streams response, then fix the test setup without changing production policy or the running soak.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 5012. 2026-10-27T12:11:16.834Z — tool call (source line 18833)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_af25a5b213d240cf85a24706ec0dc450",
+  "input": "text(await tools.exec_command({cmd:\"sed -n '1,220p' scripts/browser-smoke-journey-ci.js\\nsed -n '1,240p' test-support/pilot-fixture.js\\nsed -n '20,65p' test-support/visual-review.js\\nrg -n 'streams-shape|configuredKeeperNetwork|PILOT_KEEPERS|seekers' src/receiving.js test-support/pilot-fixture.js\",\"max_output_tokens\":7800}));\n"
+}
+````
+
+### 5013. 2026-10-27T12:11:17.179Z — tool result (source line 18836)
+
+````text
+[credential-looking item omitted in full; reason: literal assignment; no credential status assumed]
+````
+
+### 5014. 2026-10-27T12:11:20.944Z — tool call (source line 18838)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_d7f9cd77d0e1473091fe556eeda154cf",
+  "input": "text(await tools.exec_command({cmd:\"sed -n '115,190p' src/receiving.js\\nrg -n 'user_login|viewer_count|PILOT_KEEPERS_JSON' test/receiving* test/seeker* src/config.js\\nrg -n 'Send Off|raid-target|refresh' public/control.js | head -30\\nsed -n '365,415p' src/receiving.js\",\"max_output_tokens\":2800}));\n"
+}
+````
+
+### 5015. 2026-10-27T12:11:21.064Z — tool result (source line 18841)
+
+````text
+{
+  "call_id": "call_d7f9cd77d0e1473091fe556eeda154cf",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "082993",
+        "wall_time_seconds": 0.00000436,
+        "exit_code": 0,
+        "original_token_count": 1281,
+        "output": "  enabled = false,\n  state,\n  store,\n  oauth,\n  clientId,\n  botId,\n  transport,\n  keepers = RECEIVING_KEEPERS,\n  streamerId = '1591805230',\n  now = Date.now,\n  logger = (line) => console.warn(line),\n}) {\n  keepers = keeperNetwork(keepers);\n  const ids = Object.keys(keepers);\n  if (\n    ids.length < 1 ||\n    ids.length > 4 ||\n    !ids.every((id) => /^\\d{1,32}$/.test(id) && /^[a-z0-9_]{1,25}$/.test(keepers[id])) ||\n    new Set(Object.values(keepers)).size !== ids.length\n  )\n    throw Error('Receiving configuration');\n  let cached = null,\n    attemptedAt = null,\n    pending = null;\n  const warnedGrants = new Map();\n  const warn = (reason, stage = 'observation') => {\n    try {\n      Promise.resolve(\n        logger(\n          JSON.stringify({\n            severity: 'WARNING',\n            event: 'raid_relic_receiving_unavailable',\n            reason,\n            stage,\n          }),\n        ),\n      ).catch(() => {});\n    } catch {\n      /* Observability cannot change eligibility. */\n    }\n  };\n  async function observations() {\n    if (!enabled) return null;\n    const t = now();\n    if (attemptedAt !== null && t >= attemptedAt && t - attemptedAt < 60000)\n      return pending ?? cached;\n    attemptedAt = t;\n    cached = null;\n    let failure = 'bot-grant-unavailable';\n    pending = boundedCall(async (signal) => {\n      signal.addEventListener(\n        'abort',\n        () => {\n          failure = 'timeout';\n        },\n        { once: true },\n      );\n      const token = await oauth.readAccessToken('bot', ['user:read:moderated_channels']);\n      const headers = { Authorization: `Bearer ${token}`, 'Client-Id': clientId };\n      const q = new URLSearchParams(ids.map((id) => ['user_id', id]));\n      failure = 'streams-http';\n      const r = await transport(`https://api.twitch.tv/helix/streams?${q}`, { headers, signal });\n      if (r.status !== 200) throw Error('Observation unavailable');\n      failure = 'streams-shape';\n      if (!Array.isArray(r.data?.data) || r.data.data.length > ids.length)\n        throw Error('Observation unavailable');\n      const streams = {};\n      for (const v of r.data.data) {\n        if (\n          !ids.includes(v.user_id) ||\n          streams[v.user_id] ||\n          v.type !== 'live' ||\n          !/^\\d{1,128}$/.test(v.id) ||\n          !count(v.viewer_count)\n        )\n          throw Error('Observation invalid');\nrg: src/config.js: No such file or directory (os error 2)\ntest/seeker-state.test.js:12:    for (const id of [HOME, OTHER]) f.streams.get(id).viewer_count = 1;\ntest/receiving.test.js:20:  for (const id of [HOME, OTHER]) f.streams.get(id).viewer_count = 1;\ntest/receiving.test.js:180:                { user_id: HOME, id: '1', type: 'live', viewer_count: 12 },\ntest/receiving.test.js:181:                { user_id: OTHER, id: '2', type: 'live', viewer_count: 2 },\ntest/receiving.test.js:453:                { user_id: HOME, id: '1', type: 'live', viewer_count: 1 },\ntest/receiving.test.js:454:                { user_id: OTHER, id: '2', type: 'live', viewer_count: 100 },\n39:const target = document.getElementById('raid-target');\n48:  'refresh-authorization': 'Check / refresh my Keeper authorization',\n61:  document.getElementById('refresh').disabled = value;\n89:async function refresh({ preserveResult = false } = {}) {\n122:      'Fresh Keeper authorization is not checked by status. If targets are missing, use Check / refresh my Keeper authorization; reconnect this matching Keeper if it fails. Refresh status never renews tokens.';\n232:        send.textContent = `Send Off to ${names[target.value]}`;\n242:        ? `Send Off to ${names[action.slice(5)]}`\n256:      status.textContent = 'Status refreshed. Review both channels before Send Off.';\n266:      'Recovery status unavailable. Reconnect and refresh; never repeat dispatch.';\n309:    await refresh({ preserveResult: true });\n318:document.getElementById('refresh').onclick = async () => {\n321:  await refresh();\n325:refresh();\n353:    await refresh({ preserveResult: true });\n385:    await refresh({ preserveResult: true });\n388:    status.textContent = 'Outcome unavailable. Refresh; do not blindly repeat Send Off.';\nexport function configuredKeeperNetwork(raw, { home, bot } = {}) {\n  let value = RECEIVING_KEEPERS;\n  if (raw !== undefined) {\n    if (typeof raw !== 'string' || Buffer.byteLength(raw) > 1024) throw Error('Keeper mapping');\n    try {\n      value = JSON.parse(raw);\n    } catch {\n      throw Error('Keeper mapping');\n    }\n    // JSON.parse otherwise silently accepts duplicate property names.\n    const keys = raw.match(/\"[^\"\\\\]*\"\\s*:/g) ?? [];\n    if (keys.length !== Object.keys(value ?? {}).length) throw Error('Keeper mapping');\n  }\n  const names = keeperNetwork(value);\n  if (\n    home !== '1591805230' ||\n    bot !== '1591804828' ||\n    !Object.hasOwn(names, home) ||\n    Object.hasOwn(names, bot) ||\n    Object.values(names).some((login) =>\n      ['raidrelicbot', '__proto__', 'prototype', 'constructor'].includes(login),\n    ) ||\n    Object.entries(RECEIVING_KEEPERS).some(([id, login]) => names[id] !== login)\n  )\n    throw Error('Keeper mapping');\n  return names;\n}\n"
+      }
+    }
+  ]
+}
+````
+
+### 5016. 2026-10-27T12:11:26.145Z — tool call (source line 18845)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_990a84c8d8864cfab5bc92edccda5c34",
+  "input": "text(await tools.exec_command({cmd:\"sed -n '1,42p' test/receiving.test.js\\nsed -n '1,25p' src/receiving.js\\nsed -n '185,205p' src/receiving.js\\nsed -n '210,238p' public/control.js\\nrg -n 'RECEIVING_KEEPERS|PILOT_KEEPERS_JSON' src/runtime.js\",\"max_output_tokens\":1800}));\n"
+}
+````
+
+### 5017. 2026-10-27T12:11:26.259Z — tool result (source line 18848)
+
+````text
+{
+  "call_id": "call_990a84c8d8864cfab5bc92edccda5c34",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "34104d",
+        "wall_time_seconds": 0.0000046,
+        "exit_code": 0,
+        "original_token_count": 1314,
+        "output": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\nimport { createReceiving, keeperNetwork } from '../src/receiving.js';\nimport { keeperCardFilename } from '../public/keeper-card.js';\nimport { parseMarkCommand } from '../src/marks.js';\n\nconst posts = (f) =>\n  f.calls.filter((c) => c.url.endsWith('/chat/messages')).map((c) => JSON.parse(c.body));\nasync function setup(kind, enabled = true) {\n  const f = await pilotFixture(kind, {\n    extraBotScopes: ['user:read:moderated_channels'],\n    chronicleEnv: {\n      SEEKERS_ENABLED: String(enabled),\n      MARK_AUTO_APPROVE_ENABLED: 'true',\n      MARK_REVIEW_BLOCKLIST: '[\"spoiler\"]',\n    },\n  });\n  for (const id of [BOT, HOME, OTHER]) await f.login(id);\n  for (const id of [HOME, OTHER]) f.streams.get(id).viewer_count = 1;\n  for (const id of [HOME, OTHER]) {\n    await f.control(id, 'bootstrap');\n    f.advance();\n    await f.control(id, 'keep');\n    f.advance();\n  }\n  return f;\n}\ntest('bounded operator Keeper mapping and commands do not admit arbitrary callers', () => {\n  assert.equal(Object.keys(keeperNetwork()).length, 2);\n  assert.throws(() => keeperNetwork({ 1: 'same', 2: 'same' }));\n  assert.throws(() => keeperNetwork({ x: 'bad' }));\n  assert.throws(() =>\n    keeperNetwork(Object.fromEntries([1, 2, 3, 4, 5].map((x) => [String(x), 'k' + x]))),\n  );\n  for (const text of ['!seek', '!relic seek', '!seek on'])\n    assert.deepEqual(parseMarkCommand(text), { type: 'seek-on' });\n  assert.deepEqual(parseMarkCommand('!seek off'), { type: 'seek-off' });\n  assert.deepEqual(parseMarkCommand('!relic where'), { type: 'where' });\n  assert.equal(parseMarkCommand('!seek @someone'), null);\n  assert.equal(\n    keeperCardFilename(2, 'olsols2', 'vertical'),\nimport { seekerState } from './seeker-state.js';\nimport { boundedCall } from './bounded.js';\nimport { runeSvg } from './marks.js';\n\nexport const RECEIVING_KEEPERS = Object.freeze({\n  1591805230: 'raidrelichq',\n  1591806023: 'olsols2',\n});\n// Operator-owned mapping. No request parameter can expand this admission boundary.\nexport function keeperNetwork(value = RECEIVING_KEEPERS) {\n  if (\n    !value ||\n    typeof value !== 'object' ||\n    Array.isArray(value) ||\n    ![Object.prototype, null].includes(Object.getPrototypeOf(value))\n  )\n    throw Error('Keeper mapping');\n  const pairs = Object.entries(value);\n  if (Object.getOwnPropertySymbols(value).length) throw Error('Keeper mapping');\n  if (\n    !pairs.length ||\n    pairs.length > 4 ||\n    !pairs.every(([id, login]) => /^[1-9]\\d{0,31}$/.test(id) && /^[a-z0-9_]{1,25}$/.test(login)) ||\n    new Set(pairs.map(([, login]) => login)).size !== pairs.length\n  )\n          streams[v.user_id] ||\n          v.type !== 'live' ||\n          !/^\\d{1,128}$/.test(v.id) ||\n          !count(v.viewer_count)\n        )\n          throw Error('Observation invalid');\n        streams[v.user_id] = { streamId: v.id, viewers: v.viewer_count };\n      }\n      const moderators = new Set();\n      let after = null;\n      const cursors = new Set();\n      for (let page = 0; page < 3; page++) {\n        const query = new URLSearchParams({ user_id: botId, first: '100' });\n        if (after) query.set('after', after);\n        failure = 'moderation-http';\n        const m = await transport(`https://api.twitch.tv/helix/moderation/channels?${query}`, {\n          headers,\n          signal,\n        });\n        if (m.status !== 200) throw Error('Moderator unavailable');\n        failure = 'moderation-shape';\n        dt.textContent = key;\n        const dd = document.createElement('dd');\n        dd.textContent = JSON.stringify(value.pilot[key], null, 2);\n        document.getElementById('ledger').append(dt, dd);\n      }\n    for (const group of ['setup', 'keeper', 'raid'])\n      document.getElementById(group).replaceChildren();\n    candidates = (value.pilot.candidates ?? []).filter(\n      (c) => c.id !== id && names[c.id] && c.observedOnline && c.optedIn && c.eligible,\n    );\n    for (const candidate of candidates) {\n      const option = document.createElement('option');\n      option.value = candidate.id;\n      option.textContent = `${candidate.login} · observed online${Number.isSafeInteger(candidate.viewers) && candidate.viewers >= 0 ? ' · ' + candidate.viewers + ' Twitch-reported viewers' : ''}`;\n      target.append(option);\n    }\n    target.disabled = busy || !candidates.length;\n    empty.hidden = candidates.length > 0;\n    if (candidates.length) {\n      const send = document.createElement('button');\n      const label = () => {\n        send.className = 'send-off';\n        send.textContent = `Send Off to ${names[target.value]}`;\n      };\n      label();\n      target.onchange = label;\n      send.onclick = () => run(`send:${target.value}`);\n      document.getElementById('raid').append(send);\n    }\n4:import { createReceiving, configuredKeeperNetwork, RECEIVING_KEEPERS } from './receiving.js';\n61:  if (env.PILOT_KEEPERS_JSON !== undefined && !raidPilot)\n64:    raidPilot || env.PILOT_KEEPERS_JSON !== undefined\n65:      ? configuredKeeperNetwork(env.PILOT_KEEPERS_JSON, {\n69:      : RECEIVING_KEEPERS;\n71:    env.PILOT_KEEPERS_JSON !== undefined\n80:    (env.PILOT_KEEPERS_JSON !== undefined &&\n"
+      }
+    }
+  ]
+}
+````
+
+### 5018. 2026-10-27T12:11:37.190Z — assistant (source line 18853)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "The streams mock supports multi-user requests. The setup order is the problem: bootstrapping HOME can trigger a receiving read before OTHER has `viewer_count`, and that failed observation is cached for a minute. I’ll populate both stream records first and add an authenticated preflight assertion for OTHER’s eligibility.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 5019. 2026-10-27T12:11:44.682Z — tool call (source line 18854)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_563e49c0c8ca42d7b72edda87a70d342",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/scripts/browser-smoke-journey-ci.js\\n@@\\n-  for (const id of [BOT, HOME, OTHER]) await f.login(id);\\n+  stage = 'fixture-streams';\\n+  // Bootstrap's status projection can observe the entire network. Populate\\n+  // BOTH valid provider rows before the first read, as receiving fixtures do;\\n+  // otherwise OTHER's missing count poisons the bounded observation cache.\\n+  for (const id of [HOME, OTHER]) f.streams.get(id).viewer_count = 4;\\n+  for (const id of [BOT, HOME, OTHER]) await f.login(id);\\n   for (const id of [HOME, OTHER]) {\\n-    f.streams.get(id).viewer_count = 4;\\n@@\\n   await f.chat(HOME, '302', '!mark private');\\n+  stage = 'own-control-preflight';\\n+  const status = await f.request('/control/' + HOME + '/status', 'GET', {\\n+    cookie: f.cookies[HOME],\\n+  });\\n+  diagnostic.controlStatusCode = status.status;\\n+  assert.equal(status.status, 200);\\n+  const own = JSON.parse(status.body);\\n+  const candidate = own.pilot?.candidates?.find((row) => row.id === OTHER);\\n+  diagnostic.candidateCount = own.pilot?.candidates?.length ?? 0;\\n+  diagnostic.targetOnline = Number(candidate?.observedOnline === true);\\n+  diagnostic.targetOptedIn = Number(candidate?.optedIn === true);\\n+  diagnostic.targetEligible = Number(candidate?.eligible === true);\\n+  assert.ok(candidate?.observedOnline && candidate?.optedIn && candidate?.eligible);\\n@@\\n   const [response] = await Promise.all([\\n@@\\n   ]);\\n+  diagnostic.sendStatusCode = response.status();\\n@@\\n   if (line) diagnostic.assertionLine = Number(line[1]);\\n+  try {\\n+    if (review) Object.assign(diagnostic, await review.page.evaluate(() => ({\\n+      targetOptionCount: document.querySelector('#raid-target')?.options.length ?? 0,\\n+      targetDisabled: Number(document.querySelector('#raid-target')?.disabled === true),\\n+      refreshDisabled: Number(document.querySelector('#refresh')?.disabled === true),\\n+    })));\\n+  } catch {\\n+    diagnostic.domDiagnosticUnavailable = 1;\\n+  }\\n*** End Patch\"));\n"
+}
+````
+
+### 5020. 2026-10-27T12:11:44.814Z — tool result (source line 18857)
+
+````text
+{
+  "call_id": "call_563e49c0c8ca42d7b72edda87a70d342",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 5021. 2026-10-27T12:11:53.047Z — assistant (source line 18862)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Changed only `scripts/browser-smoke-journey-ci.js`.\n\nBoth mock stream rows now receive valid viewer counts before bootstrap can cache a receiving observation. Added an authenticated preflight assertion for OTHER’s eligibility and closed numeric failure diagnostics.\n\nNo tests run by source. Native journey validation remains pending; the running soak and production code are untouched.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 5022. 2026-10-27T12:12:38.217Z — user (source line 18872)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "243 sameoriginal no production/Git/cloud/keys/live. Source242journeytestfixclosedawaitparentNative; ACTIVE10minprobeoceanic-crustacean frozen241stillRUNNINGdonotstop/driverchange. Independent241reliabilityNativeFAILED stagehuman-idle-suspend TimeoutError assertionLine143 after3priorchecksPASS. Source installs page.clock atline139 AFTERapp loaded andcreateOverlayClient capturedsetTimer=setTimeout atmoduleinitialization. ClockinstallAFTERcapture cannotvirtualizeexistingnativeidleTimerorcapturedsetTimeout; trustedShiftrearmusescapturednativeFn so fastForward600001doesnothing! FixONLYbrowser-smoke-reliability.js: install browser clockBEFOREfirstappnavigation/moduleload (aftervisualReviewpagecreatedbeforegoto), no pausingrealrender unintentionally; remove late duplicateinstall. Keep realWSSclosecount/noidleautoretry/Shifttrustedresume/erasedprojection/noarrivalreplayassertions. ThisisVIRTUALCLOCKseparatepolicytest not2hproof don'tinjectfakeconnection/dataset/status/callprivateprodfunctions. No productionidlechange/waive600000. OtherexistingrealGPU/reducedMotion/close-reconnecttests muststillrun underclockactualreadframes. IfbrowserclockinterferesexistingrendererwaituseSEPARATEfreshpage/contextwithclockBEFOREnavigationforidlecaseonly actualsamefixture; browserguardallorigin/securitysame.Port5191unchangedSyntheticOnly. Source~1minuteSTOPparentrefresh243focusjourney+reliability/gates. No otherCI/test/rawmetadata edits/Nodeexecution.\n"
+  }
+]
+````
+
+### 5023. 2026-10-27T12:12:42.189Z — assistant (source line 18875)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll move clock installation before the reliability page’s first navigation so the overlay captures the clock-controlled timers. All idle suspension and recovery assertions will stay intact.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 5024. 2026-10-27T12:12:43.265Z — tool call (source line 18876)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_46f26f45544e449983f46e9a60609e32",
+  "input": "text(await tools.exec_command({cmd:\"rg -n 'clock.install|page.goto|const \\\\{ page' scripts/browser-smoke-reliability.js\",\"max_output_tokens\":1000}));\n"
+}
+````
+
+### 5025. 2026-10-27T12:12:43.389Z — tool result (source line 18879)
+
+````text
+{
+  "call_id": "call_46f26f45544e449983f46e9a60609e32",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "cfc0d9",
+        "wall_time_seconds": 0.00000432,
+        "exit_code": 0,
+        "original_token_count": 37,
+        "output": "16:  const { page, context, fixture: f, origin } = review;\n44:  await page.goto(origin + '/overlay/' + OTHER);\n139:  await page.clock.install();\n"
+      }
+    }
+  ]
+}
+````
+
+### 5026. 2026-10-27T12:12:46.915Z — tool call (source line 18881)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_521c6774ef18497da1c714517dab131e",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/scripts/browser-smoke-reliability.js\\n@@\\n   review = await visualReview({ durable: true });\\n   const { page, context, fixture: f, origin } = review;\\n+  // Install before module evaluation: overlay-client captures timer functions\\n+  // at creation. The clock runs normally until the explicit idle fast-forward.\\n+  await page.clock.install();\\n@@\\n-  await page.clock.install();\\n   await page.keyboard.press('Shift');\\n*** End Patch\"));\n"
+}
+````
+
+### 5027. 2026-10-27T12:12:47.037Z — tool result (source line 18884)
+
+````text
+{
+  "call_id": "call_521c6774ef18497da1c714517dab131e",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 5028. 2026-10-27T12:12:50.590Z — assistant (source line 18887)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Updated only `scripts/browser-smoke-reliability.js`: clock installation now precedes app navigation, and the late duplicate was removed. All WSS closure, idle suspension and trusted-resume assertions remain intact.\n\nNo tests run by source. Native validation is pending; the running probe is untouched.",
     "annotations": [],
     "logprobs": []
   }
