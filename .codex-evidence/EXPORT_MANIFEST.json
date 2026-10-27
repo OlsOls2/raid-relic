@@ -1,23 +1,23 @@
 {
   "formatVersion": 1,
   "sessionID": "01a1705c-a87d-7143-80f6-021e47b78ced",
-  "inputLeaf": "rollout-2026-10-27T07-41-28-094Z-01a1705c-a87d-7143-80f6-021e47b78ced.jsonl",
-  "rawSnapshotSHA256": "a03f1b980538b9b6aca601e549ee6c8bcec40476d7802968477b6e68a861d28b",
-  "rawBytes": 91257094,
+  "inputLeaf": "rollout-2026-10-27T08-10-23-104Z-01a1705c-a87d-7143-80f6-021e47b78ced.jsonl",
+  "rawSnapshotSHA256": "94deb98d4dc5f02e118b24c1de2419b7af9d93c1d08ddec47183c0c9d0f664fe",
+  "rawBytes": 91648902,
   "eventCounts": {
     "session_meta": 1,
-    "event_msg": 8309,
-    "response_item": 7261,
+    "event_msg": 8362,
+    "response_item": 7307,
     "world_state": 144,
-    "turn_context": 233,
-    "token_usage_record": 2161,
+    "turn_context": 234,
+    "token_usage_record": 2175,
     "compacted": 17
   },
-  "exportedEntries": 4827,
+  "exportedEntries": 4857,
   "omissions": {
     "private": 116,
     "media": 3,
-    "unselected": 13298,
+    "unselected": 13382,
     "truncated": 10,
     "credentialLookingItems": 67,
     "credentialReasons": {
@@ -26,10 +26,10 @@
     }
   },
   "firstTimestamp": "2026-10-25T00:01:23.357Z",
-  "cutoff": "2026-10-27T07:40:18.825Z",
-  "exportSHA256": "6108bb5119a581837bf424737435913f3b8364c20b3ddc2e467f8349339921a9",
-  "exportBytes": 14818177,
-  "sourceRunLogCount": 232,
+  "cutoff": "2026-10-27T08:03:34.106Z",
+  "exportSHA256": "112b6f02001a17b66da09ea92b4d479f5e19ea71b086ff3e275593caa9f2d6aa",
+  "exportBytes": 14930092,
+  "sourceRunLogCount": 233,
   "sourceRunLogs": [
     {
       "leaf": "run-000.jsonl",
@@ -1190,6 +1190,11 @@
       "leaf": "run-231.jsonl",
       "bytes": 30697,
       "sha256": "ab3cc9c0bf053885a6d535dbc86e032f65d3e7d56458d9b92a5bb0db13f4ea7c"
+    },
+    {
+      "leaf": "run-232.jsonl",
+      "bytes": 124097,
+      "sha256": "bc0365af5cf99a5a1828334c6d4390d6f9b8c016506e62d629781360b2589e23"
     }
   ],
   "scope": "Selected sanitized native JSONL; private/internal/media omitted and per-item output bounded. Raw snapshot remains local ignored. Secondary scanner findings cause whole selected-entry omission, including public identifiers; zero-finding rescan required.",
@@ -1203,6 +1208,6 @@
     },
     "omissionReportSHA256": "f7d9d91ab7dc699ae8cd590f91c224919b5b7f579e5574aaf70561df58e79457",
     "reportSHA256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
-    "scannedExportSHA256": "6108bb5119a581837bf424737435913f3b8364c20b3ddc2e467f8349339921a9"
+    "scannedExportSHA256": "112b6f02001a17b66da09ea92b4d479f5e19ea71b086ff3e275593caa9f2d6aa"
   }
 }

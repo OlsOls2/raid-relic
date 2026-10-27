@@ -14,6 +14,11 @@ import { meterProgress } from './claim-meter.js';
 import { createOverlayAudio, createCueTracker } from './overlay-audio.js';
 import { arrivalPhase } from './arrival.js';
 import { connectOverlay, resonanceActive } from './overlay-client.js';
+// Avoid replacing live-region text nodes on every animation frame.
+const updateText = (selector, value) => {
+  const node = document.querySelector(selector);
+  if (node.textContent !== value) node.textContent = value;
+};
 const channel = /^\/overlay\/(\d{1,32})$/.exec(location.pathname)?.[1];
 const echoNote = document.createElement('span');
 echoNote.className = 'echo-note';
@@ -404,9 +409,11 @@ function frame() {
     document.querySelector('#accept-arc').style.strokeDashoffset = String(
       307.876 * (1 - progress.accepts),
     );
-    document.querySelector('#claim-label').textContent =
-      `${meter.awaitingRaid ? (current.mode === 'simulator' ? 'Awaiting verified raid · gathering light' : 'Waiting for Twitch to confirm the raid') : current.mode === 'simulator' ? 'The raid arrived · claim the relic' : 'Bind the relic · two chats'} · ${progress.seconds}s · Offer ${meter.offers}/${meter.threshold} · Accept ${meter.accepts}/${meter.threshold}`;
-  } else document.querySelector('#claim-label').textContent = '';
+    updateText(
+      '#claim-label',
+      `${meter.awaitingRaid ? (current.mode === 'simulator' ? 'Awaiting verified raid · gathering light' : 'Waiting for Twitch to confirm the raid') : current.mode === 'simulator' ? 'The raid arrived · claim the relic' : 'Bind the relic · two chats'} · ${progress.seconds}s · Offer ${meter.offers}/${meter.threshold} · Accept ${meter.accepts}/${meter.threshold}`,
+    );
+  } else updateText('#claim-label', '');
   const cinematic = cinema.frame(current, time, {
     reduced: motion.matches,
     hidden: document.hidden,
@@ -544,20 +551,24 @@ function frame() {
   archive.dataset.phase = arrival.phase;
   archive.style.setProperty('--arrival', arrival.progress);
   const hop = current?.handoff;
-  document.querySelector('#handoff').textContent =
+  updateText(
+    '#handoff',
     hop && time < hop.endsAt
       ? hop.completed
         ? ''
         : `${current.mode === 'simulator' ? 'App-local ritual' : 'Ritual'} · ${Math.max(0, Math.ceil((hop.endsAt - time) / 1000))}s · offer ${hop.offers}/${hop.threshold} · accept ${hop.accepts}/${hop.threshold}`
-      : '';
-  document.querySelector('#compact-handoff').textContent =
+      : '',
+  );
+  updateText(
+    '#compact-handoff',
     hop && time < hop.endsAt
       ? hop.completed
         ? current.movedToLogin
           ? ''
           : 'Bound by two chats'
         : `${current.mode === 'simulator' ? 'Local ' : ''}${Math.max(0, Math.ceil((hop.endsAt - time) / 1000))}s · O${hop.offers}/${hop.threshold} A${hop.accepts}/${hop.threshold}`
-      : '';
+      : '',
+  );
   frameId = requestAnimationFrame(frame);
 }
 if (frameId === null && !document.hidden && document.body.dataset.connection !== 'suspended')
