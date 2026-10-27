@@ -9,6 +9,7 @@ export async function pilotFixture(
   kind = 'memory',
   {
     simulator = true,
+    rotateTokens = false,
     extraKeeperScopes = [],
     extraBotScopes = [],
     p7HTTP,
@@ -27,6 +28,10 @@ export async function pilotFixture(
     throw Error('Synthetic fixture clock rejected');
   let seq = 0;
   let validationOverride = null;
+  let refreshFailure = null;
+  const issued = new Map(),
+    versions = new Map(),
+    currentAccess = new Map();
   const secret = 'synthetic-pilot-hmac-secret';
   const streams = new Map(
     ids.map((id, index) => [
@@ -54,20 +59,29 @@ export async function pilotFixture(
       const form = new URLSearchParams(options.body);
       if (form.get('grant_type') === 'client_credentials')
         return { status: 200, data: { access_token: 'synthetic-app' } };
-      const id = form.get('code') ?? form.get('refresh_token')?.slice('refresh-'.length);
+      const refresh = form.get('grant_type') === 'refresh_token';
+      if (refresh && refreshFailure !== null) return { status: refreshFailure, data: {} };
+      const rawId = form.get('code') ?? form.get('refresh_token')?.slice('refresh-'.length);
+      const id = rawId?.replace(/-v\d+$/, '');
       if (revoked.has(id)) return { status: 400, data: {} };
+      const version = (versions.get(id) ?? 0) + 1;
+      versions.set(id, version);
+      const access = `access-${id}${rotateTokens ? '-v' + version : ''}`;
+      currentAccess.set(id, access);
+      issued.set(access, id);
       expired.delete(id);
       return {
         status: 200,
         data: {
-          access_token: `access-${id}`,
-          refresh_token: `refresh-${id}`,
+          access_token: access,
+          refresh_token: `refresh-${id}${rotateTokens ? '-v' + version : ''}`,
           token_type: 'bearer',
         },
       };
     }
     if (u.pathname.endsWith('/validate')) {
-      const id = options.headers.Authorization.slice('OAuth access-'.length);
+      const access = options.headers.Authorization.slice('OAuth '.length);
+      const id = issued.get(access) ?? access.slice('access-'.length);
       if (revoked.has(id) || expired.has(id)) return { status: 401, data: {} };
       return {
         status: 200,
@@ -118,7 +132,10 @@ export async function pilotFixture(
     }
     if (u.pathname === '/helix/chat/messages') {
       assert.equal(options.method, 'POST');
-      assert.equal(options.headers.Authorization, `Bearer access-${BOT}`);
+      assert.equal(
+        options.headers.Authorization,
+        `Bearer ${currentAccess.get(BOT) ?? 'access-' + BOT}`,
+      );
       const body = JSON.parse(options.body);
       assert.deepEqual(Object.keys(body).sort(), ['broadcaster_id', 'message', 'sender_id']);
       assert.equal(body.sender_id, BOT);
@@ -154,36 +171,35 @@ export async function pilotFixture(
     }
     throw new Error('Unexpected mocked route');
   };
-  const runtime = await createRuntime(
-    {
-      ...chronicleEnv,
-      NODE_ENV: 'development',
-      STATE_STORE: db ? 'firestore' : 'memory',
-      GOOGLE_CLOUD_PROJECT: 'raid-relic-hackathon',
-      OAUTH_ENABLED: 'true',
-      RAID_PILOT_ENABLED: 'true',
-      KEEPER_CHANNEL_IDS: ids.join(','),
-      ...(ids.length !== 2 ? { PILOT_KEEPERS_JSON: JSON.stringify(keepers) } : {}),
-      TWITCH_STREAMER_ID: HOME,
-      TWITCH_BOT_ID: BOT,
-      TWITCH_CLIENT_ID: 'public-client',
-      TWITCH_CLIENT_SECRET: 'synthetic-client-secret',
-      TWITCH_EVENTSUB_SECRET: secret,
-      TOKEN_ENCRYPTION_KEY: Buffer.alloc(32, 5).toString('base64'),
-      OAUTH_REDIRECT_URI: `${origin}/auth/callback`,
-      OAUTH_REDIRECT_ALLOWLIST: `${origin}/auth/callback`,
-      EVENTSUB_CALLBACK_URL: `${origin}/eventsub`,
-    },
-    {
-      firestoreClient: db,
-      transport,
-      p7HTTP,
-      chronicleHTTP,
-      forgeHTTP,
-      simulator,
-      now: () => time,
-    },
-  );
+  const runtimeEnv = {
+    ...chronicleEnv,
+    NODE_ENV: 'development',
+    STATE_STORE: db ? 'firestore' : 'memory',
+    GOOGLE_CLOUD_PROJECT: 'raid-relic-hackathon',
+    OAUTH_ENABLED: 'true',
+    RAID_PILOT_ENABLED: 'true',
+    KEEPER_CHANNEL_IDS: ids.join(','),
+    ...(ids.length !== 2 ? { PILOT_KEEPERS_JSON: JSON.stringify(keepers) } : {}),
+    TWITCH_STREAMER_ID: HOME,
+    TWITCH_BOT_ID: BOT,
+    TWITCH_CLIENT_ID: 'public-client',
+    TWITCH_CLIENT_SECRET: 'synthetic-client-secret',
+    TWITCH_EVENTSUB_SECRET: secret,
+    TOKEN_ENCRYPTION_KEY: Buffer.alloc(32, 5).toString('base64'),
+    OAUTH_REDIRECT_URI: `${origin}/auth/callback`,
+    OAUTH_REDIRECT_ALLOWLIST: `${origin}/auth/callback`,
+    EVENTSUB_CALLBACK_URL: `${origin}/eventsub`,
+  };
+  const runtimeOptions = {
+    firestoreClient: db,
+    transport,
+    p7HTTP,
+    chronicleHTTP,
+    forgeHTTP,
+    simulator,
+    now: () => time,
+  };
+  let runtime = await createRuntime(runtimeEnv, runtimeOptions);
   const cookies = {};
   const request = (path, method = 'GET', headers = {}, rawBody = Buffer.alloc(0)) =>
     runtime.dispatch({ path, method, headers, rawBody });
@@ -212,7 +228,7 @@ export async function pilotFixture(
     );
   }
   function signed(type, event, host, condition, options = {}) {
-    const id = `pilot-event-${++seq}`,
+    const id = options.deliveryId ?? `pilot-event-${++seq}`,
       timestamp = new Date(options.sentAt ?? time).toISOString();
     const rawBody = Buffer.from(
       JSON.stringify({
@@ -255,7 +271,19 @@ export async function pilotFixture(
       { from_broadcaster_user_id: from },
     );
   return {
-    runtime,
+    get runtime() {
+      return runtime;
+    },
+    async restart() {
+      if (kind !== 'firestore') throw Error('Memory fixtures are not durable across processes');
+      runtime = await createRuntime(runtimeEnv, runtimeOptions);
+      return runtime;
+    },
+    refreshFailure(status) {
+      if (status !== null && ![400, 401, 429, 503].includes(status))
+        throw Error('Closed refresh fault');
+      refreshFailure = status;
+    },
     db,
     request,
     control,

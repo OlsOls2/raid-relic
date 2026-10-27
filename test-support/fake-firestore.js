@@ -10,6 +10,7 @@ export function fakeFirestore() {
     reads: [],
     writes: [],
     failCommit: false,
+    failReads: false,
     retry: false,
     collection(name) {
       return {
@@ -18,6 +19,7 @@ export function fakeFirestore() {
           return {
             key,
             async get() {
+              if (db.failReads) throw Error('Synthetic unavailable store');
               db.reads.push(key);
               return snapshot(docs.get(key));
             },
@@ -39,6 +41,7 @@ export function fakeFirestore() {
           let writing = false;
           const tx = {
             async get(ref) {
+              if (db.failReads) throw Error('Synthetic unavailable store');
               db.reads.push(ref.key);
               assert.equal(writing, false, 'All transaction reads precede writes');
               return snapshot(docs.get(ref.key));

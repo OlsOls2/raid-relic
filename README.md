@@ -120,3 +120,7 @@ Source 208 adds a client-only **`/demo/film`** storyboard: 150 seconds from Send
 ### New Keeper checklist
 
 Source 212 adds **`/start`** and a private own-channel checklist for connecting Twitch, opting in, copying the canonical OBS URL and explicitly becoming a Seeker. Public readiness starts unchecked; private ticks expire and copying never claims OBS is installed. This remains a configured pilot, not open enrollment. [Two-minute setup guide and review boundaries](docs/GETTING_STARTED.md). Native review and this increment's read-only preview are pending; canonical production is not changed by source authoring.
+
+### Reliability review layers
+
+[Source 216 reliability review](docs/RELIABILITY_DEMO.md) covers signed webhook redelivery, pending-claim token expiry, shared-store runtime reconstruction and an actual local browser WSS recovery workflow. EventSub uses webhooks; the WebSocket is the read-only OBS/browser feed. The operator corroborated one min-zero cold start on the older `judge-ready` / `9b` zero preview with a matching AUTOSCALING startup record; its 2223ms first GET and 117ms follow-up are an anecdote, not a latency guarantee or a cold test of the new reliability revision. This test/docs increment adds no running resource, keepalive or production behavior change; its native browser/release gate remains pending.

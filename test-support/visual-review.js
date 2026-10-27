@@ -3,9 +3,9 @@ import { createServer } from 'node:https';
 import { createLocalTLS } from './local-tls.js';
 import { attachOverlaySockets } from '../src/overlay-sockets.js';
 import { pilotFixture } from './pilot-fixture.js';
-export async function visualReview({ seekers = false } = {}) {
+export async function visualReview({ seekers = false, durable = false } = {}) {
   const origin = 'https://localhost:5191',
-    fixture = await pilotFixture('memory', {
+    fixture = await pilotFixture(durable === true ? 'firestore' : 'memory', {
       origin,
       ...(seekers === true
         ? {
@@ -15,8 +15,8 @@ export async function visualReview({ seekers = false } = {}) {
         : {}),
     });
   const tls = await createLocalTLS(),
-    server = createServer(tls.options, fixture.runtime.handler);
-  const sockets = attachOverlaySockets(server, fixture.runtime.overlayFeeds, {
+    server = createServer(tls.options, (req, res) => fixture.runtime.handler(req, res));
+  let sockets = attachOverlaySockets(server, fixture.runtime.overlayFeeds, {
     origins: [origin],
     allowRead: fixture.runtime.allowPublicRead,
   });
@@ -52,6 +52,18 @@ export async function visualReview({ seekers = false } = {}) {
     return {
       origin,
       fixture,
+      dropConnections() {
+        for (const socket of sockets.clients) socket.terminate();
+      },
+      async restartRuntime() {
+        if (durable !== true) throw Error('Durable fixture required');
+        sockets.close();
+        await fixture.restart();
+        sockets = attachOverlaySockets(server, fixture.runtime.overlayFeeds, {
+          origins: [origin],
+          allowRead: fixture.runtime.allowPublicRead,
+        });
+      },
       page,
       context,
       observe: (p) => p.on('pageerror', () => errors++),

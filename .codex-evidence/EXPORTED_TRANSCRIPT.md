@@ -2,7 +2,7 @@
 
 Session: 01a1705c-a87d-7143-80f6-021e47b78ced
 
-Snapshot cutoff: 2026-10-27T05:01:10.477Z (last timestamped record; not a claim that future/active conversation is included).
+Snapshot cutoff: 2026-10-27T05:23:54.384Z (last timestamped record; not a claim that future/active conversation is included).
 
 This is a readable selected native-JSONL export, NOT a complete raw transcript. User/assistant messages and tool calls/results are retained; duplicate native event records are labelled. Private system/developer/bootstrap instructions, reasoning/analysis, opaque encrypted fields, media/base64 and other internal metadata are omitted. Each item is capped at 32768 characters with an explicit omission count and sanitized-item digest. No raw-backup links or private credentials are published. Credential-looking literals, headers or sensitive fields cause whole-item content omission, with source line and reason retained; counts are in the manifest. Strong key patterns remain fatal across all selected visible fields, even in otherwise omitted items. Existing synthetic fixture literals are explicitly classified, not proof of real authentication.
 
@@ -71331,6 +71331,775 @@ This is a readable selected native-JSONL export, NOT a complete raw transcript. 
   {
     "type": "output_text",
     "text": "Updated only `control.css`, the onboarding browser test and its unit tests.\n\n- Long private status/code/button text now wraps without clipping or font shrinkage.\n- Exact width assertions remain unchanged.\n- Added closed diagnostics: `textOffenderCode`, `textOverflowPx`, `textNodesMeasured`; no text or URLs logged.\n\n**18 focused tests passed, zero skips; syntax/format passed.** The specific overflowing text and native fix still need parent confirmation.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4556. 2026-10-27T05:15:02.936Z — user (source line 17105)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "216 NEWQUEUEPHASE3RELIABILITY user6be9c020 sameORIGINAL01a1705c-a87d-7143-80f6-021e47b78cedONLYsolecreativewriter/no fork/delegation/Git/cloud/provider/credentials/rawselectedevidence/cron/REALstreams/chat/CONTROLPAGES/SendOff. Phase1film48f35cb0DONE/84439/122. Phase2firstRun0DONE9d534efda74a03e62226c1684bb3a0b270995a15/revraid-relic-first-run-1027/tagfirst-run https://first-run---raid-relic-vz4bhnskgq-uc.a.run.app/start. ExactCI40453873737SUCCESS/NATIVE852/852ZEROskip+ALL40SERIAL125checksPASS.BothoriginalartNativeguide3tilesParentVIEWED; nativefreshOTHERfullmockOAuthcallback→Own5subscriptions→optIn→copyOBSmanual→SeeknonholderPASS/HOMEholderCannotSeek/roleCSRFboundaries/freshTicksTTL10s/mobile3203901280allPASS. Source213testinitialRelicPlacementnotpolicybugfixedrealisticHomebaseline;214215scopedCSSwrap3pxtextoverflowfixednothiding. Source215closed05:01:10.4774555entries216CLIlogs5wholeomissions0rescan419files24844194. ActualprodSTILLseeker-state-on3d100/alloldaliases/resources/refs/scopeskept. No redoP9/onboarding/film. PHASE4Devpost217stillmustfollowYOUR0notstopafterreliability.\nPHASE3 user: 'Reliability pass on live path. TestcoldstartsCloudRunmin0, EventSub websocket reconnects/tokenexpiry midraid;fixdemo-flakesfreeTier/min0/nopaidservices.' ACTUALARCHITECTUREEventSubTRANSPORT=WEBHOOK/notupstreamEventSubWebSocket. Don'tinventconnectionnotimplemented orredesigndeliverybridge. COVERverifiedWEBHOOKduplicate/redelivery/delay plusACTUALOBS/browseroverlayWSdisconnect/reconnect/serverrestart/newruntimeSourcepersistentstate. DocsnoteWebHookvsbrowserWStruthfullyandactualphysicalTwitchdropowneroperated. TestsnotLiveprovider/forceRevokes/raidPOST/realcontrolpages. Allruntime/privateScopes/reliabilitysimNativeboundariesunchanged.\nParentALREADYAUTHORIZEDONLYRO0HTTPColdProbe(phase3now). Freshmetadataoldjudge-ready0/minInstances0/max1/no scalingchange/no trafficchange/noconfig/streamscontrolsedits. HealthGETat05:13:30.547 firstHTTP200release9b/elapsed2223ms onIDLEoldjudge-ready-1027, secondafter5sec200117ms/no writes/no cookies. ParentqueryplatformSYSTEMSTARTUPLOGat05:13:39.151 foundNONEyet (logindexlag/coldnotguaranteed). IMPORTANTDO NOTCLAIMCOLDSTARTfromlatencyALONE; coldstateUNCONFIRMEDuntilstartupAUTOSCALING corroboration. Parentwillreadmetadata/systemlogagain afteryourcodefaulttests. Docsinitialfactsincludequalifiedmin0healthfirstvsfollowupNOTp95/SLA/guaranteedcold. ParentoperatoronlyGCPcallsSourceNOcloud/SDK credentials/liveNet. Registry358.067MB<0.5GBprojectandcleanupdryRunTRUE/readOnly/no globalfreeTierguarantee; allresourcesexisting/autoscalingMin0/NOmin1/keepalivepoll/newtimer/paidservice tofixlatency. No configurationknob/timeredits bySource.\nIMPLEMENTTARGETEDFAULTREGRESSIONS FIRST inspectcurrenttestedgapsnotrandomrefactor. Needactualruntimefixturetests BOTHmemory+sharedFakeFirestore whereuseful: afterauthenticatedlocalsetup/actualSIGNEDSourceSendOffmockAPIaccepted/permittedverifiedRaid receipt/pendingquorum, expireSOURCEKEEPERgrantMIDPENDING/rotateBOTgrant justbeforeACK, refreshboundstate/perRoleSingleflight/distLease/re-read/CAS ; validTTLno writes; tokenerrortransient503429backsOff/notreconsent/doesNOTerasependinghop/quorum/retroforgevotes; onlyrefresh400401reConsent truthful; no unauthorizedrole/tokenstorage/privatePIIprint; ACKexactroom/dedup/provideracceptanceNotProvenViewerRendered.No API401RaidPOSTretry—unsafeSTART_RAIDPOST neverautomaticallyreplayed/duplicateEventSubcannotdoublering. Claim alreadyverifiedbyEventSub+signedactors persisted independentOAuthExpiry provideraccess. Don'tloosenauthentication whenexpired, no actors/acceptancefakeauthority.Be explicitmocktransportvsactuallive.\nCOLDPROCESSfault: reconstructcreateRuntime/sharedSTOREafterfirstsourceoffer/partialpendingtargetvote fromsignedevents; recoveringpublisherFreshFeedshouldsendcurrentcompleteclaimstatewithPERSISTEDclock/timestamp/lastclaim/stop only, neverreplayarrivalasfreshonread/reconnect/pretendr0/bootstrapnewrelic/losestreak. Newruntimegrantcacheempty probesfirstusevalidSDKsafe; ifstateunavailable bootfailclosed503, no bootstrap writes/retryunsafeprovider. NativecoldinitfreshNodefixture localnotactualCloudRunstartup—labelseparate. FakeFirestoretransactionsread-beforewritepreservebounds; writerconcurrency lease testsSource52alreadybroad12caseskeep unchanged. NeedNodeintegrationtestswithmockTransportf. HTTPHMACchallenge/replay/body/timestamp strict afterredelivery; no newsubs/scopes/method.SIGNEDlocaltestsidempotency windowsknown/lateness currentclock3min TTLdon'twaive.WeCanassertcreatedAtpendingEqualbeforeAfterreconnect/restart, oldstopsretained/ringsstreakunchangeduntilrealmockcomplete.\nBROWSERnewbrowser-smoke-reliability.js(orstrengthenexisting small) actualTLSfixtureapprovedoriginWebSocket forcecloseLOCALconnection/serverws hub thenbrowserauto reconnect (NOTremoveWSSoriginsecurity), GETinitialprojectionarrivalsphasealreadyelapsedseekNOTnew20scinematic flash; pendingmeterretainsvotes/time; aftermockcompletionconsistentring/holder afterdisconnect. Testnetworkoffline/reconnectno rapidunboundedretry/jitterbounded; fallback/reducedmotion/connectionlostmessageclearswithoutreload; no StalePrivateWordafterForget/optOutnewSnapshot. CanusePageclockfastforwardboundedNsecondsNODEserverclock f.advance separatelytruthful, notfakeconnectedStateinDOM. Avoidwaiting3minwall, tests≤150secactualparentNodecap1GB/PNG4Mno raise. Existingpreview0selfWSS403INTENTIONALbecauseoriginscanonical—don'twidenCORS/WSorigins/disableP5to'make0live'. OnlyLOCALcanonicalfixture actualWSSliveproof, ProductionOBS/RaidphysicalOwnerGrokafterpromote.UserexplicitDon'ttouchrealstream/chat/control/SendOff. No needprivatePNGcapture reliabilitynonvisualunlessUIbugfix; oneoptionalboundedframeifnewUIrecovery state.\nPatchONLYrealbugsrevealed,reliableboundedlogic—notinventpatchbecauseuseraskedfix, tests+docsvalidincrementifallproductionbehaviorsalreadycorrect. Small no dependencies/protocolarchitecture/capchange. Docs/RELIABILITY_DEMO.md exactlayeredmatrix(nativeFaults,public0HTTPlatencies,coldcorroborationpending/physicalgates), humanliveDemoChecklistONLYowner/no activationinstructionsautomated.Mayadd docsproofJSONnonsecretclosedmetadataifParentwillprovide later via217Sourcefollowupbutno speculativecoldPASS.Gitnativegatesknown85240historicalcurrentchangesParentfreshcountsnotinventQUALITY; Sourcefocusedtestsactualreturn.IncludeactualwhichNativeFaultScenariofullyexercisednotmockonlypurereducer.Newbundle42?countactual.FullParentQA+publishONE0tagreliability/revraid-relic-reliability-1027 thenPHASE4Source217privateDEVPOST_DRAFT7sections/no post. Source216~8minfocusedfaultcoverage/genuinefix thenSTOPParentnativegreen+systemlogsactual. Don'tstopwholeassignedqueueafter216asall4notdoneyet.No coldautoscaleconfigsourceproofmissingphysicalObsnotallworkblocked.'ZeroRunningCost'no newongoingpaidinfrastructure versusliteralGCPfreeguarantee truthful.DonotreadselectedprivateGCPrawfiles SourcecanuseParentquotedfactsONLY; privatecredentials notlogs.\n"
+  }
+]
+````
+
+### 4557. 2026-10-27T05:15:08.012Z — assistant (source line 17110)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll test the two delivery paths separately: signed EventSub webhook redelivery and browser/OBS WebSocket reconnects. I’ll add fault regressions around pending claims, token expiry and process reconstruction, and patch only bugs the tests expose. The min-zero HTTP timing will stay labelled “cold start unconfirmed.”\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4558. 2026-10-27T05:15:09.773Z — tool call (source line 17111)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_6944e427e136429bb317e68ec5d7e8ce",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '1,130p' src/runtime.js; sed -n '340,415p' src/runtime.js; cat test-support/fake-firestore.js | head -70; cat test/oauth-maintenance.test.js | head -80; rg -n 'restart|reconstruct|createRuntime|store' test/recovery.test.js | head -35; cat public/overlay-client.js | head -125; sed -n '1,95p' src/overlay-sockets.js\",\"max_output_tokens\":4800})).output)\n"
+}
+````
+
+### 4559. 2026-10-27T05:15:10.160Z — tool result (source line 17114)
+
+````text
+[credential-looking item omitted in full; reason: literal assignment; no credential status assumed]
+````
+
+### 4560. 2026-10-27T05:15:27.157Z — tool call (source line 17118)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_4fdf11c52e0e45c09e36306c87d0be2c",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '118,158p' test-support/pilot-fixture.js; sed -n '212,257p' test-support/pilot-fixture.js; cat src/overlay-feed.js; sed -n '125,215p' public/overlay-client.js; sed -n '1,110p' scripts/browser-smoke-recovery.js; rg -n 'data-|connection|status' public/overlay.js | tail -25; rg -n 'data-' public/arrival.js | head\",\"max_output_tokens\":3300})).output)\n"
+}
+````
+
+### 4561. 2026-10-27T05:15:27.252Z — tool result (source line 17121)
+
+````text
+{
+  "call_id": "call_4fdf11c52e0e45c09e36306c87d0be2c",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "Warning: truncated output (original token count: 4130)\nTotal output lines: 482\n\n    }\n    if (u.pathname === '/helix/chat/messages') {\n      assert.equal(options.method, 'POST');\n      assert.equal(options.headers.Authorization, `Bearer access-${BOT}`);\n      const body = JSON.parse(options.body);\n      assert.deepEqual(Object.keys(body).sort(), ['broadcaster_id', 'message', 'sender_id']);\n      assert.equal(body.sender_id, BOT);\n      assert.ok(ids.includes(body.broadcaster_id));\n      assert.equal(typeof body.message, 'string');\n      assert.ok(body.message.length <= 500);\n      if (chatFailure === 'transport') throw Error('synthetic-token-sensitive-network-error');\n      if (chatFailure === '401')\n        return { status: 401, data: { message: 'synthetic-sensitive-body' } };\n      if (chatFailure === 'drop')\n        return {\n          status: 200,\n          data: {\n            data: [\n              {\n                is_sent: false,\n                drop_reason: {\n                  code: 'untrusted-sensitive-code',\n                  message: 'synthetic-sensitive-body',\n                },\n              },\n            ],\n          },\n        };\n      return {\n        status: 200,\n        data: { data: [{ is_sent: true, message_id: `mock-chat-${calls.length}` }] },\n      };\n    }\n    if (u.pathname.endsWith('/raids')) {\n      if (timeoutRaid) throw new Error('synthetic ambiguous result');\n      return { status: 200, data: { data: [{}] } };\n    }\n    throw new Error('Unexpected mocked route');\n  };\n  const runtime = await createRuntime(\n    {\n    );\n  }\n  function signed(type, event, host, condition, options = {}) {\n    const id = `pilot-event-${++seq}`,\n      timestamp = new Date(options.sentAt ?? time).toISOString();\n    const rawBody = Buffer.from(\n      JSON.stringify({\n        subscription: { type, version: '1', condition: condition ?? { broadcaster_user_id: host } },\n        event,\n      }),\n    );\n    return request(\n      '/eventsub',\n      'POST',\n      {\n        'twitch-eventsub-message-id': id,\n        'twitch-eventsub-message-timestamp': timestamp,\n        'twitch-eventsub-message-type': 'notification',\n        'twitch-eventsub-message-signature': `sha256=${createHmac('sha256', secret).update(id).update(timestamp).update(rawBody).digest('hex')}`,\n      },\n      rawBody,\n    );\n  }\n  const chat = (host, user, text, options = {}) =>\n    signed(\n      'channel.chat.message',\n      {\n        broadcaster_user_id: host,\n        chatter_user_id: user,\n        chatter_user_login: `viewer${user}`,\n        message_id: options.messageId ?? `chat-${++seq}`,\n        badges: [],\n        message: { text, fragments: [] },\n      },\n      host,\n      { broadcaster_user_id: host, user_id: BOT },\n      options,\n    );\n  const raid = (from = HOME, to = OTHER, viewers = 1) =>\n    signed(\n      'channel.raid',\n      { from_broadcaster_user_id: from, to_broadcaster_user_id: to, viewers },\n      from,\n      { from_broadcaster_user_id: from },\n    );\n  return {\nimport { RECEIVING_KEEPERS } from './receiving.js';\nimport { validStreak } from '../public/streak-view.js';\nimport { validFlightText } from '../public/cinematic.js';\nimport { validClaimMeter } from '../public/claim-meter.js';\n// One mutation queue for every configured feed. Never wrap a wrapped store.\nexport function createOverlayHub(\n  store,\n  channels,\n  { simulator = false, now = Date.now, logins = RECEIVING_KEEPERS } = {},\n) {\n  if (\n    !channels.length ||\n    channels.length > 4 ||\n    !channels.every((channel) => /^\\d{1,32}$/.test(channel))\n  )\n    throw new Error('Configured overlay channels required');\n  let queue = Promise.resolve();\n  let revision = 0;\n  const enqueue = (operation) => {\n    const result = queue.then(operation);\n    queue = result.catch(() => {});\n    return result;\n  };\n  const listeners = new Map(channels.map((id) => [id, new Set()]));\n  async function read(channel) {\n    try {\n      const state = await store.getOverlayState(channel, now());\n      if (\n        !['ready', 'waiting', 'paused'].includes(state.status) ||\n        !Array.isArray(state.marks) ||\n        state.marks.length > 160\n      )\n        throw new Error('Invalid public state');\n      const serverNow = now();\n      const journey = store.getPublicPresentation\n        ? await store.getPublicPresentation(channel, serverNow)\n        : { rings: 0, handoff: null };\n      if (journey.streak !== undefined && !validStreak(journey.streak))\n        throw Error('Invalid streak');\n      const echo = journey.resonance;\n      if (\n        echo &&\n        (!Number.isFinite(echo.receivedAt) ||\n          !Number.isFinite(echo.expiresAt) ||\n          echo.expiresAt - echo.receivedAt !== 1200 ||\n          !/^[a-f0-9]{64}$/.test(echo.id))\n      )\n        throw new Error('Invalid decorative cue');\n      const resonance = echo\n        ? { receivedAt: echo.receivedAt, expiresAt: echo.expiresAt, id: echo.id }\n        : null;\n      const marks = state.marks.map(({ id, runeSvg, faded, flightText }) => {\n        if (faded !== undefined && typeof faded !== 'boolean')\n          throw new Error('Invalid faded flag');\n        if (flightText !== undefined && !validFlightText(flightText))\n          throw Error('Invalid approved caption');\n        return {\n          id,\n          runeSvg,\n          ...(flightText === undefined ? {} : { flightText }),\n          ...(faded === true ? { faded: true } : {}),\n        };\n      });\n      if (journey.claimMeter != null && !validClaimMeter(journey.claimMeter))\n        throw Error('Invalid claim meter');\n      if (\n        journey.handoff?.sourceLogin !== undefined &&\n        !Object.values(logins).includes(journey.handoff.sourceLogin)\n      )\n        throw Error('Invalid source Keeper');\n      if (journey.holderLogin !== undefined && !Object.values(logins).includes(journey.holderLogin))\n        throw Error('Invalid registry holder');\n      if (\n        journey.movedToLogin !== undefined &&\n        !Object.values(logins).includes(journey.movedToLogin)\n      )\n        throw Error('Invalid holder');\n      const incoming = journey.handoff?.role === 'host' && !journey.handoff.completed;\n      const status = incoming && state.status !== 'paused' ? 'incoming' : state.status;\n      return {\n        type: 'snapshot',\n        revision,\n        mode: simulator ? 'simulator' : 'live',\n        status,\n        ...(journey.holderLogin ? { holderLogin: journey.holderLogin } : {}),\n        ...(status === 'waiting' && journey.movedToLogin\n          ? { movedToLogin: journey.movedToLogin }\n          : {}),\n        ...(journey.streak === undefined ? {} : { streak: journey.streak }),\n        ...(journey.wanderArrival ? { wanderArrival…830 tokens truncated…!current()) return;\n      if (typeof event.data !== 'string' || event.data.length > 131072) {\n        lost(own);\n        return;\n      }\n      let value;\n      try {\n        value = JSON.parse(event.data);\n      } catch {\n        lost(own);\n        return;\n      }\n      if (value?.type === 'heartbeat') {\n        alive();\n        return;\n      }\n      if (!validSnapshot(value)) {\n        lost(own);\n        return;\n      }\n      clearTimer(opening);\n      opening = null;\n      alive();\n      if (value.revision <= revision) return;\n      revision = value.revision;\n      backoff = 500;\n      status('connected');\n      render(value);\n    };\n    active.onerror = () => lost(own);\n    active.onclose = () => lost(own);\n  }\n  function suspend() {\n    suspended = true;\n    epoch++;\n    clearTimer(idle);\n    idle = null;\n    clearTimer(retry);\n    retry = null;\n    clear();\n    const old = socket;\n    socket = null;\n    render(null);\n    status('suspended');\n    try {\n      old?.close();\n    } catch {}\n  }\n  function armIdle() {\n    clearTimer(idle);\n    idle = setTimer(suspend, idleDelay);\n  }\n  const wake = (event) => {\n    if (stopped || documentEvents?.hidden) return;\n    // Only visibility/focus/trusted local interaction resets the human idle window.\n    if (event?.type === 'online') {\n      if (suspended) return;\n// Parent-run fixed-loopback recovery gate: synthetic OAuth/events only; no screenshots.\nimport { createServer } from 'node:https';\nimport { mkdir, writeFile } from 'node:fs/promises';\nimport { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\nimport { createLocalTLS } from '../test-support/local-tls.js';\nimport { attachOverlaySockets } from '../src/overlay-sockets.js';\nconst origin = 'https://localhost:5191';\nlet tls,\n  server,\n  sockets,\n  browser,\n  stage = 'startup',\n  failure;\nconst checks = [];\ntry {\n  const f = await pilotFixture('memory', { origin });\n  tls = await createLocalTLS();\n  server = createServer(tls.options, f.runtime.handler);\n  sockets = attachOverlaySockets(server, f.runtime.overlayFeeds, {\n    origins: [origin],\n    allowRead: f.runtime.allowPublicRead,\n  });\n  await new Promise((resolve, reject) => {\n    server.once('error', reject);\n    server.listen(5191, '127.0.0.1', resolve);\n  });\n  for (const id of [BOT, HOME, OTHER]) await f.login(id);\n  for (const id of [HOME, OTHER]) {\n    await f.control(id, 'bootstrap');\n    f.advance();\n    await f.control(id, 'keep');\n    f.advance();\n  }\n  const { chromium } = await import('playwright');\n  browser = await chromium.launch({\n    executablePath: '/snap/bin/chromium',\n    chromiumSandbox: true,\n    headless: true,\n  });\n  const context = await browser.newContext({ ignoreHTTPSErrors: true, reducedMotion: 'reduce' });\n  await context.route('**/*', (r) =>\n    new URL(r.request().url()).origin === origin ? r.continue() : r.abort(),\n  );\n  await context.routeWebSocket('**/*', (r) =>\n    new URL(r.url()).origin === origin.replace('https:', 'wss:') ? r.connectToServer() : r.close(),\n  );\n  await context.addCookies(\n    Object.values(f.cookies).map((cookie) => {\n      const i = cookie.indexOf('=');\n      return {\n        name: cookie.slice(0, i),\n        value: cookie.slice(i + 1),\n        url: origin,\n        secure: true,\n        httpOnly: true,\n        sameSite: 'Lax',\n      };\n    }),\n  );\n  const page = await context.newPage();\n  let delayed = true;\n  await page.route(`**/control/${HOME}/status`, async (route) => {\n    if (!delayed) return route.continue();\n    delayed = false;\n    await new Promise((resolve) => setTimeout(resolve, 9000));\n    try {\n      await route.fulfill({\n        status: 200,\n        json: {\n          keeperId: HOME,\n          csrf: 'obsolete-synthetic-response',\n          actions: [],\n          pilot: { account: 'obsolete' },\n        },\n      });\n    } catch {\n      /* Expected aborted obsolete read. */\n    }\n  });\n  stage = 'bounded-control-read';\n  await page.goto(`${origin}/control/${HOME}`);\n  await page.locator('#result').filter({ hasText: 'Status timed out' }).waitFor();\n  if (await page.locator('#raid button').count()) throw Error('stale Send enabled');\n  await page.getByRole('button', { name: 'Refresh status', exact: true }).click();\n  await page.locator('#result').filter({ hasText: 'Status refreshed' }).waitFor();\n  await page.waitForTimeout(1100);\n  if ((await page.locator('#ledger').textContent()).includes('obsolete'))\n    throw Error('obsolete read overwrote status');\n  let posts = 0;\n  await page.route(`**/control/${HOME}`, (r) => {\n    if (r.request().method() === 'POST') {\n      posts++;\n      return r.abort();\n    }\n    return r.continue();\n  });\n  await page.getByRole('button', { name: 'Pause', exact: true }).click();\n  await page.locator('#result').filter({ hasText: 'Request outcome unavailable' }).waitFor();\n  if (posts !== 1 || (await page.locator('#raid button').count()))\n    throw Error('POST retried or stale actions retained');\n  checks.push({\n    name: 'SIMULATOR bounded private read, obsolete-response suppression, explicit Retry and no ambiguous POST retry',\n    passed: true,\n  });\n  stage = 'socket-recovery';\n  const overlay = await context.newPage();\n  await overlay.goto(`${origin}/overlay/${HOME}`);\n  await overlay.bringToFront();\n  await overlay\n    .locator('#compact-count')\n20:echoNote.setAttribute('role', 'status');\n23:const state = document.querySelector('#status');\n182:    !['ready', 'incoming', 'waiting'].includes(snapshot.status) ||\n183:    (snapshot.status === 'waiting' && !snapshot.handoff?.completed)\n199:  document.body.dataset.state = snapshot?.status ?? 'connecting';\n201:    snapshot?.status !== 'waiting' || Boolean(snapshot?.movedToLogin || snapshot?.holderLogin);\n226:    document.querySelector('#lineage').removeAttribute('data-streak');\n260:    ['ready', 'waiting'].includes(snapshot.status);\n262:    messages[snapshot.status] =\n270:    : messages[snapshot.status];\n274:  document.querySelector('#compact-status').textContent = snapshot.movedToLogin\n286:        }[snapshot.status];\n288:    document.querySelector('#compact-status').textContent = 'Wandered · no raid';\n337:    status(value) {\n338:      document.body.dataset.connection = value;\n347:        document.body.dataset.connection !== 'suspended'\n352:        document.querySelector('#compact-status').textContent =\n373:  if (document.hidden || document.body.dataset.connection === 'suspended') return;\n393:    current && ['ready', 'incoming', 'waiting'].includes(current.status)\n563:if (frameId === null && !document.hidden && document.body.dataset.connection !== 'suspended')\n"
+    }
+  ]
+}
+````
+
+### 4562. 2026-10-27T05:15:44.892Z — tool call (source line 17125)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_07454b637ad94d8c921c99dc5c3bf079",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '215,260p' src/app.js; rg -n 'snapshot|unavailable|503' src/app.js | tail -18; sed -n '110,165p' scripts/browser-smoke-recovery.js; sed -n '180,226p' public/overlay.js; sed -n '332,355p' public/overlay.js; rg -n 'eventType|notification|duplicate' test/webhook.test.js | head\",\"max_output_tokens\":1500})).output)\n"
+}
+````
+
+### 4563. 2026-10-27T05:15:44.988Z — tool result (source line 17128)
+
+````text
+{
+  "call_id": "call_07454b637ad94d8c921c99dc5c3bf079",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "Warning: truncated output (original token count: 2061)\nTotal output lines: 189\n\n        headers: { 'cache-control': 'no-store', 'content-security-policy': \"default-src 'none'\" },\n      };\n    }\n    const demoPath = path.split('?')[0];\n    if (demoAssets.has(demoPath)) {\n      if (method !== 'GET') return result(previewReadOnly ? 403 : 405, 'Static demo is read only');\n      const file = demoAssets.get(demoPath),\n        type = file.endsWith('.html')\n          ? 'text/html; charset=utf-8'\n          : file.endsWith('.js')\n            ? 'text/javascript; charset=utf-8'\n            : 'text/css; charset=utf-8';\n      if (path.includes('?') && !file.endsWith('.html'))\n        return result(400, 'Invalid static asset query');\n      return {\n        ...result(200, await readFile(new URL(`../public/${file}`, import.meta.url)), type),\n        headers: {\n          'cache-control': 'public, max-age=3600',\n          'content-security-policy':\n            \"default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'self'\",\n        },\n      };\n    }\n    if (method === 'GET' && path === '/health') {\n      return result(\n        200,\n        JSON.stringify({\n          status: 'ok',\n          demo: 'simulated-client-only',\n          ...(wander?.enabled\n            ? { wander: { enabled: true, kind: 'non-raid', ...wander.policy } }\n            : {}),\n          releaseCommit: release,\n          phase: raidPilot ? 'live' : 'foundation',\n          ...(!raidPilot ? { readiness: 'not-ready-for-raids' } : {}),\n          mode: overlayFeed?.simulator ? 'simulator' : 'live',\n          ...(previewReadOnly ? { preview: 'Read-only preview' } : {}),\n        }),\n        'application/json',\n      );\n    }\n    // Preview shares live storage: deny before authentication, DB access or effects.\n    if (\n      previewReadOnly &&\n      (method !== 'GET' ||\n        path.startsWith('/control/') ||\n160:        return result(403, 'Trusted Wander tick unavailable');\n283:      if (!receiving) return result(503, 'Receiving view unavailable');\n307:        return result(503, 'Receiving view unavailable; clear previous content and refresh');\n317:      if (!oauth?.control) return result(503, 'Control not configured');\n321:      if (!oauth) return result(503, 'OAuth not configured');\n339:        return result(503, 'Journey unavailable; clear previous data');\n380:        return result(503, 'Scores unavailable; previous content must be cleared');\n438:          'Shared history unavailable or expired; previous content must be cleared',\n506:        return result(503, 'Recap unavailable; previous snapshot must be cleared');\n555:        return result(503, 'Search unavailable; previous matches must be cleared');\n592:        return result(503, 'Atlas unavailable; clear previous data and refresh later');\n608:        return result(503, 'Atlas unavailable');\n629:        return result(200, JSON.stringify(await selected.snapshot()), 'application/json');\n641:    if (!secret) re…561 tokens truncated…ilure, failure: failure ?? null, checks, captures: [] },\n      null,\n      2,\n    ),\n  );\n}\nif (failure) process.exitCode = 1;\n  if (\n    !snapshot ||\n    !['ready', 'incoming', 'waiting'].includes(snapshot.status) ||\n    (snapshot.status === 'waiting' && !snapshot.handoff?.completed)\n  )\n    audio.silence();\n  cinema.observe(snapshot);\n  clearCinema();\n  archiveNode.dataset.fusionPending = String(\n    cinema.pending(snapshot, snapshot?.serverNow ?? 0, motion.matches),\n  );\n  archiveNode.style.setProperty('--p3-fusion', '0');\n  if (\n    cue &&\n    !(cue === 'claim' && snapshot?.handoff?.completedAt !== undefined) &&\n    !motion.matches &&\n    !document.hidden\n  )\n    audio.cue(cue);\n  document.body.dataset.state = snapshot?.status ?? 'connecting';\n  document.querySelector('#waiting-note').hidden =\n    snapshot?.status !== 'waiting' || Boolean(snapshot?.movedToLogin || snapshot?.holderLogin);\n  relic3d?.update(snapshot);\n  current = snapshot;\n  receivedAt = performance.now();\n  receiptServerTime = snapshot?.serverNow ?? Date.now();\n  ringPips.replaceChildren();\n  for (let i = 0; i < Math.min(16, snapshot?.lineageRings ?? 0); i++) {\n    const pip = document.createElement('span');\n    pip.setAttribute('aria-hidden', 'true');\n    ringPips.append(pip);\n  }\n  document.querySelector('#rings').replaceChildren();\n  document.querySelector('#lineage').textContent = snapshot\n    ? snapshot.mode === 'simulator'\n      ? ringSummary(snapshot.lineageRings).text\n      : `Ring ${snapshot.lineageRings}`\n    : 'The relic rests…';\n  if (snapshot?.streak) {\n    const line = document.querySelector('#lineage');\n    line.title = streakText(snapshot.streak);\n    line.dataset.streak = snapshot.streak.known ? String(snapshot.streak.current) : 'unknown';\n    line.textContent += snapshot.streak.known\n      ? ` · Streak ${snapshot.streak.current}`\n      : ' · Streak ?';\n  } else {\n    document.querySelector('#lineage').removeAttribute('data-streak');\nlet frameId = null;\nif (channel)\n  connectOverlay({\n    url: `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/${channel}`,\n    render,\n    status(value) {\n      document.body.dataset.connection = value;\n      if (value === 'suspended') {\n        cancelAnimationFrame(frameId);\n        frameId = null;\n        count.textContent = 'Paused to save resources';\n        document.querySelector('#compact-count').textContent = 'Focus to resume';\n      } else if (\n        frameId === null &&\n        !document.hidden &&\n        document.body.dataset.connection !== 'suspended'\n      )\n        frameId = requestAnimationFrame(frame);\n      document.body.classList.toggle('disconnected', value !== 'connected');\n      if (value !== 'connected')\n        document.querySelector('#compact-status').textContent =\n          value === 'suspended'\n            ? 'Paused · focus to resume'\n            : value === 'stale'\nrg: test/webhook.test.js: IO error for operation on test/webhook.test.js: No such file or directory (os error 2)\n"
+    }
+  ]
+}
+````
+
+### 4564. 2026-10-27T05:16:17.519Z — tool call (source line 17132)
+
+````text
+[credential-looking item omitted in full; reason: literal assignment; no credential status assumed]
+````
+
+### 4565. 2026-10-27T05:16:17.641Z — tool result (source line 17135)
+
+````text
+{
+  "call_id": "call_6dd86b62700f42ceadd0504a7b498e57",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "313a51",
+        "wall_time_seconds": 0.00000376,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    }
+  ]
+}
+````
+
+### 4566. 2026-10-27T05:16:21.602Z — tool call (source line 17139)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_191272d13bec44fcbbfb6a055be6959d",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '163,210p' test-support/pilot-fixture.js; sed -n '120,149p' src/overlay-feed.js; sed -n '122,142p' public/overlay-client.js; sed -n '1,70p' test/reliability*.test.js 2>/dev/null\",\"max_output_tokens\":1100})).output)\n"
+}
+````
+
+### 4567. 2026-10-27T05:16:21.681Z — tool result (source line 17142)
+
+````text
+{
+  "call_id": "call_191272d13bec44fcbbfb6a055be6959d",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "      if (timeoutRaid) throw new Error('synthetic ambiguous result');\n      return { status: 200, data: { data: [{}] } };\n    }\n    throw new Error('Unexpected mocked route');\n  };\n  const runtimeEnv =     {\n      ...chronicleEnv,\n      NODE_ENV: 'development',\n      STATE_STORE: db ? 'firestore' : 'memory',\n      GOOGLE_CLOUD_PROJECT: 'raid-relic-hackathon',\n      OAUTH_ENABLED: 'true',\n      RAID_PILOT_ENABLED: 'true',\n      KEEPER_CHANNEL_IDS: ids.join(','),\n      ...(ids.length !== 2 ? { PILOT_KEEPERS_JSON: JSON.stringify(keepers) } : {}),\n      TWITCH_STREAMER_ID: HOME,\n      TWITCH_BOT_ID: BOT,\n      TWITCH_CLIENT_ID: 'public-client',\n      TWITCH_CLIENT_SECRET: 'synthetic-client-secret',\n      TWITCH_EVENTSUB_SECRET: secret,\n      TOKEN_ENCRYPTION_KEY: Buffer.alloc(32, 5).toString('base64'),\n      OAUTH_REDIRECT_URI: `${origin}/auth/callback`,\n      OAUTH_REDIRECT_ALLOWLIST: `${origin}/auth/callback`,\n      EVENTSUB_CALLBACK_URL: `${origin}/eventsub`,\n    };\n  const runtimeOptions = {\n      firestoreClient: db,\n      transport,\n      p7HTTP,\n      chronicleHTTP,\n      forgeHTTP,\n      simulator,\n      now: () => time,\n    };\n  let runtime = await createRuntime(runtimeEnv, runtimeOptions);\n  const cookies = {};\n  const request = (path, method = 'GET', headers = {}, rawBody = Buffer.alloc(0)) =>\n    runtime.dispatch({ path, method, headers, rawBody });\n  async function login(id, { p7 = false } = {}) {\n    const start = await request(\n      id === BOT ? `/oauth/bot/start${p7 ? '?features=p7' : ''}` : `/oauth/keeper/${id}/start`,\n    );\n    const state = new URL(start.headers.location).searchParams.get('state');\n    const result = await request(`/auth/callback?state=${state}&code=${id}`, 'GET', {\n      cookie: start.headers['set-cookie'].split(';')[0],\n    });\n    if (result.status !== 200) throw new Error('Synthetic OAuth failed');\n    if (id !== BOT) cookies[id] = result.headers['set-cookie'][1].split(';')[0];\n    return result;\n    if (!store[name]) continue;\n    wrapped[name] = (...args) =>\n      enqueue(async () => {\n        const result = await store[name](...args);\n        if (name === 'accept') {\n          const input = args[0];\n          const quiet =\n            input.chat &&\n            !input.chat.markAction &&\n            !input.raid &&\n            !input.lifecycle &&\n            !input.observation;\n          if (\n            (quiet && result !== 'resonance') ||\n            !(\n              ['accepted', 'resonance', 'applied'].includes(result) ||\n              ['reserved', 'accepted'].includes(result?.status)\n            )\n          )\n            return result;\n        }\n        revision++;\n        for (const channel of channels) {\n          const snapshot = await read(channel);\n          for (const listener of listeners.get(channel)) {\n            try {\n              listener(snapshot);\n            } catch {\n              /* Client cannot fail commit. */\n            }\n    try {\n      old?.close();\n    } catch {\n      /* Error/close delivery is not required for recovery. */\n    }\n    if (retry !== null) return;\n    const ticket = setTimer(() => {\n      if (retry !== ticket || stopped) return;\n      clearTimer(ticket);\n      retry = null;\n      connect();\n    }, backoff);\n    retry = ticket;\n    backoff = Math.min(backoff * 2, 10000);\n  }\n  function connect() {\n    if (stopped || suspended || documentEvents?.hidden || socket) return;\n    const own = ++epoch;\n    let revision = -1;\n    status('connecting');\n    opening = setTimer(() => lost(own, 'stale'), 8000); // socket AND first valid snapshot\n"
+    }
+  ]
+}
+````
+
+### 4568. 2026-10-27T05:16:41.296Z — tool call (source line 17146)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_0108868ee8eb44f5b790a30bd2db2f39",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '215,266p' src/claims.js; rg -n 'offers|accepts|votes' src/claims.js | head -20; sed -n '110,123p' src/overlay-feed.js; head -35 test/claims.test.js\",\"max_output_tokens\":1000})).output)\n"
+}
+````
+
+### 4569. 2026-10-27T05:16:41.383Z — tool result (source line 17149)
+
+````text
+{
+  "call_id": "call_0108868ee8eb44f5b790a30bd2db2f39",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "Warning: truncated output (original token count: 1262)\nTotal output lines: 121\n\n      hop.offers.length >= hop.threshold &&\n      hop.accepts.length >= hop.threshold\n    ) {\n      const doc = marks[hop.from];\n      const session = doc.sessions.find((s) => s.streamId === hop.sourceStreamId);\n      const approved = (session?.marks ?? []).filter(\n        (m) =>\n          m.status === 'approved' &&\n          !doc.blocked.includes(m.userId) &&\n          !source.blockedUserIds.includes(m.userId),\n      );\n      if (\n        lineage.stops.length >= LINEAGE_LIMITS.stops ||\n        approved.length > LINEAGE_LIMITS.marksPerStop\n      ) {\n        hop.cancelled = true;\n        hop.capacityBlocked = true;\n      } else {\n        lineage.stops.push({\n          stopId: hash(hop.eventId),\n          eventId: hop.eventId,\n          from: hop.from,\n          to: hop.to,\n          streamId: hop.sourceStreamId,\n          claimedAt: now,\n          raidSize: hop.raidSize,\n          ringIndex: lineage.stops.length + 1,\n          marks: approved.map(({ id, userId, text }) => ({ id, userId, text })),\n        });\n        completeStreak(registry, lineage.stops.at(-1), now, streakEnabled);\n        if (Buffer.byteLength(JSON.stringify(lineage)) > LINEAGE_LIMITS.bytes)\n          throw new Error('Lineage capacity reached');\n        completedScore = scoreCompletion(hop, [...hop.offers, ...hop.accepts]);\n        acknowledgement = null;\n        delete registry.echo;\n        registry.holderId = hop.to;\n        dequeueSeeker(channels[hop.to], now);\n        registry.carriedClosures = 0;\n        delete registry.send;\n        hop.finalized = true;\n        marks[hop.from].context.holdsRelic = false;\n        marks[hop.to].context.holdsRelic = true;\n      }\n      delete hop.offers;\n      delete hop.accepts;\n      delete hop.movedOffers;\n    }\n  }\n  // Closed replies never restore votes, ownership or the old window.\n  if (\n    hop &&\n    !hop.finalized &&\n108:      Array.isArray(hop.offers) &&\n109:      Array.isArray(hop.accepts) &&\n129:      delete hop.offers;\n130:      delete hop.accept…262 tokens truncated…        acknowledgement = `${side === 'offers' ? 'Offers' : 'Accepts'} ${hop[side].length}/${hop.threshold}. ${hop.verified ? '' : 'Waiting for Twitch to confirm the raid. '}${missing.length ? 'Waiting for ' + missing.join(' and ') + '.' : hop.verified ? 'Both chats reached the threshold.' : 'Both chats reached the threshold; waiting for Twitch to confirm the raid.'}`;\n  }\n  const wrapped = Object.create(store);\n  for (const name of [\n    'accept',\n    'setKeeperContext',\n    'controlMarks',\n    'setChannelPolicy',\n    'sendOffStep',\n    'wanderStep',\n  ]) {\n    if (!store[name]) continue;\n    wrapped[name] = (...args) =>\n      enqueue(async () => {\n        const result = await store[name](...args);\nimport test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { createHmac } from 'node:crypto';\nimport { hash } from '../src/crypto.js';\nimport { createMemoryState } from '../src/state.js';\nimport { createFirestoreStore } from '../src/store.js';\nimport { createApp } from '../src/app.js';\nimport { createSendOff } from '../src/send-off.js';\nimport { createMarkService } from '../src/marks.js';\nimport { reduceClaims, LINEAGE_LIMITS } from '../src/claims.js';\nimport { fakeFirestore } from '../test-support/fake-firestore.js';\nconst source = '1591805230';\nconst target = '1591806023';\nconst bot = '1591804828';\nconst secret = 'synthetic-send-test-secret';\nconst base = Date.parse('2026-10-25T12:00:00Z');\nfunction fixture(kind, mode = 'ok') {\n  const db = kind === 'firestore' ? fakeFirestore() : null;\n  const config = {\n    lifecycle: {\n      channels: [source, target],\n      logins: { raidrelichq: source, targetkeeper: target },\n    },\n  };\n  const makeStore = () => (db ? createFirestoreStore(db, config) : state);\n  const state = db ? makeStore() : createMemoryState(config);\n  let time = base;\n  let seq = 0;\n  const calls = [];\n  const roles = [];\n  const apps = Object.fromEntries(\n    [source, target].map((host) => [\n      host,\n      createApp({\n        secret,\n"
+    }
+  ]
+}
+````
+
+### 4570. 2026-10-27T05:16:53.689Z — tool call (source line 17153)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_2cd8d4a7977d43f2b4b9254509a0b17d",
+  "input": "text((await tools.exec_command({cmd:\"rg -n 'reconsent|required|temporary|code =' src/oauth.js | head -22; sed -n '612,636p' src/app.js; head -45 src/webhook.js; rg -n 'heartbeat|stale|deadline' scripts/browser-smoke-recovery.js | tail -8\",\"max_output_tokens\":1100})).output)\n"
+}
+````
+
+### 4571. 2026-10-27T05:16:53.975Z — tool result (source line 17156)
+
+````text
+{
+  "call_id": "call_2cd8d4a7977d43f2b4b9254509a0b17d",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "51:    throw new Error('OAuth configuration required');\n74:    throw new Error('Explicit Keeper accounts required');\n110:      throw Object.assign(new Error('Reconnect this account'), { code: 'reconsent-required' });\n124:  async function validate(token, role, required = scopes(role)) {\n139:      !required.every((scope) => data.scopes.includes(scope)) ||\n182:          throw Object.assign(Error('Authorization required'), { code: 'authorization-required' });\n232:    const required = [...scopes(role), ...(p7 && role === 'bot' ? P7_SCOPES : []), ...extraScopes];\n233:    if (!required.every((scope) => proof.scopes.includes(scope)))\n304:      const code = url.searchParams.get('code');\n319:          throw new Error('Authorization required');\n359:        throw Object.assign(Error('Read grant unavailable'), { code: 'authorization-required' });\n    if (feedPath) {\n      const selected = (overlayFeeds ??\n        (overlayFeed ? { [overlayFeed.channel]: overlayFeed } : {}))[feedPath[2]];\n      if (!selected) return result(404, 'Not found');\n      if (method !== 'GET') return result(404, 'Read only');\n      const params = new URLSearchParams(feedPath[3] ?? '');\n      if (feedPath[1] && feedPath[3] !== undefined) return result(400, 'Invalid query');\n      if (\n        [...params].some(\n          ([key, value]) =>\n            !['corner', 'sound'].includes(key) ||\n            params.getAll(key).length !== 1 ||\n            (key === 'corner' ? value !== '1' : !['0', '1'].includes(value)),\n        )\n      )\n        return result(400, 'Invalid query');\n      if (feedPath[1])\n        return result(200, JSON.stringify(await selected.snapshot()), 'application/json');\n      return result(200, await publicHTML('overlay-live.html'), 'text/html; charset=utf-8');\n    }\n    if (method === 'GET' && assets.has(path)) {\n      const [file, type] = assets.get(path);\n      const bytes = file.endsWith('.html')\n        ? await publicHTML(file)\n        : await readFile(new URL(`../public/${file}`, import.meta.url));\nhead: cannot open 'src/webhook.js' for reading: No such file or directory\n83:  if (await page.locator('#raid button').count()) throw Error('stale Send enabled');\n100:    throw Error('POST retried or stale actions retained');\n"
+    }
+  ]
+}
+````
+
+### 4572. 2026-10-27T05:17:24.398Z — tool call (source line 17160)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_5dfb6b943b454801b39aff4341a8ef86",
+  "input": "text(await tools.exec_command({cmd:\"cat > test/reliability-demo.test.js <<'EOF'\\nimport test from 'node:test';\\nimport assert from 'node:assert/strict';\\nimport { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\\nimport { createRuntime } from '../src/runtime.js';\\nconst raidPosts=f=>f.calls.filter(c=>new URL(c.url).pathname.endsWith('/raids')&&c.method==='POST');\\nconst refreshPosts=f=>f.calls.filter(c=>new URL(c.url).pathname.endsWith('/token')&&new URLSearchParams(c.body).get('grant_type')==='refresh_token');\\nasync function pending(kind){\\n  const f=await pilotFixture(kind,{rotateTokens:true,chronicleEnv:{P9_STREAK_ENABLED:'true',MARK_AUTO_APPROVE_ENABLED:'true'}});\\n  for(const id of [BOT,HOME,OTHER])await f.login(id);\\n  for(const id of [HOME,OTHER]){assert.equal((await f.control(id,'bootstrap')).status,200);f.advance();await f.control(id,'keep');f.advance();}\\n  await f.chat(HOME,'8600','!mark moon');f.advance(31000);\\n  assert.equal(JSON.parse((await f.control(HOME,'send:'+OTHER)).body).status,'accepted');\\n  const sentAt=f.now();\\n  const receipt=()=>f.signed('channel.raid',{from_broadcaster_user_id:HOME,to_broadcaster_user_id:OTHER,viewers:4},HOME,{from_broadcaster_user_id:HOME},{deliveryId:'reliable-receipt',sentAt});\\n  await receipt();await f.chat(HOME,'8601','!offer',{messageId:'reliable-offer'});\\n  const before=await f.runtime.state.getKeeperRegistry();\\n  assert.equal(before.pendingHop.offers.length,1);assert.equal(before.pendingHop.threshold,2);\\n  return {f,before,receipt};\\n}\\nfor(const kind of ['memory','firestore']) {\\n  test(`${kind}: source expiry and bot rotation during pending quorum preserve receipt clock and never replay Raid POST`,async()=>{\\n    const {f,before,receipt}=await pending(kind);\\n    const oldSource=await f.runtime.store.getToken('streamer'),oldBot=await f.runtime.store.getToken('bot');\\n    f.expire(HOME);f.expire(BOT);\\n    const refreshBefore=refreshPosts(f).length;\\n    const tokens=await Promise.all(Array.from({length:4},()=>f.runtime.oauth.accessTokenForKeeper(HOME)));\\n    assert.equal(new Set(tokens).size,1);assert.equal(refreshPosts(f).length-refreshBefore,1);\\n    assert.notDeepEqual(await f.runtime.store.getToken('streamer'),oldSource);\\n    await f.chat(OTHER,'8701','!accept');\\n    assert.notDeepEqual(await f.runtime.store.getToken('bot'),oldBot);\\n    let snapshot=await f.runtime.overlayFeeds[OTHER].snapshot();\\n    assert.equal(snapshot.handoff.startedAt,before.pendingHop.startedAt);\\n    assert.equal(snapshot.handoff.endsAt,before.pendingHop.endsAt);\\n    assert.equal(snapshot.handoff.offers,1);assert.equal(snapshot.handoff.accepts,1);\\n    assert.equal(snapshot.lineageRings,0);\\n    const grantWrites=refreshPosts(f).length;\\n    let leases=0;const acquire=f.runtime.store.acquire.bind(f.runtime.store);\\n    f.runtime.store.acquire=(...args)=>{leases++;return acquire(...args);};\\n    await f.runtime.oauth.accessTokenForKeeper(HOME);assert.equal(leases,0);assert.equal(refreshPosts(f).length,grantWrites);\\n    await receipt();await f.chat(HOME,'8601','!offer',{messageId:'reliable-offer'});\\n    assert.equal((await f.runtime.state.getKeeperRegistry()).pendingHop.offers.length,1);\\n    await f.chat(HOME,'8602','!offer');await f.chat(OTHER,'8702','!accept');\\n    assert.equal((await f.runtime.state.getPublicJourney()).rings,1);\\n    assert.equal((await f.runtime.state.getKeeperRegistry()).holderId,OTHER);\\n    await receipt();await f.chat(OTHER,'8702','!accept');\\n    assert.equal((await f.runtime.state.getPublicJourney()).rings,1);assert.equal(raidPosts(f).length,1);\\n    assert.ok(f.calls.filter(c=>new URL(c.url).pathname.endsWith('/chat/messages')).every(c=>{\\n      const body=JSON.parse(c.body);return body.sender_id===BOT&&[HOME,OTHER].includes(body.broadcaster_id);\\n    }));\\n  });\\n  test(`${kind}: transient refresh 429/503 and definitive refresh rejection do not erase pending votes or manufacture consent`,async()=>{\\n    const {f,before}=await pending(kind);\\n    f.expire(HOME);\\n    for(const status of [503,429,400,401]) {\\n      f.refreshFailure(status);\\n      await assert.rejects(()=>f.runtime.oauth.accessTokenForKeeper(HOME),error=>{\\n        assert.equal(error.code==='reconsent-required',[400,401].includes(status));\\n        assert.doesNotMatch(error.message,/access-|refresh-|synthetic-client/);return true;\\n      });\\n      const current=await f.runtime.state.getKeeperRegistry();\\n      assert.deepEqual(current.pendingHop,before.pendingHop);assert.equal(raidPosts(f).length,1);\\n    }\\n    f.expire(BOT);f.refreshFailure(503);\\n    await f.chat(OTHER,'8701','!accept');\\n    assert.equal((await f.runtime.state.getKeeperRegistry()).pendingHop.accepts.length,1);\\n    f.refreshFailure(null);await f.runtime.oauth.accessTokenForKeeper(HOME);\\n    await f.chat(HOME,'8602','!offer');await f.chat(OTHER,'8702','!accept');\\n    assert.equal((await f.runtime.state.getPublicJourney()).rings,1);assert.equal(raidPosts(f).length,1);\\n  });\\n}\\ntest('shared Firestore runtime reconstruction retains partial quorum, original timestamps and completed history without startup networking',async()=>{\\n  const {f,before,receipt}=await pending('firestore');\\n  await f.chat(OTHER,'8701','!accept');\\n  const partial=await f.runtime.state.getKeeperRegistry();\\n  const calls=f.calls.length;\\n  f.advance(23000);await f.restart();assert.equal(f.calls.length,calls);\\n  const recovered=await f.runtime.overlayFeeds[OTHER].snapshot();\\n  assert.equal(recovered.handoff.startedAt,before.pendingHop.startedAt);\\n  assert.equal(recovered.handoff.endsAt,before.pendingHop.endsAt);\\n  assert.equal(recovered.handoff.offers,1);assert.equal(recovered.handoff.accepts,1);\\n  assert.ok(recovered.serverNow-recovered.handoff.startedAt>=23000);\\n  assert.deepEqual((await f.runtime.state.getKeeperRegistry()).pendingHop,partial.pendingHop);\\n  await receipt();assert.equal(raidPosts(f).length,1);\\n  await f.chat(HOME,'8602','!offer');await f.chat(OTHER,'8702','!accept');\\n  const completed=await f.runtime.overlayFeeds[OTHER].snapshot();assert.equal(completed.lineageRings,1);\\n  const journey=await f.runtime.state.getPublicJourney();\\n  const afterCalls=f.calls.length;await f.restart();assert.equal(f.calls.length,afterCalls);\\n  const again=await f.runtime.overlayFeeds[OTHER].snapshot();\\n  assert.equal(again.handoff.completedAt,completed.handoff.completedAt);\\n  assert.deepEqual(again.streak,completed.streak);assert.deepEqual(await f.runtime.state.getPublicJourney(),journey);\\n  assert.equal(raidPosts(f).length,1);\\n  f.db.failReads=true;\\n  const writes=f.db.writes.length;\\n  assert.equal((await f.request('/api/atlas')).status,503);\\n  assert.equal((await f.runtime.overlayFeeds[OTHER].snapshot()).status,'unavailable');\\n  assert.equal(f.db.writes.length,writes);assert.equal(raidPosts(f).length,1);\\n  f.db.failReads=false;\\n  assert.equal((await f.runtime.overlayFeeds[OTHER].snapshot()).lineageRings,1);\\n});\\ntest('failed production persistence loading fails closed rather than selecting memory or bootstrapping',async()=>{\\n  let loads=0;\\n  await assert.rejects(()=>createRuntime({NODE_ENV:'production',STATE_STORE:'firestore',GOOGLE_CLOUD_PROJECT:'raid-relic-hackathon',RELEASE_COMMIT:'a'.repeat(40)},\\n    {loadSDK:async()=>{loads++;throw Error('Unavailable persistence');}}));\\n  assert.equal(loads,1);\\n});\\nEOF\\n./node_modules/.bin/prettier --write test-support/pilot-fixture.js test-support/fake-firestore.js test/reliability-demo.test.js\\nnode test/reliability-demo.test.js > /tmp/reliability216-tests.txt 2>&1\\ntail -60 /tmp/reliability216-tests.txt\",\"max_output_tokens\":2400}))\n"
+}
+````
+
+### 4573. 2026-10-27T05:17:25.106Z — tool result (source line 17163)
+
+````text
+{
+  "call_id": "call_5dfb6b943b454801b39aff4341a8ef86",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.7 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "041cc8",
+        "wall_time_seconds": 0.534099862,
+        "exit_code": 0,
+        "original_token_count": 2665,
+        "output": "Warning: truncated output (original token count: 2665)\nTotal output lines: 54\n\ntest-support/pilot-fixture.js 107ms\ntest-support/fake-firestore.js 16ms\ntest/reliability-demo.test.js 31ms\n{\"severity\":\"INFO\",\"event\":\"command_reply\",\"host\":\"1591805230\",\"kind\":\"mark\",\"outcome\":\"sent\",\"reason\":\"normal\",\"httpStatus\":200}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_raid_dispatch\",\"diagnostic\":{\"httpStatus\":200,\"category\":\"accepted-not-travel\",\"nextStep\":\"Accepted only; wait for verified raid EventSub, not another POST.\",\"message\":null,\"error\":null,\"redacted\":false,\"truncated\":false,\"sourceId\":\"1591805230\",\"targetId\":\"1591806023\",\"intentId\":\"f9ad862d292d8ad8207768b1846192bc263035ba9312674ddca765dd23426811\",\"expectedPrincipal\":\"1591805230\",\"grantKind\":\"source-keeper-user\",\"at\":1792929631004,\"completedAt\":1792929631004,\"reset\":null,\"retryAfter\":null}}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_claim_ack\",\"host\":\"1591805230\",\"key\":\"d17aef5b9b1ac541a9ea8f5106d2db090a289da7bebb2173dae78e573cf16141\",\"outcome\":\"sent\",\"diagnostic\":{\"stage\":\"response\",\"httpStatus\":200,\"dropKind\":null,\"isSent\":true}}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_claim_ack\",\"host\":\"1591806023\",\"key\":\"55c0e7f4f485898edf5b6e7fcd4ad45dbbbf85f9652e2414851395c80f6dd301\",\"outcome\":\"sent\",\"diagnostic\":{\"stage\":\"response\",\"httpStatus\":200,\"dropKind\":null,\"isSent\":true}}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_claim_ack\",\"host\":\"1591805230\",\"key\":\"fa154724763d574c53d703f6df499265d2ab9a4b89682c2469eb7e246a2b94bc\",\"outcome\":\"sent\",\"diagnostic\":{\"stage\":\"response\",\"httpStatus\":200,\"dropKind\":null,\"isSent\":true}}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_claim_ack\",\"host\":\"1591805230\",\"key\":\"3296c78a8c1470a949e89bd49a970c824410bb1439df38581e57f6ac8cb27149\",\"outcome\":\"sent\",\"diagnostic\":{\"stage\":\"response\",\"httpStatus\":200,\"dropKind\":null,\"isSent\":true}}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_claim_ack\",\"host\":\"1591806023\",\"key\":\"5ece260945bd2c975efbf06b84f1ef09e3e013f8ea0ea2fa38e8a31292388b97\",\"outcome\":\"sent\",\"diagnostic\":{\"stage\":\"response\",\"httpStatus\":200,\"dropKind\":null,\"isSent\":true}}\n{\"severity\":\"INFO\",\"event\":\"command_reply\",\"host\":\"1591806023\",\"kind\":\"accept\",\"outcome\":\"sent\",\"reason\":\"normal\",\"httpStatus\":200}\n{\"severity\":\"INFO\",\"event\":\"command_reply\",\"host\":\"1591805230\",\"kind\":\"mark\",\"outcome\":\"sent\",\"reason\":\"normal\",\"httpStatus\":200}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_raid_dispatch\",\"diagnostic\":{\"httpStatus\":200,\"category\":\"accepted-not-travel\",\"nextStep\":\"Accepted only; wait for verified raid EventSub, not another POST.\",\"message\":null,\"error\":null,\"redacted\":false,\"truncated\":false,\"sourceId\":\"1591805230\",\"targetId\":\"1591806023\",\"intentId\":\"c96646f54cae00d3e9dd83979e5adf1e32a52d0505a2058c3028548dcb523626\",\"expectedPrincipal\":\"1591805230\",\"grantKind\":\"source-keeper-user\",\"at\":1792929631004,\"completedAt\":1792929631004,\"reset\":null,\"retryAfter\":null}}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_claim_ack\",\"host\":\"1591805230\",\"key\":\"d17aef5b9b1ac541a9ea8f5106d2db090a289da7bebb2173dae78e573cf16141\",\"outcome\":\"sent\",\"diagnostic\":{\"stage\":\"response\",\"httpStatus\":200,\"dropKind\":null,\"isSent\":true}}\n{\"severity\":\"WARNING\",\"event\":\"raid_relic_claim_ack\",\"host\":\"1591806023\",\"key\":\"55c0e7f4f485898edf5b6e7fcd4ad45dbbbf85f9652e2414851395c80f6dd301\",\"outcome\":\"unknown\",\"diagnostic\":{\"stage\":\"bot-grant\",\"httpStatus\":null,\"dropKind\":null,\"isSent\":null}}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_claim_ack\",\"host\":\"1591805230\",\"key\":\"075997f931af199d41a101d5a1d92485b67ff86ff0edcedc0c2eb80a291893d6\",\"outcome\":\"sent\",\"diagnostic\":{\"stage\":\"response\",\"httpStatus\":200,\"dropKind\":null,\"isSent\":true}}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_claim_ack\",\"host\":\"1591805230\",\"key\":\"3296c78a8c1470a949e89bd49a970c824410bb1439df38581e57f6ac8cb27149\",\"outcome\":\"sent\",\"diagnostic\":{\"stage\":\"response\",\"httpStatus\":200,\"dropKind\":null,\"isSent\":true}}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_claim_ack\",\"host\":\"1591806023\",\"key\":\"5ece260945bd2c975efbf06b84f1ef09e3e013f8ea0ea2fa38e8a31292388b97\",\"outcome\":\"sent\",\"diagnostic\":{\"stage\":\"response\",\"httpStatus\":200,\"dropKind\":null,\"isSent\":true}}\n{\"severity\":\"INFO\",\"event\":\"command_reply\",\"host\":\"1591805230\",\"kind\":\"mark\",\"outcome\":\"sent\",\"reason\":\"normal\",\"httpStatus\":200}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_raid_dispatch\",\"diagnostic\":{\"httpStatus\":200,\"category\":\"accepted-not-travel\",\"nextStep\":\"Accepted only; wait for verified raid EventSub, not another POST.\",\"message\":null,\"error\":null,\"redacted\":false,\"truncated\":false,\"sourceId\":\"1591805230\",\"targetId\":\"1591806023\",\"intentId\":\"a4e022670014350efb37fed292ca2944a4b6f91688a73196addb2e8ba4af2e26\",\"expectedPrincipal\":\"1591805230\",\"grantKind\":\"source-keeper-user\",\"at\":1792929631004,\"completedAt\":1792929631004,\"reset\":null,\"retryAfter\":null}}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_claim_ack\",\"host\":\"1591805230\",\"key\":\"d17aef5b9b1ac541a9ea8f5106d2db090a289da7bebb2173dae78e573cf16141\",\"out…265 tokens truncated…e}}\n{\"severity\":\"INFO\",\"event\":\"command_reply\",\"host\":\"1591806023\",\"kind\":\"accept\",\"outcome\":\"sent\",\"reason\":\"normal\",\"httpStatus\":200}\n{\"severity\":\"INFO\",\"event\":\"command_reply\",\"host\":\"1591805230\",\"kind\":\"mark\",\"outcome\":\"sent\",\"reason\":\"normal\",\"httpStatus\":200}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_raid_dispatch\",\"diagnostic\":{\"httpStatus\":200,\"category\":\"accepted-not-travel\",\"nextStep\":\"Accepted only; wait for verified raid EventSub, not another POST.\",\"message\":null,\"error\":null,\"redacted\":false,\"truncated\":false,\"sourceId\":\"1591805230\",\"targetId\":\"1591806023\",\"intentId\":\"b239a75d19b1551ee028a7d211acd363c99084dd688c58774e8a22af5e36c8b1\",\"expectedPrincipal\":\"1591805230\",\"grantKind\":\"source-keeper-user\",\"at\":1792929631004,\"completedAt\":1792929631004,\"reset\":null,\"retryAfter\":null}}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_claim_ack\",\"host\":\"1591805230\",\"key\":\"d17aef5b9b1ac541a9ea8f5106d2db090a289da7bebb2173dae78e573cf16141\",\"outcome\":\"sent\",\"diagnostic\":{\"stage\":\"response\",\"httpStatus\":200,\"dropKind\":null,\"isSent\":true}}\n{\"severity\":\"WARNING\",\"event\":\"raid_relic_claim_ack\",\"host\":\"1591806023\",\"key\":\"55c0e7f4f485898edf5b6e7fcd4ad45dbbbf85f9652e2414851395c80f6dd301\",\"outcome\":\"unknown\",\"diagnostic\":{\"stage\":\"bot-grant\",\"httpStatus\":null,\"dropKind\":null,\"isSent\":null}}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_claim_ack\",\"host\":\"1591805230\",\"key\":\"075997f931af199d41a101d5a1d92485b67ff86ff0edcedc0c2eb80a291893d6\",\"outcome\":\"sent\",\"diagnostic\":{\"stage\":\"response\",\"httpStatus\":200,\"dropKind\":null,\"isSent\":true}}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_claim_ack\",\"host\":\"1591805230\",\"key\":\"3296c78a8c1470a949e89bd49a970c824410bb1439df38581e57f6ac8cb27149\",\"outcome\":\"sent\",\"diagnostic\":{\"stage\":\"response\",\"httpStatus\":200,\"dropKind\":null,\"isSent\":true}}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_claim_ack\",\"host\":\"1591806023\",\"key\":\"5ece260945bd2c975efbf06b84f1ef09e3e013f8ea0ea2fa38e8a31292388b97\",\"outcome\":\"sent\",\"diagnostic\":{\"stage\":\"response\",\"httpStatus\":200,\"dropKind\":null,\"isSent\":true}}\n{\"severity\":\"INFO\",\"event\":\"command_reply\",\"host\":\"1591805230\",\"kind\":\"mark\",\"outcome\":\"sent\",\"reason\":\"normal\",\"httpStatus\":200}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_raid_dispatch\",\"diagnostic\":{\"httpStatus\":200,\"category\":\"accepted-not-travel\",\"nextStep\":\"Accepted only; wait for verified raid EventSub, not another POST.\",\"message\":null,\"error\":null,\"redacted\":false,\"truncated\":false,\"sourceId\":\"1591805230\",\"targetId\":\"1591806023\",\"intentId\":\"cf77bb170842e919b1f266e9c1efa0921f8af660ae6285d3d7771fc310d086af\",\"expectedPrincipal\":\"1591805230\",\"grantKind\":\"source-keeper-user\",\"at\":1792929631004,\"completedAt\":1792929631004,\"reset\":null,\"retryAfter\":null}}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_claim_ack\",\"host\":\"1591805230\",\"key\":\"d17aef5b9b1ac541a9ea8f5106d2db090a289da7bebb2173dae78e573cf16141\",\"outcome\":\"sent\",\"diagnostic\":{\"stage\":\"response\",\"httpStatus\":200,\"dropKind\":null,\"isSent\":true}}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_claim_ack\",\"host\":\"1591806023\",\"key\":\"55c0e7f4f485898edf5b6e7fcd4ad45dbbbf85f9652e2414851395c80f6dd301\",\"outcome\":\"sent\",\"diagnostic\":{\"stage\":\"response\",\"httpStatus\":200,\"dropKind\":null,\"isSent\":true}}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_claim_ack\",\"host\":\"1591805230\",\"key\":\"075997f931af199d41a101d5a1d92485b67ff86ff0edcedc0c2eb80a291893d6\",\"outcome\":\"sent\",\"diagnostic\":{\"stage\":\"response\",\"httpStatus\":200,\"dropKind\":null,\"isSent\":true}}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_claim_ack\",\"host\":\"1591805230\",\"key\":\"3296c78a8c1470a949e89bd49a970c824410bb1439df38581e57f6ac8cb27149\",\"outcome\":\"sent\",\"diagnostic\":{\"stage\":\"response\",\"httpStatus\":200,\"dropKind\":null,\"isSent\":true}}\n{\"severity\":\"INFO\",\"event\":\"raid_relic_claim_ack\",\"host\":\"1591806023\",\"key\":\"5ece260945bd2c975efbf06b84f1ef09e3e013f8ea0ea2fa38e8a31292388b97\",\"outcome\":\"sent\",\"diagnostic\":{\"stage\":\"response\",\"httpStatus\":200,\"dropKind\":null,\"isSent\":true}}\n✔ memory: source expiry and bot rotation during pending quorum preserve receipt clock and never replay Raid POST (68.909272ms)\n✔ memory: transient refresh 429/503 and definitive refresh rejection do not erase pending votes or manufacture consent (27.193593ms)\n✔ firestore: source expiry and bot rotation during pending quorum preserve receipt clock and never replay Raid POST (58.2213ms)\n✔ firestore: transient refresh 429/503 and definitive refresh rejection do not erase pending votes or manufacture consent (38.830774ms)\n✔ shared Firestore runtime reconstruction retains partial quorum, original timestamps and completed history without startup networking (43.225171ms)\n✔ failed production persistence loading fails closed rather than selecting memory or bootstrapping (0.468364ms)\nℹ tests 6\nℹ suites 0\nℹ pass 6\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 250.721711\n"
+      }
+    }
+  ]
+}
+````
+
+### 4574. 2026-10-27T05:17:35.192Z — tool call (source line 17167)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_caaa7f1105cd4adbb7c6d43040154d1e",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '640,695p' src/app.js; sed -n '112,137p' scripts/browser-smoke-recovery.js; sed -n '1,100p' public/arrival.js; rg -n 'data.*phase|cinema|flash' public/overlay.js | tail -18; rg -n 'data|Offer|offer' public/overlay.js | head -25\",\"max_output_tokens\":1200})).output)\n"
+}
+````
+
+### 4575. 2026-10-27T05:17:35.365Z — tool result (source line 17170)
+
+````text
+{
+  "call_id": "call_caaa7f1105cd4adbb7c6d43040154d1e",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "Warning: truncated output (original token count: 1920)\nTotal output lines: 140\n\n    if (method !== 'POST') return result(405, 'Method not allowed');\n    if (!secret) return result(503, 'Webhook secret not configured');\n    if (!Buffer.isBuffer(rawBody)) return result(400, 'Expected raw bytes');\n    if (rawBody.length > MAX_BODY_BYTES) return result(413, 'Body too large');\n    const id = header(headers, 'twitch-eventsub-message-id');\n    const timestamp = header(headers, 'twitch-eventsub-message-timestamp');\n    const signature = header(headers, 'twitch-eventsub-message-signature');\n    const type = header(headers, 'twitch-eventsub-message-type');\n    if (!id || id.length > 256 || !/^sha256=[a-f0-9]{64}$/.test(signature))\n      return result(403, 'Invalid signature');\n    const expected = createHmac('sha256', secret)\n      .update(id)\n      .update(timestamp)\n      .update(rawBody)\n      .digest();\n    if (!timingSafeEqual(expected, Buffer.from(signature.slice(7), 'hex')))\n      return result(403, 'Invalid signature');\n    const receivedAt = now();\n    const sentAt = Date.parse(timestamp);\n    if (\n      !/^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d(?:\\.\\d{1,9})?Z$/.test(timestamp) ||\n      !Number.isFinite(sentAt) ||\n      sentAt > receivedAt ||\n      receivedAt - sentAt > REPLAY_WINDOW_MS\n    )\n      return result(403, 'Outside replay window');\n    let payload;\n    try {\n      payload = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(rawBody));\n    } catch {\n      return result(400, 'Invalid JSON');\n    }\n    if (!payload || typeof payload !== 'object' || Array.isArray(payload))\n      return result(400, 'Invalid payload');\n    if (type === 'webhook_callback_verification') {\n      if (typeof payload.challenge !== 'string' || !payload.challenge)\n        return result(400, 'Missing challenge');\n      return result(200, payload.challenge);\n    }\n    if (type !== 'notification' && type !== 'revocation')\n      return result(400, 'Unsupported message type');\n    const subscription = payload.subscription;\n    if (!subscription || typeof subscription.type !== 'string')\n      return result(400, 'Missing subscription');\n    let raid;\n    let chat;\n    let lifecycle;\n    const signedHost = subscription.condition?.broadcaster_user_id;\n    const context =\n      chatContext && keepers.includes(signedHost)\n        ? { ...chatContext, streamerId: signedHost }\n        : null;\n    if (type === 'notification') {\n      if (subscription.type === 'channel.ba…720 tokens truncated…rl !== null && pose.flight <= 0;\n540:  if (cinematic.send) audio.cue('send');\n541:  if (cinematic.chord) audio.cue('claim');\n544:  archive.dataset.phase = arrival.phase;\n56:const fusionArcs = ['offer', 'accept', 'ring'].map((name) => {\n81:  svg.dataset.decorative = 'true';\n102:  archiveNode.dataset.ambientCount = '0';\n103:  archiveNode.dataset.charge = 'false';\n106:  archiveNode.dataset.fusionPending = 'false';\n188:  archiveNode.dataset.fusionPending = String(\n199:  document.body.dataset.state = snapshot?.status ?? 'connecting';\n221:    line.dataset.streak = snapshot.streak.known ? String(snapshot.streak.current) : 'unknown';\n226:    document.querySelector('#lineage').removeAttribute('data-streak');\n243:    snapshot.mode === 'simulator' ? 'SIMULATOR · local test data' : '';\n324:    image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(mark.runeSvg)}`;\n338:      document.body.dataset.connection = value;\n347:        document.body.dataset.connection !== 'suspended'\n373:  if (document.hidden || document.body.dataset.connection === 'suspended') return;\n401:    document.querySelector('#offer-arc').style.strokeDashoffset = String(\n402:      339.292 * (1 - progress.offers),\n408:      `${meter.awaitingRaid ? (current.mode === 'simulator' ? 'Awaiting verified raid · gathering light' : 'Waiting for Twitch to confirm the raid') : current.mode === 'simulator' ? 'The raid arrived · claim the relic' : 'Bind the relic · two chats'} · ${progress.seconds}s · Offer ${meter.offers}/${meter.threshold} · Accept ${meter.accepts}/${meter.threshold}`;\n414:  archiveNode.dataset.cinematicElapsed = String(Math.floor(cinematic.elapsed));\n416:  archiveNode.dataset.charge = String(cinematic.charge && !motion.matches && !document.hidden);\n451:  archiveNode.dataset.ambientCount = String(ambientCount);\n471:  archiveNode.dataset.fusionPending = String(cinematic.fusionPending);\n500:    node.dataset.orbitIndex = String(item.index);\n544:  archive.dataset.phase = arrival.phase;\n551:        : `${current.mode === 'simulator' ? 'App-local ritual' : 'Ritual'} · ${Math.max(0, Math.ceil((hop.endsAt - time) / 1000))}s · offer ${hop.offers}/${hop.threshold} · accept ${hop.accepts}/${hop.threshold}`\n559:        : `${current.mode === 'simulator' ? 'Local ' : ''}${Math.max(0, Math.ceil((hop.endsAt - time) / 1000))}s · O${hop.offers}/${hop.threshold} A${hop.accepts}/${hop.threshold}`\n"
+    }
+  ]
+}
+````
+
+### 4576. 2026-10-27T05:18:08.688Z — tool call (source line 17176)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_3b79ebb27002443d88abf6d6078a5a99",
+  "input": "text((await tools.exec_command({cmd:\"rg -n 'id=\\\"(archive|impact|incoming|status|compact|lineage|count)' public/overlay-live.html; rg -n 'relic3d-frame|rune|sigil' public/overlay-live.html | head -15; sed -n '10,27p' public/overlay.js; rg -n 'revision' src/overlay-feed.js | tail -10; sed -n '35,48p' test-support/visual-review.js\",\"max_output_tokens\":800})).output)\n"
+}
+````
+
+### 4577. 2026-10-27T05:18:08.772Z — tool result (source line 17179)
+
+````text
+{
+  "call_id": "call_3b79ebb27002443d88abf6d6078a5a99",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "37:      <p id=\"status\" role=\"status\" aria-live=\"polite\">Connecting to relic state…</p>\n39:      <p id=\"count\">No current state</p>\n40:      <p class=\"lineage\" id=\"lineage\">0 growth rings · waiting for completed claims</p>\n47:        <span id=\"compact-status\">Connecting…</span><span id=\"compact-count\">No current state</span\n48:        ><span id=\"compact-handoff\"></span>\n29:        <div id=\"runes\" class=\"runes\" aria-label=\"Approved mark runes\"></div>\n  validSourceLogin,\n} from './cinematic.js';\nimport { createRelic3D, ringSummary } from './relic3d.js';\nimport { meterProgress } from './claim-meter.js';\nimport { createOverlayAudio, createCueTracker } from './overlay-audio.js';\nimport { arrivalPhase } from './arrival.js';\nimport { connectOverlay, resonanceActive } from './overlay-client.js';\nconst channel = /^\\/overlay\\/(\\d{1,32})$/.exec(location.pathname)?.[1];\nconst echoNote = document.createElement('span');\nechoNote.className = 'echo-note';\nechoNote.setAttribute('role', 'status');\ndocument.querySelector('.archive').append(echoNote);\nconst runes = document.querySelector('#runes');\nconst state = document.querySelector('#status');\nconst count = document.querySelector('#count');\nconst holderLink = document.createElement('a');\nholderLink.id = 'holder-link';\nholderLink.href = '/atlas/';\n18:  let revision = 0;\n82:        revision,\n102:        revision,\n141:        revision++;\n      headless: true,\n      chromiumSandbox: true,\n    });\n    context = await browser.newContext({\n      ignoreHTTPSErrors: true,\n      viewport: { width: 390, height: 844 },\n      serviceWorkers: 'block',\n    });\n    await context.route('**/*', (r) => {\n      if (new URL(r.request().url()).origin !== origin) {\n        external++;\n        return r.abort();\n      }\n      return r.continue();\n"
+    }
+  ]
+}
+````
+
+### 4578. 2026-10-27T05:18:13.727Z — tool call (source line 17183)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_0a6b27e8fa934a7aa3325dbd56b04f1d",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '22,40p' public/overlay-live.html; sed -n '392,417p' public/overlay.js; rg -n 'flash|p3-flash' public/overlay.js | head -10; sed -n '150,161p' src/overlay-feed.js\"})).output)\n"
+}
+````
+
+### 4579. 2026-10-27T05:18:13.810Z — tool result (source line 17186)
+
+````text
+{
+  "call_id": "call_0a6b27e8fa934a7aa3325dbd56b04f1d",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "        Sound\n      </button>\n      <div class=\"archive\">\n        <div class=\"guide guide-a\"></div>\n        <div class=\"guide guide-b\"></div>\n        <div class=\"guide guide-c\"></div>\n        <div id=\"rings\" class=\"growth-rings\" aria-hidden=\"true\"></div>\n        <div id=\"runes\" class=\"runes\" aria-label=\"Approved mark runes\"></div>\n        <svg id=\"claim-arcs\" hidden viewBox=\"0 0 120 120\" aria-hidden=\"true\">\n          <circle id=\"offer-arc\" cx=\"60\" cy=\"60\" r=\"54\" />\n          <circle id=\"accept-arc\" cx=\"60\" cy=\"60\" r=\"49\" /></svg\n        ><img class=\"crystal\" src=\"/crystal.svg\" alt=\"Faceted silver and violet relic\" />\n      </div>\n      <div id=\"claim-meter\" role=\"status\" hidden><span id=\"claim-label\"></span></div>\n      <h1>Raid Relic</h1>\n      <p id=\"status\" role=\"status\" aria-live=\"polite\">Connecting to relic state…</p>\n      <div class=\"charge-track\" aria-hidden=\"true\"><span id=\"charge\"></span></div>\n      <p id=\"count\">No current state</p>\n      <p class=\"lineage\" id=\"lineage\">0 growth rings · waiting for completed claims</p>\n  const meter =\n    current && ['ready', 'incoming', 'waiting'].includes(current.status)\n      ? current.claimMeter\n      : null;\n  const progress = meterProgress(meter, time);\n  document.querySelector('#claim-meter').hidden = !progress;\n  document.querySelector('#claim-arcs').hidden = !progress;\n  document.body.classList.toggle('voting', Boolean(progress));\n  if (progress) {\n    document.querySelector('#offer-arc').style.strokeDashoffset = String(\n      339.292 * (1 - progress.offers),\n    );\n    document.querySelector('#accept-arc').style.strokeDashoffset = String(\n      307.876 * (1 - progress.accepts),\n    );\n    document.querySelector('#claim-label').textContent =\n      `${meter.awaitingRaid ? (current.mode === 'simulator' ? 'Awaiting verified raid · gathering light' : 'Waiting for Twitch to confirm the raid') : current.mode === 'simulator' ? 'The raid arrived · claim the relic' : 'Bind the relic · two chats'} · ${progress.seconds}s · Offer ${meter.offers}/${meter.threshold} · Accept ${meter.accepts}/${meter.threshold}`;\n  } else document.querySelector('#claim-label').textContent = '';\n  const cinematic = cinema.frame(current, time, {\n    reduced: motion.matches,\n    hidden: document.hidden,\n  });\n  archiveNode.dataset.cinematicElapsed = String(Math.floor(cinematic.elapsed));\n  const chargeLevel = document.hidden ? 0 : cinematic.chargeLevel;\n  archiveNode.dataset.charge = String(cinematic.charge && !motion.matches && !document.hidden);\n  archiveNode.style.setProperty('--charge-level', String(chargeLevel));\n44:  (document.body.classList.contains('corner') || !['comet', 'flash', 'shock'].includes(name)\n51:  ['comet', 'flash', 'shock', 'release', 'fusion'].map((name) => [name, effect(name)]),\n423:    flash: cinematic.flash || null,\n431:    if (name === 'flash') node.style.opacity = String(value ?? 0);\n          }\n        }\n        return result;\n      });\n  }\n  const feeds = Object.fromEntries(\n    channels.map((channel) => [\n      channel,\n      {\n        store: wrapped,\n        channel,\n        simulator,\n"
+    }
+  ]
+}
+````
+
+### 4580. 2026-10-27T05:18:36.858Z — assistant (source line 17191)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "The runtime fault tests pass so far: pending claims retain their votes and timestamps through source-token expiry, bot-token rotation, refresh failures and shared-Firestore runtime reconstruction. Duplicate deliveries still produce one ring and one Raid POST. I haven’t found a production bug to patch; I’m finishing webhook validation and the actual local WebSocket recovery workflow.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4581. 2026-10-27T05:19:03.798Z — tool call (source line 17192)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_8bf1551bfa524174b3332a92369472e4",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='test-support/visual-review.js';s=open(p).read().replace('export async function visualReview({ seekers = false } = {}) {','export async function visualReview({ seekers = false, durable = false } = {}) {');s=s.replace(\\\"fixture = await pilotFixture('memory', {\\\", \\\"fixture = await pilotFixture(durable === true ? 'firestore' : 'memory', {\\\");s=s.replace('server = createServer(tls.options, fixture.runtime.handler);', 'server = createServer(tls.options, (req, res) => fixture.runtime.handler(req, res));');s=s.replace('  const sockets = attachOverlaySockets(', '  let sockets = attachOverlaySockets(');needle='      origin,\\\\n      fixture,';s=s.replace(needle,'''      origin,\\n      fixture,\\n      dropConnections() { for (const socket of sockets.clients) socket.terminate(); },\\n      async restartRuntime() {\\n        if (durable !== true) throw Error('Durable fixture required');\\n        sockets.close();\\n        await fixture.restart();\\n        sockets = attachOverlaySockets(server, fixture.runtime.overlayFeeds, {\\n          origins: [origin], allowRead: fixture.runtime.allowPublicRead,\\n        });\\n      },''');open(p,'w').write(s)\\np='test/reliability-demo.test.js';s=open(p).read().replace(\\\"import test from 'node:test';\\\", \\\"import test from 'node:test';\\\\nimport { createHmac } from 'node:crypto';\\\");s+='''\\n\\ntest('raw webhook challenge, tamper, invalid JSON and delayed replay boundaries preserve an existing pending claim', async () => {\\n  const { f, before } = await pending('firestore');\\n  const request = (body, {age=0,kind='webhook_callback_verification',tamper=false}={}) => {\\n    const id='reliability-boundary', timestamp=new Date(f.now()-age).toISOString();\\n    const signature='sha256='+createHmac('sha256','synthetic-pilot-hmac-secret').update(id).update(timestamp).update(body).digest('hex');\\n    return f.request('/eventsub','POST',{\\n      'twitch-eventsub-message-id':id,'twitch-eventsub-message-timestamp':timestamp,\\n      'twitch-eventsub-message-type':kind,'twitch-eventsub-message-signature':signature,\\n    },tamper?Buffer.concat([body,Buffer.from(' ')]):body);\\n  };\\n  const body=Buffer.from(JSON.stringify({challenge:'fixture-✓'}));\\n  const challenge=await request(body);assert.equal(challenge.status,200);assert.equal(challenge.body,'fixture-✓');\\n  assert.equal((await request(body,{tamper:true})).status,403);\\n  assert.equal((await request(body,{age:600001})).status,403);\\n  assert.equal((await request(Buffer.from('{'))).status,400);\\n  assert.deepEqual((await f.runtime.state.getKeeperRegistry()).pendingHop,before.pendingHop);\\n  assert.equal(raidPosts(f).length,1);\\n});\\n''';open(p,'w').write(s)\\nPY\\ncat > scripts/browser-smoke-reliability.js <<'EOF'\\n// Canonical-origin LOCAL TLS/WSS only. No upstream EventSub WebSocket exists.\\nimport assert from 'node:assert/strict';\\nimport { mkdir, writeFile } from 'node:fs/promises';\\nimport { visualReview, growthPixels } from '../test-support/visual-review.js';\\nimport { HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\\nlet review,stage='setup',passed=false,failureCategory=null,connections=0;\\nconst checks=[],diagnostic={};\\ntry{\\n  review=await visualReview({durable:true});const {page,context,fixture:f,origin}=review;\\n  await context.routeWebSocket('**/*',route=>new URL(route.url()).origin===origin.replace('https:','wss:')?route.connectToServer():route.close());\\n  page.on('websocket',()=>connections++);\\n  for(const id of [BOT,HOME,OTHER])await f.login(id);\\n  for(const id of [HOME,OTHER]){await f.control(id,'bootstrap');f.advance();await f.control(id,'keep');f.advance();}\\n  await f.chat(HOME,'9600','!mark moon');await f.chat(HOME,HOME,'!relic approve m1');f.advance(31000);\\n  assert.equal(JSON.parse((await f.control(HOME,'send:'+OTHER)).body).status,'accepted');\\n  await f.raid(HOME,OTHER,4);await f.chat(HOME,'9601','!offer');await f.chat(OTHER,'9701','!accept');\\n  const hop=(await f.runtime.state.getKeeperRegistry()).pendingHop;\\n  f.advance(23000);\\n  stage='late-initial-snapshot';await page.setViewportSize({width:1280,height:800});\\n  await page.goto(origin+'/overlay/'+OTHER);await page.bringToFront();\\n  await page.waitForFunction(()=>document.body.dataset.connection==='connected');\\n  await page.waitForFunction(()=>Number(document.querySelector('.archive').dataset.cinematicElapsed)>=23000);\\n  assert.match(await page.locator('#claim-label').innerText(),/Offer 1\\\\/2.*Accept 1\\\\/2/);\\n  assert.equal(Number(await page.locator('.p3-flash').evaluate(el=>getComputedStyle(el).opacity)),0);\\n  await page.waitForFunction(()=>Number(document.querySelector('canvas.relic3d')?.dataset.frames)>0);\\n  assert.equal(await growthPixels(page,async()=>{}),true);\\n  stage='offline-reconnect';\\n  await context.setOffline(true);review.dropConnections();\\n  await page.waitForFunction(()=>document.body.dataset.connection!=='connected');\\n  const attempts=connections;\\n  // Bounded real observation of existing 500/1000ms backoff, not a catch-up clock.\\n  await page.waitForTimeout(1200);\\n  assert.ok(connections-attempts<=3);\\n  await context.setOffline(false);\\n  await page.waitForFunction(()=>document.body.dataset.connection==='connected');\\n  assert.match(await page.locator('#claim-label').innerText(),/Offer 1\\\\/2.*Accept 1\\\\/2/);\\n  assert.equal((await f.runtime.state.getKeeperRegistry()).pendingHop.startedAt,hop.startedAt);\\n  assert.equal(Number(await page.locator('.p3-flash').evaluate(el=>getComputedStyle(el).opacity)),0);\\n  checks.push({name:'Actual local WSS offline/backoff/reconnect seeks an elapsed receipt and preserves partial quorum without replay flash',passed:true});\\n  stage='runtime-reconstruction';\\n  f.advance(1000);const calls=f.calls.length;await review.restartRuntime();assert.equal(f.calls.length,calls);\\n  await page.waitForFunction(()=>document.body.dataset.connection==='connected');\\n  await page.waitForFunction(()=>Number(document.querySelector('.archive').dataset.cinematicElapsed)>=24000);\\n  const restored=await f.runtime.overlayFeeds[OTHER].snapshot();\\n  assert.equal(restored.handoff.startedAt,hop.startedAt);assert.equal(restored.handoff.endsAt,hop.endsAt);\\n  assert.match(await page.locator('#claim-label').innerText(),/Offer 1\\\\/2.*Accept 1\\\\/2/);\\n  await f.chat(HOME,'9602','!offer');await f.chat(OTHER,'9702','!accept');\\n  await page.waitForFunction(()=>document.querySelector('.growth-fallback')?.dataset.total==='1');\\n  assert.equal((await f.runtime.state.getKeeperRegistry()).holderId,OTHER);\\n  assert.equal((await f.runtime.state.getPublicJourney()).rings,1);\\n  checks.push({name:'New runtime and hub over shared fake Firestore restore original partial clock, then genuine signed fixture votes bind exactly once',passed:true});\\n  stage='privacy-after-disconnect';\\n  await page.waitForFunction(()=>document.querySelectorAll('#runes img').length>0);\\n  await context.setOffline(true);review.dropConnections();\\n  await f.chat(HOME,'9600','!relic forgetme');f.advance(5000);\\n  await context.setOffline(false);\\n  await page.waitForFunction(()=>document.body.dataset.connection==='connected');\\n  await page.waitForFunction(()=>document.querySelectorAll('#runes img').length===0);\\n  assert.equal((await f.runtime.overlayFeeds[OTHER].snapshot()).approvedCount,0);\\n  await page.emulateMedia({reducedMotion:'reduce'});\\n  await page.waitForFunction(()=>document.querySelectorAll('.archive canvas').length===0);\\n  assert.ok(await page.locator('.archive > img.crystal').evaluate(async img=>{await img.decode();return img.naturalWidth>0;}));\\n  assert.equal((await f.runtime.state.getPublicJourney()).rings,1);\\n  assert.equal(f.calls.filter(c=>new URL(c.url).pathname.endsWith('/raids')&&c.method==='POST').length,1);\\n  assert.ok(connections>=4&&connections<=10);\\n  assert.deepEqual(review.stats(),{errors:0,external:0});\\n  checks.push({name:'Fresh post-disconnect erasure removes carried words; decoded reduced SVG, no extra Raid POST or unbounded reconnect loop',passed:true});\\n  diagnostic.connections=connections;passed=true;\\n}catch(e){failureCategory=['AssertionError','TimeoutError','TypeError'].includes(e?.name)?e.name:'browser-or-fixture';const line=/browser-smoke-reliability[.]js:(\\\\d+)/.exec(e?.stack??'');if(line)diagnostic.assertionLine=Number(line[1]);diagnostic.connections=connections;diagnostic.browserErrors=review?.stats().errors??0;}\\nfinally{await review?.close();await mkdir('artifacts',{recursive:true});const report=JSON.stringify({passed,stage,failureCategory,checks,diagnostic});assert.ok(Buffer.byteLength(report)<=65536);await writeFile('artifacts/reliability-browser-results.json',report+'\\\\n');}\\nif(!passed)process.exitCode=1;\\nEOF\\n./node_modules/.bin/prettier --write test-support/visual-review.js test/reliability-demo.test.js scripts/browser-smoke-reliability.js\\nnode test/reliability-demo.test.js > /tmp/reliability216-tests.txt 2>&1\\ntail -11 /tmp/reliability216-tests.txt\\nnode --check scripts/browser-smoke-reliability.js\",\"max_output_tokens\":850}))\n"
+}
+````
+
+### 4582. 2026-10-27T05:19:04.574Z — tool result (source line 17195)
+
+````text
+{
+  "call_id": "call_8bf1551bfa524174b3332a92369472e4",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.8 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "006550",
+        "wall_time_seconds": 0.601862486,
+        "exit_code": 0,
+        "original_token_count": 155,
+        "output": "test-support/visual-review.js 78ms\ntest/reliability-demo.test.js 55ms\nscripts/browser-smoke-reliability.js 28ms\n✔ shared Firestore runtime reconstruction retains partial quorum, original timestamps and completed history without startup networking (41.789039ms)\n✔ failed production persistence loading fails closed rather than selecting memory or bootstrapping (0.431483ms)\n✔ raw webhook challenge, tamper, invalid JSON and delayed replay boundaries preserve an existing pending claim (24.375849ms)\nℹ tests 7\nℹ suites 0\nℹ pass 7\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 268.048661\n"
+      }
+    }
+  ]
+}
+````
+
+### 4583. 2026-10-27T05:19:12.386Z — tool call (source line 17199)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_aa55d09a5dd24bdf88830b58beec12f2",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '34,52p' public/overlay.js; sed -n '305,328p' public/overlay.js; rg -n 'runes img' scripts/browser-smoke*.js | head -8; head -20 src/overlay-feed.js; rg -n 'snapshot\\\\(' src/overlay-feed.js | tail -4; sed -n '153,170p' src/overlay-feed.js\",\"max_output_tokens\":900})).output)\n"
+}
+````
+
+### 4584. 2026-10-27T05:19:12.468Z — tool result (source line 17202)
+
+````text
+{
+  "call_id": "call_aa55d09a5dd24bdf88830b58beec12f2",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "  optedIn: new URLSearchParams(location.search).get('sound') === '1',\n});\nconst cueFor = createCueTracker();\nconst cinema = createCinemaTracker();\nconst archiveNode = document.querySelector('.archive');\nconst effect = (name) => {\n  const node = document.createElement('div');\n  node.className = `p3-${name}`;\n  node.hidden = true;\n  node.setAttribute('aria-hidden', 'true');\n  (document.body.classList.contains('corner') || !['comet', 'flash', 'shock'].includes(name)\n    ? archiveNode\n    : document.body\n  ).append(node);\n  return node;\n};\nconst effects = Object.fromEntries(\n  ['comet', 'flash', 'shock', 'release', 'fusion'].map((name) => [name, effect(name)]),\n);\n    document.querySelector('#compact-count').removeAttribute('title');\n    document.querySelector('#compact-count').removeAttribute('aria-label');\n  }\n  if (!simulated)\n    document.querySelector('#waiting-note').textContent = snapshot.movedToLogin\n      ? `The relic has moved on to @${snapshot.movedToLogin}`\n      : 'The relic stirs… a confirmed raid will light the way here.';\n  count.textContent = simulated\n    ? `${snapshot.approvedCount} approved marks · charge ${snapshot.approvedCount}/160`\n    : `${snapshot.approvedCount} approved runes`;\n  document.querySelector('#charge').style.width = `${(snapshot.approvedCount / 160) * 100}%`;\n  document.querySelector('.charge-track').hidden = !simulated;\n  snapshot.marks.forEach((mark, index) => {\n    const image = document.createElement('img');\n    image.className = 'rune';\n    image.alt = mark.faded\n      ? 'Approved carried rune, dimmed after three holder stream closures; retained, not deleted'\n      : 'Approved community rune';\n    if (mark.faded) image.classList.add('faded');\n    image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(mark.runeSvg)}`;\n    const angle = index * 2.399963;\n    const radius = 30 + (index % 3) * 5;\n    image.style.setProperty('--x', `${Math.cos(angle) * radius}%`);\n    image.style.setProperty('--y', `${Math.sin(angle) * radius}%`);\nscripts/browser-smoke-reliability.js:100:  await page.waitForFunction(() => document.querySelectorAll('#runes img').length > 0);\nscripts/browser-smoke-reliability.js:107:  await page.waitForFunction(() => document.querySelectorAll('#runes img').length === 0);\nimport { RECEIVING_KEEPERS } from './receiving.js';\nimport { validStreak } from '../public/streak-view.js';\nimport { validFlightText } from '../public/cinematic.js';\nimport { validClaimMeter } from '../public/claim-meter.js';\n// One mutation queue for every configured feed. Never wrap a wrapped store.\nexport function createOverlayHub(\n  store,\n  channels,\n  { simulator = false, now = Date.now, logins = RECEIVING_KEEPERS } = {},\n) {\n  if (\n    !channels.length ||\n    channels.length > 4 ||\n    !channels.every((channel) => /^\\d{1,32}$/.test(channel))\n  )\n    throw new Error('Configured overlay channels required');\n  let queue = Promise.resolve();\n  let revision = 0;\n  const enqueue = (operation) => {\n    const result = queue.then(operation);\n      });\n  }\n  const feeds = Object.fromEntries(\n    channels.map((channel) => [\n      channel,\n      {\n        store: wrapped,\n        channel,\n        simulator,\n        snapshot: () => enqueue(() => read(channel)),\n        subscribe(listener) {\n          listeners.get(channel).add(listener);\n          return () => listeners.get(channel).delete(listener);\n        },\n      },\n    ]),\n  );\n  return { store: wrapped, feeds };\n"
+    }
+  ]
+}
+````
+
+### 4585. 2026-10-27T05:19:57.301Z — tool call (source line 17208)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_8a82ae94ce2548e79fe2f4f6e9f99330",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='test/reliability-demo.test.js';s=open(p).read();needle=\\\"      await receipt();\\\\n      await f.chat(HOME, '8601', '!offer', { messageId: 'reliable-offer' });\\\";s=s.replace(needle,\\\"\\\"\\\"      const repliesBeforeDuplicate = f.calls.filter(c => new URL(c.url).pathname.endsWith('/chat/messages')).length;\\n      await receipt();\\n      await f.chat(HOME, '8601', '!offer', { messageId: 'reliable-offer' });\\n      assert.equal(f.calls.filter(c => new URL(c.url).pathname.endsWith('/chat/messages')).length, repliesBeforeDuplicate);\\\"\\\"\\\");open(p,'w').write(s)\\np='scripts/browser-smoke-reliability.js';s=open(p).read().replace(\\\"  assert.ok(\\\\n    await page.locator('.archive > img.crystal').evaluate\\\", \\\"  assert.equal(await page.locator('.archive > img.crystal').isVisible(), true);\\\\n  assert.ok(\\\\n    await page.locator('.archive > img.crystal').evaluate\\\");open(p,'w').write(s)\\nPY\\n./node_modules/.bin/prettier --write test/reliability-demo.test.js scripts/browser-smoke-reliability.js\\nnode test/reliability-demo.test.js > /tmp/reliability216-tests.txt 2>&1\\ntail -10 /tmp/reliability216-tests.txt\\nrg -n 'isVisible|repliesBeforeDuplicate' scripts/browser-smoke-reliability.js test/reliability-demo.test.js\",\"max_output_tokens\":700}))\n"
+}
+````
+
+### 4586. 2026-10-27T05:19:58.029Z — tool result (source line 17211)
+
+````text
+{
+  "call_id": "call_8a82ae94ce2548e79fe2f4f6e9f99330",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.7 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "b7587f",
+        "wall_time_seconds": 0.543839948,
+        "exit_code": 0,
+        "original_token_count": 145,
+        "output": "test/reliability-demo.test.js 106ms (unchanged)\nscripts/browser-smoke-reliability.js 35ms (unchanged)\n✔ failed production persistence loading fails closed rather than selecting memory or bootstrapping (0.444603ms)\n✔ raw webhook challenge, tamper, invalid JSON and delayed replay boundaries preserve an existing pending claim (25.095895ms)\nℹ tests 7\nℹ suites 0\nℹ pass 7\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 270.977926\nscripts/browser-smoke-reliability.js:111:  assert.equal(await page.locator('.archive > img.crystal').isVisible(), true);\n"
+      }
+    }
+  ]
+}
+````
+
+### 4587. 2026-10-27T05:20:01.883Z — tool call (source line 17215)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_9e8ed026cd9b44229ac3a64329b17094",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '58,92p' test/reliability-demo.test.js; rg -n 'runtimeEnv|rotateTokens|refreshFailure|deliveryId|restart' test-support/pilot-fixture.js; sed -n '1,31p' test-support/visual-review.js; sed -n '50,80p' test-support/visual-review.js\",\"max_output_tokens\":1100})).output)\n"
+}
+````
+
+### 4588. 2026-10-27T05:20:01.960Z — tool result (source line 17218)
+
+````text
+[credential-looking item omitted in full; reason: literal assignment; no credential status assumed]
+````
+
+### 4589. 2026-10-27T05:21:08.422Z — tool call (source line 17222)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_3852673e3e254087bc4c54001cf8c491",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='test-support/pilot-fixture.js';s=open(p).read();s=s.replace(\\\"      const id = rawId?.replace(/-v\\\\\\\\d+$/, '');\\\\n      const version\\\", \\\"      const id = rawId?.replace(/-v\\\\\\\\d+$/, '');\\\\n      if (revoked.has(id)) return { status: 400, data: {} };\\\\n      const version\\\");s=s.replace(\\\"      if (revoked.has(id)) return { status: 400, data: {} };\\\\n      expired.delete(id);\\\", \\\"      expired.delete(id);\\\");open(p,'w').write(s)\\np='test/reliability-demo.test.js';s=open(p).read().replace(\\\"    await receipt();\\\\n    await f.chat(HOME, '8601', '!offer', { messageId: 'reliable-offer' });\\\", \\\"    const repliesBeforeDuplicate = f.calls.filter(c => new URL(c.url).pathname.endsWith('/chat/messages')).length;\\\\n    await receipt();\\\\n    await f.chat(HOME, '8601', '!offer', { messageId: 'reliable-offer' });\\\\n    assert.equal(f.calls.filter(c => new URL(c.url).pathname.endsWith('/chat/messages')).length, repliesBeforeDuplicate);\\\");open(p,'w').write(s)\\nPY\\ncat > docs/RELIABILITY_DEMO.md <<'EOF'\\n# Reliability review — source 216\\n\\nThis increment adds fault regressions and local native-browser coverage; it makes **no production application, renderer, protocol, scope, resource or scheduling change**. The focused source tests below pass, but the full native cohort/browser gate and new zero-preview publication are pending. Earlier 852-test / 40-flow results belong to the first-run release, not this increment.\\n\\n## Delivery layers and evidence\\n\\n| Layer | Exercise / evidence | What it does not prove |\\n| --- | --- | --- |\\n| EventSub delivery | The app receives signed **webhooks**, not an upstream EventSub WebSocket. Actual local runtime HTTP dispatch tests cover raw-body HMAC, UTF-8 challenge, tampering, invalid JSON, stale delivery rejection and duplicate notifications while a claim is pending. | No forced real Twitch interruption, resubscription or physical raid was performed. |\\n| Mid-claim grants | Memory and fake-Firestore runtime tests expire the source grant after a verified synthetic raid/offer, rotate its pair under concurrent callers, then expire/rotate the bot before an ACK. Original pending timestamps/quorum persist. Fresh grants acquire no token lease. | These are mocked token endpoints, not another recovery of actual accounts or proof of viewer-rendered ACKs. |\\n| Token failures | Mock refresh 429/503 remains temporary; only well-formed refresh 400/401 becomes reconsent-required. A failed bot-grant ACK does not erase a committed vote. Later valid signed votes complete one ring. | Transient failure does not justify consent, a new scope, a replayed Raid POST or automatic repeated chat delivery. |\\n| Runtime reconstruction | A new `createRuntime`/hub with empty process caches reads the same shared fake Firestore after partial votes. Receipt start/end times, votes, completed stop and streak survive; startup makes no provider calls. Failed persistence loading rejects instead of choosing memory; unavailable Atlas reads return 503 and feeds publish unavailable without writes. | Reconstruction in one local Node test is not a fresh OS process, actual Firestore outage or Cloud Run autoscaling proof. Memory is intentionally not durable across processes. |\\n| Browser/OBS connection | New `browser-smoke-reliability.js` uses actual sandboxed Chromium and local TLS/WSS: terminate its server connection, briefly take its context offline, observe bounded existing retry backoff, reconnect to an elapsed receipt without a new flash, replace the runtime/hub, then finish signed fixture votes. A further disconnect/erasure requires a fresh empty projection; reduced motion must permanently remove GL and decode original SVG. | Native execution is pending. This is not physical OBS testing, upstream EventSub WebSocket reconnect or permission to widen preview WSS origins. |\\n| Min-zero HTTP observation | Operator-reported 27 October 2026 **05:13:30.547 UTC** GET of an idle existing `judge-ready` zero-preview revision: health 200 / release `9b`, 2223ms. A second GET five seconds later: 200, 117ms. Existing min0/max1 configuration was preserved. A 05:13:39.151 system-startup-log read found no matching record yet. | **Cold start unconfirmed.** Latency alone cannot establish cold state; log indexing may lag. Two samples are not p95, an SLA or a platform performance guarantee. |\\n\\nThe operator may reconcile a later platform startup/AUTOSCALING record with that exact revision/time and record the bounded result separately. The source author has not queried cloud metadata/logs or private evidence. No startup record or cold PASS is inferred here.\\n\\n## Local test entry points\\n\\n- `test/reliability-demo.test.js`: signed runtime/HTTP transactions in memory and shared fake Firestore, not only pure reducers. Includes one Raid POST despite duplicate deliveries, exact-room bot principal, original pending clock, atomic token-pair save, no fresh-token lease write, rejection classification, store outage and reconstruction.\\n- Existing `test/oauth-maintenance.test.js` retains the separate per-role/mixed-scope/distributed-lease/race regressions; no optional permission becomes a mandatory base grant.\\n- `scripts/browser-smoke-reliability.js`: same-origin local TLS/WSS fixture with closed diagnostics in `artifacts/reliability-browser-results.json` (≤64KiB). No capture or private DOM/token/error-body dump. The Node fixture clock advances only server receipt age; real browser GL/frame/pixel and socket observations remain actual. The bounded 1.2-second offline observation tests retry rate, not an artificial connected flag.\\n\\nThe new fixture options are test-only: optional rotating synthetic pairs, closed refresh HTTP faults, explicit delivery IDs and a Firestore-only runtime rebuild; the shared fake store can reject reads. Default existing fixture behavior remains unchanged. The visual helper can terminate only its own local sockets and replace its own durable fixture hub. No production test hook or public forced restart/tick is added.\\n\\n## Owner's live-demo checklist\\n\\nBefore a human-operated stream demonstration, review the exact deployed source/flags and retained journey, verify the two intended accounts and their normal setup, and confirm that the OBS source shows fresh state. Routine access-token expiry is handled before use; only definitive refresh rejection calls for matching-account reconnection. If a connection drops, reconnect to the existing pending clock and votes; do not restart the ritual merely to replay an animation. Accepted/ambiguous Raid POST outcomes are never blindly retried. Treat an ACK's provider acceptance separately from what a viewer actually saw.\\n\\nLive tests, real browser/OBS focus, native Raid Now, chat participation and any grant/control/provider actions remain owner-operated and outside this source run. A preview's self-origin WSS 403 is intentional; no origin/CORS/callback workaround is authorized. The planned review tag is `reliability` at zero traffic, master read-only, P7 five OFF, Seekers ON, Wander/clip/paid OFF. Publication and any later production promotion are separate operator/owner steps; none is claimed here.\\n\\nNo min1 setting, keepalive polling, new paid service, worker, scheduler, dependency, retry after irreversible dispatch, FPS/resource waiver or timing-limit change was introduced. Existing Cloud Run/Firestore hosting can incur usage. Operator-reported registry usage was 358.067MB against the 0.5GB baseline allowance and cleanup was a read-only dry run; that is not a global free-tier or zero-invoice promise. The owned Wander cron remains **commented out until explicit Olly/Grok GO**; this reliability work does not enable it. Clips and paid features stay OFF.\\nEOF\\ncat >> README.md <<'EOF'\\n\\n### Reliability review layers\\n\\n[Source 216 reliability review](docs/RELIABILITY_DEMO.md) covers signed webhook redelivery, pending-claim token expiry, shared-store runtime reconstruction and an actual local browser WSS recovery workflow. EventSub uses webhooks; the WebSocket is the read-only OBS/browser feed. The operator's two min-zero preview health timings do **not** establish a cold start without platform corroboration. This test/docs increment adds no running resource, keepalive or production behavior change; its native browser/release gate remains pending.\\nEOF\\n./node_modules/.bin/prettier --write test-support/pilot-fixture.js test/reliability-demo.test.js docs/RELIABILITY_DEMO.md README.md\\nnode test/reliability-demo.test.js > /tmp/reliability216-tests.txt 2>&1\\ntail -10 /tmp/reliability216-tests.txt\",\"max_output_tokens\":900}))\n"
+}
+````
+
+### 4590. 2026-10-27T05:21:09.337Z — tool result (source line 17225)
+
+````text
+{
+  "call_id": "call_3852673e3e254087bc4c54001cf8c491",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.9 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "762a93",
+        "wall_time_seconds": 0.730778314,
+        "exit_code": 0,
+        "original_token_count": 124,
+        "output": "test-support/pilot-fixture.js 112ms (unchanged)\ntest/reliability-demo.test.js 47ms\ndocs/RELIABILITY_DEMO.md 67ms\nREADME.md 58ms (unchanged)\n✔ failed production persistence loading fails closed rather than selecting memory or bootstrapping (0.461964ms)\n✔ raw webhook challenge, tamper, invalid JSON and delayed replay boundaries preserve an existing pending claim (25.55386ms)\nℹ tests 7\nℹ suites 0\nℹ pass 7\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 283.374113\n"
+      }
+    }
+  ]
+}
+````
+
+### 4591. 2026-10-27T05:21:32.940Z — tool call (source line 17231)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_b5f80f8c4a9a458886f4fce5e2d017bd",
+  "input": "const names=[\"p7\",\"receiving\",\"claims\",\"oauth-maintenance\",\"onboarding\",\"p4\"];const results=await Promise.allSettled(names.map(name=>tools.exec_command({cmd:`node test/${name}.test.js > /tmp/reliability216-${name}.txt 2>&1\\ntest_result=$?\\ntail -9 /tmp/reliability216-${name}.txt\\nexit \"$test_result\"`,max_output_tokens:350})));for(let i=0;i<results.length;i++)text({suite:names[i],result:results[i]});\n"
+}
+````
+
+### 4592. 2026-10-27T05:21:35.820Z — tool result (source line 17239)
+
+````text
+{
+  "call_id": "call_b5f80f8c4a9a458886f4fce5e2d017bd",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 2.9 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "suite": "p7",
+        "result": {
+          "status": "fulfilled",
+          "value": {
+            "chunk_id": "a6cb7d",
+            "wall_time_seconds": 1.9253872909999998,
+            "exit_code": 0,
+            "original_token_count": 61,
+            "output": "✔ firestore: pin uses configured BOT principal and mismatched bot/client validation blocks queued providers (47.274366ms)\nℹ tests 43\nℹ suites 0\nℹ pass 43\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 1744.927422\n"
+          }
+        }
+      }
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "suite": "receiving",
+        "result": {
+          "status": "fulfilled",
+          "value": {
+            "chunk_id": "ef4a41",
+            "wall_time_seconds": 0.688489951,
+            "exit_code": 0,
+            "original_token_count": 58,
+            "output": "✔ async logger rejection is contained without awaiting logging or changing fail-closed eligibility (0.723566ms)\nℹ tests 20\nℹ suites 0\nℹ pass 20\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 607.270974\n"
+          }
+        }
+      }
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "suite": "claims",
+        "result": {
+          "status": "fulfilled",
+          "value": {
+            "chunk_id": "68bbb2",
+            "wall_time_seconds": 2.698225287,
+            "exit_code": 0,
+            "original_token_count": 59,
+            "output": "✔ firestore: actual Twitch empty opposite raid condition still opens verified handoff and atomic claim (4.834362ms)\nℹ tests 29\nℹ suites 0\nℹ pass 29\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 2623.712687\n"
+          }
+        }
+      }
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "suite": "oauth-maintenance",
+        "result": {
+          "status": "fulfilled",
+          "value": {
+            "chunk_id": "57f42d",
+            "wall_time_seconds": 0.557547547,
+            "exit_code": 0,
+            "original_token_count": 58,
+            "output": "✔ firestore: an extra-scope waiter cannot use a base-only grant and pure validation never refreshes (6.946099ms)\nℹ tests 12\nℹ suites 0\nℹ pass 12\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 381.640356\n"
+          }
+        }
+      }
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "suite": "onboarding",
+        "result": {
+          "status": "fulfilled",
+          "value": {
+            "chunk_id": "245912",
+            "wall_time_seconds": 0.307156277,
+            "exit_code": 0,
+            "original_token_count": 56,
+            "output": "✔ private control permission/result text wraps completely without clipping or reducing type (1.096209ms)\nℹ tests 8\nℹ suites 0\nℹ pass 8\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 224.81405\n"
+          }
+        }
+      }
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "suite": "p4",
+        "result": {
+          "status": "fulfilled",
+          "value": {
+            "chunk_id": "5634bf",
+            "wall_time_seconds": 0.548408708,
+            "exit_code": 0,
+            "original_token_count": 52,
+            "output": "✔ firestore: aborted renewal cannot extend an otherwise surviving session (0.315523ms)\nℹ tests 18\nℹ suites 0\nℹ pass 18\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 329.020145\n"
+          }
+        }
+      }
+    }
+  ]
+}
+````
+
+### 4593. 2026-10-27T05:21:52.895Z — tool call (source line 17243)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_1223d1dac50b48b9a91e19c78947bc94",
+  "input": "text((await tools.exec_command({cmd:\"rg -n 'function clearCinema|effects\\\\[|node.style.opacity' public/overlay.js; sed -n '105,127p' public/overlay.js; sed -n '417,435p' public/overlay.js; rg -n 'repliesBeforeDuplicate' test/reliability-demo.test.js; sed -n '153,162p' test-support/visual-review.js; sed -n '59,82p' test-support/pilot-fixture.js\",\"max_output_tokens\":700})).output)\n"
+}
+````
+
+### 4594. 2026-10-27T05:21:52.985Z — tool result (source line 17246)
+
+````text
+[credential-looking item omitted in full; reason: literal assignment; no credential status assumed]
+````
+
+### 4595. 2026-10-27T05:22:14.956Z — tool call (source line 17250)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_ab37f77804144fc9936fd71c5028ce70",
+  "input": "text(await tools.exec_command({cmd:\"./node_modules/.bin/prettier --check test-support/pilot-fixture.js test-support/fake-firestore.js test-support/visual-review.js test/reliability-demo.test.js scripts/browser-smoke-reliability.js docs/RELIABILITY_DEMO.md README.md\\nnode --check scripts/browser-smoke-reliability.js\\nnode --check test-support/pilot-fixture.js\\nnode --check test-support/visual-review.js\",\"max_output_tokens\":300}))\n"
+}
+````
+
+### 4596. 2026-10-27T05:22:15.644Z — tool result (source line 17253)
+
+````text
+{
+  "call_id": "call_ab37f77804144fc9936fd71c5028ce70",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.7 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "36128e",
+        "wall_time_seconds": 0.516612556,
+        "exit_code": 0,
+        "original_token_count": 17,
+        "output": "Checking formatting...\nAll matched files use Prettier code style!\n"
+      }
+    }
+  ]
+}
+````
+
+### 4597. 2026-10-27T05:22:22.710Z — assistant (source line 17256)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Reliability increment ready: seven new runtime fault tests, a local TLS/WSS recovery workflow and [layered evidence notes](docs/RELIABILITY_DEMO.md).\n\n**137 focused tests passed, zero skips; syntax/format passed.** Tests preserved pending clocks/quorum through token failures and runtime reconstruction, with no duplicate ring or Raid POST. No production bug required a patch; app/rendering behavior is unchanged.\n\nNative browser/full gates and `reliability@0` remain pending. Cold start is explicitly **unconfirmed**. Devpost draft remains queued.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4598. 2026-10-27T05:23:26.502Z — user (source line 17264)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "217 RELIABILITYREPORTCLOSEOUTDOCSONLY<1min sameOriginalsoleauthor/noGit/cloud/provider/keys/realcontrols/streams/chat/SendOff. Source216focused137pass0skip/new7runtimeFaultTests+NativeTLSWSSworkflowreadyNOPRODUCTIONBUGfound/no appchanges.Validno inventedpatch. ParentWILLfocusedNative/FullunitAll41serialthenpubreliability0 beforePHASE4privateDevpost218 (doNOTcreateDraftyetin217). CorrectnewfactsDOCS ONLY docs/RELIABILITY_DEMO.md(+READMEaccurateone-linerifneed), no app/tests/privateRawfiles bySource.\nCORROBORATEDACTUALMIN0COLD: ParentpermittedREADONLYzerojudge-readyoldrevision9b idle>1h,firstGET05:13:30.547UTC200 elapsed2223ms correct9brelease, followupafter5sec05:13:37.891200117ms. minInstances0/max1 VERIFIEDno scalingchange/resources/traffic/actions.PRECISESYSTEMLOGbyGCPCloudLoggingobserved05:15:32.686 nowFOUND1startinginstance at2026-10-27T05:13:30.722446Z reasonAUTOSCALING onEXACTraid-relic-judge-ready-1027. ThisCORROBORATESactualautoscalingcoldstart(matchesfirstGETwindow); initialempty05:13:39logswasindexlag. No longerunconfirmed. Onecold+warmanecdoteNOTp95/SLA/performanceguarantee/notnewreliabilityrevision'sexactcold/unverifiedphysicalTwitch. Sourceauthorno cloudcalls; reportfactsParentoperatorobserved. Canincludeclosedtimestamp/revision/HttpCode/ms/no platforminstanceId/privateURL/cookies/Token. Parentproofprivateprefixcold-start-final-proof JSONnotpubliclink; citeinrepoactualfactsdirect. Capturemin0 no min1/keepalive/timer/newbillservice.BackgroundPrivateSDKno extraCreds. SourceproofLateReadLogNo LogsCredentials.\nUpdateMATRIX'coldunconfirmed/parentmayreconcile' nowCORROBORATEDparentSystemLog atsame0target/time andlatencies/bounds caveat. RemoveobsoleteclaimpendingCold. Browser/fullcohortnotrunYETatthissourcepoint: insteadofstale'Nativepending'publishedforever,rewordreferenceDATed docs/QUALITY.md+exactCI/artifactsasoperatorpublicationgate, no claimSourceexecutednative.No fakefuture85941counts. Nativebrowserrowwording'the workflow exercises...' plusactualNativegatespublishcontrolled; don'tstatepassedbeforeParentQA.Author137focusedactual0skipqualifiesasfocusednotwhole. ParentwillQualityactualnativecounts laterappunchanged.IfneedReportexecutionsectionclosedcountsParentmetadataapp-derivedlaterReferenceQualitygood enough. UserwantsallfouritemsSequence: YOURDoccloseoutpart3ONLYfinishthenParentrealnativegates0 then218DevpostplainEnglish/no post. No unrequestedguidanceAPI/coldperfoptimizations/reconnectrefactorbecausefixturetestsfoundno productionbug.LabelWebhooktransportnotEventSubWS+OBSbrowserWS, coldbaselineold9bvsnewfirstRun9d0allprod3d100. Source217quickformatter/diffSTOPsameThread originalno otherwriter.PreservecoldfirstnilreadhistoricalonlyifusefulnotstaleCurrentcode.Root_Metadata_Task.\n"
+  }
+]
+````
+
+### 4599. 2026-10-27T05:23:30.519Z — assistant (source line 17267)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll update the cold-start finding with the operator’s exact revision and startup timestamp, while keeping it separate from the new reliability workflow and any latency guarantee.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4600. 2026-10-27T05:23:42.342Z — tool call (source line 17268)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_15ad342bdb5f4aaa93023288f6b7ff90",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='docs/RELIABILITY_DEMO.md';s=open(p).read();s=s.replace('The focused source tests below pass, but the full native cohort/browser gate and new zero-preview publication are pending.', 'The source author ran 137 focused tests with zero failures/skips. Full native cohort/browser results and publication are operator gates recorded in [the dated quality record](QUALITY.md); focused tests are not a whole-cohort or deployment claim.');s=s.replace('Native execution is pending. This is not physical OBS testing, upstream EventSub WebSocket reconnect or permission to widen preview WSS origins.', 'Its native result belongs to the operator publication gate in the dated quality record. This is not physical OBS testing, upstream EventSub WebSocket reconnect or permission to widen preview WSS origins.');s=s.replace('A 05:13:39.151 system-startup-log read found no matching record yet.', 'The follow-up was at 05:13:37.891 UTC. A later operator system-log read at 05:15:32.686 UTC found one starting-instance record on exact revision `raid-relic-judge-ready-1027`, timestamp **05:13:30.722446 UTC**, reason **AUTOSCALING**, within the first-request window.');s=s.replace('**Cold start unconfirmed.** Latency alone cannot establish cold state; log indexing may lag. Two samples are not p95, an SLA or a platform performance guarantee.', '**Autoscaling cold start corroborated by the operator’s matching system record**, not inferred from latency alone. This is one cold/warm observation on the older `judge-ready` / `9b` zero preview, not the new reliability revision. Two samples are not p95, an SLA or a platform performance guarantee.');s=s.replace('The operator may reconcile a later platform startup/AUTOSCALING record with that exact revision/time and record the bounded result separately. The source author has not queried cloud metadata/logs or private evidence. No startup record or cold PASS is inferred here.', 'The initial 05:13:39.151 UTC lookup returned no matching record; the later matching record resolves that earlier uncertainty and is consistent with indexing lag. The operator reports the revision had been idle for over an hour, with min0/max1 unchanged. No scaling, resource, traffic, stream or game action was performed for this GET-only probe. The source author made no cloud calls and read no private logs/evidence. This corroboration is platform startup evidence, not physical Twitch/OBS proof or a claim that the new reliability revision was cold-tested.');open(p,'w').write(s)\\np='README.md';s=open(p).read();s=s.replace(\\\"The operator's two min-zero preview health timings do **not** establish a cold start without platform corroboration.\\\", \\\"The operator corroborated one min-zero cold start on the older `judge-ready` / `9b` zero preview with a matching AUTOSCALING startup record; its 2223ms first GET and 117ms follow-up are an anecdote, not a latency guarantee or a cold test of the new reliability revision.\\\");open(p,'w').write(s)\\nPY\\nrg -n 'Cold|cold|pending|05:13|Native execution|focused' docs/RELIABILITY_DEMO.md | head -12\\n./node_modules/.bin/prettier --write docs/RELIABILITY_DEMO.md README.md\",\"max_output_tokens\":1000}))\n"
+}
+````
+
+### 4601. 2026-10-27T05:23:42.782Z — tool result (source line 17271)
+
+````text
+{
+  "call_id": "call_15ad342bdb5f4aaa93023288f6b7ff90",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.4 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "0c5eed",
+        "wall_time_seconds": 0.233727007,
+        "exit_code": 0,
+        "original_token_count": 1093,
+        "output": "Warning: truncated output (original token count: 1093)\nTotal output lines: 9\n\n3:This increment adds fault regressions and local native-browser coverage; it makes **no production application, renderer, protocol, scope, resource or scheduling change**. The source author ran 137 focused tests with zero failures/skips. Full native cohort/browser results and publication are operator gates recorded in [the dated quality record](QUALITY.md); focused tests are not a whole-cohort or deployment claim. Earlier 852-test / 40-flow results belong to the first-run release, not this increment.\n9:| EventSub delivery         | The app receives signed **webhooks**, not an upstream EventSub WebSocket. Actual local runtime HTTP dispatch tests cover raw-body HMAC, UTF-8 challenge, tampering, invalid JSON, stale delivery rejection and duplicate notifications while a claim is pending.                                                                                                                                                                                   | No forced real Twitch interruption, resubscription or physical raid was performed.                                                                                             |\n10:| Mid-claim grants          | Memory and fake-Firestore runtime tests expire the source grant after a verified synthetic raid/offer, rotate its pair under concurrent callers, then expire/rotate the bot before an ACK. Original pending timestamps/quorum persist. Fresh grants acquire no token lease.                                                                                                                                                                        | These are mocked token endpoints, not another recovery of actual accounts or proof of viewer-rendered ACKs.                                                                    |\n14:| Min-zero HTTP observation | Operator-reported 27 October 2026 **05:13:30.547 UTC** GET of an idle existing `judge-ready` zero-preview revision: health 200 / release `9b`, 2223ms. A second GET fiv…93 tokens truncated…                                                                                                | **Autoscaling cold start corroborated by the operator’s matching system record**, not inferred from latency alone. This is one cold/warm observation on the older `judge-ready` / `9b` zero preview, not the new reliability revision. Two samples are not p95, an SLA or a platform performance guarantee.              |\n16:The initial 05:13:39.151 UTC lookup returned no matching record; the later matching record resolves that earlier uncertainty and is consistent with indexing lag. The operator reports the revision had been idle for over an hour, with min0/max1 unchanged. No scaling, resource, traffic, stream or game action was performed for this GET-only probe. The source author made no cloud calls and read no private logs/evidence. This corroboration is platform startup evidence, not physical Twitch/OBS proof or a claim that the new reliability revision was cold-tested.\n20:- `test/reliability-demo.test.js`: signed runtime/HTTP transactions in memory and shared fake Firestore, not only pure reducers. Includes one Raid POST despite duplicate deliveries, exact-room bot principal, original pending clock, atomic token-pair save, no fresh-token lease write, rejection classification, store outage and reconstruction.\n28:Before a human-operated stream demonstration, review the exact deployed source/flags and retained journey, verify the two intended accounts and their normal setup, and confirm that the OBS source shows fresh state. Routine access-token expiry is handled before use; only definitive refresh rejection calls for matching-account reconnection. If a connection drops, reconnect to the existing pending clock and votes; do not restart the ritual merely to replay an animation. Accepted/ambiguous Raid POST outcomes are never blindly retried. Treat an ACK's provider acceptance separately from what a viewer actually saw.\ndocs/RELIABILITY_DEMO.md 86ms\nREADME.md 75ms (unchanged)\n"
+      }
+    }
+  ]
+}
+````
+
+### 4602. 2026-10-27T05:23:47.974Z — tool call (source line 17275)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_9a3fb047b5da4417923f947d187597d5",
+  "input": "text((await tools.exec_command({cmd:\"python3 - <<'PY'\\ns=open('docs/RELIABILITY_DEMO.md').read();print(s[s.index('| Min-zero'):s.index('\\\\n\\\\nThe initial')])\\nPY\",\"max_output_tokens\":700})).output)\n"
+}
+````
+
+### 4603. 2026-10-27T05:23:48.067Z — tool result (source line 17278)
+
+````text
+{
+  "call_id": "call_9a3fb047b5da4417923f947d187597d5",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "| Min-zero HTTP observation | Operator-reported 27 October 2026 **05:13:30.547 UTC** GET of an idle existing `judge-ready` zero-preview revision: health 200 / release `9b`, 2223ms. A second GET five seconds later: 200, 117ms. Existing min0/max1 configuration was preserved. The follow-up was at 05:13:37.891 UTC. A later operator system-log read at 05:15:32.686 UTC found one starting-instance record on exact revision `raid-relic-judge-ready-1027`, timestamp **05:13:30.722446 UTC**, reason **AUTOSCALING**, within the first-request window. | **Autoscaling cold start corroborated by the operator’s matching system record**, not inferred from latency alone. This is one cold/warm observation on the older `judge-ready` / `9b` zero preview, not the new reliability revision. Two samples are not p95, an SLA or a platform performance guarantee. |\n"
+    }
+  ]
+}
+````
+
+### 4604. 2026-10-27T05:23:54.361Z — assistant (source line 17281)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Updated only README and `docs/RELIABILITY_DEMO.md` with the operator-correlated AUTOSCALING record: exact revision, startup/read timestamps and 2223ms/117ms timings.\n\nIt now says **one corroborated cold start**, with no p95/SLA, new-revision or physical Twitch claim. Native reliability gates remain separate. Formatting passed; no code, tests or operations changed.",
     "annotations": [],
     "logprobs": []
   }
