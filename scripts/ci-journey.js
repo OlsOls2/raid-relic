@@ -1,7 +1,7 @@
 // Trusted CI launcher. Toolchain download happens BEFORE this offline boundary.
 import { spawn } from 'node:child_process';
 import { constants } from 'node:fs';
-import { mkdir, mkdtemp, writeFile, realpath, open, rm, access } from 'node:fs/promises';
+import { mkdir, mkdtemp, writeFile, realpath, open, rm, access, readlink } from 'node:fs/promises';
 import { dirname, join, resolve, isAbsolute } from 'node:path';
 let scratch,
   passed = false,
@@ -9,8 +9,43 @@ let scratch,
   childExitCode = null,
   childSignal = 'none',
   errorCode = 'none',
-  stderrCategory = 'none';
+  stderrCategory = 'none',
+  stderrOrigin = 'none',
+  permissionArea = 'none',
+  insideStage = 'not-started',
+  insideErrorCode = 'none';
 let stderr = '';
+const projectStderr = (value) => {
+  stderrOrigin = /^bwrap:/m.test(value)
+    ? 'bwrapPrefix'
+    : /error while loading shared libraries|cannot execute binary/i.test(value)
+      ? 'nativeLoader'
+      : /EACCES|EPERM|EROFS/.test(value)
+        ? 'nodeFilesystem'
+        : value
+          ? 'unclassified'
+          : 'none';
+  permissionArea = value.includes('/app/artifacts')
+    ? 'artifacts'
+    : value.includes('/tmp/home')
+      ? 'home'
+      : value.includes('/tool-node')
+        ? 'tool-node'
+        : /\/tmp(?:\/|['"\s])/.test(value)
+          ? 'tmp'
+          : /\/app(?:\/|['"\s])/.test(value)
+            ? 'source'
+            : 'none';
+  const marker =
+    /^CI_PREFLIGHT:(identity|namespaces|readonly|tmp|home|cache|artifacts|launch):(OK|EACCES|EPERM|EROFS|ENOENT|ENOSPC|invariant|other)$/m;
+  for (const line of value.split('\n')) {
+    const match = marker.exec(line);
+    if (match) {
+      insideStage = match[1];
+      insideErrorCode = match[2];
+    }
+  }
+};
 const classifyStderr = (value) => {
   if (/unknown option|unrecognized option|invalid option|invalid argument/i.test(value))
     return 'invalidBwrapArg';
@@ -89,6 +124,54 @@ try {
   await mkdir(join(scratch, 'artifacts'), { mode: 0o700 });
   await mkdir(resolve(repo, 'artifacts'), { recursive: true });
   await writeFile(join(scratch, 'hosts'), '127.0.0.1 localhost\n::1 localhost\n', { mode: 0o600 });
+  const hostNamespaces = {};
+  for (const name of ['user', 'pid', 'net'])
+    hostNamespaces[name] = await readlink('/proc/self/ns/' + name);
+  // Trusted bootstrap is mounted read-only. It emits closed markers and never
+  // imports application code unless all sandbox invariants hold.
+  await writeFile(
+    join(scratch, 'preflight.mjs'),
+    `
+import { mkdir, open, unlink, readFile, readlink } from 'node:fs/promises';
+import { networkInterfaces } from 'node:os';
+let stage = 'identity';
+const mark = (code) => process.stderr.write('CI_PREFLIGHT:' + stage + ':' + code + '\\n');
+const requireInvariant = (ok) => { if (!ok) throw Object.assign(new Error(), { code: 'invariant' }); };
+try {
+  requireInvariant(process.getuid() === ${uid} && process.getgid() === ${gid} && process.getuid() > 0);
+  mark('OK');
+  stage = 'namespaces';
+  const host = ${JSON.stringify(hostNamespaces)};
+  for (const name of ['user', 'pid', 'net'])
+    requireInvariant(await readlink('/proc/self/ns/' + name) !== host[name]);
+  const interfaces = networkInterfaces();
+  requireInvariant(Object.hasOwn(interfaces, 'lo') && Object.entries(interfaces).every(([name, rows]) =>
+    name === 'lo' && rows.every((row) => row.internal)));
+  mark('OK');
+  stage = 'readonly';
+  const mounts = (await readFile('/proc/self/mountinfo', 'utf8')).trim().split('\\n').map((line) => line.split(' '));
+  for (const path of ['/app', '/tool-node', '/opt/playwright-browsers', '/ci-preflight.mjs'])
+    requireInvariant(mounts.some((row) => row[4] === path && row[5].split(',').includes('ro')));
+  mark('OK');
+  for (const [name, path] of [['tmp', '/tmp'], ['home', '/tmp/home'], ['cache', '/tmp/home/cache'], ['artifacts', '/app/artifacts']]) {
+    stage = name;
+    if (name === 'home' || name === 'cache') await mkdir(path, { recursive: true, mode: 0o700 });
+    const probe = path + '/.ci-write-probe';
+    const handle = await open(probe, 'wx', 0o600);
+    await handle.close();
+    await unlink(probe);
+    mark('OK');
+  }
+  stage = 'launch';
+  mark('OK');
+} catch (error) {
+  mark(['EACCES', 'EPERM', 'EROFS', 'ENOENT', 'ENOSPC', 'invariant'].includes(error?.code) ? error.code : 'other');
+  process.exit(1);
+}
+await import('/app/scripts/browser-smoke-journey-ci.js');
+`,
+    { mode: 0o600 },
+  );
   const args = [
     '--cpu=120',
     '--data=1073741824',
@@ -137,12 +220,13 @@ try {
     '/dev',
     '--size',
     '536870912',
+    '--perms',
+    '1777',
     '--tmpfs',
     '/tmp',
-    '--dir',
-    '/tmp/home',
-    '--dir',
-    '/tmp/home/cache',
+    '--ro-bind',
+    join(scratch, 'preflight.mjs'),
+    '/ci-preflight.mjs',
     '--ro-bind',
     dirname(process.execPath),
     '/tool-node',
@@ -179,7 +263,7 @@ try {
     'NODE_OPTIONS',
     '--max-old-space-size=256',
     '/tool-node/node',
-    'scripts/browser-smoke-journey-ci.js',
+    '/ci-preflight.mjs',
   ];
   preflightStage = 'sandbox-spawn';
   const child = spawn('/usr/bin/prlimit', args, {
@@ -222,6 +306,7 @@ try {
     clearTimeout(timeout);
   }
   stderrCategory = classifyStderr(stderr);
+  projectStderr(stderr);
   stderr = '';
   preflightStage = 'report-open';
   const handle = await open(
@@ -263,6 +348,10 @@ try {
       childExitCode,
       childSignal,
       stderrCategory,
+      stderrOrigin,
+      permissionArea,
+      insideStage,
+      insideErrorCode,
     }),
   );
 } catch (error) {
@@ -272,7 +361,10 @@ try {
     ? error.code
     : 'other';
   if (preflightStage === 'toolchain' && errorCode === 'ENOENT') stderrCategory = 'toolchainMissing';
-  else if (stderr) stderrCategory = classifyStderr(stderr);
+  else if (stderr) {
+    stderrCategory = classifyStderr(stderr);
+    projectStderr(stderr);
+  }
   stderr = '';
   console.log(
     JSON.stringify({
@@ -283,6 +375,10 @@ try {
       childSignal,
       errorCode,
       stderrCategory,
+      stderrOrigin,
+      permissionArea,
+      insideStage,
+      insideErrorCode,
     }),
   );
 } finally {
