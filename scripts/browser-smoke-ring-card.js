@@ -83,7 +83,7 @@ try {
   const d = page.waitForEvent('download');
   await button.click();
   await png(await d, 'p9-atlas-ring-card.png');
-  assert.equal(exact, 1);
+  assert.equal(exact, 2); // Initial exact-stop validation and final privacy recheck.
   stage = 'removed-stop';
   await page.route('**/api/atlas/stops/*', (r) =>
     r.fulfill({ status: 404, body: '{}', contentType: 'application/json' }),
