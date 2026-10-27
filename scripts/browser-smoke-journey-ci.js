@@ -20,6 +20,47 @@ try {
     new URL(r.url()).origin === origin.replace('https:', 'wss:') ? r.connectToServer() : r.close(),
   );
   await context.addInitScript(() => {
+    window.__journeyOwnPosts = 0;
+    window.__journeyPostProof = null;
+    const nativeFetch = window.fetch.bind(window);
+    window.fetch = async (...args) => {
+      const response = await nativeFetch(...args);
+      if (
+        args[1]?.method === 'POST' &&
+        new URL(String(args[0]), location.href).pathname === location.pathname &&
+        /^\/control\/[0-9]+$/.test(location.pathname)
+      ) {
+        window.__journeyOwnPosts++;
+        window.__journeyPostProof = (async () => {
+          const reader = response.clone().body.getReader();
+          const decoder = new TextDecoder();
+          let size = 0,
+            text = '';
+          try {
+            for (;;) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              size += value.byteLength;
+              if (size > 65536) {
+                void reader.cancel().catch(() => {});
+                return { http: response.status, status: 'oversized' };
+              }
+              text += decoder.decode(value, { stream: true });
+            }
+            const value = JSON.parse(text + decoder.decode());
+            return {
+              http: response.status,
+              status: value?.status === 'accepted' ? 'accepted' : 'unexpected',
+            };
+          } catch {
+            return { http: response.status, status: 'invalid-body' };
+          } finally {
+            reader.releaseLock();
+          }
+        })();
+      }
+      return response;
+    };
     window.__journeyCard = { approved: false, held: false, simulated: false };
     const draw = CanvasRenderingContext2D.prototype.fillText;
     CanvasRenderingContext2D.prototype.fillText = function (text, ...args) {
@@ -76,15 +117,33 @@ try {
   page.once('dialog', (dialog) => {
     void dialog.accept();
   });
-  const [response] = await Promise.all([
+  const [response, refreshed] = await Promise.all([
     page.waitForResponse(
       (r) => new URL(r.url()).pathname === '/control/' + HOME && r.request().method() === 'POST',
+    ),
+    page.waitForResponse(
+      (r) =>
+        new URL(r.url()).pathname === '/control/' + HOME + '/status' &&
+        r.request().method() === 'GET',
     ),
     page.getByRole('button', { name: 'Send Off to olsols2', exact: true }).click(),
   ]);
   diagnostic.sendStatusCode = response.status();
   assert.equal(response.status(), 200);
-  assert.equal((await response.json()).status, 'accepted');
+  await page.waitForFunction(() => Boolean(window.__journeyPostProof));
+  const proof = await page.evaluate(() => window.__journeyPostProof);
+  diagnostic.bodyProofCode = ['accepted', 'unexpected', 'invalid-body', 'oversized'].indexOf(
+    proof.status,
+  );
+  assert.equal(proof.http, response.status());
+  assert.equal(proof.status, 'accepted');
+  assert.equal(await page.evaluate(() => window.__journeyOwnPosts), 1);
+  assert.equal(refreshed.status(), 200);
+  await page.waitForFunction(() => !document.querySelector('#refresh').disabled);
+  await page
+    .locator('#result')
+    .filter({ hasText: /accepted/i })
+    .waitFor();
   assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, HOME);
   assert.equal((await f.runtime.state.getPublicJourney()).rings, 0);
   const raids = () => f.calls.filter((c) => c.url.includes('/raids?') && c.method === 'POST');
@@ -214,6 +273,16 @@ try {
   });
   passed = true;
 } catch (e) {
+  diagnostic.errorName = [
+    'AssertionError',
+    'TimeoutError',
+    'TypeError',
+    'SyntaxError',
+    'ProtocolError',
+    'Error',
+  ].includes(e?.name)
+    ? e.name
+    : 'other';
   failureCategory = ['AssertionError', 'TimeoutError', 'TypeError'].includes(e?.name)
     ? e.name
     : 'fixture-or-browser';

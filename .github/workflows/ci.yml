@@ -32,7 +32,7 @@ jobs:
       - run: npm ci
       # Toolchain setup may download; the journey itself runs in an offline namespace.
       - run: sudo apt-get update && sudo apt-get install -y bubblewrap
-      - run: npx playwright-core install --with-deps chromium
+      - run: npx playwright-core install chromium
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/raid-relic-browsers
       - run: node scripts/ci-journey.js
