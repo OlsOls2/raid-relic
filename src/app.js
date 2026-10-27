@@ -75,6 +75,7 @@ const demoAssets = new Map([
   ['/onboarding.js', 'onboarding.js'],
   ['/first-run.js', 'first-run.js'],
   ['/demo/film', 'film.html'],
+  ['/demo/judge', 'film.html'],
   ['/demo/film/', 'film.html'],
   ['/film.js', 'film.js'],
   ['/film-state.js', 'film-state.js'],

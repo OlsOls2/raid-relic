@@ -1,5 +1,12 @@
 // Closed local fiction. This clock never authorizes a real raid or transfer.
 export const FILM_MS = 150000;
+export const JUDGE_MS = 45000;
+export const filmDuration = (path) => (path === '/demo/judge' ? JUDGE_MS : FILM_MS);
+export function advanceFilmAtPace(state, delta, path, hidden = false) {
+  if (path !== '/demo/judge') return advanceFilm(state, delta, hidden);
+  if (!state.playing || hidden || !Number.isFinite(delta) || delta <= 0) return state;
+  return seekFilm(state, state.ms + (Math.min(250, delta) * FILM_MS) / JUDGE_MS);
+}
 export const FILM_SCENES = Object.freeze([
   Object.freeze({
     at: 0,

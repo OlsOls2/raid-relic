@@ -2,17 +2,25 @@
 
 A raid usually lasts ten seconds. Raid Relic turns it into something two communities build together, then pass on.
 
-![Original relic in a labelled simulated browser demo](docs/media/raid-relic-hero.png)
+[**Try the whole loop in 45 seconds — no Twitch login**](https://judge-sandbox---raid-relic-vz4bhnskgq-uc.a.run.app/demo/judge)
 
-[Try the demo](https://raid-relic-760724762396.us-central1.run.app/demo/) · [Explore the Atlas](https://raid-relic-760724762396.us-central1.run.app/atlas/)
+This read-only review sandbox plays Send Off → arrival → two-chat claim → approved engraving → fictional live-holder spotlight → journey/replay → ring-card preview. Everything is local sample fiction, with no Twitch connection, API, socket, storage or real transfers. Pause, skip or restart; a permanently simulated PNG downloads only when you choose **Export simulated ring card**. This is a review preview, not a production promotion.
 
 ## Judge in 60 seconds
 
-1. Open the demo: no login or installation. Choose **Autoplay 35-second tour**, or use the keyboard to send an offer and accept. Pause, take over, or replay. Reduced motion keeps a readable static relic.
-2. Open the Atlas and replay **Stop 8** in the recorded journey. Each completed hand-off adds a ring; retained stops have downloadable ring cards.
-3. Imagine this on your stream: viewers leave approved marks on a shared relic, meet the next community, and see the journey continue instead of disappearing when the raid ends.
+1. Open the **45-second whole-loop sandbox** above. Watch the provisional offer wait for a distinct simulated accept before the one recorded ring appears. No account or installation is needed.
+2. At the last scene, optionally export the simulated card. Reduced motion keeps a readable SVG relic; focused controls retain their normal keys.
+3. For recording, use the unchanged [150-second fictional film](https://demo-film---raid-relic-vz4bhnskgq-uc.a.run.app/demo/film). The [35-second interactive demo](https://raid-relic-760724762396.us-central1.run.app/demo/) remains available for hands-on votes: choose **Autoplay 35-second tour** there; the [Atlas](https://raid-relic-760724762396.us-central1.run.app/atlas/) shows the separately retained public journey.
 
-The demo is browser-only: no Twitch connection, API, socket, persistent storage or game effects. Its downloads are permanently marked simulated. The hero above is a simulated screenshot, not live-stream footage.
+[Judge guide and evidence boundaries](docs/JUDGES.md). The screenshots below are viewport views of the labelled `/demo/film` simulator, not live Twitch or physical OBS footage. The parent operator captured, viewed and promoted both native source233 PNGs; their source route and simulated sample labels remain explicit.
+
+![Simulated film: original relic and fictional Keeper spotlight](docs/media/demo-film-story.png)
+
+*SIMULATED `/demo/film`, spotlight scene; fictional Keepers, one sample ring. 1280×720 viewport, not full-document coverage.*
+
+![Simulated film: original ring-card preview with sample engraving and fictional journey](docs/media/demo-film-card.png)
+
+*SIMULATED `/demo/film`, manual-export preview; not a live card or evidence of a real transfer. 1280×720 viewport; export is optional.*
 
 ## How it works
 

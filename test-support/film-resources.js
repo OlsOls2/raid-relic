@@ -1,6 +1,7 @@
 // Native test-only classification. No request URL or object identifier is reported.
 const staticPaths = new Set([
   '/demo/film',
+  '/demo/judge',
   '/film.js',
   '/film-state.js',
   '/film.css',

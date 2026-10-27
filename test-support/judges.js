@@ -28,6 +28,7 @@ const assets = new Set([
   '/onboarding.js',
   '/first-run.js',
   '/demo/film',
+  '/demo/judge',
   '/demo/film/',
   '/film.js',
   '/film-state.js',

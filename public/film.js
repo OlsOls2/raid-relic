@@ -2,7 +2,8 @@ import {
   FILM_MS,
   FILM_SCENES,
   freshFilm,
-  advanceFilm,
+  advanceFilmAtPace,
+  filmDuration,
   seekFilm,
   filmStep,
   filmFrame,
@@ -16,6 +17,15 @@ import { ringCardModel, ringCardPNG, saveRingCard, demoCardFilename } from './ri
 const $ = (id) => document.getElementById(id),
   archive = $('film-art');
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
+const duration = filmDuration(location.pathname);
+if (location.pathname === '/demo/judge') {
+  document.body.classList.add('judge-mode');
+  document.title = '45-second SIMULATED judge sandbox · Raid Relic';
+  $('film-banner').textContent = 'JUDGE / SIMULATOR — no Twitch connection or real transfers';
+  $('film-intro').textContent =
+    '45-second fictional whole-loop preview · no account, audio or real actions. Pause, skip or replay; card export is optional.';
+}
+document.body.dataset.presentationDuration = String(duration);
 const rune =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 8 92 50 50 92 8 50Z M23 70 38 24 66 59 79 31" fill="none" stroke="#d8b46a" stroke-width="4"/></svg>';
 let state = freshFilm(),
@@ -231,7 +241,7 @@ function render() {
     state.ms === FILM_MS ? 'Replay film' : state.playing ? 'Pause film' : 'Play film';
   $('film-next').disabled = state.ms === FILM_MS;
   $('film-seek').value = String(state.ms);
-  setText('film-time', `${stamp(state.ms)} / 2:30`);
+  setText('film-time', `${stamp((state.ms * duration) / FILM_MS)} / ${stamp(duration)}`);
   if (f.index === 7) void prepareCard();
   void draw(f);
 }
@@ -240,7 +250,12 @@ function schedule() {
 }
 function tick(now) {
   raf = null;
-  state = advanceFilm(state, last === null ? 0 : now - last, document.hidden);
+  state = advanceFilmAtPace(
+    state,
+    last === null ? 0 : now - last,
+    location.pathname,
+    document.hidden,
+  );
   last = now;
   render();
   schedule();

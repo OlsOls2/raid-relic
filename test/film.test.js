@@ -96,3 +96,32 @@ test('film is an early static GET route with connect-none and no store/SDK or wr
   assert.match(source, /document\.hidden/);
   assert.match(source, /URL\.revokeObjectURL/);
 });
+
+test('judge entry scales only the exact local presentation path to45 seconds without changing claim order or hidden clocks', async () => {
+  const { filmDuration, advanceFilmAtPace, JUDGE_MS } = await import('../public/film-state.js');
+  assert.equal(JUDGE_MS, 45000);
+  assert.equal(filmDuration('/demo/judge'), 45000);
+  for (const path of ['/demo/film', '/demo/judge/other', '/demo/film?judge=1'])
+    assert.equal(filmDuration(path), 150000);
+  let s = freshFilm();
+  for (let elapsed = 0; elapsed < 45000; elapsed += 15) s = advanceFilmAtPace(s, 15, '/demo/judge');
+  assert.equal(s.ms, FILM_MS);
+  assert.equal(s.playing, false);
+  assert.equal(filmFrame(54999).rings, 0);
+  assert.equal(filmFrame(55000).rings, 1);
+  assert.equal(advanceFilmAtPace(freshFilm(), 1000, '/demo/judge', true).ms, 0);
+  assert.deepEqual(advanceFilmAtPace(freshFilm(), 30, '/demo/film'), advanceFilm(freshFilm(), 30));
+  const trap = new Proxy(
+    {},
+    {
+      get() {
+        throw Error('No SDK or state reads');
+      },
+    },
+  );
+  const app = createApp({ state: trap, oauth: trap, previewReadOnly: true });
+  const response = await app.dispatch({ method: 'GET', path: '/demo/judge' });
+  assert.equal(response.status, 200);
+  assert.match(response.headers['content-security-policy'], /connect-src 'none'/);
+  assert.equal((await app.dispatch({ method: 'POST', path: '/demo/judge' })).status, 403);
+});
