@@ -142,3 +142,84 @@ label[for='raid-target'] {
 .send-off {
   margin-top: 10px;
 }
+
+#first-run {
+  margin: 14px 0;
+  border-block: 1px solid #52617a;
+  padding: 10px 0;
+}
+#first-run summary {
+  cursor: pointer;
+  min-height: 44px;
+  padding: 8px 0;
+}
+#first-run summary:focus-visible {
+  outline: 3px solid var(--amber);
+  outline-offset: 4px;
+}
+#first-run li[data-state='ready'] {
+  color: #bde4cb;
+}
+#first-run li {
+  margin: 10px 0;
+}
+#first-obs-url {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  font: inherit;
+  min-height: 44px;
+}
+#first-run input[type='checkbox'] {
+  min-height: 24px;
+  min-width: 24px;
+  vertical-align: middle;
+}
+
+/* Native details content and form controls must shrink within the own-channel
+   checklist. Wrap complete text; never mask overflow or truncate its URL. */
+#first-run {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+#first-run * {
+  box-sizing: border-box;
+  min-width: 0;
+}
+#first-run :is(summary, p, label, ol, li, .actions) {
+  max-width: 100%;
+}
+#first-run :is(summary, button, label) {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+#first-run label {
+  display: block;
+  margin-block: 12px;
+}
+#first-run ol {
+  margin-inline: 0;
+  padding-inline-start: 1.4rem;
+}
+#first-run :is(input, button) {
+  max-width: 100%;
+}
+
+/* Private status can contain long closed-vocabulary diagnostics, permission
+   names or a Simulator result. Keep the complete text readable at 320px. */
+main {
+  overflow-wrap: anywhere;
+}
+main :is(code, pre) {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  max-width: 100%;
+}
+main :is(button, summary) {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}

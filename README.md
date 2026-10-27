@@ -115,4 +115,8 @@ Freeze: **31 October 2026, 18:00 UK/UTC**.
 
 ### Film the fictional loop
 
-Source 208 adds a client-only **`/demo/film`** storyboard: 150 seconds from Send Off through arrival, two-chat binding, engraving, simulated Keeper spotlight, journey replay and a manually exported simulated card. Space pauses, Next skips, and Restart resets the local story. It is permanently labelled FILM / SIMULATOR, with no Twitch connection, audio or real transfers. [Film controls and bounded recording handoff](docs/DEMO_FILM.md). This new route awaits its own native/capture gate and read-only preview publication; earlier quality results do not validate it.
+Source 208 adds a client-only **`/demo/film`** storyboard: 150 seconds from Send Off through arrival, two-chat binding, engraving, simulated Keeper spotlight, journey replay and a manually exported simulated card. Space pauses, Next skips, and Restart resets the local story. It is permanently labelled FILM / SIMULATOR, with no Twitch connection, audio or real transfers. [Film controls and bounded recording handoff](docs/DEMO_FILM.md). The operator published [the read-only film preview](https://demo-film---raid-relic-vz4bhnskgq-uc.a.run.app/demo/film) from `48f35cbb8f7664a9cd27b5acb9965d6ed2b25874` after its native/capture gate; that earlier cohort does not validate the later onboarding increment below.
+
+### New Keeper checklist
+
+Source 212 adds **`/start`** and a private own-channel checklist for connecting Twitch, opting in, copying the canonical OBS URL and explicitly becoming a Seeker. Public readiness starts unchecked; private ticks expire and copying never claims OBS is installed. This remains a configured pilot, not open enrollment. [Two-minute setup guide and review boundaries](docs/GETTING_STARTED.md). Native review and this increment's read-only preview are pending; canonical production is not changed by source authoring.

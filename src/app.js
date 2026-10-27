@@ -68,6 +68,12 @@ const faviconAssets = new Map([
   ['/favicon.ico', 'favicon.svg'],
 ]);
 const demoAssets = new Map([
+  ['/start', 'start.html'],
+  ['/start/', 'start.html'],
+  ['/start.js', 'start.js'],
+  ['/start.css', 'start.css'],
+  ['/onboarding.js', 'onboarding.js'],
+  ['/first-run.js', 'first-run.js'],
   ['/demo/film', 'film.html'],
   ['/demo/film/', 'film.html'],
   ['/film.js', 'film.js'],

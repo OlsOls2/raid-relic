@@ -2,7 +2,7 @@
 
 Session: 01a1705c-a87d-7143-80f6-021e47b78ced
 
-Snapshot cutoff: 2026-10-27T04:26:06.857Z (last timestamped record; not a claim that future/active conversation is included).
+Snapshot cutoff: 2026-10-27T05:01:10.477Z (last timestamped record; not a claim that future/active conversation is included).
 
 This is a readable selected native-JSONL export, NOT a complete raw transcript. User/assistant messages and tool calls/results are retained; duplicate native event records are labelled. Private system/developer/bootstrap instructions, reasoning/analysis, opaque encrypted fields, media/base64 and other internal metadata are omitted. Each item is capped at 32768 characters with an explicit omission count and sanitized-item digest. No raw-backup links or private credentials are published. Credential-looking literals, headers or sensitive fields cause whole-item content omission, with source line and reason retained; counts are in the manifest. Strong key patterns remain fatal across all selected visible fields, even in otherwise omitted items. Existing synthetic fixture literals are explicitly classified, not proof of real authentication.
 
@@ -70359,6 +70359,978 @@ This is a readable selected native-JSONL export, NOT a complete raw transcript. 
   {
     "type": "output_text",
     "text": "Added only `/edition-crystal/twitchcon-2026.svg`, with positive coverage and rejection tests for unknown editions/query variants.\n\n**6 focused tests passed, zero skips; formatting passed.** No app changes or broader allowlist. Ready for parent native gates; onboarding, reliability and draft phases remain queued.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4492. 2026-10-27T04:40:01.800Z — user (source line 16850)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "212 NEXTWHOLEQUEUEPHASE2 user6be9c020 sameOriginal01a1705c-a87d-7143-80f6-021e47b78cedONLYsolewriter/no fork/delegation/Git/cloud/providers/keys/rawselectedevidence/cron/REALstreams/chat/CONTROLpages/SendOff. FilmPhase1FINISHEDPUBLISHEDcommit48f35cbb8f7664a9cd27b5acb9965d6ed2b25874/revraid-relic-demo-film-1027/tagdemo-film0 URLhttps://demo-film---raid-relic-vz4bhnskgq-uc.a.run.app/demo/film. CI40450627472SUCCESS/NATIVE844/844ZEROskip+ALL39serialflows122checksPASS/focusedfilm3checks4tilesPARENTVIEWED. No newappcode209210211TESTONLYreal staticassetsclosed /edition-view.js,/edition-crystal/twitchcon-2026.svg andexactownedboundedPNGblob;19requestsallstatic, no I/O/provider.Wantnotrepeatfilmoldbrief. Source211closed04:26:06.8574491entries212CLIlogs5wholeomissions0rescan411files24639752.Currentactualprodseeker-state-on3d100/alloldtagspreserved/assetsmatch/health200/P5previewtrueP7offStrueWfalse/ClipPaidfalse/min0.No part2yet. Whole4queuecontinueafteryour0then213reliability214Devpost.\nIMPLEMENTPHASE2: Walk brand-new configured-streamer journeyENDTOEND inSANDBOX fixture: Connect Twitch→signedownidentityOAuthcookie/state exactrole→explicitopt-in→copyOBSbrowserSource/addmanualsetup→BecomeSeekerexplicit(nonholder)/readiness. Userasks'get started in2minutes' checklistwithcopybuttons/readinessticks/lessfriction. KeepPILOT3configuredallowlist/2–4max/SSRF/CSRF/exact scopes/sessiongrants allunchanged; noarbitraryselfserviceonboarding/automaticallyauthorizeunknownchannels or addidentity/scopes/resources.NowuserroleActionsscopeauthorizedcodechangesforonboarding butNO REALCONTROLHTTP/pages/auth/streams/SendOffopsbySourceorParent(ONLYmockOAuth/signedlocalFixture). Idealpublic /start guide withconfiguredloginselector/canonicalconnectlink+perownauthenticatedcontrol checklistsmallreuseexistingreadiness/OBSURL; ifembeddingexistingcontrolUInecessarysourcecodeallowedwithinonboardingtaskbutoperateONLYlocalmocks.Ergonomicpublicguide'sactivationbuttons userclickonly linkownControlexistingCanonicalstartURI no app-hiddenautoPOST. No publicAPIleakbotgrants/privateauthrole/token/timestamps/PII. Unauthenticatedfreshguidecannotdisplayclaimedready; explicitstatesunchecked/notverified/needsconnection.Privateownsession/readinessauthgatesrealstatusreadOnly10secTTL notfakeGreen/publicprofilepublicdataonlyifappropriate.ExistingcookiePath/control/:id mustNOTbroadenrootjustforguide; preserveCSRF/sameOrigin/forcepathvalidators/sessionrotation. IfnewguidecannotreadprivatecookiepathuseauthenticatedowncontrolprojectionexistingreadOnlyorplacechecklistOWNcontroluicomponent.No newprivateAPIjustbypasscookieallowedpathneeded.Do NOTcopyTwitchstateauthURL code/token; canonicalAPPSTARTURLonlyprivatehashcap? user'sauthselfcontrolsneverpastecredentialURLsintoREADME/publicshots.\nPILOTBOUNDARYrealbrandnewUNCONFIGUREDstreamer cannotenroluntilownerconfigidentity+Twitchuserconsent+actualOBSinstallation. That REALexternalgateMUSThonestclearcopy/auditdocs nottreatedfeaturebroken/blockedallwork. Add helpful'privatepilot/notconfigured/contactowner' pathno fabricatedpermission/orderstate. Testfreshconfiguredidentity3withoutpre-seededoptin/seeking/grant; ifexistingpilotFixture.setupautoseedsHomeOtheroptIn/grants, DON'Treuseas'fresh'. Implementtestdriver fresh runtime/fakeOAuthprovider callback EXACTstate/cookies3minimalgrants thenopt-inexplicit, OBSmanualcopytestedClipboard success+reject notgreenonerror, guide link scopes actor, seekerjoinexplicitafterOptIn/nonholder. NeedactualHTTP/source route/projectionfixtureintegrationNOTinventedDTO as205error; Nodebothmemory/FakeFirestore ifserverchanges; browsernewbrowser-smoke-onboarding.js hasfreshstepsend-to-end simulatedprovider(fencednoNetwork), authboundariesoutsider/wrongchannel/expired/grantRevoked/wrongrole/CSRF/staleReady/noautoactions. New /startreadonlyGETPOSTclosed. Clipboardmanualgestureonly no silentwritesonload; buttonsaccessiblecopycanonicalOBS URLforselectedapprovedownchannel +width1920height1080 oractualdocumentedOBSgeometry; defaultexistingcanonicalOrigin NOTpreviewWSS403 URL; don'twidenWSorigins/CORS tohelpguide. Tick'Copied'doesNOTproveOBSinstalled/displayed—manualcheckboxclear/uncheckedbydefaultandmemoryephemeralno privacySensitivepersistentstorage.UseralreadyhasOBS prerequisite2minnotguaranteeproviderpermissions/installtime/no autoaudio. Mobile3203901280clearsemanticsfocus/keyboard/aria-live nooverflow/darkgoldoriginalbrand/onevisualheroNo generic4clonedSaaScards; reuse existingfrontendstylefonts/no newdeps/assets/providers/backgroundpolls. Readinessrefreshuserbuttonsinglecall no recurringpaidpollresource.RetentionoldForget/ban/privatehold/tokens/Seekerbarrier notchanged. Currentholderjoinforbidden truthfulholdingoff, queue ticknotcheckforcurrentholder receivingautoDequeue! NonSeekereligiblemanualtargetchoiceunchanged. RoleSDKmetadataSourceNo liveTwitchlogin/scopeconsentrequest.\nScopeshort~8min: focusedfreshjourneyintegration/browser+docs/GETTING_STARTED.md/READMElink, addsingleprivateflowchecklistmodulepublicJSasneeded/appsrouteassetsMapnewassetshonest.CaptureoptionalONBOARD_CAPTURE=1 usingexistingboundedcapturePage<=512KPNGpercapture/raw4MiB/agg4M privatefDnames; no capraise/no fakeLayout. Parentfullnativeunitthen40?ACTUALallbrowserexclusive serial/pixelsreview/localonly, thennew0tagfirst-run/revraid-relic-first-run-1027/cloneactualprod.P5ROtrue0 blocksrealgamePOSTsintentionally sopreviewreviewUIonly, functionalityprovennativefixtures; don'tdisableMasterreadOnlytolivelogin.Sitescanonical3dactualdoesNOThaveyourchecklistuntilownerapprovespromotion, docskeepclearPreviewonly.NativefilmCohort84439/122historicalappchangedsoParentnewQAcountsnotinvent. No generatedQUALITYMeta counts/SourceCDdeploy/prod/testswaivers. STOPphase2feature-readyafterfocusedtests/notesrealexternalgate exactly; ParentpublishthenSource213reliability+214privateDevpost continueallqueue.\n"
+  }
+]
+````
+
+### 4493. 2026-10-27T04:40:06.855Z — assistant (source line 16855)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll add a public `/start` guide and an account-scoped checklist in the existing private controls. Connection and consent steps will stay user-initiated; copied OBS URLs and manual OBS confirmation will be labelled separately from server readiness.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4494. 2026-10-27T04:40:07.903Z — tool call (source line 16856)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_b7cb4ef57abb4a3d932b9123372a0210",
+  "input": "text((await tools.exec_command({cmd:\"cat public/control.html; sed -n '1,220p' public/control.js; sed -n '1,220p' public/control-view.js; sed -n '1,130p' test-support/pilot-fixture.js; rg -n 'control.html|control.js|control-view|overlayOrigin|origin' src/app.js | head -30\",\"max_output_tokens\":6500})).output)\n"
+}
+````
+
+### 4495. 2026-10-27T04:40:08.017Z — tool result (source line 16859)
+
+````text
+[credential-looking item omitted in full; reason: literal assignment; no credential status assumed]
+````
+
+### 4496. 2026-10-27T04:40:13.342Z — tool call (source line 16863)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_31e2e4e4b77b4bb0b7a04c99a19a74ec",
+  "input": "text((await tools.exec_command({cmd:\"rg -n 'botConsentStartURL|return \\\\{|overlay|subscriptions|botGrantStored' src/pilot.js | head -40; sed -n '105,178p' src/pilot.js; sed -n '220,350p' public/control.js; cat public/control.css; rg -n 'cookies|return \\\\{|login,' test-support/pilot-fixture.js | tail -15; cat public/keeper-network.js; rg -n 'control-read.js|control.css' src/app.js\"})).output)\n"
+}
+````
+
+### 4497. 2026-10-27T04:40:13.442Z — tool result (source line 16866)
+
+````text
+{
+  "call_id": "call_31e2e4e4b77b4bb0b7a04c99a19a74ec",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "3:import { subscriptionFailureDiagnostic } from './subscriptions.js';\n22:  subscriptions,\n65:    return {\n81:        'Both channels need five enabled subscriptions; Bootstrap / reconcile each channel again after callbacks verify',\n113:    return {\n123:    if (!(await store.acquireJob(id, owner, now()))) return { status: 'busy' };\n128:    let stage = 'subscriptions';\n130:      const reconciled = await subscriptions[id].reconcile({ readiness: true });\n182:        subscriptions: reconciled.results,\n215:  return {\n227:        return { status: 'blocked', reason: 'handoff-expiry-proof' };\n261:          return { status: 'processed', authorization: 'ready' };\n263:          return {\n273:        return { status: 'processed', seeking: seekerStatus.member, seekerStatus };\n297:                ? 'subscriptions-not-ready'\n332:      return { status: 'processed', action };\n360:      return {\n382:        botGrantStored: Boolean(await store.getToken('bot')),\n446:        subscriptions: await store.getJob(id),\n          awaitRegistry,\n          channels,\n          marks,\n          { channels: ids, logins: Object.fromEntries(ids.map((key) => [keepers[key], key])) },\n          { source: id, actor: id, login: keepers[target], sentAt: now() },\n          now(),\n        ),\n      );\n    return {\n      eligible: reasons.some((reason) => reason === null),\n      reason: reasons.some((reason) => reason === null) ? null : reasons[0],\n      observedOnline: Object.fromEntries(\n        ids.map((key) => [keepers[key], channels[key]?.online === true]),\n      ),\n    };\n  }\n  async function bootstrap(id) {\n    const owner = randomBytes(24).toString('hex');\n    if (!(await store.acquireJob(id, owner, now()))) return { status: 'busy' };\n    // Capture both baseline and observation start before ANY network effects.\n    const started = now();\n    const baseline = hash(JSON.stringify((await state.getStreamStatus(id)) ?? null));\n    let result;\n    let stage = 'subscriptions';\n    try {\n      const reconciled = await subscriptions[id].reconcile({ readiness: true });\n      stage = 'ban-capability';\n      const banGranted = oauth.hasBanGrant ? await oauth.hasBanGrant(id) : false;\n      stage = 'keeper-grant';\n      const token = await oauth.accessTokenForKeeper(id);\n      stage = 'stream-observation';\n      const response = await boundedCall((signal) =>\n        transport(`https://api.twitch.tv/helix/streams?user_id=${id}`, {\n          signal,\n          headers: { Authorization: `Bearer ${token}`, 'Client-Id': clientId },\n        }),\n      );\n      if (\n        response.status !== 200 ||\n        !Array.isArray(response.data?.data) ||\n        response.data.data.length > 1\n      )\n        throw new Error('Stream observation failed');\n      const stream = response.data.data[0];\n      let event;\n      if (!stream) event = { host: id, type: 'offline', sentAt: started };\n      else {\n        if (stream.user_id !== id) throw new Error('Stream account mismatch');\n        event = parseLifecycle(\n          {\n            subscription: {\n              type: 'stream.online',\n              version: '1',\n              condition: { broadcaster_user_id: id },\n            },\n            event: {\n              broadcaster_user_id: id,\n              id: stream.id,\n              type: stream.type,\n              started_at: stream.started_at,\n            },\n          },\n          id,\n          started,\n        );\n      }\n      event.provenance = 'helix-observation';\n      stage = 'observation-commit';\n      const observation = await state.accept({\n        id: `observation:${owner}`,\n        now: now(),\n        sentAt: started,\n        expiresAt: now() + 600000,\n        observation: { baseline, event },\n    }\n    target.disabled = busy || !candidates.length;\n    empty.hidden = candidates.length > 0;\n    if (candidates.length) {\n      const send = document.createElement('button');\n      const label = () => {\n        send.className = 'send-off';\n        send.textContent = `Send Off to ${names[target.value]}`;\n      };\n      label();\n      target.onchange = label;\n      send.onclick = () => run(`send:${target.value}`);\n      document.getElementById('raid').append(send);\n    }\n    for (const action of value.actions.filter((a) => a !== 'logout' && !a.startsWith('send:'))) {\n      const button = document.createElement('button');\n      button.textContent = action.startsWith('send:')\n        ? `Send Off to ${names[action.slice(5)]}`\n        : labels[action];\n      button.onclick = () => run(action);\n      document\n        .getElementById(\n          action === 'bootstrap'\n            ? 'setup'\n            : action === 'process' || action.startsWith('send:')\n              ? 'raid'\n              : 'keeper',\n        )\n        .append(button);\n    }\n    if (!preserveResult)\n      status.textContent = 'Status refreshed. Review both channels before Send Off.';\n  } catch (error) {\n    if (generation !== readGeneration || request.signal.aborted) return;\n    invalidate();\n    expiryRecovery = null;\n    document.getElementById('expire-handoff').disabled = true;\n    csrf = null;\n    recovery = null;\n    document.getElementById('cancel-queued').disabled = true;\n    document.getElementById('recovery-status').textContent =\n      'Recovery status unavailable. Reconnect and refresh; never repeat dispatch.';\n    status.textContent =\n      error?.code === 'timeout'\n        ? 'Status timed out. Retry Refresh status; reconnect only this matching Keeper if authorization expired.'\n        : error?.code === 'authorization'\n          ? 'Control session expired or unauthorized. Reconnect this matching Keeper, then Retry Refresh status.'\n          : 'Status unavailable or invalid. Retry Refresh status; actions are disabled until a fresh authorized status is read.';\n  } finally {\n    if (generation === readGeneration) disable(false);\n  }\n}\nasync function run(action) {\n  if (busy || !csrf) return;\n  if (action.startsWith('send:')) {\n    if (!candidates.some((c) => c.id === action.slice(5))) {\n      status.textContent = 'Refresh status to choose an observed eligible Keeper.';\n      return;\n    }\n    if (\n      !confirm(\n        `Request a real Twitch raid to ${names[action.slice(5)]}? This can affect your live broadcast.`,\n      )\n    )\n      return;\n  }\n  disable(true);\n  try {\n    const response = await boundedResponse(`/control/${id}`, {\n      method: 'POST',\n      cache: 'no-store',\n      headers: { 'content-type': 'application/json' },\n      body: JSON.stringify({ action, csrf }),\n    });\n    if (action === 'logout' && response.ok) {\n      location.assign(`/control/${id}`);\n      return;\n    }\n    let value;\n    try {\n      value = JSON.parse(response.text);\n    } catch {}\n    status.textContent =\n      simulated && response.ok ? response.text : actionMessage(value, names[target.value]);\n    await refresh({ preserveResult: true });\n  } catch {\n    invalidate();\n    status.textContent =\n      'Request outcome unavailable. Refresh status; never blindly repeat a raid request.';\n  } finally {\n    disable(false);\n  }\n}\ndocument.getElementById('refresh').onclick = async () => {\n  if (busy) return;\n  disable(true);\n  await refresh();\n};\ndocument.getElementById('logout').onclick = () => run('logout');\ndisable(true);\nrefresh();\naddEventListener('pagehide', () => {\n  readGeneration++;\n  readController?.abort();\n  invalidate();\n});\n\ndocument.getElementById('cancel-queued').onclick = async () => {\n  const intentId = document.getElementById('intent-confirm').value;\n  if (\n    busy ||\n    !recovery?.canCancel ||\n    (simulated ? intentId !== recovery.intentId : intentId !== 'CANCEL') ||\n    !confirm(\n      'Cancel only this exact unclaimed queued intent? This cannot cancel a dispatched Twitch raid.',\n    )\n  )\n    return;\n  disable(true);\n  try {\n    const result = await boundedResponse(`${location.pathname}/cancel-queued`, {\n      method: 'POST',\n      headers: { 'content-type': 'application/json' },\n      body: JSON.stringify({ csrf, intentId: recovery.intentId, generation: recovery.generation }),\n    });\n    const body = JSON.parse(result.text);\n    status.textContent = result.ok ? actionMessage(body) : 'Recovery authorization failed';\n    await refresh({ preserveResult: true });\n  } catch {\n    invalidate();\n    status.textContent = 'Recovery unavailable. Refresh and inspect; do not repeat dispatch.';\nmain {\n  max-width: 900px;\n}\nh1 {\n  max-width: none;\n  font-size: clamp(30px, 5vw, 48px);\n}\nsection {\n  margin: 36px 0;\n}\ndl {\n  display: grid;\n  grid-template-columns: minmax(90px, 1fr) minmax(0, 3fr);\n  gap: 10px 24px;\n  padding: 20px 0;\n  border-block: 1px solid var(--slate);\n}\ndt {\n  color: var(--amber);\n}\ndd {\n  margin: 0;\n  overflow-wrap: anywhere;\n  white-space: pre-wrap;\n}\n.actions {\n  display: flex;\n  gap: 12px;\n  flex-wrap: wrap;\n}\n#result {\n  min-height: 3em;\n  color: var(--amber);\n}\nbutton {\n  max-width: 100%;\n}\nlabel[for='raid-target'] {\n  display: block;\n  margin: 16px 0 8px;\n}\nselect {\n  font: inherit;\n  max-width: 100%;\n  padding: 8px;\n  color: var(--moon);\n  background: var(--slate);\n  border: 1px solid #8092a9;\n}\nselect:focus-visible {\n  outline: 2px solid var(--amber);\n  outline-offset: 4px;\n}\n\n.status-lights {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n  border-block: 1px solid #52617a;\n  padding: 16px 0;\n}\n.status-lights p {\n  margin: 0;\n  font-size: 14px;\n  flex: 1 1 180px;\n}\n.status-lights p:before {\n  content: '';\n  display: inline-block;\n  width: 10px;\n  height: 10px;\n  border-radius: 50%;\n  background: #dba95c;\n  margin-right: 8px;\n}\n.status-lights [data-state='ready']:before {\n  background: #bde4cb;\n  box-shadow: 0 0 6px #bde4cb66;\n}\n.status-lights [data-state='offline']:before {\n  background: #8090a5;\n}\n.send-off {\n  font-size: 22px;\n  min-height: 64px;\n  padding: 16px 28px;\n  background: #e6bb70;\n  color: #101d30;\n  border-color: #fff0cb;\n  font-weight: 600;\n}\n.send-off:hover {\n  background: #f3cf90;\n}\n#keeper-summary {\n  font-size: 18px;\n  color: #e3e8ef;\n}\n#ledger[hidden] {\n  display: none;\n}\n\n/* Keep real ready-state decisions above secondary setup/recovery at720px. */\nheader {\n  padding-top: 12px;\n  padding-bottom: 12px;\n}\nmain {\n  padding-top: 12px;\n}\nmain > h1 {\n  margin: 8px 0 10px;\n  font-size: clamp(27px, 4vw, 38px);\n}\nmain > p {\n  margin: 8px 0;\n}\n.status-lights {\n  padding: 10px 0;\n}\n#result {\n  min-height: 0;\n  margin: 8px 0;\n}\n#keeper-summary {\n  margin: 10px 0;\n}\nmain > section:first-of-type {\n  margin: 16px 0 28px;\n}\nmain > section:first-of-type h2 {\n  margin: 8px 0;\n  font-size: 26px;\n}\nmain > section:first-of-type p {\n  margin: 8px 0;\n  font-size: 14px;\n}\nlabel[for='raid-target'] {\n  margin: 10px 0 6px;\n}\n.send-off {\n  margin-top: 10px;\n}\n96:      return { status: 200, data: { data: subscriptions, pagination: {} } };\n100:      return {\n111:      return {\n117:      return { status: 200, data: { data: [{ id, login: u.searchParams.get('login') }] } };\n130:        return { status: 401, data: { message: 'synthetic-sensitive-body' } };\n132:        return {\n146:      return {\n153:      return { status: 200, data: { data: [{}] } };\n187:  const cookies = {};\n199:    if (id !== BOT) cookies[id] = result.headers['set-cookie'][1].split(';')[0];\n205:      : await request(`/control/${id}/status`, 'GET', { cookie: cookies[id] });\n210:      { cookie: cookies[id], origin, 'content-type': 'application/json', ...overrides },\n257:  return {\n262:    login,\n263:    cookies,\n// Default local/static presentation; runtime serves the validated operator mapping.\nexport const keeperNames = Object.freeze({ 1591805230: 'raidrelichq', 1591806023: 'olsols2' });\n35:  ['/control-read.js', ['control-read.js', 'text/javascript; charset=utf-8']],\n55:  ['/control.css', ['control.css', 'text/css; charset=utf-8']],\n"
+    }
+  ]
+}
+````
+
+### 4498. 2026-10-27T04:40:30.012Z — tool call (source line 16870)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_cd0ae905ea4f49ee9be9eac3ac7de5bc",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '355,395p' src/pilot.js; sed -n '430,470p' src/pilot.js; sed -n '250,285p' test-support/pilot-fixture.js; cat test-support/network3-fixture.js | head -30; sed -n '1,65p' scripts/browser-smoke-pilot.js\",\"max_output_tokens\":1700})).output)\n"
+}
+````
+
+### 4499. 2026-10-27T04:40:30.086Z — tool result (source line 16873)
+
+````text
+{
+  "call_id": "call_cd0ae905ea4f49ee9be9eac3ac7de5bc",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "Warning: truncated output (original token count: 1714)\nTotal output lines: 195\n\n          now(),\n        );\n        registry = await state.getKeeperRegistry();\n      }\n      const authorization = 'not-checked';\n      return {\n        authorization,\n        optionalBotActions: p7?.status() ?? { enabled: false, reason: 'disabled' },\n        chronicle: chronicle?.enabled\n          ? 'Paid generation enabled: one attempt per received stop; fiction only.'\n          : 'Off: handwritten template fiction; no model calls.',\n        seekers: receiving?.enabled\n          ? {\n              enabled: true,\n              joined:\n                (await state.getReceivingView(now())).queueStates?.[keepers[id]]?.member === true,\n            }\n          : { enabled: false, joined: false },\n        candidates: receiving\n          ? await receiving.candidates(id)\n          : await state.getKeeperCandidates(id),\n        candidatesObservedAt: now(),\n        mode: simulator ? 'simulator' : 'live',\n        account: keepers[id],\n        online: channel?.online ?? false,\n        optedIn: channel?.optedIn ?? false,\n        paused: channel?.paused ?? false,\n        botGrantStored: Boolean(await store.getToken('bot')),\n        bothReadiness: Object.fromEntries(\n          await Promise.all(\n            ids.map(async (keeper) => [\n              keepers[keeper],\n              (await store.getJob(keeper))?.ready === true,\n            ]),\n          ),\n        ),\n        ownerStep:\n          'Status shows cached subscription/lifecycle readiness, not fresh Keeper authorization. If targets are missing, use Check / refresh my Keeper authorization; reconnect this matching Keeper if it fails.',\n        recovery:\n          registry.send?.sourceId === id\n            ? {\n        expiryRecovery:\n          registry.send?.sourceId === id &&\n          registry.holderId === id &&\n          registry.send.status === 'confirmed' &&\n          registry.pendingHop &&\n          !registry.pendingHop.finalized\n            ? {\n                intentId: registry.send.id,\n                hopId: registry.pendingHop.eventId,\n                endsAt: registry.pendingHop.endsAt,\n                canExpire: now() >= registry.pendingHop.endsAt,\n              }\n            : null,\n        dispatchDiagnostic:\n          registry.send?.sourceId === id ? (registry.send.diagnostic ?? null) : null,\n        holder: registry.holderId,\n        subscriptions: await store.getJob(id),\n        intent: registry.send?.sourceId === id ? registry.send.status : null,\n        handoff: handoffView(registry, id, now(), undefined, keepers),\n      };\n    },\n  };\n}\n  const raid = (from = HOME, to = OTHER, viewers = 1) =>\n    signed(\n      'channel.raid',\n      { from_broadcaster_user_id: from, to_broadcaster_user_id: to, viewers },\n      from,\n      { from_broadcaster_user_id: from },\n    );\n  return {\n    runtime,\n    db,\n    request,\n    control,\n    login,\n    cookies,\n    calls,\n    subscriptions,\n    streams,\n    chat,\n    raid,\n    signed,\n    now: () => time,\n    validation(fn) {\n      validationOverride = fn;\n    },\n    chatFailure(mode) {\n      chatFailure = mode;\n    },\n    expire(id) {\n      expired.add(id);\n    },\n    revoke(id) {\n      revoked.add(id);\n    },\n    advance(ms = 1) {\n      time += ms;\n    },\n// Synthetic grants and signed local EventSub only. Never real account consent.\nimport assert from 'node:assert/strict';\nimport { pilotFixture, HOME, OTHER, BOT } from './pilot-fixture.js';\nexpo…14 tokens truncated…34';\nexport const NETWORK3 = Object.freeze({\n  [HOME]: 'raidrelichq',\n  [OTHER]: 'olsols2',\n  [THIRD]: 'olsols3',\n});\nexport async function network3Fixture(kind = 'memory', options = {}) {\n  return pilotFixture(kind, {\n    keepers: NETWORK3,\n    extraBotScopes: ['user:read:moderated_channels'],\n    chronicleEnv: {\n      SEEKERS_ENABLED: 'true',\n      MARK_AUTO_APPROVE_ENABLED: 'true',\n      MARK_REVIEW_BLOCKLIST: '[\"spoiler\"]',\n      P9_STREAK_ENABLED: 'true',\n    },\n    ...options,\n  });\n}\nexport async function readyNetwork3(f) {\n  for (const id of [BOT, HOME, OTHER, THIRD]) await f.login(id);\n  // Control status can trigger the shared batched observation. Seed every room\n  // before the first such request; missing counts correctly poison that batch.\n  for (const id of [HOME, OTHER, THIRD]) f.streams.get(id).viewer_count = 1;\n  for (const id of [HOME, OTHER, THIRD]) {\n    assert.equal((await f.control(id, 'bootstrap')).status, 200);\nimport { capturePage } from '../test-support/capture-page.js';\n// Optional host QA: local mocked OAuth/Helix only; never follows Twitch URLs.\nimport { createServer } from 'node:https';\nimport { mkdir, writeFile } from 'node:fs/promises';\nimport { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\nimport { createLocalTLS } from '../test-support/local-tls.js';\nimport { attachOverlaySockets } from '../src/overlay-sockets.js';\nconst origin = 'https://localhost:5191';\nconst f = await pilotFixture('memory', { origin });\nlet server, sockets, localTLS;\nconst captures = new Map();\nconst captureCoverage = [];\nconst capture = (page, name) => capturePage(page, name, captures, captureCoverage);\nlet browser, failure, activePage;\nlet frontendPageErrorCount = 0;\nlet diagnostic = null;\nlet phase = 'local startup';\nlet diagnostics;\nlet lastPostStatus;\nasync function press(page, id, label, expected) {\n  phase = label;\n  const ownPath = `/control/${id}`;\n  const post = page.waitForResponse(\n    (r) => new URL(r.url()).pathname === ownPath && r.request().method() === 'POST',\n  );\n  const refreshed = page\n    .waitForResponse(\n      (r) => new URL(r.url()).pathname === `${ownPath}/status` && r.request().method() === 'GET',\n    )\n    .catch(() => null);\n  await page.evaluate(() => {\n    window.__pilotPostProof = null;\n  });\n  await page.getByRole('button', { name: label, exact: true }).click();\n  phase = `${label}: own-response`;\n  const response = await post;\n  await page.waitForFunction(() => Boolean(window.__pilotPostProof));\n  const result = await page.evaluate(() => window.__pilotPostProof);\n  if (result.http !== response.status()) throw Error('Response proof mismatch');\n  lastPostStatus = {\n    http: response.status(),\n    status: [\n      'accepted',\n      'processed',\n      'reconciled',\n      'blocked',\n      'busy',\n      'failed',\n      'unknown',\n      'rejected',\n      'rejected-preflight',\n      'idle-or-reconcile-only',\n    ].includes(result.status)\n      ? result.status\n      : 'unexpected',\n  };\n  if (response.status() !== 200 || result.status !== expected)\n    throw new Error('Owner POST returned unexpected status');\n  phase = `${label}: status-refresh`;\n  if (!(await refreshed)) throw new Error('Owner status refresh missing');\n  await page.waitForFunction(() => !document.getElementById('refresh').disabled);\n  phase = `${label}: result-dom`;\n  await page\n    .locator('#result')\n    .filter({\n"
+    }
+  ]
+}
+````
+
+### 4500. 2026-10-27T04:40:43.230Z — tool call (source line 16877)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_c0f9dd67c83c43e89c37f92d30448ff0",
+  "input": "text((await tools.exec_command({cmd:\"rg -n 'oauth/keeper|oauth/streamer|role' src/app.js | tail -23; sed -n '1,45p' src/control.js; rg -n 'getKeeperRegistry|setToken|store:' src/runtime.js | tail -12; rg -n 'return \\\\{' src/runtime.js | tail -4; sed -n '1,58p' public/atlas.css; sed -n '1,60p' test/network3.test.js\",\"max_output_tokens\":1700})).output)\n"
+}
+````
+
+### 4501. 2026-10-27T04:40:43.315Z — tool result (source line 16880)
+
+````text
+{
+  "call_id": "call_c0f9dd67c83c43e89c37f92d30448ff0",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "import { boundedCall } from './bounded.js';\nimport { strictJSON, forgeDescription } from './forge.js';\nimport { readFile } from 'node:fs/promises';\nimport { randomBytes } from 'node:crypto';\nimport { hash } from './crypto.js';\n\nexport function createControl({\n  store,\n  keeperIds,\n  origin,\n  secure,\n  now = Date.now,\n  activityTimeoutMs = 8000,\n}) {\n  let pilot;\n  const name = (id) => `${secure ? '__Host-' : ''}rr_control_${id}`;\n  const cookie = (id, value, age) =>\n    `${name(id)}=${value}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${age}${secure ? '; Secure' : ''}`;\n  const csrf = (secret) => hash(`control-csrf:${secret}`);\n  async function session(id, headers) {\n    if (!keeperIds.includes(id)) return null;\n    const entries = (headers.cookie ?? '')\n      .split(';')\n      .map((s) => s.trim())\n      .filter((s) => s.startsWith(`${name(id)}=`));\n    const secret = entries.length === 1 ? entries[0].slice(name(id).length + 1) : '';\n    if (!/^[\\w-]{43}$/.test(secret)) return null;\n    const record = await store.getControlSession(id, hash(secret), now());\n    return record?.keeperId === id && record.role === 'keeper' ? { ...record, secret } : null;\n  }\n  async function authorizePost({ keeperId, headers = {}, rawBody }, allowedActions = []) {\n    if (\n      headers.origin !== origin ||\n      headers['content-type'] !== 'application/json' ||\n      !Buffer.isBuffer(rawBody) ||\n      rawBody.length > 1024\n    )\n      return null;\n    const record = await session(keeperId, headers);\n    if (!record) return null;\n    let body;\n    try {\n      const text = new TextDecoder('utf-8', { fatal: true }).decode(rawBody);\n      if ((text.match(/\"(?:action|csrf)\"\\s*:/g) ?? []).length !== 2) return null;\n      body = JSON.parse(text);\n346:  return {\n:root {\n  color-scheme: dark;\n  --slate: #26354b;\n  --deep: #101d30;\n  --moon: #e3e8ef;\n  --amber: #dba95c;\n  --violet: #b7a2df;\n  --muted: #bbc6d7;\n  font-family: 'Segoe UI', system-ui, sans-serif;\n  color: var(--moon);\n  background: var(--deep);\n}\n* {\n  box-sizing: border-box;\n}\nbody {\n  margin: 0;\n}\nheader,\nmain,\nfooter {\n  max-width: 1184px;\n  margin: auto;\n  padding: 24px clamp(20px, 5vw, 64px);\n}\nheader {\n  display: flex;\n  justify-content: space-between;\n  gap: 20px;\n  align-items: baseline;\n  border-bottom: 1px solid #39485e;\n}\nheader span,\nfooter,\n.note {\n  color: var(--muted);\n  font-size: 13px;\n}\n.brand {\n  font-family: Georgia, serif;\n  font-size: 26px;\n  text-decoration: none;\n  color: var(--moon);\n}\na {\n  color: var(--amber);\n  text-underline-offset: 5px;\n}\na:hover {\n  color: #f0ca8e;\n}\na:focus-visible,\nbutton:focus-visible,\ninput:focus-visible,\n.mark-history:focus-visible {\n  outline: 2px solid var(--amber);\n  outline-offset: 5px;\n}\nimport test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { configuredKeeperNetwork, RECEIVING_KEEPERS } from '../src/receiving.js';\nimport { createApp } from '../src/app.js';\nimport { pilotFixture } from '../test-support/pilot-fixture.js';\nimport {\n  network3Fixture,\n  readyNetwork3,\n  networkHop,\n  NETWORK3,\n  HOME,\n  OTHER,\n  THIRD,\n  BOT,\n} from '../test-support/network3-fixture.js';\nconst config = { home: HOME, bot: BOT };\ntest('operator Keeper mapping is bounded, closed, duplicate-safe and retains existing identities', () => {\n  assert.deepEqual(configuredKeeperNetwork(undefined, config), RECEIVING_KEEPERS);\n  assert.deepEqual(configuredKeeperNetwork(JSON.stringify(NETWORK3), config), NETWORK3);\n  assert.equal(\n    Object.keys(\n      configuredKeeperNetwork(JSON.stringify({ ...NETWORK3, 12345: 'fourthkeeper' }), config),\n    ).length,\n    4,\n  );\n  for (const raw of [\n    'null',\n    '[]',\n    'false',\n    '\"map\"',\n    '{',\n    'x'.repeat(1025),\n    JSON.stringify({ ...NETWORK3, [BOT]: 'raidrelicbot' }),\n    JSON.stringify({ ...NETWORK3, [THIRD]: 'olsols2' }),\n    JSON.stringify({ ...NETWORK3, [THIRD]: '../olsols3' }),\n    JSON.stringify({ ...NETWORK3, 0: 'zero' }),\n    JSON.stringify({ ...NETWORK3, '001': 'leadingzero' }),\n    JSON.stringify({ ...NETWORK3, [THIRD]: { login: 'olsols3' } }),\n    JSON.stringify({ ...NETWORK3, [THIRD]: 'constructor' }),\n    JSON.stringify({ ...NETWORK3, [HOME]: 'different' }),\n    JSON.stringify({ ...NETWORK3, 1: 'four', 2: 'five' }),\n    '{\"1591805230\":\"raidrelichq\",\"1591806023\":\"olsols2\",\"1591806023\":\"olsols2\"}',\n    '{\"__proto__\":{\"polluted\":true},\"1591805230\":\"raidrelichq\",\"1591806023\":\"olsols2\"}',\n  ])\n    assert.throws(() => configuredKeeperNetwork(raw, config));\n});\ntest('configured public module is early, read-only, self-contained and has no store/OAuth access', async () => {\n  const trap = new Proxy(\n    {},\n    {\n      get() {\n        throw Error('SDK access');\n      },\n    },\n  );\n  const app = createApp({ keeperNames: NETWORK3, state: trap, oauth: trap });\n  const r = await app.dispatch({ method: 'GET', path: '/keeper-network.js' });\n  assert.equal(r.status, 200);\n  assert.match(r.body, /1593561134.*olsols3/);\n  assert.doesNotMatch(r.body, /fetch|import|process|token|secret/i);\n"
+    }
+  ]
+}
+````
+
+### 4502. 2026-10-27T04:42:07.197Z — tool call (source line 16884)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_48a3f5c921424c0a9e7a6d75400c7b04",
+  "input": "text(await tools.exec_command({cmd:\"cat > public/onboarding.js <<'EOF'\\n// Public presentation only. No admission, authorization, polling or token access.\\nexport const CANONICAL_APP = 'https://raid-relic-760724762396.us-central1.run.app';\\nexport function setupLinks(id, names) {\\n  if (typeof id !== 'string' || !/^[1-9]\\\\d{0,19}$/.test(id) ||\\n      !Object.hasOwn(names, id) || !/^[a-z0-9_]{1,25}$/.test(names[id])) return null;\\n  return Object.freeze({ login: names[id], connect: `${CANONICAL_APP}/oauth/keeper/${id}/start`,\\n    control: `${CANONICAL_APP}/control/${id}`, overlay: `${CANONICAL_APP}/overlay/${id}` });\\n}\\nexport function setupReadiness(pilot, { own = false, readAt = null, now = Date.now(), obs = false, id } = {}) {\\n  const fresh = own && pilot && Number.isFinite(readAt) && now >= readAt && now - readAt <= 10000;\\n  return Object.freeze({\\n    session: Boolean(fresh), optedIn: Boolean(fresh && pilot.optedIn === true),\\n    subscriptions: Boolean(fresh && pilot.subscriptions?.ready === true),\\n    botStored: Boolean(fresh && pilot.botGrantStored === true),\\n    obs: obs === true,\\n    queue: !fresh ? 'unchecked' : pilot.holder === id ? 'holding' : !pilot.optedIn ? 'opt-in-first'\\n      : !pilot.seekers?.enabled ? 'disabled' : pilot.seekers.joined ? 'joined' : 'off',\\n    fresh: Boolean(fresh),\\n  });\\n}\\nexport async function copyOBS(url, clipboard) {\\n  const parsed = new URL(url);\\n  if (parsed.origin !== CANONICAL_APP || parsed.search || parsed.hash ||\\n      !/^\\\\/overlay\\\\/[1-9]\\\\d{0,19}$/.test(parsed.pathname) || parsed.username || parsed.password)\\n    throw Error('Invalid OBS URL');\\n  await clipboard.writeText(parsed.href);\\n  return 'URL copied — this does not prove OBS is installed or showing it.';\\n}\\nEOF\\ncat > public/start.html <<'EOF'\\n<!doctype html><html lang=\\\"en\\\"><head><meta charset=\\\"utf-8\\\"><meta name=\\\"viewport\\\" content=\\\"width=device-width,initial-scale=1\\\"><title>Get started · Raid Relic</title><link rel=\\\"stylesheet\\\" href=\\\"/fonts.css\\\"><link rel=\\\"stylesheet\\\" href=\\\"/atlas.css\\\"><link rel=\\\"stylesheet\\\" href=\\\"/start.css\\\"><script type=\\\"module\\\" src=\\\"/start.js\\\"></script><link rel=\\\"icon\\\" href=\\\"/favicon.svg\\\" type=\\\"image/svg+xml\\\"></head><body><a class=\\\"skip-link\\\" href=\\\"#main-content\\\">Skip to setup guide</a><header><a class=\\\"brand\\\" href=\\\"/atlas/\\\">Raid Relic</a><span>Configured Keeper pilot</span></header><main id=\\\"main-content\\\" tabindex=\\\"-1\\\"><div class=\\\"start-intro\\\"><div><h1>Your next raid can leave a story.</h1><p>A two-minute checklist if Twitch and OBS are already set up. Consent, permissions and installation can take longer.</p><p>This is a private configured-channel pilot, not open enrollment. No account or readiness has been verified on this public page.</p></div><img src=\\\"/crystal.svg\\\" alt=\\\"Original moon-silver Raid Relic\\\"></div><label for=\\\"start-channel\\\">Your configured channel</label><select id=\\\"start-channel\\\"><option value=\\\"\\\">Choose your channel</option><option value=\\\"unconfigured\\\">My channel is not listed</option></select><p id=\\\"start-status\\\" role=\\\"status\\\">Choose your own channel; no login or action happens automatically.</p><ol class=\\\"start-steps\\\"><li><h2>Connect your matching Twitch account</h2><p>Use a private browser signed in as the selected Keeper. The app creates its own fresh OAuth state; never copy a redirected Twitch consent URL.</p><a id=\\\"start-connect\\\" aria-disabled=\\\"true\\\">Connect Twitch</a><p>Unchecked here. This guide never reads private sessions, grants or another channel's controls.</p></li><li><h2>Opt in deliberately</h2><p>Open your own private controls. Use Set up channel to reconcile the five existing subscriptions, then Opt in this channel. No automatic Keep, bootstrap or raid is performed.</p><a id=\\\"start-control\\\" aria-disabled=\\\"true\\\">Open my private checklist</a></li><li><h2>Add your OBS Browser Source</h2><label for=\\\"start-obs\\\">Canonical overlay URL — no account secrets</label><input id=\\\"start-obs\\\" readonly><button id=\\\"start-copy\\\" disabled>Copy OBS URL</button><p id=\\\"start-copy-status\\\" role=\\\"status\\\">Not copied. In OBS add a Browser Source at 1920×1080, then check it yourself. Audio is optional and muted until a gesture.</p><label><input id=\\\"start-confirm\\\" type=\\\"checkbox\\\"> I manually checked my OBS source (not server verified)</label><p>This check stays only in this page and resets on reload. A copied URL alone is not an installed source.</p></li><li><h2>Choose whether to seek the relic</h2><p>In your private checklist, explicitly choose Become a Seeker after opting in. Current holders cannot join; after passing, former holders may rejoin. This guide does not join for you.</p><p>Fresh readiness is checked only in your own controls. Queue membership does not prove live status, bot permissions or raid eligibility.</p></li></ol><p><a href=\\\"/demo/\\\">Try the no-login simulated demo first</a>. Not configured? Contact the pilot owner through your existing private contact; they must add your verified channel before you can consent. No email, Twitch password or stream key is collected here.</p></main><footer>Unofficial fan edition; not affiliated with or endorsed by Twitch/TwitchCon.</footer></body></html>\\nEOF\\ncat > public/start.css <<'EOF'\\n.start-intro{display:grid;grid-template-columns:2fr 1fr;align-items:center;gap:24px}.start-intro img{width:100%;height:260px;object-fit:contain}.start-steps{padding-left:24px}.start-steps li{padding:16px 0;border-bottom:1px solid #52617a}.start-steps h2{font:26px/1.3 Cinzel,Georgia,serif}select,input,button{font:inherit;max-width:100%;min-height:44px}select,input{background:var(--deep);color:var(--moon);border:1px solid #8092a9;padding:8px}#start-obs{display:block;width:100%;margin:10px 0}button{padding:10px 18px}a[aria-disabled=true]{color:var(--muted);text-decoration:none}a:focus-visible,summary:focus-visible{outline:3px solid var(--amber);outline-offset:4px}.skip-link{position:absolute;top:-100px;left:12px;background:var(--deep);padding:12px;z-index:5}.skip-link:focus{top:0}label{display:block;margin:12px 0}input[type=checkbox]{vertical-align:middle}.start-steps p{max-width:75ch}h1{font-family:Cinzel,Georgia,serif}#start-status,#start-copy-status{color:var(--amber)}@media(max-width:650px){.start-intro{grid-template-columns:1fr}.start-intro img{height:150px;grid-row:1}.start-steps h2{font-size:23px}header{flex-wrap:wrap}}\\nEOF\\ncat > public/start.js <<'EOF'\\nimport { keeperNames } from './keeper-network.js';\\nimport { setupLinks, copyOBS } from './onboarding.js';\\nconst $ = id => document.getElementById(id), select = $('start-channel');\\nfor (const [id, login] of Object.entries(keeperNames)) {\\n  if (!setupLinks(id, keeperNames)) continue;\\n  const option = document.createElement('option'); option.value = id; option.textContent = '@'+login;\\n  select.insertBefore(option, select.lastElementChild);\\n}\\nselect.onchange = () => {\\n  const links = setupLinks(select.value, keeperNames);\\n  for (const [id, url] of [['start-connect',links?.connect],['start-control',links?.control]]) {\\n    const a=$(id); a.removeAttribute('href');a.setAttribute('aria-disabled',String(!url));if(url)a.href=url;\\n  }\\n  $('start-obs').value=links?.overlay??''; $('start-copy').disabled=!links;\\n  $('start-confirm').checked=false;\\n  $('start-copy-status').textContent='Not copied. Check the source manually after adding it to OBS.';\\n  $('start-status').textContent=links ? `@${links.login} is configured, not verified ready. Only you can connect and opt in.`\\n    : 'Private pilot: ask the owner to configure your verified channel first. This page cannot enroll it.';\\n};\\n$('start-copy').onclick=async()=>{\\n  try { $('start-copy-status').textContent=await copyOBS($('start-obs').value,navigator.clipboard); }\\n  catch { $('start-obs').focus();$('start-obs').select();$('start-copy-status').textContent='Copy failed. Select the URL and copy it manually; nothing is marked copied or installed.'; }\\n};\\nEOF\\ncat > public/first-run.js <<'EOF'\\nimport { keeperNames } from './keeper-network.js';\\nimport { setupLinks, setupReadiness, copyOBS } from './onboarding.js';\\n// Uses only the existing authenticated status response; never reads a new API.\\nexport function mountFirstRun(id, run) {\\n  const $=key=>document.getElementById(key), links=setupLinks(id,keeperNames);\\n  let pilot=null, actions=[], readAt=null, busy=true, timer=null;\\n  if(links)$('first-obs-url').value=links.overlay;\\n  function render() {\\n    const r=setupReadiness(pilot,{own:Boolean(pilot),readAt,id,obs:$('first-obs-confirm').checked});\\n    for(const [key,ready,label] of [['session',r.session,'Matching private session (not a fresh grant check)'],['optin',r.optedIn,'Explicit Keeper opt-in'],['subscriptions',r.subscriptions,'Five subscriptions observed ready'],['obs',r.obs,'OBS manually checked by you, not server verified']]) {\\n      const node=$('first-'+key);node.dataset.state=ready?'ready':'unknown';node.textContent=(ready?'✓ ':'○ ')+label;\\n    }\\n    $('first-freshness').textContent=r.fresh?'Status just read; ticks expire after 10 seconds. No background polling.':'Not freshly verified. Use Refresh status; no setup action runs automatically.';\\n    $('first-queue').textContent={unchecked:'Queue: not checked.',holding:'You hold the relic. Pass it on before joining the Seeker queue.', 'opt-in-first':'Queue off. Opt in first, then choose Become a Seeker.',disabled:'Seeker queue is disabled by the operator.',joined:'Explicit Seeker membership observed; live eligibility is checked separately.',off:'Queue off. Become a Seeker only if you want to receive the relic.'}[r.queue];\\n    for(const [node,action] of [['first-bootstrap','bootstrap'],['first-keep','keep'],['first-seek','seek-on']])\\n      $(node).disabled=busy||!r.fresh||!actions.includes(action)||(action==='seek-on'&&['holding','opt-in-first','disabled'].includes(r.queue));\\n    $('first-obs-copy').disabled=busy||!links||!r.fresh;\\n  }\\n  for(const [node,action] of [['first-bootstrap','bootstrap'],['first-keep','keep'],['first-seek','seek-on']]) $(node).onclick=()=>run(action);\\n  $('first-obs-confirm').onchange=render;\\n  $('first-obs-copy').onclick=async()=>{\\n    try{$('first-copy-status').textContent=await copyOBS(links.overlay,navigator.clipboard);}\\n    catch{$('first-obs-url').focus();$('first-obs-url').select();$('first-copy-status').textContent='Copy failed. Select and copy manually; OBS installation is not verified.';}\\n  };\\n  return {\\n    clear(){clearTimeout(timer);pilot=null;actions=[];readAt=null;render();},\\n    observe(value,allowed){clearTimeout(timer);pilot=value;actions=allowed;readAt=Date.now();render();timer=setTimeout(render,10001);},\\n    setBusy(value){busy=value;render();},\\n    dispose(){clearTimeout(timer);pilot=null;readAt=null;},\\n  };\\n}\\nEOF\\npython3 - <<'PY'\\np='src/app.js';s=open(p).read().replace('const demoAssets = new Map([',\\\"const demoAssets = new Map([\\\\n  ['/start', 'start.html'],\\\\n  ['/start/', 'start.html'],\\\\n  ['/start.js', 'start.js'],\\\\n  ['/start.css', 'start.css'],\\\\n  ['/onboarding.js', 'onboarding.js'],\\\\n  ['/first-run.js', 'first-run.js'],\\\");open(p,'w').write(s)\\np='test-support/judges.js';s=open(p).read().replace('const assets = new Set([',\\\"const assets = new Set([\\\\n  '/start', '/start/', '/start.js', '/start.css', '/onboarding.js', '/first-run.js',\\\");open(p,'w').write(s)\\np='public/control.html';s=open(p).read();needle='      <p id=\\\"keeper-summary\\\" role=\\\"status\\\">Read status before taking action.</p>';s=s.replace(needle,needle+'''\\\\n      <details id=\\\"first-run\\\"><summary>Get started in two minutes — own-channel checklist</summary>\\n      <p>Timing assumes Twitch and OBS are already available. Consent and installation can take longer. This checklist never starts a raid.</p>\\n      <ol><li id=\\\"first-session\\\">○ Matching private session not checked</li><li id=\\\"first-optin\\\">○ Explicit Keeper opt-in not checked</li><li id=\\\"first-subscriptions\\\">○ Subscriptions not checked</li><li id=\\\"first-obs\\\">○ OBS installation not verified</li></ol>\\n      <p id=\\\"first-freshness\\\" role=\\\"status\\\">Not freshly verified.</p>\\n      <div class=\\\"actions\\\"><button id=\\\"first-bootstrap\\\" disabled>Set up channel</button><button id=\\\"first-keep\\\" disabled>Opt in this channel</button></div>\\n      <p>Setup reconciles only the existing five subscriptions. The bot must already have its approved grant and be a moderator; these ticks do not prove optional permissions.</p>\\n      <label for=\\\"first-obs-url\\\">Own canonical OBS Browser Source URL</label><input id=\\\"first-obs-url\\\" readonly><button id=\\\"first-obs-copy\\\" disabled>Copy my OBS URL</button>\\n      <p id=\\\"first-copy-status\\\" role=\\\"status\\\">Add a Browser Source at 1920×1080. Copying is not installation.</p>\\n      <label><input id=\\\"first-obs-confirm\\\" type=\\\"checkbox\\\"> I manually checked this source in OBS (page-only, not server verified)</label>\\n      <p id=\\\"first-queue\\\" role=\\\"status\\\">Queue: not checked.</p><button id=\\\"first-seek\\\" disabled>Become a Seeker</button>\\n      <p>Joining is explicit and does not prove live eligibility. Current holders cannot join; former holders may rejoin after passing. <a href=\\\"/start\\\">Public setup guide</a></p></details>''');open(p,'w').write(s)\\np='public/control.js';s=open(p).read().replace(\\\"import { boundedResponse } from './control-read.js';\\\", \\\"import { boundedResponse } from './control-read.js';\\\\nimport { mountFirstRun } from './first-run.js';\\\");s=s.replace('const names = networkNames;', 'const firstRun = mountFirstRun(id, (action) => run(action));\\\\nconst names = networkNames;');s=s.replace('  busy = value;', '  busy = value;');s=s.replace(\\\"  document.getElementById('cancel-queued').disabled = value || !recovery?.canCancel;\\\", \\\"  document.getElementById('cancel-queued').disabled = value || !recovery?.canCancel;\\\\n  firstRun.setBusy(value || !csrf);\\\");s=s.replace('function invalidate() {','function invalidate() {\\\\n  firstRun.clear();');s=s.replace('    csrf = value.csrf;', '    csrf = value.csrf;\\\\n    firstRun.observe(value.pilot, value.actions);');s=s.replace(\\\"  readGeneration++;\\\\n  readController?.abort();\\\", \\\"  firstRun.dispose();\\\\n  readGeneration++;\\\\n  readController?.abort();\\\");open(p,'w').write(s)\\nPY\\ncat >> public/control.css <<'EOF'\\n\\n#first-run { margin: 14px 0; border-block: 1px solid #52617a; padding: 10px 0; }\\n#first-run summary { cursor: pointer; min-height: 44px; padding: 8px 0; }\\n#first-run summary:focus-visible { outline: 3px solid var(--amber); outline-offset: 4px; }\\n#first-run li[data-state='ready'] { color: #bde4cb; }\\n#first-run li { margin: 10px 0; }\\n#first-obs-url { display: block; width: 100%; max-width: 100%; font: inherit; min-height: 44px; }\\n#first-run input[type='checkbox'] { min-height: 24px; min-width: 24px; vertical-align: middle; }\\nEOF\"}))\n"
+}
+````
+
+### 4503. 2026-10-27T04:42:07.317Z — tool result (source line 16887)
+
+````text
+{
+  "call_id": "call_48a3f5c921424c0a9e7a6d75400c7b04",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "ba2a14",
+        "wall_time_seconds": 0.00000384,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    }
+  ]
+}
+````
+
+### 4504. 2026-10-27T04:42:38.301Z — tool call (source line 16893)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_2caf8b17f6a548a7a342f9231598733c",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '64,105p' test/network3.test.js; sed -n '1,95p' test/pilot.test.js; sed -n '336,365p' src/runtime.js; head -45 public/control-read.js\",\"max_output_tokens\":1800})).output)\n"
+}
+````
+
+### 4505. 2026-10-27T04:42:38.387Z — tool result (source line 16896)
+
+````text
+{
+  "call_id": "call_2caf8b17f6a548a7a342f9231598733c",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "Warning: truncated output (original token count: 2145)\nTotal output lines: 212\n\n  test(`${kind}: third admission needs its own identity and grant; existing ten subscriptions are untouched`, async () => {\n    const f = await network3Fixture(kind);\n    for (const id of [BOT, HOME, OTHER]) await f.login(id);\n    for (const id of [HOME, OTHER]) await f.control(id, 'bootstrap');\n    assert.equal(f.subscriptions.length, 10);\n    assert.equal((await f.request('/oauth/keeper/999/start')).status, 404);\n    // Start a third role but return the other signed account: must reject, no role replacement.\n    const start = await f.request(`/oauth/keeper/${THIRD}/start`);\n    const nonce = new URL(start.headers.location).searchParams.get('state');\n    const bad = await f.request('/auth/callback?state=' + nonce + '&code=' + OTHER, 'GET', {\n      cookie: start.headers['set-cookie'].split(';')[0],\n    });\n    assert.equal(bad.status, 400);\n    assert.ok(!(await f.runtime.store.getToken('keeper:' + THIRD)));\n    const before = f.calls.filter(\n      (c) => c.url.endsWith('/subscriptions') && c.method === 'POST',\n    ).length;\n    await assert.rejects(f.runtime.subscriptionManagers[THIRD].reconcile({ readiness: true }));\n    assert.equal(\n      f.calls.filter((c) => c.url.endsWith('/subscriptions') && c.method === 'POST').length,\n      before,\n    );\n    await f.login(THIRD);\n    assert.equal((await f.control(THIRD, 'bootstrap')).status, 200);\n    assert.equal(f.subscriptions.length, 15);\n    const own = f.subscriptions.slice(10);\n    assert.equal(own.length, 5);\n    assert.ok(own.every((s) => Object.values(s.condition).includes(THIRD)));\n    assert.deepEqual(own.map((s) => s.type).sort(), [\n      'channel.chat.message',\n      'channel.raid',\n      'channel.raid',\n      'stream.offline',\n      'stream.online',\n    ]);\n    await f.control(THIRD, 'bootstrap');\n    assert.equal(f.subscriptions.length, 15);\n    assert.equal((await f.runtime.state.getStreamStatus(THIRD)).optedIn, false);\n  });\n  test(`${kind}: signed A→B→C→A, early offers, distinct chat roles, independent budgets and cross-room erasure`, async () => {\n    const f = await network3Fixture(kind);\n    assert.equal(f.calls.length, 0);\nimport test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { createRuntime } from '../src/runtime.js';\nimport { createServer } from 'node:http';\nimport { once } from 'node:events';\nimport WebSocket from 'ws';\nimport { attachOverlaySockets } from '../src/overlay-sockets.js';\nimport { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\n\nasync function ready(f) {\n  assert.equal(f.calls.length, 0);\n  for (const id of [BOT, HOME, OTHER]) await f.login(id);\n  for (const id of [HOME, OTHER]) {\n    assert.equal((await f.control(id, 'bootstrap')).status, 200);\n    f.advance();\n    assert.equal((await f.control(id, 'keep')).status, 200);\n    f.advance();\n  }\n}\nfor (const kind of ['memory', 'firestore']) {\n  test(`${kind}: authenticated two-channel pilot completes mocked raid/claim/return with both feed updates and safe Atlas`, async () => {\n    const f = await pilotFixture(kind);\n    await ready(f);\n    const r = f.runtime;\n    assert.equal(f.subscriptions.length, 10);\n    assert.ok(f.calls.every((c) => !c.url.includes('/raids')));\n    const health = JSON.parse((await f.request('/health')).body);\n    assert.equal(health.phase, 'live');\n    assert.equal(health.mode, 'simulator');\n    assert.equal(Object.hasOwn(health, 'liveValidated'), false);\n    const updates = { [HOME]: [], [OTHER]: [] };\n    for (const id of [HOME, OTHER])\n      r.overlayFeeds[id].subscribe((value) => updates[id].push(value));\n    await f.chat…345 tokens truncated…HER, `send:${HOME}`);\n    const posted = f.calls.filter((c) => c.url.includes('/raids'));\n    assert.equal(posted.length, 2);\n    assert.equal(posted[1].headers.Authorization, `Bearer access-${OTHER}`);\n    f.advance();\n    await f.raid(OTHER, HOME);\n    await f.chat(OTHER, OTHER, '!offer');\n    await f.chat(HOME, HOME, '!accept');\n    assert.equal((await r.state.getKeeperRegistry()).holderId, HOME);\n    assert.equal((await r.state.getPublicJourney()).rings, 2);\n    for (const id of [HOME, OTHER]) assert.equal((await f.request(`/overlay/${id}`)).status, 200);\n    assert.equal((await f.request('/overlay/777')).status, 404);\n  });\n  test(`${kind}: bootstrap lease, idempotency, 409 recovery and offline during observation win without quota reset`, async () => {\n    const f = await pilotFixture(kind);\n    for (const id of [BOT, HOME, OTHER]) await f.login(id);\n    f.conflict();\n    const concurrent = await Promise.all([\n      f.control(HOME, 'bootstrap'),\n      f.control(HOME, 'bootstrap'),\n    ]);\n    assert.ok(concurrent.some((result) => result.status === 409));\n    assert.equal(f.subscriptions.length, 5);\n    await f.control(HOME, 'keep');\n    await f.chat(HOME, '811', '!mark moon');\n    await f.control(HOME, 'bootstrap');\n    assert.equal(f.subscriptions.length, 5);\n    const doc = await f.runtime.marks.moderationView(HOME, {\n      broadcasterId: HOME,\n      chatterId: HOME,\n    });\n    assert.equal(doc.sessions[0].spent, 1);\n    assert.equal((await f.runtime.state.getStreamStatus(HOME)).streamId, '9001');\n    f.advance();\n    f.hook(async () => {\n      f.hook(null);\n      f.advance();\n    policy: wander,\n    key: env.TOKEN_ENCRYPTION_KEY,\n    state,\n    oauth,\n    bots,\n    botId: env.TWITCH_BOT_ID,\n    clientId: env.TWITCH_CLIENT_ID,\n    transport: transport ?? httpTransport,\n    now,\n  });\n  return {\n    ...createApp({\n      keeperNames,\n      wander: wanderService,\n      receiving,\n      previewReadOnly,\n      scoreAcks,\n      claimAcks,\n      shares,\n      replies,\n      banAuthorized: async (host) => {\n        const proof = (await store.getJob(host))?.banCapability;\n        return proof?.scope === 'channel:moderate' && proof.expiresAt > now();\n      },\n      secret: env.TWITCH_EVENTSUB_SECRET,\n      state,\n      oauth,\n      overlayFeed,\n      overlayFeeds,\n      raidPilot,\n// Bounded private-page I/O. Never retries any request or logs bodies/errors.\nexport class ControlReadError extends Error {\n  constructor(code, status = null) {\n    super(code);\n    this.code = code;\n    this.status = status;\n  }\n}\nexport async function boundedResponse(\n  url,\n  options = {},\n  {\n    fetchImpl = globalThis.fetch,\n    timeoutMs = 8000,\n    maxBytes = 65536,\n    json = false,\n    setTimer = setTimeout,\n    clearTimer = clearTimeout,\n  } = {},\n) {\n  const controller = new AbortController();\n  let timer, abort;\n  try {\n    if (options.signal?.aborted) throw new ControlReadError('aborted');\n    const cancelled = new Promise((_, reject) => {\n      abort = () => {\n        controller.abort();\n        reject(new ControlReadError('aborted'));\n      };\n      options.signal?.addEventListener('abort', abort, { once: true });\n    });\n    const timeout = new Promise((_, reject) => {\n      timer = setTimer(() => {\n        controller.abort();\n        reject(new ControlReadError('timeout'));\n      }, timeoutMs);\n    });\n    const operation = (async () => {\n      let response;\n      try {\n        response = await fetchImpl(url, { ...options, signal: controller.signal });\n      } catch {\n        throw new ControlReadError('network');\n      }\n      let text = '';\n"
+    }
+  ]
+}
+````
+
+### 4506. 2026-10-27T04:43:22.686Z — tool call (source line 16900)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_31b048c2022941debd27206f9ac84f06",
+  "input": "text(await tools.exec_command({cmd:\"cat > test/onboarding.test.js <<'EOF'\\nimport test from 'node:test';\\nimport assert from 'node:assert/strict';\\nimport { setupLinks, setupReadiness, copyOBS, CANONICAL_APP } from '../public/onboarding.js';\\nimport { network3Fixture, NETWORK3, HOME, OTHER, THIRD, BOT } from '../test-support/network3-fixture.js';\\nimport { createApp } from '../src/app.js';\\ntest('public setup links use only configured exact accounts and canonical app starts, not provider state URLs', async()=>{\\n  assert.equal(setupLinks(THIRD,NETWORK3).connect,CANONICAL_APP+'/oauth/keeper/'+THIRD+'/start');\\n  assert.equal(setupLinks(THIRD,NETWORK3).overlay,CANONICAL_APP+'/overlay/'+THIRD);\\n  for(const id of ['999','../1','__proto__',BOT,null])assert.equal(setupLinks(id,NETWORK3),null);\\n  const writes=[];assert.match(await copyOBS(setupLinks(THIRD,NETWORK3).overlay,{writeText:async s=>writes.push(s)}),/does not prove OBS/);\\n  assert.deepEqual(writes,[CANONICAL_APP+'/overlay/'+THIRD]);\\n  await assert.rejects(()=>copyOBS(setupLinks(THIRD,NETWORK3).overlay,{writeText:async()=>{throw Error('denied');}}));\\n  for(const url of ['https://evil.invalid/overlay/1',CANONICAL_APP+'/overlay/1?token=x',CANONICAL_APP+'/control/1'])\\n    await assert.rejects(()=>copyOBS(url,{writeText:async()=>assert.fail('invalid clipboard write')}));\\n});\\ntest('readiness distinguishes own fresh session, expiry, manual OBS and holder-excluded queue without fresh-grant claims',()=>{\\n  const pilot={optedIn:true,botGrantStored:true,subscriptions:{ready:true},seekers:{enabled:true,joined:true},holder:HOME};\\n  const opts={id:THIRD,own:true,readAt:1000,now:1001};\\n  const r=setupReadiness(pilot,opts);assert.equal(r.optedIn,true);assert.equal(r.queue,'joined');assert.equal(r.obs,false);\\n  for(const patch of [{own:false},{now:11001},{now:999}]) {const stale=setupReadiness(pilot,{...opts,...patch});assert.equal(stale.fresh,false);assert.equal(stale.queue,'unchecked');assert.equal(stale.session,false);}\\n  assert.equal(setupReadiness({...pilot,holder:THIRD},opts).queue,'holding');\\n  assert.equal(setupReadiness({...pilot,optedIn:false},opts).queue,'opt-in-first');\\n  assert.equal(setupReadiness(null,{...opts,obs:true}).obs,true);\\n});\\ntest('public start GET/static assets never access sessions or SDK; writes are refused',async()=>{\\n  const trap=new Proxy({},{get(){throw Error('SDK/private read');}});\\n  const app=createApp({state:trap,oauth:trap,previewReadOnly:true});\\n  for(const path of ['/start','/start/','/start.js','/start.css','/onboarding.js','/first-run.js']) {\\n    const r=await app.dispatch({method:'GET',path});assert.equal(r.status,200);assert.match(r.headers['content-security-policy'],/connect-src 'none'/);\\n    assert.equal((await app.dispatch({method:'POST',path})).status,403);\\n  }\\n});\\nfor(const kind of ['memory','firestore'])test(`${kind}: genuinely fresh configured third account connects with signed own OAuth then explicitly opts in and joins`,async()=>{\\n  const f=await network3Fixture(kind);\\n  assert.equal(f.calls.length,0);assert.equal((await f.request('/start')).status,200);assert.equal(f.calls.length,0);\\n  assert.ok(!(await f.runtime.store.getToken('keeper:'+THIRD)));\\n  assert.notEqual((await f.runtime.state.getStreamStatus(THIRD))?.optedIn,true);\\n  assert.ok([401,403].includes((await f.request('/control/'+THIRD+'/status')).status));\\n  await f.login(BOT);await f.login(HOME);await f.control(HOME,'bootstrap');f.advance();await f.control(HOME,'keep');\\n  const start=await f.request('/oauth/keeper/'+THIRD+'/start');const state=new URL(start.headers.location).searchParams.get('state');\\n  assert.equal((await f.request('/auth/callback?state='+state+'&code='+OTHER,'GET',{cookie:start.headers['set-cookie'].split(';')[0]})).status,400);\\n  assert.ok(!(await f.runtime.store.getToken('keeper:'+THIRD)));\\n  await f.login(THIRD);\\n  const own=async()=>JSON.parse((await f.request('/control/'+THIRD+'/status','GET',{cookie:f.cookies[THIRD]})).body);\\n  let value=await own();assert.equal(value.keeperId,THIRD);assert.equal(value.pilot.optedIn,false);assert.equal(value.pilot.authorization,'not-checked');\\n  const obs=setupLinks(THIRD,NETWORK3).overlay;assert.equal(obs,CANONICAL_APP+'/overlay/'+THIRD);\\n  assert.equal((await f.control(THIRD,'keep', {origin:'https://evil.invalid'})).status,403);\\n  assert.equal((await f.request('/control/'+HOME+'/status','GET',{cookie:f.cookies[THIRD]})).status,401);\\n  assert.equal((await f.control(THIRD,'bootstrap')).status,200);assert.equal(f.subscriptions.filter(s=>Object.values(s.condition).includes(THIRD)).length,5);\\n  value=await own();assert.equal(value.pilot.optedIn,false);assert.equal(value.pilot.seekers.joined,false);\\n  f.advance();assert.equal((await f.control(THIRD,'keep')).status,200);\\n  value=await own();assert.equal(value.pilot.optedIn,true);assert.equal(value.pilot.seekers.joined,false);\\n  f.advance();assert.equal((await f.control(THIRD,'seek-on')).status,200);\\n  value=await own();assert.equal(value.pilot.seekers.joined,true);\\n  assert.equal(setupReadiness(value.pilot,{own:true,id:THIRD,readAt:1000,now:1001}).queue,'joined');\\n  assert.ok(f.calls.every(c=>!c.url.endsWith('/raids')&&!c.url.endsWith('/chat/messages')));\\n  f.advance(12*3600000+1);assert.equal((await f.request('/control/'+THIRD+'/status','GET',{cookie:f.cookies[THIRD]})).status,401);\\n});\\ntest('master read-only onboarding guide never bypasses OAuth/control denial',async()=>{\\n  const f=await network3Fixture('memory',{chronicleEnv:{P5_PREVIEW_READ_ONLY:'true',SEEKERS_ENABLED:'true'}});\\n  assert.equal((await f.request('/start')).status,200);\\n  assert.equal((await f.request('/oauth/keeper/'+THIRD+'/start')).status,403);\\n  assert.equal((await f.request('/control/'+THIRD,'POST',{},Buffer.from('{}'))).status,403);\\n  assert.equal(f.calls.length,0);\\n});\\nEOF\\n./node_modules/.bin/prettier --write public/onboarding.js public/start.html public/start.css public/start.js public/first-run.js public/control.js public/control.html public/control.css src/app.js test-support/judges.js test/onboarding.test.js\\nnode test/onboarding.test.js > /tmp/onboarding212-tests.txt 2>&1\\ntail -38 /tmp/onboarding212-tests.txt\",\"max_output_tokens\":1600}))\n"
+}
+````
+
+### 4507. 2026-10-27T04:43:23.652Z — tool result (source line 16903)
+
+````text
+{
+  "call_id": "call_31b048c2022941debd27206f9ac84f06",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 1.0 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "ee6979",
+        "wall_time_seconds": 0.791147087,
+        "exit_code": 0,
+        "original_token_count": 333,
+        "output": "public/onboarding.js 58ms\npublic/start.html 54ms\npublic/start.css 43ms\npublic/start.js 14ms\npublic/first-run.js 17ms\npublic/control.js 82ms (unchanged)\npublic/control.html 35ms\npublic/control.css 22ms\nsrc/app.js 111ms (unchanged)\ntest-support/judges.js 52ms\ntest/onboarding.test.js 19ms\n✔ public setup links use only configured exact accounts and canonical app starts, not provider state URLs (2.873024ms)\n✔ readiness distinguishes own fresh session, expiry, manual OBS and holder-excluded queue without fresh-grant claims (0.376403ms)\n✔ public start GET/static assets never access sessions or SDK; writes are refused (6.575177ms)\n{\"severity\":\"WARNING\",\"event\":\"raid_relic_receiving_unavailable\",\"reason\":\"streams-shape\",\"stage\":\"observation\"}\n✔ memory: genuinely fresh configured third account connects with signed own OAuth then explicitly opts in and joins (41.083954ms)\n{\"severity\":\"WARNING\",\"event\":\"raid_relic_receiving_unavailable\",\"reason\":\"streams-shape\",\"stage\":\"observation\"}\n✔ firestore: genuinely fresh configured third account connects with signed own OAuth then explicitly opts in and joins (34.566817ms)\n✔ master read-only onboarding guide never bypasses OAuth/control denial (1.898456ms)\nℹ tests 6\nℹ suites 0\nℹ pass 6\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 93.527045\n"
+      }
+    }
+  ]
+}
+````
+
+### 4508. 2026-10-27T04:43:49.592Z — tool call (source line 16909)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_96c67d2a64564f7195fd91d0d49bde65",
+  "input": "text((await tools.exec_command({cmd:\"rg -n 'addCookies|cookie' scripts/browser-smoke-network3.js | head -10; sed -n '26,50p' scripts/browser-smoke-network3.js; cat test/control-read.test.js | head -15; rg -n 'control.js' test/*.test.js | head -15\",\"max_output_tokens\":850})).output)\n"
+}
+````
+
+### 4509. 2026-10-27T04:43:49.688Z — tool result (source line 16912)
+
+````text
+{
+  "call_id": "call_96c67d2a64564f7195fd91d0d49bde65",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "62:    const [name, value] = f.cookies[id].split('=');\n63:    await context.addCookies([\n73:    cookie: f.cookies[THIRD],\n81:        { cookie: f.cookies[THIRD], origin, 'content-type': 'application/json' },\n  const f = await network3Fixture('memory', { origin });\n  await readyNetwork3(f);\n  assert.equal(f.subscriptions.length, 15);\n  tls = await createLocalTLS();\n  server = createServer(tls.options, f.runtime.handler);\n  sockets = attachOverlaySockets(server, f.runtime.overlayFeeds, {\n    origins: [origin],\n    allowRead: f.runtime.allowPublicRead,\n  });\n  await new Promise((resolve, reject) => {\n    server.once('error', reject);\n    server.listen(5191, '127.0.0.1', resolve);\n  });\n  const { chromium } = await import('playwright');\n  browser = await chromium.launch({\n    executablePath: '/snap/bin/chromium',\n    headless: true,\n    chromiumSandbox: true,\n  });\n  const context = await browser.newContext({\n    ignoreHTTPSErrors: true,\n    viewport: { width: 1280, height: 844 },\n    acceptDownloads: true,\n    serviceWorkers: 'block',\n  });\ncat: test/control-read.test.js: No such file or directory\ntest/clip-design.test.js:124:  for (const f of ['src/runtime.js', 'src/app.js', 'src/control.js', 'src/oauth.js'])\ntest/p4.test.js:5:import { createControl } from '../src/control.js';\ntest/keeper-candidates.test.js:108:    js = await readFile('public/control.js', 'utf8');\n"
+    }
+  ]
+}
+````
+
+### 4510. 2026-10-27T04:44:12.685Z — assistant (source line 16917)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "The new tests pass in both memory and fake Firestore: a fresh configured third account rejects the wrong OAuth identity, then connects, sets up subscriptions, opts in and joins through separate explicit actions. Checklist ticks use the existing own-account status response, expire after ten seconds and add no polling or provider calls.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4511. 2026-10-27T04:45:00.676Z — tool call (source line 16918)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_70c69442e2214abe98db353d6f00bc19",
+  "input": "text(await tools.exec_command({cmd:\"cat > scripts/browser-smoke-onboarding.js <<'EOF'\\n// Local signed/mock OAuth only. Never follows a real login or control URL.\\nimport assert from 'node:assert/strict';\\nimport { mkdir, writeFile } from 'node:fs/promises';\\nimport { visualReview } from '../test-support/visual-review.js';\\nimport { BOT, OTHER, HOME } from '../test-support/pilot-fixture.js';\\nimport { capturePage } from '../test-support/capture-page.js';\\nlet review,stage='setup',passed=false,failureCategory=null;\\nconst checks=[],diagnostic={},captures=new Map(),captureCoverage=[];\\ntry {\\n  review=await visualReview();const {page,context,fixture:f,origin}=review;\\n  await context.addInitScript(()=>{\\n    window.__onboardCopies=[];window.__copyDenied=false;\\n    Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{\\n      if(window.__copyDenied)throw Error('denied');window.__onboardCopies.push(value);\\n    }}});\\n  });\\n  stage='public-guide';await page.goto(origin+'/start');\\n  assert.equal(f.calls.length,0);\\n  await page.locator('#start-channel').selectOption(OTHER);\\n  const canonical='https://raid-relic-760724762396.us-central1.run.app';\\n  assert.equal(await page.locator('#start-connect').getAttribute('href'),canonical+'/oauth/keeper/'+OTHER+'/start');\\n  assert.match(await page.locator('#start-status').innerText(),/not verified ready/);\\n  assert.deepEqual(await page.evaluate(()=>window.__onboardCopies),[]);\\n  await page.locator('#start-copy').click();assert.match(await page.locator('#start-copy-status').innerText(),/URL copied.*does not prove OBS/);\\n  assert.equal(await page.locator('#start-confirm').isChecked(),false);\\n  await page.evaluate(()=>{window.__copyDenied=true;});\\n  await page.locator('#start-copy').click();assert.match(await page.locator('#start-copy-status').innerText(),/Copy failed/);\\n  assert.equal(await page.locator('#start-confirm').isChecked(),false);\\n  await page.locator('#start-channel').selectOption('unconfigured');\\n  assert.equal(await page.locator('#start-connect').getAttribute('href'),null);\\n  assert.equal(await page.locator('#start-copy').isDisabled(),true);\\n  for(const width of [320,390,1280]){await page.setViewportSize({width,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));}\\n  assert.equal(f.calls.length,0);\\n  if(process.env.ONBOARD_CAPTURE==='1')await capturePage(page,'onboard-guide',captures,captureCoverage);\\n  checks.push({name:'Public configured pilot guide has no private reads or automatic actions; canonical own links and honest clipboard outcomes',passed:true});\\n  stage='fresh-own-connection';\\n  assert.ok(!(await f.runtime.store.getToken('keeper:'+OTHER)));\\n  await f.login(BOT);await f.login(OTHER); // Actual application state-cookie callback against mock transport.\\n  const [name,value]=f.cookies[OTHER].split('=');\\n  await context.addCookies([{name,value,url:origin,httpOnly:true,secure:true,sameSite:'Lax'}]);\\n  await page.goto(origin+'/control/'+OTHER);\\n  await page.waitForFunction(()=>!document.querySelector('#refresh').disabled);\\n  await page.locator('#first-run > summary').click();\\n  assert.equal(await page.locator('#first-optin').getAttribute('data-state'),'unknown');\\n  assert.equal(await page.locator('#first-subscriptions').getAttribute('data-state'),'unknown');\\n  assert.equal(await page.locator('#first-obs-confirm').isChecked(),false);\\n  assert.equal(f.subscriptions.length,0);\\n  async function action(id){\\n    const response=page.waitForResponse(r=>new URL(r.url()).pathname==='/control/'+OTHER&&r.request().method()==='POST');\\n    await page.locator('#'+id).click();assert.equal((await response).status(),200);\\n    await page.waitForFunction(()=>!document.querySelector('#refresh').disabled);\\n  }\\n  stage='explicit-setup';await action('first-bootstrap');\\n  await page.waitForFunction(()=>document.querySelector('#first-subscriptions').dataset.state==='ready');\\n  assert.equal(f.subscriptions.length,5);\\n  assert.equal((await f.runtime.state.getStreamStatus(OTHER)).optedIn,false);\\n  stage='explicit-opt-in';await action('first-keep');\\n  await page.waitForFunction(()=>document.querySelector('#first-optin').dataset.state==='ready');\\n  assert.notEqual((await f.runtime.state.getStreamStatus(OTHER)).seeking,true);\\n  await page.locator('#first-obs-copy').click();\\n  assert.match(await page.locator('#first-copy-status').innerText(),/URL copied/);\\n  assert.equal(await page.locator('#first-obs').getAttribute('data-state'),'unknown');\\n  await page.locator('#first-obs-confirm').check();\\n  assert.equal(await page.locator('#first-obs').getAttribute('data-state'),'ready');\\n  stage='explicit-seeker';await action('first-seek');\\n  await page.waitForFunction(()=>document.querySelector('#first-queue').textContent.startsWith('Explicit Seeker'));\\n  assert.equal((await f.runtime.state.getStreamStatus(OTHER)).seeking,true);\\n  for(const width of [320,390,1280]){await page.setViewportSize({width,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));}\\n  if(process.env.ONBOARD_CAPTURE==='1')await capturePage(page,'onboard-checklist',captures,captureCoverage);\\n  checks.push({name:'Fresh own account explicitly sets up five subscriptions, opts in, copies/acknowledges OBS and chooses Seeker without a raid',passed:true});\\n  stage='boundaries';\\n  assert.equal((await f.request('/control/'+HOME+'/status','GET',{cookie:f.cookies[OTHER]})).status,401);\\n  assert.equal((await f.control(OTHER,'keep',{origin:'https://evil.invalid'})).status,403);\\n  assert.equal((await f.request('/control/'+OTHER,'POST',{cookie:f.cookies[OTHER],origin,'content-type':'application/json'},Buffer.from(JSON.stringify({action:'keep',csrf:'bad'})))).status,403);\\n  assert.ok(f.calls.every(c=>!c.url.endsWith('/raids')&&!c.url.endsWith('/chat/messages')));\\n  const before=f.calls.length;\\n  await page.clock.install();await page.clock.runFor(11000);\\n  assert.equal(await page.locator('#first-optin').getAttribute('data-state'),'unknown');\\n  assert.match(await page.locator('#first-freshness').innerText(),/Not freshly verified/);\\n  assert.equal(f.calls.length,before);\\n  f.advance(12*3600000+1);\\n  await page.locator('#refresh').click();\\n  await page.waitForFunction(()=>document.querySelector('#result').textContent.includes('expired or unauthorized'));\\n  assert.equal(await page.locator('#first-session').getAttribute('data-state'),'unknown');\\n  assert.equal(await page.locator('#first-keep').isDisabled(),true);\\n  assert.deepEqual(review.stats(),{errors:0,external:0});\\n  checks.push({name:'Own-room/origin/CSRF boundaries, ten-second stale ticks and expired session fail closed without polling or game effects',passed:true});\\n  for(const b of captures.values())assert.ok(b.length<=524288);\\n  assert.ok(captures.size<=6);assert.ok([...captures.values()].reduce((n,b)=>n+b.length,0)<=4*1024*1024);\\n  passed=true;\\n}catch(e){failureCategory=['AssertionError','TimeoutError','TypeError'].includes(e?.name)?e.name:'browser-or-fixture';const line=/browser-smoke-onboarding[.]js:(\\\\d+)/.exec(e?.stack??'');if(line)diagnostic.assertionLine=Number(line[1]);diagnostic.browserErrors=review?.stats().errors??0;}\\nfinally{await review?.close();await mkdir('artifacts',{recursive:true});for(const [name,bytes]of captures)await writeFile('artifacts/'+name+'.png',bytes);const report=JSON.stringify({passed,stage,failureCategory,checks,diagnostic,captureCoverage});assert.ok(Buffer.byteLength(report)<=65536);await writeFile('artifacts/onboarding-browser-results.json',report+'\\\\n');}\\nif(!passed)process.exitCode=1;\\nEOF\\ncat > docs/GETTING_STARTED.md <<'EOF'\\n# A two-minute Keeper setup checklist\\n\\nSource 212 adds **`/start`** and an own-account **Get started in two minutes** checklist inside the existing private controls. Native/browser review and the new read-only preview are pending. It is a target for someone who already has Twitch and OBS available, not a guarantee of OAuth, moderation or installation time. No action runs automatically.\\n\\nThis remains a configured Keeper pilot, not arbitrary public enrollment. If your channel is not listed, contact the pilot owner through your existing private contact: they must verify and configure the account first. No passwords, stream keys or email are collected by the guide. The selector is populated by the existing validated public Keeper mapping; a query, cookie or form cannot expand admission.\\n\\n1. Select **your own** configured channel on `/start`. Connect Twitch uses only the canonical application `/oauth/keeper/<configured-id>/start` route, which creates its existing signed state/nonce and matching-account callback. Do not copy a redirected Twitch URL or another account's login. A public selector never proves that you are connected or ready.\\n2. Open the matching private controls, expand the checklist and explicitly choose **Set up channel**, then **Opt in this channel**. These reuse the existing own-session/origin/CSRF actions. Setup reconciles the same five subscriptions and observes the stream; it does not start a raid. The approved bot grant and moderator status are still prerequisites, not installed by a tick or a copy button.\\n3. **Copy my OBS URL**, then add a Browser Source in OBS at 1920×1080. The URL is always canonical `/overlay/<own-id>`, never a preview WSS workaround. Optional sound remains muted until a user gesture. Copy success proves only clipboard completion; failures offer manual selection. The unchecked manual OBS confirmation is page-local, resets on reload and is explicitly not server verification.\\n4. If you want to receive the relic, choose **Become a Seeker** explicitly after opting in. A current holder cannot join; after passing, a former holder may rejoin. Queue membership is not proof of live/moderation/raid eligibility. Other eligible non-Seeker Keepers remain valid manual targets. Automatic Wander stays OFF and its cron commented pending explicit owner GO.\\n\\nPrivate checklist ticks consume only the already-authenticated own status response. They expire after ten seconds and reset to unchecked on a failed read; **Refresh status** is a user action, not a background poll. A matching session tick is not a fresh grant-validation claim. Subscription ticks mean cached readiness was observed, not that every optional bot permission or future action is authorized. Existing before-use OAuth maintenance remains intact; no extra validation or token request is added to cached status. A copied URL or public profile cannot set private readiness.\\n\\nThe read-only review preview intentionally denies real OAuth/control writes. Its public guide can be reviewed without login; functional consent/setup/opt-in/Seeker behavior is tested only with signed local fixtures. Canonical production does not gain this UI until the owner separately approves promotion. No source-author real login, control, provider, stream, chat or raid action is performed. Cookie scope, session rotation, CSRF, admission, scopes and privacy/quota rules remain unchanged.\\n\\n## Local/native review\\n\\n`test/onboarding.test.js` uses actual memory and fake-Firestore runtime HTTP responses and a genuinely fresh configured third identity: wrong-account callback denial, own connection, explicit setup/opt-in/join, canonical OBS links, wrong-room/origin refusal and session expiry. Pure tests cover clipboard success/rejection, unchecked/manual labels and ten-second freshness. `scripts/browser-smoke-onboarding.js` walks the public guide then own mocked controls, including mobile widths, no automatic actions, clipboard denial, independent opt-in and Seeker steps, stale ticks and session expiry. This is not physical OBS installation or actual Twitch proof.\\n\\nOptional `ONBOARD_CAPTURE=1` uses the existing complete-document tiled capture helper: `onboard-guide.png`, `onboard-guide-tile-N.png`, `onboard-checklist.png`, `onboard-checklist-tile-N.png`. Per raw tile <4MiB, each encoded PNG ≤512KiB, aggregate ≤4MiB, at most six emitted images; helper coverage remains bounded to eight tiles per document. The operator owns exact-name extraction, native capture/viewing and publication. The bounded report is `artifacts/onboarding-browser-results.json`. No quality count or deployment is predicted here.\\n\\nNo dependency, paid API, service, storage, worker or scheduler is introduced. Existing hosting can still incur usage. Clips/paid features stay OFF, P7 writes remain gated, and no preview visit implies authorization to promote or schedule anything.\\nEOF\\ncat >> README.md <<'EOF'\\n\\n### New Keeper checklist\\n\\nSource 212 adds **`/start`** and a private own-channel checklist for connecting Twitch, opting in, copying the canonical OBS URL and explicitly becoming a Seeker. Public readiness starts unchecked; private ticks expire and copying never claims OBS is installed. This remains a configured pilot, not open enrollment. [Two-minute setup guide and review boundaries](docs/GETTING_STARTED.md). Native review and this increment's read-only preview are pending; canonical production is not changed by source authoring.\\nEOF\\n./node_modules/.bin/prettier --write scripts/browser-smoke-onboarding.js docs/GETTING_STARTED.md README.md\\nnode --check scripts/browser-smoke-onboarding.js\\nnode --check public/first-run.js\\nnode --check public/control.js\",\"max_output_tokens\":700}))\n"
+}
+````
+
+### 4512. 2026-10-27T04:45:01.265Z — tool result (source line 16921)
+
+````text
+{
+  "call_id": "call_70c69442e2214abe98db353d6f00bc19",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.6 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "36b93f",
+        "wall_time_seconds": 0.40672726,
+        "exit_code": 0,
+        "original_token_count": 28,
+        "output": "scripts/browser-smoke-onboarding.js 116ms\ndocs/GETTING_STARTED.md 95ms (unchanged)\nREADME.md 62ms (unchanged)\n"
+      }
+    }
+  ]
+}
+````
+
+### 4513. 2026-10-27T04:45:46.908Z — tool call (source line 16929)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_b0392535470a433aa716944b7227290c",
+  "input": "text((await tools.exec_command({cmd:\"rg -n 'revoke\\\\(|revoked' test/pilot.test.js test/network3.test.js | tail -10; rg -n 'CONTROL.*|readOnly|blocked' src/pilot.js | head -15; sed -n '184,195p' src/pilot.js; sed -n '55,100p' public/onboarding.js; sed -n '1,75p' public/first-run.js; rg -n 'firstRun' public/control.js\",\"max_output_tokens\":1000})).output)\n"
+}
+````
+
+### 4514. 2026-10-27T04:45:47.001Z — tool result (source line 16932)
+
+````text
+{
+  "call_id": "call_b0392535470a433aa716944b7227290c",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "Warning: truncated output (original token count: 1136)\nTotal output lines: 109\n\ntest/network3.test.js:177:    f.revoke(THIRD);\ntest/pilot.test.js:330:  test(`${kind}: missing target/bot and revoked grants cannot dispatch despite persisted ready flags`, async () => {\ntest/pilot.test.js:334:      f.revoke(account);\n54:  async function blocked(id, reason, diagnostic) {\n59:          event: 'raid_relic_send_blocked',\n66:      status: 'blocked',\n71:        'Send Off blocked: ' +\n227:        return { status: 'blocked', reason: 'handoff-expiry-proof' };\n250:          status: 'blocked',\n283:            if (!intent || intent.sourceId !== id) return blocked(id, 'no-own-queued-intent');\n285:              return blocked(id, 'intent-reconcile-only');\n294:            return blocked(\n305:              return blocked(id, reserved?.reason ?? 'reservation-unavailable');\n310:            return blocked(\n323:          return blocked(id, 'request-outcome-unavailable');\n        ready: reconciled.ready,\n        observation,\n        banCapability: banGranted\n          ? { scope: 'channel:moderate', expiresAt: started + 300000 }\n          : null,\n      };\n    } catch (error) {\n      result = {\n        status: 'failed',\n        ready: false,\n        message: 'Bootstrap failed; review grants and retry explicitly',\n        diagnostic: subscriptionFailureDiagnostic(error) ?? { stage },\n  return 'URL copied — this does not prove OBS is installed or showing it.';\n}\nimport { keeperNames } from './keeper-network.js';\nimport { setupLinks, setupReadiness, copyOBS } from './onboarding.js';\n// Uses only the existing authenticated status response; never reads a new API.\nexport function mountFirstRun(id, run) {\n  const $ = (key) => document.getElementById(key),\n    links = setupLinks(id, keeperNames);\n  let pilot = null,\n    actions = [],\n    readAt = null,\n    busy = true,\n    timer = null;\n  if (links) $('first-obs-url').value = links.overlay;\n  function render() {\n    const r = setupReadiness(pilot, {\n      own: Boolean(pilot),\n      readAt,\n      id,\n      obs: $('first-obs-conf…136 tokens truncated…ss').textContent = r.fresh\n      ? 'Status just read; ticks expire after 10 seconds. No background polling.'\n      : 'Not freshly verified. Use Refresh status; no setup action runs automatically.';\n    $('first-queue').textContent = {\n      unchecked: 'Queue: not checked.',\n      holding: 'You hold the relic. Pass it on before joining the Seeker queue.',\n      'opt-in-first': 'Queue off. Opt in first, then choose Become a Seeker.',\n      disabled: 'Seeker queue is disabled by the operator.',\n      joined: 'Explicit Seeker membership observed; live eligibility is checked separately.',\n      off: 'Queue off. Become a Seeker only if you want to receive the relic.',\n    }[r.queue];\n    for (const [node, action] of [\n      ['first-bootstrap', 'bootstrap'],\n      ['first-keep', 'keep'],\n      ['first-seek', 'seek-on'],\n    ])\n      $(node).disabled =\n        busy ||\n        !r.fresh ||\n        !actions.includes(action) ||\n        (action === 'seek-on' && ['holding', 'opt-in-first', 'disabled'].includes(r.queue));\n    $('first-obs-copy').disabled = busy || !links || !r.fresh;\n  }\n  for (const [node, action] of [\n    ['first-bootstrap', 'bootstrap'],\n    ['first-keep', 'keep'],\n    ['first-seek', 'seek-on'],\n  ])\n    $(node).onclick = () => run(action);\n  $('first-obs-confirm').onchange = render;\n  $('first-obs-copy').onclick = async () => {\n    try {\n      $('first-copy-status').textContent = await copyOBS(links.overlay, navigator.clipboard);\n    } catch {\n      $('first-obs-url').focus();\n      $('first-obs-url').select();\n      $('first-copy-status').textContent =\n        'Copy failed. Select and copy manually; OBS installation is not verified.';\n    }\n  };\n  return {\n    clear() {\n      clearTimeout(timer);\n      pilot = null;\n      actions = [];\n      readAt = null;\n30:const firstRun = mountFirstRun(id, (action) => run(action));\n65:  firstRun.setBusy(value || !csrf);\n68:  firstRun.clear();\n124:    firstRun.observe(value.pilot, value.actions);\n327:  firstRun.dispose();\n"
+    }
+  ]
+}
+````
+
+### 4515. 2026-10-27T04:46:13.413Z — tool call (source line 16936)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_5f388d1a53f14259b48b19a71ba4518c",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='scripts/browser-smoke-onboarding.js';s=open(p).read().replace(\\\"  stage = 'public-guide';\\\", \\\"  await page.clock.install();\\\\n  stage = 'public-guide';\\\");s=s.replace(\\\"  await page.clock.install();\\\\n  await page.clock.runFor(11000);\\\", \\\"  await page.clock.runFor(11000);\\\");s=s.replace(\\\"  if (process.env.ONBOARD_CAPTURE === '1')\\\\n    await capturePage(page, 'onboard-checklist', captures, captureCoverage);\\\",'');open(p,'w').write(s)\\np='docs/GETTING_STARTED.md';s=open(p).read().replace('`onboard-guide.png`, `onboard-guide-tile-N.png`, `onboard-checklist.png`, `onboard-checklist-tile-N.png`.', '`onboard-guide.png` and `onboard-guide-tile-N.png` cover the public guide; the private checklist is exercised by DOM/action assertions, not captured from a real control page.');open(p,'w').write(s)\\np='test/onboarding.test.js';s=open(p).read();needle='  f.advance(12 * 3600000 + 1);';s=s.replace(needle,'''  f.revoke(THIRD);\\n  const subscriptionCount = f.subscriptions.length;\\n  const failedSetup = await f.control(THIRD, 'bootstrap');\\n  assert.equal(JSON.parse(failedSetup.body).status, 'failed');\\n  assert.equal(f.subscriptions.length, subscriptionCount);\\n  // Cached own-session status is never mislabelled as fresh grant proof.\\n  assert.equal((await own()).pilot.authorization, 'not-checked');\\n'''+needle);open(p,'w').write(s)\\nPY\\n./node_modules/.bin/prettier --write scripts/browser-smoke-onboarding.js docs/GETTING_STARTED.md test/onboarding.test.js\\nnode test/onboarding.test.js > /tmp/onboarding212-tests.txt 2>&1\\ntail -28 /tmp/onboarding212-tests.txt\\nnode test/keeper-candidates.test.js > /tmp/onboarding212-candidates.txt 2>&1\\ntail -12 /tmp/onboarding212-candidates.txt\",\"max_output_tokens\":1300}))\n"
+}
+````
+
+### 4516. 2026-10-27T04:46:14.511Z — tool result (source line 16939)
+
+````text
+{
+  "call_id": "call_5f388d1a53f14259b48b19a71ba4518c",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 1.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "12c9a1",
+        "wall_time_seconds": 0.903449536,
+        "exit_code": 0,
+        "original_token_count": 491,
+        "output": "scripts/browser-smoke-onboarding.js 104ms (unchanged)\ndocs/GETTING_STARTED.md 62ms (unchanged)\ntest/onboarding.test.js 39ms\n✔ public setup links use only configured exact accounts and canonical app starts, not provider state URLs (3.027386ms)\n✔ readiness distinguishes own fresh session, expiry, manual OBS and holder-excluded queue without fresh-grant claims (0.397283ms)\n✔ public start GET/static assets never access sessions or SDK; writes are refused (6.885779ms)\n{\"severity\":\"WARNING\",\"event\":\"raid_relic_receiving_unavailable\",\"reason\":\"streams-shape\",\"stage\":\"observation\"}\n{\"severity\":\"WARNING\",\"event\":\"raid_relic_bootstrap_failed\",\"keeperId\":\"1593561134\",\"diagnostic\":{\"stage\":\"grants\"}}\n✔ memory: genuinely fresh configured third account connects with signed own OAuth then explicitly opts in and joins (45.645553ms)\n{\"severity\":\"WARNING\",\"event\":\"raid_relic_receiving_unavailable\",\"reason\":\"streams-shape\",\"stage\":\"observation\"}\n{\"severity\":\"WARNING\",\"event\":\"raid_relic_bootstrap_failed\",\"keeperId\":\"1593561134\",\"diagnostic\":{\"stage\":\"grants\"}}\n✔ firestore: genuinely fresh configured third account connects with signed own OAuth then explicitly opts in and joins (38.659732ms)\n✔ master read-only onboarding guide never bypasses OAuth/control denial (2.34238ms)\nℹ tests 6\nℹ suites 0\nℹ pass 6\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 103.241849\n✔ firestore: scoped observed candidate snapshot supports both holder directions without provider requests (33.925492ms)\n✔ firestore: offline, unopted, paused, banned, blocked and self are excluded from observed targets (84.927811ms)\n✔ firestore: stale selection cannot reserve or dispatch a now-ineligible target (37.363761ms)\n✔ control target selection is labelled, manual, canonical and keeps the named one-target button (11.62118ms)\nℹ tests 7\nℹ suites 0\nℹ pass 7\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 317.644734\n"
+      }
+    }
+  ]
+}
+````
+
+### 4517. 2026-10-27T04:46:21.828Z — tool call (source line 16943)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_34c92c4dde6449b1a711e6e60b4af8bd",
+  "input": "text((await tools.exec_command({cmd:\"rg --files test | rg 'oauth.*maintenance|control|onboarding|p4'\"})).output)\n"
+}
+````
+
+### 4518. 2026-10-27T04:46:21.907Z — tool result (source line 16946)
+
+````text
+{
+  "call_id": "call_34c92c4dde6449b1a711e6e60b4af8bd",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "test/p4.test.js\ntest/onboarding.test.js\ntest/oauth-maintenance.test.js\ntest/control.test.js\n"
+    }
+  ]
+}
+````
+
+### 4519. 2026-10-27T04:46:28.045Z — tool call (source line 16950)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_91bdef44a384442f994e28afccc898a6",
+  "input": "const results=await Promise.allSettled([\"p4\",\"oauth-maintenance\",\"control\"].map(name=>tools.exec_command({cmd:`node test/${name}.test.js > /tmp/onboarding212-${name}.txt 2>&1\\ntail -9 /tmp/onboarding212-${name}.txt`,max_output_tokens:400})));for(let i=0;i<results.length;i++)text({suite:[\"p4\",\"oauth-maintenance\",\"control\"][i],result:results[i]});\n"
+}
+````
+
+### 4520. 2026-10-27T04:46:28.517Z — tool result (source line 16955)
+
+````text
+{
+  "call_id": "call_91bdef44a384442f994e28afccc898a6",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.5 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "suite": "p4",
+        "result": {
+          "status": "fulfilled",
+          "value": {
+            "chunk_id": "d6ad65",
+            "wall_time_seconds": 0.182569972,
+            "exit_code": 0,
+            "original_token_count": 52,
+            "output": "✔ firestore: aborted renewal cannot extend an otherwise surviving session (0.262122ms)\nℹ tests 18\nℹ suites 0\nℹ pass 18\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 172.370643\n"
+          }
+        }
+      }
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "suite": "oauth-maintenance",
+        "result": {
+          "status": "fulfilled",
+          "value": {
+            "chunk_id": "19b62a",
+            "wall_time_seconds": 0.294225213,
+            "exit_code": 0,
+            "original_token_count": 58,
+            "output": "✔ firestore: an extra-scope waiter cannot use a base-only grant and pure validation never refreshes (6.450736ms)\nℹ tests 12\nℹ suites 0\nℹ pass 12\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 305.980193\n"
+          }
+        }
+      }
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "suite": "control",
+        "result": {
+          "status": "fulfilled",
+          "value": {
+            "chunk_id": "184e15",
+            "wall_time_seconds": 0.058133741,
+            "exit_code": 0,
+            "original_token_count": 57,
+            "output": "✔ firestore: OAuth redirects/callbacks and private control responses deny framing and referrers (1.934657ms)\nℹ tests 10\nℹ suites 0\nℹ pass 10\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 60.156078\n"
+          }
+        }
+      }
+    }
+  ]
+}
+````
+
+### 4521. 2026-10-27T04:46:54.408Z — tool call (source line 16959)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_5e7b462635b748619bdd77a779e71c20",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='public/start.js';s=open(p).read().replace(\\\"  select = $('start-channel');\\\", \\\"  select = $('start-channel');\\\\n$('start-confirm').checked = false;\\\");open(p,'w').write(s)\\np='public/first-run.js';s=open(p).read().replace(\\\"  if (links) $('first-obs-url').value = links.overlay;\\\", \\\"  $('first-obs-confirm').checked = false;\\\\n  if (links) $('first-obs-url').value = links.overlay;\\\");open(p,'w').write(s)\\nPY\\nhead -10 public/start.js\\n./node_modules/.bin/prettier --write public/start.js public/first-run.js\\n./node_modules/.bin/prettier --check public/onboarding.js public/start.js public/start.html public/start.css public/first-run.js public/control.js public/control.html public/control.css src/app.js test-support/judges.js test/onboarding.test.js scripts/browser-smoke-onboarding.js README.md docs/GETTING_STARTED.md\\nnode --check public/control.js\\nnode --check scripts/browser-smoke-onboarding.js\\npython3 - <<'PY'\\nfrom pathlib import Path\\nfor p in ['docs/GETTING_STARTED.md','public/start.js','public/onboarding.js','public/first-run.js','scripts/browser-smoke-onboarding.js','test/onboarding.test.js']:\\n s=Path(p).read_text(); assert s.endswith('\\\\n'); assert all(l==l.rstrip() for l in s.splitlines())\\nprint('Whitespace checks passed')\\nPY\",\"max_output_tokens\":700}))\n"
+}
+````
+
+### 4522. 2026-10-27T04:46:55.562Z — tool result (source line 16962)
+
+````text
+{
+  "call_id": "call_5e7b462635b748619bdd77a779e71c20",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 1.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "215f22",
+        "wall_time_seconds": 0.982401576,
+        "exit_code": 0,
+        "original_token_count": 148,
+        "output": "import { keeperNames } from './keeper-network.js';\nimport { setupLinks, copyOBS } from './onboarding.js';\nconst $ = (id) => document.getElementById(id),\n  select = $('start-channel');\n$('start-confirm').checked = false;\nfor (const [id, login] of Object.entries(keeperNames)) {\n  if (!setupLinks(id, keeperNames)) continue;\n  const option = document.createElement('option');\n  option.value = id;\n  option.textContent = '@' + login;\npublic/start.js 51ms (unchanged)\npublic/first-run.js 34ms (unchanged)\nChecking formatting...\nAll matched files use Prettier code style!\nWhitespace checks passed\n"
+      }
+    }
+  ]
+}
+````
+
+### 4523. 2026-10-27T04:48:02.257Z — tool call (source line 16970)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_86d7c1a2c3ca402ea3389c7f0886936f",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='README.md';s=open(p).read();s=s.replace(\\\"This new route awaits its own native/capture gate and read-only preview publication; earlier quality results do not validate it.\\\", \\\"The operator published [the read-only film preview](https://demo-film---raid-relic-vz4bhnskgq-uc.a.run.app/demo/film) from `48f35cbb8f7664a9cd27b5acb9965d6ed2b25874` after its native/capture gate; that earlier cohort does not validate the later onboarding increment below.\\\");open(p,'w').write(s)\\nPY\\n./node_modules/.bin/prettier --check README.md\\nnode test/onboarding.test.js > /tmp/onboarding212-final.txt 2>&1\\ntail -9 /tmp/onboarding212-final.txt\",\"max_output_tokens\":500}))\n"
+}
+````
+
+### 4524. 2026-10-27T04:48:02.749Z — tool result (source line 16973)
+
+````text
+{
+  "call_id": "call_86d7c1a2c3ca402ea3389c7f0886936f",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.5 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "95eb7f",
+        "wall_time_seconds": 0.321154044,
+        "exit_code": 0,
+        "original_token_count": 67,
+        "output": "Checking formatting...\nAll matched files use Prettier code style!\n✔ master read-only onboarding guide never bypasses OAuth/control denial (2.35966ms)\nℹ tests 6\nℹ suites 0\nℹ pass 6\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 99.694538\n"
+      }
+    }
+  ]
+}
+````
+
+### 4525. 2026-10-27T04:48:07.946Z — assistant (source line 16976)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Phase 2 implemented: `/start` plus an own-account checklist for explicit setup, opt-in, canonical OBS copy and Seeker choice.\n\n- Readiness ticks expire after 10 seconds; no added polling or provider calls.\n- Copy success and manual OBS confirmation remain distinct from verified readiness.\n- Added fresh-third-account integration tests and a bounded browser workflow.\n- **53 focused tests passed, zero skips; formatting/syntax passed.**\n\nAdmission, OAuth/session/CSRF rules and game policies are unchanged. Parent native/visual gates and `first-run@0` publication remain pending. Reliability and Devpost phases stay queued.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4526. 2026-10-27T04:51:07.912Z — user (source line 16984)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "213 FIRST-RUNNATIVEFIX sameoriginalsolewriter/no Git/cloud/provider/keys/realcontrol/streams/chat/SendOff. Phase2Source212closed04:48:07.9584525entries213logs5omissions0rescan419files24778236. NATIVEonboard33.7secFAILEDnoJSONreportUNHANDLEDPROMISE: actionhelperwaitForResponse30sTimeout atscript85called111first-seek. Parentreadactualpublic/first-run.js correctlyDISABLESseek-onwhenholding (lineNodebind). NEWbrowserfixturestartsEMPTYregistry, logsONLYBOT+OTHER,firstkeepplacesINITIALRELICatOTHER ->currentholderOTHER MUSTNOTjoinqueue. ThisisREALISTICpolicycorrect! Testtriesclickdisabledfirst-seek waits30sec andpromiseUnhandledshortcircuitsfinallyJSON. Do NOTchangeproductionSeekerholderexclusion/actionpolicy to satisfytest!\nFIXTESTSCENARIO: FreshOTHERjoinsEXISTINGnetworkwhereHOMEalreadyholdsrelic (useractualprod3hasexistingholder). SeedlegitimatepreexistingHOMEbaselineinLOCALFIXTURE ONLY (e.g f.login(HOME)+ownkeep minimalnoBootstrap/fiveSubs ifunneeded orappropriatefixtureownregisteredlifecycleAPI) thenassertOTHERtrulyfreshnopreregisteredKeepergrant/optin/seeking/OBS. Keepothersfreshsignedconnectcallbackfakeprovider,explicitbootstrapOwnfiveSubscriptions,explicitkeep+OBSclipboardmanual+seek allowedNOWnonholder. NeedmaintainpublicguideNoAutomaticAction assertions(f.calls counts targetpublicreadsnotnewbaseline setup), subscriptioncountrelativebaseline actualOwn5 fieldssourceNo broadweakening; don'tpretendtestHOMEalreadyHolderafterOtherinitialbootstrap. Addtestcurrentholderbranchalwayscopyholdingandseekdisabled fororiginnewplacement (purestatealreadymaybe), no test'forceGrantseekingfalse' cheat/mutateRegistryexceptlegitimatefixturesetup. Negativeunknown/unconfiguredandrolechecksunchanged.\nFIXHELPERunhandledPromise action(): useawaitPromise.all([waitForResponse(),buttonclick()])orattachrejectionimmediately sofailureALWAYSfinallyclosedresultsJson; no globalunhandledswallow skip; realfailurefailreports.Exactnative33secoutlogwaspage.waitForResponseTimeoutline85/111subflow, no bugdemoappotherrows.SourceNo providerreal no testdeadlinecapsraise. OptionalONBOARD_CAPTURE currentlycapturespublicguidebeforeauthonly (fine) ParentFDwhitelist8names512k. WouldhelpalsoPRIVATELOCALsignedchecklistcapture optionalONBOARD_CAPTURE atafterSeekerpositive (namedonboard-checklist) usingcapturePage<=6total/rawtile4M no capraise) forvisualUIreview, BUTuserREALcontrolpagesneveropened; localfixtureallowed. Parentcanextractexplicitnewnames. Source213~3minfixture/testfixONLY+maybeboundedcapture notonboardingauthoritychanges. ParentfullNative844+new/40serialafterFOCUSpositive thenphase2first-run0/publish. Wholequeuecontinuesreliability214(min0cold/actualwebhook+browserWS/tokenmidraid)then215privateDraft. DoNOTstopoverallafterfix/pubs.SameSource52autorenew/3dqueue/frameallpreserve.Currentprod3d100/userNOTauthorizeprodshift.\n"
+  }
+]
+````
+
+### 4527. 2026-10-27T04:51:12.219Z — assistant (source line 16989)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll fix the local scenario so Home legitimately holds the relic before the fresh Other account connects, keeping holder exclusion intact. I’ll also handle both response and click failures in the action helper so they reach the closed JSON report.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4528. 2026-10-27T04:51:13.005Z — tool call (source line 16990)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_c0210708d7d24c7288f05f4615d0c5ee",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '1,220p' scripts/browser-smoke-onboarding.js; sed -n '100,190p' test/onboarding.test.js; rg -n 'initial|holderId|optedIn' src/lifecycle.js | head -25\",\"max_output_tokens\":3700})).output)\n"
+}
+````
+
+### 4529. 2026-10-27T04:51:13.115Z — tool result (source line 16993)
+
+````text
+{
+  "call_id": "call_c0210708d7d24c7288f05f4615d0c5ee",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "// Local signed/mock OAuth only. Never follows a real login or control URL.\nimport assert from 'node:assert/strict';\nimport { mkdir, writeFile } from 'node:fs/promises';\nimport { visualReview } from '../test-support/visual-review.js';\nimport { BOT, OTHER, HOME } from '../test-support/pilot-fixture.js';\nimport { capturePage } from '../test-support/capture-page.js';\nlet review,\n  stage = 'setup',\n  passed = false,\n  failureCategory = null;\nconst checks = [],\n  diagnostic = {},\n  captures = new Map(),\n  captureCoverage = [];\ntry {\n  review = await visualReview();\n  const { page, context, fixture: f, origin } = review;\n  await context.addInitScript(() => {\n    window.__onboardCopies = [];\n    window.__copyDenied = false;\n    Object.defineProperty(navigator, 'clipboard', {\n      configurable: true,\n      value: {\n        writeText: async (value) => {\n          if (window.__copyDenied) throw Error('denied');\n          window.__onboardCopies.push(value);\n        },\n      },\n    });\n  });\n  await page.clock.install();\n  stage = 'public-guide';\n  await page.goto(origin + '/start');\n  assert.equal(f.calls.length, 0);\n  await page.locator('#start-channel').selectOption(OTHER);\n  const canonical = 'https://raid-relic-760724762396.us-central1.run.app';\n  assert.equal(\n    await page.locator('#start-connect').getAttribute('href'),\n    canonical + '/oauth/keeper/' + OTHER + '/start',\n  );\n  assert.match(await page.locator('#start-status').innerText(), /not verified ready/);\n  assert.deepEqual(await page.evaluate(() => window.__onboardCopies), []);\n  await page.locator('#start-copy').click();\n  assert.match(\n    await page.locator('#start-copy-status').innerText(),\n    /URL copied.*does not prove OBS/,\n  );\n  assert.equal(await page.locator('#start-confirm').isChecked(), false);\n  await page.evaluate(() => {\n    window.__copyDenied = true;\n  });\n  await page.locator('#start-copy').click();\n  assert.match(await page.locator('#start-copy-status').innerText(), /Copy failed/);\n  assert.equal(await page.locator('#start-confirm').isChecked(), false);\n  await page.locator('#start-channel').selectOption('unconfigured');\n  assert.equal(await page.locator('#start-connect').getAttribute('href'), null);\n  assert.equal(await page.locator('#start-copy').isDisabled(), true);\n  for (const width of [320, 390, 1280]) {\n    await page.setViewportSize({ width, height: 844 });\n    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));\n  }\n  assert.equal(f.calls.length, 0);\n  if (process.env.ONBOARD_CAPTURE === '1')\n    await capturePage(page, 'onboard-guide', captures, captureCoverage);\n  checks.push({\n    name: 'Public configured pilot guide has no private reads or automatic actions; canonical own links and honest clipboard outcomes',\n    passed: true,\n  });\n  stage = 'fresh-own-connection';\n  assert.ok(!(await f.runtime.store.getToken('keeper:' + OTHER)));\n  await f.login(BOT);\n  await f.login(OTHER); // Actual application state-cookie callback against mock transport.\n  const [name, value] = f.cookies[OTHER].split('=');\n  await context.addCookies([\n    { name, value, url: origin, httpOnly: true, secure: true, sameSite: 'Lax' },\n  ]);\n  await page.goto(origin + '/control/' + OTHER);\n  await page.waitForFunction(() => !document.querySelector('#refresh').disabled);\n  await page.locator('#first-run > summary').click();\n  assert.equal(await page.locator('#first-optin').getAttribute('data-state'), 'unknown');\n  assert.equal(await page.locator('#first-subscriptions').getAttribute('data-state'), 'unknown');\n  assert.equal(await page.locator('#first-obs-confirm').isChecked(), false);\n  assert.equal(f.subscriptions.length, 0);\n  async function action(id) {\n    const response = page.waitForResponse(\n      (r) => new URL(r.url()).pathname === '/control/' + OTHER && r.request().method() === 'POST',\n    );\n    await page.locator('#' + id).click();\n    assert.equal((await response).status(), 200);\n    await page.waitForFunction(() => !document.querySelector('#refresh').disabled);\n  }\n  stage = 'explicit-setup';\n  await action('first-bootstrap');\n  await page.waitForFunction(\n    () => document.querySelector('#first-subscriptions').dataset.state === 'ready',\n  );\n  assert.equal(f.subscriptions.length, 5);\n  assert.equal((await f.runtime.state.getStreamStatus(OTHER)).optedIn, false);\n  stage = 'explicit-opt-in';\n  await action('first-keep');\n  await page.waitForFunction(\n    () => document.querySelector('#first-optin').dataset.state === 'ready',\n  );\n  assert.notEqual((await f.runtime.state.getStreamStatus(OTHER)).seeking, true);\n  await page.locator('#first-obs-copy').click();\n  assert.match(await page.locator('#first-copy-status').innerText(), /URL copied/);\n  assert.equal(await page.locator('#first-obs').getAttribute('data-state'), 'unknown');\n  await page.locator('#first-obs-confirm').check();\n  assert.equal(await page.locator('#first-obs').getAttribute('data-state'), 'ready');\n  stage = 'explicit-seeker';\n  await action('first-seek');\n  await page.waitForFunction(() =>\n    document.querySelector('#first-queue').textContent.startsWith('Explicit Seeker'),\n  );\n  assert.equal((await f.runtime.state.getStreamStatus(OTHER)).seeking, true);\n  for (const width of [320, 390, 1280]) {\n    await page.setViewportSize({ width, height: 844 });\n    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));\n  }\n\n  checks.push({\n    name: 'Fresh own account explicitly sets up five subscriptions, opts in, copies/acknowledges OBS and chooses Seeker without a raid',\n    passed: true,\n  });\n  stage = 'boundaries';\n  assert.equal(\n    (await f.request('/control/' + HOME + '/status', 'GET', { cookie: f.cookies[OTHER] })).status,\n    401,\n  );\n  assert.equal((await f.control(OTHER, 'keep', { origin: 'https://evil.invalid' })).status, 403);\n  assert.equal(\n    (\n      await f.request(\n        '/control/' + OTHER,\n        'POST',\n        { cookie: f.cookies[OTHER], origin, 'content-type': 'application/json' },\n        Buffer.from(JSON.stringify({ action: 'keep', csrf: 'bad' })),\n      )\n    ).status,\n    403,\n  );\n  assert.ok(f.calls.every((c) => !c.url.endsWith('/raids') && !c.url.endsWith('/chat/messages')));\n  const before = f.calls.length;\n  await page.clock.runFor(11000);\n  assert.equal(await page.locator('#first-optin').getAttribute('data-state'), 'unknown');\n  assert.match(await page.locator('#first-freshness').innerText(), /Not freshly verified/);\n  assert.equal(f.calls.length, before);\n  f.advance(12 * 3600000 + 1);\n  await page.locator('#refresh').click();\n  await page.waitForFunction(() =>\n    document.querySelector('#result').textContent.includes('expired or unauthorized'),\n  );\n  assert.equal(await page.locator('#first-session').getAttribute('data-state'), 'unknown');\n  assert.equal(await page.locator('#first-keep').isDisabled(), true);\n  assert.deepEqual(review.stats(), { errors: 0, external: 0 });\n  checks.push({\n    name: 'Own-room/origin/CSRF boundaries, ten-second stale ticks and expired session fail closed without polling or game effects',\n    passed: true,\n  });\n  for (const b of captures.values()) assert.ok(b.length <= 524288);\n  assert.ok(captures.size <= 6);\n  assert.ok([...captures.values()].reduce((n, b) => n + b.length, 0) <= 4 * 1024 * 1024);\n  passed = true;\n} catch (e) {\n  failureCategory = ['AssertionError', 'TimeoutError', 'TypeError'].includes(e?.name)\n    ? e.name\n    : 'browser-or-fixture';\n  const line = /browser-smoke-onboarding[.]js:(\\d+)/.exec(e?.stack ?? '');\n  if (line) diagnostic.assertionLine = Number(line[1]);\n  diagnostic.browserErrors = review?.stats().errors ?? 0;\n} finally {\n  await review?.close();\n  await mkdir('artifacts', { recursive: true });\n  for (const [name, bytes] of captures) await writeFile('artifacts/' + name + '.png', bytes);\n  const report = JSON.stringify({\n    passed,\n    stage,\n    failureCategory,\n    checks,\n    diagnostic,\n    captureCoverage,\n  });\n  assert.ok(Buffer.byteLength(report) <= 65536);\n  await writeFile('artifacts/onboarding-browser-results.json', report + '\\n');\n}\nif (!passed) process.exitCode = 1;\n    await f.login(HOME);\n    await f.control(HOME, 'bootstrap');\n    f.advance();\n    await f.control(HOME, 'keep');\n    const start = await f.request('/oauth/keeper/' + THIRD + '/start');\n    const state = new URL(start.headers.location).searchParams.get('state');\n    assert.equal(\n      (\n        await f.request('/auth/callback?state=' + state + '&code=' + OTHER, 'GET', {\n          cookie: start.headers['set-cookie'].split(';')[0],\n        })\n      ).status,\n      400,\n    );\n    assert.ok(!(await f.runtime.store.getToken('keeper:' + THIRD)));\n    await f.login(THIRD);\n    const own = async () =>\n      JSON.parse(\n        (await f.request('/control/' + THIRD + '/status', 'GET', { cookie: f.cookies[THIRD] }))\n          .body,\n      );\n    let value = await own();\n    assert.equal(value.keeperId, THIRD);\n    assert.equal(value.pilot.optedIn, false);\n    assert.equal(value.pilot.authorization, 'not-checked');\n    const obs = setupLinks(THIRD, NETWORK3).overlay;\n    assert.equal(obs, CANONICAL_APP + '/overlay/' + THIRD);\n    assert.equal((await f.control(THIRD, 'keep', { origin: 'https://evil.invalid' })).status, 403);\n    assert.equal(\n      (await f.request('/control/' + HOME + '/status', 'GET', { cookie: f.cookies[THIRD] })).status,\n      401,\n    );\n    assert.equal((await f.control(THIRD, 'bootstrap')).status, 200);\n    assert.equal(\n      f.subscriptions.filter((s) => Object.values(s.condition).includes(THIRD)).length,\n      5,\n    );\n    value = await own();\n    assert.equal(value.pilot.optedIn, false);\n    assert.equal(value.pilot.seekers.joined, false);\n    f.advance();\n    assert.equal((await f.control(THIRD, 'keep')).status, 200);\n    value = await own();\n    assert.equal(value.pilot.optedIn, true);\n    assert.equal(value.pilot.seekers.joined, false);\n    f.advance();\n    assert.equal((await f.control(THIRD, 'seek-on')).status, 200);\n    value = await own();\n    assert.equal(value.pilot.seekers.joined, true);\n    assert.equal(\n      setupReadiness(value.pilot, { own: true, id: THIRD, readAt: 1000, now: 1001 }).queue,\n      'joined',\n    );\n    assert.ok(f.calls.every((c) => !c.url.endsWith('/raids') && !c.url.endsWith('/chat/messages')));\n    f.revoke(THIRD);\n    const subscriptionCount = f.subscriptions.length;\n    const failedSetup = await f.control(THIRD, 'bootstrap');\n    assert.equal(JSON.parse(failedSetup.body).status, 'failed');\n    assert.equal(f.subscriptions.length, subscriptionCount);\n    // Cached own-session status is never mislabelled as fresh grant proof.\n    assert.equal((await own()).pilot.authorization, 'not-checked');\n    f.advance(12 * 3600000 + 1);\n    assert.equal(\n      (await f.request('/control/' + THIRD + '/status', 'GET', { cookie: f.cookies[THIRD] }))\n        .status,\n      401,\n    );\n  });\ntest('master read-only onboarding guide never bypasses OAuth/control denial', async () => {\n  const f = await network3Fixture('memory', {\n    chronicleEnv: { P5_PREVIEW_READ_ONLY: 'true', SEEKERS_ENABLED: 'true' },\n  });\n  assert.equal((await f.request('/start')).status, 200);\n  assert.equal((await f.request('/oauth/keeper/' + THIRD + '/start')).status, 403);\n  assert.equal((await f.request('/control/' + THIRD, 'POST', {}, Buffer.from('{}'))).status, 403);\n  assert.equal(f.calls.length, 0);\n});\n37:export const emptyRegistry = () => ({ holderId: null, originated: false });\n45:  optedIn: false,\n95:      optedIn: channel.optedIn,\n96:      holdsRelic: registry.holderId === host && !channel.banned,\n101:    marks.context.optedIn = channel.optedIn;\n134:      registry.holderId === host &&\n238:      (registry.holderId !== host &&\n239:        channel.optedIn &&\n265:    channel.optedIn = true;\n270:    channel.optedIn = false;\n274:  // Only the initial home can place the one unplaced relic. Opting out/offline\n278:    registry.holderId === null &&\n281:    channel.optedIn &&\n287:    registry.holderId = host;\n"
+    }
+  ]
+}
+````
+
+### 4530. 2026-10-27T04:51:25.081Z — tool call (source line 16997)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_56bce9e84c5c410cb6898f3a14fddae7",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '155,188p' test-support/pilot-fixture.js; sed -n '274,290p' src/lifecycle.js; rg -n 'seekers.*enabled|SEEKERS_ENABLED' src/receiving.js src/pilot.js; head -17 test-support/visual-review.js\",\"max_output_tokens\":900})).output)\n"
+}
+````
+
+### 4531. 2026-10-27T04:51:25.180Z — tool result (source line 17000)
+
+````text
+{
+  "call_id": "call_56bce9e84c5c410cb6898f3a14fddae7",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "    throw new Error('Unexpected mocked route');\n  };\n  const runtime = await createRuntime(\n    {\n      ...chronicleEnv,\n      NODE_ENV: 'development',\n      STATE_STORE: db ? 'firestore' : 'memory',\n      GOOGLE_CLOUD_PROJECT: 'raid-relic-hackathon',\n      OAUTH_ENABLED: 'true',\n      RAID_PILOT_ENABLED: 'true',\n      KEEPER_CHANNEL_IDS: ids.join(','),\n      ...(ids.length !== 2 ? { PILOT_KEEPERS_JSON: JSON.stringify(keepers) } : {}),\n      TWITCH_STREAMER_ID: HOME,\n      TWITCH_BOT_ID: BOT,\n      TWITCH_CLIENT_ID: 'public-client',\n      TWITCH_CLIENT_SECRET: 'synthetic-client-secret',\n      TWITCH_EVENTSUB_SECRET: secret,\n      TOKEN_ENCRYPTION_KEY: Buffer.alloc(32, 5).toString('base64'),\n      OAUTH_REDIRECT_URI: `${origin}/auth/callback`,\n      OAUTH_REDIRECT_ALLOWLIST: `${origin}/auth/callback`,\n      EVENTSUB_CALLBACK_URL: `${origin}/eventsub`,\n    },\n    {\n      firestoreClient: db,\n      transport,\n      p7HTTP,\n      chronicleHTTP,\n      forgeHTTP,\n      simulator,\n      now: () => time,\n    },\n  );\n  const cookies = {};\n  const request = (path, method = 'GET', headers = {}, rawBody = Buffer.alloc(0)) =>\n  // Only the initial home can place the one unplaced relic. Opting out/offline\n  // never releases it for another opt-in. No transfer path exists in this increment.\n  if (\n    !registry.originated &&\n    registry.holderId === null &&\n    host === INITIAL_HOME &&\n    channel.online &&\n    channel.optedIn &&\n    !channel.banned &&\n    !channel.paused &&\n    !channel.blockedUserIds.includes(host) &&\n    !marks.blocked.includes(host)\n  ) {\n    registry.holderId = host;\n    if (seekersEnabled) dequeueSeeker(channel, now);\n    registry.originated = true;\n  }\nsrc/pilot.js:366:        seekers: receiving?.enabled\n// Native local QA only: explicit synthetic grants, self-only TLS, Chromium sandbox.\nimport { createServer } from 'node:https';\nimport { createLocalTLS } from './local-tls.js';\nimport { attachOverlaySockets } from '../src/overlay-sockets.js';\nimport { pilotFixture } from './pilot-fixture.js';\nexport async function visualReview() {\n  const origin = 'https://localhost:5191',\n    fixture = await pilotFixture('memory', { origin });\n  const tls = await createLocalTLS(),\n    server = createServer(tls.options, fixture.runtime.handler);\n  const sockets = attachOverlaySockets(server, fixture.runtime.overlayFeeds, {\n    origins: [origin],\n    allowRead: fixture.runtime.allowPublicRead,\n  });\n  let browser,\n    context,\n    errors = 0,\n"
+    }
+  ]
+}
+````
+
+### 4532. 2026-10-27T04:52:06.941Z — tool call (source line 17006)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_2be9241f7de348e091a8cdfad1343cdb",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='test-support/visual-review.js';s=open(p).read().replace('export async function visualReview() {', 'export async function visualReview({ seekers = false } = {}) {');s=s.replace(\\\"fixture = await pilotFixture('memory', { origin });\\\", \\\"fixture = await pilotFixture('memory', {\\\\n      origin,\\\\n      ...(seekers === true ? {\\\\n        extraBotScopes: ['user:read:moderated_channels'],\\\\n        chronicleEnv: { SEEKERS_ENABLED: 'true' },\\\\n      } : {}),\\\\n    });\\\");open(p,'w').write(s)\\np='scripts/browser-smoke-onboarding.js';s=open(p).read().replace('review = await visualReview();','review = await visualReview({ seekers: true });');s=s.replace(\\\"  stage = 'fresh-own-connection';\\\\n  assert.ok(!(await f.runtime.store.getToken('keeper:' + OTHER)));\\\\n  await f.login(BOT);\\\", '''  stage = 'existing-network-baseline';\\n  for (const stream of f.streams.values()) stream.viewer_count = 1;\\n  await f.login(BOT);\\n  await f.login(HOME);\\n  assert.equal((await f.control(HOME, 'bootstrap')).status, 200);\\n  f.advance();\\n  assert.equal((await f.control(HOME, 'keep')).status, 200);\\n  assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, HOME);\\n  const baselineSubscriptions = f.subscriptions.length;\\n  stage = 'fresh-own-connection';\\n  assert.ok(!(await f.runtime.store.getToken('keeper:' + OTHER)));\\n  assert.notEqual((await f.runtime.state.getStreamStatus(OTHER))?.optedIn, true);\\n  assert.notEqual((await f.runtime.state.getStreamStatus(OTHER))?.seeking, true);''');s=s.replace('  assert.equal(f.subscriptions.length, 0);','  assert.equal(f.subscriptions.length, baselineSubscriptions);');a=s.index('    const response = page.waitForResponse(');b=s.index(\\\"    await page.waitForFunction(() => !document.querySelector('#refresh').disabled);\\\",a);s=s[:a]+'''    const [response] = await Promise.all([\\n      page.waitForResponse(r => new URL(r.url()).pathname === '/control/' + OTHER && r.request().method() === 'POST'),\\n      page.locator('#' + id).click(),\\n    ]);\\n    assert.equal(response.status(), 200);\\n'''+s[b:];s=s.replace('  assert.equal(f.subscriptions.length, 5);', '''  assert.equal(f.subscriptions.length, baselineSubscriptions + 5);\\n  assert.equal(f.subscriptions.filter(s => Object.values(s.condition).includes(OTHER)).length, 5);''');s=s.replace(\\\"  stage = 'explicit-seeker';\\\\n  await action('first-seek');\\\", \\\"  stage = 'explicit-seeker';\\\\n  assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, HOME);\\\\n  assert.equal(await page.locator('#first-seek').isDisabled(), false);\\\\n  await action('first-seek');\\\");open(p,'w').write(s)\\np='test/onboarding.test.js';s=open(p).read();needle=\\\"    await f.control(HOME, 'keep');\\\";s=s.replace(needle,needle+'''\\n    assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, HOME);\\n    const holderStatus = JSON.parse((await f.request('/control/' + HOME + '/status', 'GET', {cookie:f.cookies[HOME]})).body);\\n    assert.equal(setupReadiness(holderStatus.pilot, {own:true,id:HOME,readAt:1000,now:1001}).queue, 'holding');\\n    assert.equal((await f.control(HOME, 'seek-on')).status, 200);\\n    assert.notEqual((await f.runtime.state.getStreamStatus(HOME)).seeking, true);\\n''');open(p,'w').write(s)\\nPY\\n./node_modules/.bin/prettier --write test-support/visual-review.js scripts/browser-smoke-onboarding.js test/onboarding.test.js\\nnode test/onboarding.test.js > /tmp/onboarding213-tests.txt 2>&1\\ntail -16 /tmp/onboarding213-tests.txt\\nnode --check scripts/browser-smoke-onboarding.js\",\"max_output_tokens\":1100}))\n"
+}
+````
+
+### 4533. 2026-10-27T04:52:07.602Z — tool result (source line 17009)
+
+````text
+{
+  "call_id": "call_2be9241f7de348e091a8cdfad1343cdb",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.6 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "2b3cc6",
+        "wall_time_seconds": 0.466632017,
+        "exit_code": 0,
+        "original_token_count": 283,
+        "output": "test-support/visual-review.js 76ms\nscripts/browser-smoke-onboarding.js 52ms\ntest/onboarding.test.js 42ms\n✔ public start GET/static assets never access sessions or SDK; writes are refused (7.330023ms)\n{\"severity\":\"WARNING\",\"event\":\"raid_relic_receiving_unavailable\",\"reason\":\"streams-shape\",\"stage\":\"observation\"}\n{\"severity\":\"WARNING\",\"event\":\"raid_relic_bootstrap_failed\",\"keeperId\":\"1593561134\",\"diagnostic\":{\"stage\":\"grants\"}}\n✔ memory: genuinely fresh configured third account connects with signed own OAuth then explicitly opts in and joins (44.371982ms)\n{\"severity\":\"WARNING\",\"event\":\"raid_relic_receiving_unavailable\",\"reason\":\"streams-shape\",\"stage\":\"observation\"}\n{\"severity\":\"WARNING\",\"event\":\"raid_relic_bootstrap_failed\",\"keeperId\":\"1593561134\",\"diagnostic\":{\"stage\":\"grants\"}}\n✔ firestore: genuinely fresh configured third account connects with signed own OAuth then explicitly opts in and joins (39.819063ms)\n✔ master read-only onboarding guide never bypasses OAuth/control denial (2.233779ms)\nℹ tests 6\nℹ suites 0\nℹ pass 6\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 102.865485\n"
+      }
+    }
+  ]
+}
+````
+
+### 4534. 2026-10-27T04:52:23.705Z — assistant (source line 17014)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I also found that `visualReview()` creates a Seeker-disabled fixture by default. The onboarding test now explicitly enables the existing Seeker flag and mocked bot capability; other workflows keep their unchanged default. I’m adding a UI assertion that Home’s holder state keeps its join button disabled.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4535. 2026-10-27T04:52:26.361Z — tool call (source line 17015)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_3cda10c74c6b46999c0da6b6e1dde1fa",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='scripts/browser-smoke-onboarding.js';s=open(p).read();needle='  const baselineSubscriptions = f.subscriptions.length;';s=s.replace(needle,needle+'''\\n  stage = 'holder-cannot-join';\\n  const [holderCookieName, holderCookieValue] = f.cookies[HOME].split('=');\\n  await context.addCookies([{ name: holderCookieName, value: holderCookieValue, url: origin,\\n    httpOnly: true, secure: true, sameSite: 'Lax' }]);\\n  await page.goto(origin + '/control/' + HOME);\\n  await page.waitForFunction(() => !document.querySelector('#refresh').disabled);\\n  await page.locator('#first-run > summary').click();\\n  assert.match(await page.locator('#first-queue').innerText(), /You hold the relic/);\\n  assert.equal(await page.locator('#first-seek').isDisabled(), true);\\n  assert.notEqual((await f.runtime.state.getStreamStatus(HOME)).seeking, true);\\n''');open(p,'w').write(s)\\nPY\\n./node_modules/.bin/prettier --write scripts/browser-smoke-onboarding.js\\n./node_modules/.bin/prettier --check scripts/browser-smoke-onboarding.js test-support/visual-review.js test/onboarding.test.js\\nnode --check scripts/browser-smoke-onboarding.js\",\"max_output_tokens\":500}))\n"
+}
+````
+
+### 4536. 2026-10-27T04:52:26.972Z — tool result (source line 17018)
+
+````text
+{
+  "call_id": "call_3cda10c74c6b46999c0da6b6e1dde1fa",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.6 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "f2d97a",
+        "wall_time_seconds": 0.438227853,
+        "exit_code": 0,
+        "original_token_count": 27,
+        "output": "scripts/browser-smoke-onboarding.js 106ms\nChecking formatting...\nAll matched files use Prettier code style!\n"
+      }
+    }
+  ]
+}
+````
+
+### 4537. 2026-10-27T04:52:47.915Z — assistant (source line 17023)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Fixed the test scenario and failure handling; production policy is unchanged.\n\n- Home now legitimately holds the relic before fresh Other onboarding.\n- Only this fixture enables Seekers and the mocked bot capability.\n- Added holder-copy/disabled-join assertions; subscription checks verify Other’s own five.\n- `Promise.all` routes click/response failures into the JSON report.\n\n**6 focused tests passed, zero skips; syntax/format passed.** Ready for parent’s focused native rerun. Reliability and Devpost phases remain queued.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4538. 2026-10-27T04:54:59.485Z — user (source line 17031)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "214 ONBOARDMOBILEFIX sameoriginalsoleauthor noGit/cloud/provider/keys/realcontrols/streams/chat/SendOff. Native213freshexistingHOMEholderFIXWORKS! FocusedONBOARD_CAPTURE1 now3.99s reachesEXPLICIT-SEEKER membershiptrue/currentholderHOME/5Ownsubs/copyOBSmanualticks passing. ONLYFAILscript152 doc.scrollWidth<=innerWidth in320/390/1280loop, firstlikely320. Reportchecks1stageexplicit-seeker AssertionErrorline152. PublicGUIDE mobilePASSand3PNGprivatecapturesParentavailable(onboard-guide/tile2/tile3) butsignedLOCALNEWchecklistoverflows.NativefailureisREALCSSnotneedtestwaiver. #first-obs-url100%/max100% inputDEFAULTcontent-box plusborder/padding maybeovershoot; details summary/manualOBSlabel/sourceurl long content; existingglobalstylesNo newviewportboundsraise/overflow:hiddenmask. NeedmeasureclosedDOMboundingoffenders: adddiagnosticwidth/scrollWidth/knownstaticselectorindex/overflowPx<=10000 butNO text/value/cookies/privateURL/logs. FixSCOPEDfirst-runCSSbox-sizing:border-box/min-width0/wrap/breakanywherewherelegitimate, retainreadablefullcontentfocus/input horizontalcaret no hardclip/ellipsishide usefulURL. Do notglobalshrinktype orhidehorizontaloverflowmask/no maxwidthwaiver. PreservewholeRole/CSRF/session/scope/Game policy no appchangesbeyondCSSunlessgenuineUIissue. Nativeexistingcontrolold320passedbefore212sohotspotnew#first-run. Public/canonicalcopyURLvalidno credentialURLs. Summarywrapifneedslonglabel; allbuttonsmax100 existing. Maybeglobalmain min widthsnotnew butonlyfixnewchecks.NeedkeepexactNative3203901280assertionandfreshrealfixturepluscurrentholderblocked checks. AddoptionalONBOARD_CAPTURE1signedLOCALchecklistframe afterpositive/nooverflow namedonboard-checklist (capturePage existingtilecap512K/<=6totalaggregate4M; defaultpublicguide3tiles +checklistmaybe>6 iffullControlpage tall SKIPnewcaptureif wouldexceedboundsorcliptochecklistelementviewportONLYnamedmarkedpartial—theTaskpublicguidephotosalreadyenough). No realcontrolpagephotosorHTTP bySource/Parent. Source213closed04:52:47.9324537entries214CLIlogs5wholeomissions0rescan419files24809272. Source214~3minCSS+targetunitformat STOPParentNativefocus andfullall40onlyafterpass thenphase2first-run0. WholequeueRELIABILITYphase215 / Devpost216afterpublication stillmustcontinue. No generatedQUALITYcounts/nativeclaimbeforeParent. No titleScope_No_User_Worker.MissingRealOAuth/OBSphysicalstillownerexternalnotblockcode.\n"
+  }
+]
+````
+
+### 4539. 2026-10-27T04:55:03.254Z — assistant (source line 17034)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll keep the width assertion and add closed bounding-box diagnostics to identify the offending element. I’ll confine the CSS fix to the new checklist and leave all content visible and readable.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4540. 2026-10-27T04:55:04.068Z — tool call (source line 17035)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_015cb19f319f4845a108d1f3d6371560",
+  "input": "text((await tools.exec_command({cmd:\"tail -65 public/control.css; sed -n '145,170p' scripts/browser-smoke-onboarding.js; rg -n 'input|button|overflow|width' public/atlas.css | head -40; sed -n '115,170p' public/atlas.css\",\"max_output_tokens\":1400})).output)\n"
+}
+````
+
+### 4541. 2026-10-27T04:55:04.176Z — tool result (source line 17038)
+
+````text
+{
+  "call_id": "call_015cb19f319f4845a108d1f3d6371560",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "  font-size: clamp(27px, 4vw, 38px);\n}\nmain > p {\n  margin: 8px 0;\n}\n.status-lights {\n  padding: 10px 0;\n}\n#result {\n  min-height: 0;\n  margin: 8px 0;\n}\n#keeper-summary {\n  margin: 10px 0;\n}\nmain > section:first-of-type {\n  margin: 16px 0 28px;\n}\nmain > section:first-of-type h2 {\n  margin: 8px 0;\n  font-size: 26px;\n}\nmain > section:first-of-type p {\n  margin: 8px 0;\n  font-size: 14px;\n}\nlabel[for='raid-target'] {\n  margin: 10px 0 6px;\n}\n.send-off {\n  margin-top: 10px;\n}\n\n#first-run {\n  margin: 14px 0;\n  border-block: 1px solid #52617a;\n  padding: 10px 0;\n}\n#first-run summary {\n  cursor: pointer;\n  min-height: 44px;\n  padding: 8px 0;\n}\n#first-run summary:focus-visible {\n  outline: 3px solid var(--amber);\n  outline-offset: 4px;\n}\n#first-run li[data-state='ready'] {\n  color: #bde4cb;\n}\n#first-run li {\n  margin: 10px 0;\n}\n#first-obs-url {\n  display: block;\n  width: 100%;\n  max-width: 100%;\n  font: inherit;\n  min-height: 44px;\n}\n#first-run input[type='checkbox'] {\n  min-height: 24px;\n  min-width: 24px;\n  vertical-align: middle;\n}\n  await action('first-seek');\n  await page.waitForFunction(() =>\n    document.querySelector('#first-queue').textContent.startsWith('Explicit Seeker'),\n  );\n  assert.equal((await f.runtime.state.getStreamStatus(OTHER)).seeking, true);\n  for (const width of [320, 390, 1280]) {\n    await page.setViewportSize({ width, height: 844 });\n    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));\n  }\n\n  checks.push({\n    name: 'Fresh own account explicitly sets up five subscriptions, opts in, copies/acknowledges OBS and chooses Seeker without a raid',\n    passed: true,\n  });\n  stage = 'boundaries';\n  assert.equal(\n    (await f.request('/control/' + HOME + '/status', 'GET', { cookie: f.cookies[OTHER] })).status,\n    401,\n  );\n  assert.equal((await f.control(OTHER, 'keep', { origin: 'https://evil.invalid' })).status, 403);\n  assert.equal(\n    (\n      await f.request(\n        '/control/' + OTHER,\n        'POST',\n        { cookie: f.cookies[OTHER], origin, 'content-type': 'application/json' },\n22:  max-width: 1184px;\n53:button:focus-visible,\n54:input:focus-visible,\n59:button,\n60:input {\n63:button {\n71:button:hover {\n74:button:disabled {\n86:  max-width: 14ch;\n88:  overflow-wrap: normal;\n98:  max-width: 66ch;\n108:  width: min(100%, 280px);\n113:  min-width: 0;\n118:  max-width: 43ch;\n121:  max-width: 100%;\n131:  min-width: 0;\n152:  max-width: 40ch;\n185:  min-width: 0;\n186:  max-width: 100%;\n187:  width: min(100%, 320px);\n219:  width: 1px;\n227:  width: 48%;\n231:  min-width: 0;\n232:  overflow-wrap: anywhere;\n244:  width: 12px;\n271:  max-width: 100%;\n280:  min-width: 0;\n281:  overflow-wrap: anywhere;\n286:  width: 64px;\n312:@media (max-width: 680px) {\n321:    width: 100px;\n331:    width: 100%;\n345:    width: 100%;\n354:@media (max-width: 480px) {\n366:    width: 68px;\n371:    max-width: none;\n380:    width: 100%;\n382:  #mark-search button {\n399:  overflow-wrap: normal;\n407:  width: min(100%, 320px);\n.intro p {\n  color: var(--muted);\n  font-size: 18px;\n  max-width: 43ch;\n}\nimg {\n  max-width: 100%;\n}\nnav {\n  display: flex;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 18px 24px;\n  margin: 22px 0 28px;\n}\nnav > * {\n  min-width: 0;\n}\n.search-jump {\n  color: var(--moon);\n  text-decoration-color: var(--violet);\n  text-decoration-thickness: 2px;\n}\n#rings {\n  color: var(--amber);\n  margin-left: auto;\n}\n#status {\n  color: var(--muted);\n  min-height: 2em;\n}\n#status.empty-state {\n  font-family: Georgia, serif;\n  font-size: 24px;\n  line-height: 1.5;\n  padding: 24px 0 24px 20px;\n  border-left: 2px solid var(--violet);\n  max-width: 40ch;\n}\n#simulator {\n  padding: 12px;\n  color: var(--amber);\n  border: 1px solid var(--amber);\n}\n.mark-history {\n  scroll-margin-top: 24px;\n  border-top: 1px solid #52617a;\n  border-bottom: 1px solid #52617a;\n  padding: 24px 0;\n  margin: 28px 0 40px;\n}\n.mark-history h2 {\n  margin: 0 0 12px;\n}\n.mark-history p {\n  color: var(--muted);\n"
+    }
+  ]
+}
+````
+
+### 4542. 2026-10-27T04:55:11.787Z — tool call (source line 17042)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_0834b5d0197f497a97c94e1b88e76e86",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '55,74p' public/atlas.css; sed -n '350,405p' public/atlas.css; rg -n 'white-space|input|label|summary' public/control.css public/atlas.css; rg -n '#first-run|first-obs' public/control.html\",\"max_output_tokens\":1400})).output)\n"
+}
+````
+
+### 4543. 2026-10-27T04:55:11.887Z — tool result (source line 17045)
+
+````text
+{
+  "call_id": "call_0834b5d0197f497a97c94e1b88e76e86",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": ".mark-history:focus-visible {\n  outline: 2px solid var(--amber);\n  outline-offset: 5px;\n}\nbutton,\ninput {\n  font: inherit;\n}\nbutton {\n  color: var(--moon);\n  background: var(--slate);\n  border: 1px solid #8b9db7;\n  padding: 11px 18px;\n  cursor: pointer;\n  min-height: 44px;\n}\nbutton:hover {\n  background: #33445e;\n}\nbutton:disabled {\n  .gallery {\n    gap: 16px;\n  }\n}\n@media (max-width: 480px) {\n  header,\n  main,\n  footer {\n    padding-left: 22px;\n    padding-right: 22px;\n  }\n  .intro {\n    grid-template-columns: minmax(0, 1fr);\n    gap: 4px;\n  }\n  .intro img {\n    width: 68px;\n    justify-self: end;\n  }\n  .intro h1 {\n    font-size: clamp(30px, 9vw, 40px);\n    max-width: none;\n  }\n  .intro p {\n    margin-bottom: 0;\n  }\n  .mark-history h2 {\n    font-size: 27px;\n  }\n  #search-query {\n    width: 100%;\n  }\n  #mark-search button {\n    flex: 1 1 130px;\n  }\n  .mark-history {\n    margin-top: 24px;\n  }\n  .gallery {\n    grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr));\n  }\n}\n@media (prefers-reduced-motion: reduce) {\n  html {\n    scroll-behavior: auto;\n  }\n}\n/* Keep title word boundaries independent of surrounding wrapping tracks. */\nh1 {\n  overflow-wrap: normal;\n  word-break: normal;\n  hyphens: none;\n}\n\n/* Local hero only: no overlay stylesheet or global canvas reset. */\n.atlas-relic {\npublic/atlas.css:54:input:focus-visible,\npublic/atlas.css:60:input {\npublic/atlas.css:180:#mark-search label {\npublic/atlas.css:537:.score-badge summary {\npublic/atlas.css:544:.score-badge summary:focus-visible {\npublic/atlas.css:548:.score-badge[data-earned='false'] summary {\npublic/atlas.css:587:  white-space: nowrap;\npublic/atlas.css:632:.atlas-relic-figure > .edition-label {\npublic/atlas.css:645:/* Consistent keyboard access across links, native disclosure and replay inputs. */\npublic/atlas.css:648:input:focus-visible,\npublic/atlas.css:650:summary:focus-visible,\npublic/atlas.css:686:.edition-label,\npublic/atlas.css:715:  white-space: normal;\npublic/control.css:24:  white-space: pre-wrap;\npublic/control.css:38:label[for='raid-target'] {\npublic/control.css:95:#keeper-summary {\npublic/control.css:125:#keeper-summary {\npublic/control.css:139:label[for='raid-target'] {\npublic/control.css:151:#first-run summary {\npublic/control.css:156:#first-run summary:focus-visible {\npublic/control.css:173:#first-run input[type='checkbox'] {\n40:          <li id=\"first-obs\">○ OBS installation not verified</li>\n51:        <label for=\"first-obs-url\">Own canonical OBS Browser Source URL</label\n52:        ><input id=\"first-obs-url\" readonly /><button id=\"first-obs-copy\" disabled>\n59:          ><input id=\"first-obs-confirm\" type=\"checkbox\" /> I manually checked this source in OBS\n"
+    }
+  ]
+}
+````
+
+### 4544. 2026-10-27T04:56:02.852Z — tool call (source line 17051)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_b13ae76726d5403fa4949ef5efde97e5",
+  "input": "text(await tools.exec_command({cmd:\"cat >> public/control.css <<'EOF'\\n\\n/* Native details content and form controls must shrink within the own-channel\\n   checklist. Wrap complete text; never mask overflow or truncate its URL. */\\n#first-run {\\n  box-sizing: border-box;\\n  width: 100%;\\n  max-width: 100%;\\n  min-width: 0;\\n  overflow-wrap: anywhere;\\n}\\n#first-run * {\\n  box-sizing: border-box;\\n  min-width: 0;\\n}\\n#first-run :is(summary, p, label, ol, li, .actions) {\\n  max-width: 100%;\\n}\\n#first-run :is(summary, button, label) {\\n  white-space: normal;\\n  overflow-wrap: anywhere;\\n}\\n#first-run label {\\n  display: block;\\n  margin-block: 12px;\\n}\\n#first-run ol {\\n  margin-inline: 0;\\n  padding-inline-start: 1.4rem;\\n}\\n#first-run :is(input, button) {\\n  max-width: 100%;\\n}\\nEOF\\npython3 - <<'PY'\\np='scripts/browser-smoke-onboarding.js';s=open(p).read();needle=\\\"  assert.equal((await f.runtime.state.getStreamStatus(OTHER)).seeking, true);\\\\n  for (const width of [320, 390, 1280]) {\\\";s=s.replace(needle,\\\"  assert.equal((await f.runtime.state.getStreamStatus(OTHER)).seeking, true);\\\\n  stage = 'checklist-width';\\\\n  for (const width of [320, 390, 1280]) {\\\");needle=\\\"    await page.setViewportSize({ width, height: 844 });\\\\n    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));\\\";# Add only second/private loop diagnostics, retaining the public loop unchanged.\\na=s.index(\\\"  stage = 'checklist-width';\\\");before=s[:a];after=s[a:];after=after.replace(needle,\\\"\\\"\\\"    await page.setViewportSize({ width, height: 844 });\\n    Object.assign(diagnostic, await page.evaluate(() => {\\n      const known = ['#first-run', '#first-run summary', '#first-obs-url', '#first-obs-confirm',\\n        '#first-run label', '#first-run .actions', '#first-bootstrap', '#first-keep',\\n        '#first-seek', '#first-run ol', '#first-run li', '#first-copy-status',\\n        '#first-freshness', '#first-queue', '#keeper-summary', '#authorization-status',\\n        '#ledger', '#setup', '#keeper', '#raid', '#p7-consent-url', '#intent-confirm', 'header', 'main'];\\n      let overflowPx = 0, offenderCode = 0;\\n      for (const node of document.querySelectorAll('body *')) {\\n        const rect = node.getBoundingClientRect();\\n        const overflow = Math.max(0, rect.right - innerWidth, -rect.left);\\n        if (overflow > overflowPx) {\\n          overflowPx = overflow;\\n          offenderCode = known.findIndex(selector => node.matches(selector)) + 1;\\n        }\\n      }\\n      return { width: innerWidth, scrollWidth: document.documentElement.scrollWidth,\\n        offenderCode, overflowPx: Math.min(10000, Math.ceil(overflowPx)) };\\n    }));\\n    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));\\\"\\\"\\\",1);s=before+after;open(p,'w').write(s)\\np='test/onboarding.test.js';s=open(p).read();s += '''\\n\\ntest('own checklist uses scoped shrink/wrap rules without hiding overflow or truncating content', async () => {\\n  const { readFile } = await import('node:fs/promises');\\n  const css = await readFile('public/control.css', 'utf8');\\n  const block = css.slice(css.indexOf('/* Native details content'));\\n  assert.match(block, /#first-run\\\\\\\\s*\\\\\\\\{[^}]*box-sizing:\\\\\\\\s*border-box;[^}]*max-width:\\\\\\\\s*100%;[^}]*min-width:\\\\\\\\s*0;/s);\\n  assert.match(block, /overflow-wrap:\\\\\\\\s*anywhere/);\\n  assert.match(block, /white-space:\\\\\\\\s*normal/);\\n  assert.doesNotMatch(block, /overflow(?:-x)?:\\\\\\\\s*(?:hidden|clip)|text-overflow:\\\\\\\\s*ellipsis|font-size/);\\n});\\n''';open(p,'w').write(s)\\nPY\\n./node_modules/.bin/prettier --write public/control.css scripts/browser-smoke-onboarding.js test/onboarding.test.js\\nnode test/onboarding.test.js > /tmp/onboarding214-tests.txt 2>&1\\ntail -11 /tmp/onboarding214-tests.txt\\nnode --check scripts/browser-smoke-onboarding.js\",\"max_output_tokens\":800}))\n"
+}
+````
+
+### 4545. 2026-10-27T04:56:03.536Z — tool result (source line 17054)
+
+````text
+{
+  "call_id": "call_b13ae76726d5403fa4949ef5efde97e5",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.7 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "76ad43",
+        "wall_time_seconds": 0.511803047,
+        "exit_code": 0,
+        "original_token_count": 138,
+        "output": "public/control.css 65ms (unchanged)\nscripts/browser-smoke-onboarding.js 101ms\ntest/onboarding.test.js 43ms\n✔ firestore: genuinely fresh configured third account connects with signed own OAuth then explicitly opts in and joins (43.470094ms)\n✔ master read-only onboarding guide never bypasses OAuth/control denial (2.472742ms)\n✔ own checklist uses scoped shrink/wrap rules without hiding overflow or truncating content (1.096369ms)\nℹ tests 7\nℹ suites 0\nℹ pass 7\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 108.878578\n"
+      }
+    }
+  ]
+}
+````
+
+### 4546. 2026-10-27T04:56:24.503Z — tool call (source line 17058)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_d6d408b5cead4d0cb0587d41e14189de",
+  "input": "text(await tools.exec_command({cmd:\"./node_modules/.bin/prettier --check public/control.css scripts/browser-smoke-onboarding.js test/onboarding.test.js\\nnode test/control.test.js | tail -9\",\"max_output_tokens\":400}))\n"
+}
+````
+
+### 4547. 2026-10-27T04:56:25.102Z — tool result (source line 17061)
+
+````text
+{
+  "call_id": "call_d6d408b5cead4d0cb0587d41e14189de",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.6 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "8d076e",
+        "wall_time_seconds": 0.417046831,
+        "exit_code": 0,
+        "original_token_count": 74,
+        "output": "Checking formatting...\nAll matched files use Prettier code style!\n✔ firestore: OAuth redirects/callbacks and private control responses deny framing and referrers (1.934696ms)\nℹ tests 10\nℹ suites 0\nℹ pass 10\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 57.053172\n"
+      }
+    }
+  ]
+}
+````
+
+### 4548. 2026-10-27T04:56:31.136Z — assistant (source line 17064)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Added scoped checklist CSS for border-box sizing, shrinking controls and wrapping full labels—no overflow hiding or truncation.\n\nThe browser test retains all three width assertions and now reports closed numeric overflow diagnostics.\n\n**17 focused tests passed, zero skips; syntax/format passed.** Native confirmation remains pending. No authority, policy or capture-cap changes.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4549. 2026-10-27T04:59:51.275Z — user (source line 17074)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "215 ONBOARD3PXFIX sameoriginalsolewriter/noGit/cloud/provider/keys/realcontrol/streams/chat/SendOff. Native214ALLfreshAuth/OptIn/OBS/SEEKactionsPASSED; script200checklist-width assertionfails320: width320 scrollWidth323 overflowPx0. ALLDOMelementRectsfit butTEXT/pseudo overflow3px. Earlierfirst-runborderboxscopedCSSdidnotfixwholepage. DiagnoseTEXT RANGES + knownstaticselector numericcode ONLY(no rawtext/URLs/values); public/controlHTML loadsatlas.css+control.css+fonts, main base maxwidth900. Proper scopedcontrolMAIN overflow-wrap:anywhere/pre/button/summary wrapping MAYfixunbreakablelegacytext; preserveFULLcopyableURLandreadability/no truncation/overflowHiddenmask/viewportallowance/fontshrink. Realcheckall3203901280MUSTpass. WholeprivatecontrolpageincludeslegacybotAuth/copyURL/resulttext/readinessstatusnewseekresponse; objectboxmayfitbuttextoverflow unknownbranch. SourceNativecan'tbrowseactualcontrol; allLOCALfixturesallowed. AddclosednumericTextRangeparentselectorcode/extent diagnostics ifneeded andtellParentfieldnames whitelist(no realDOM data). Parentreportcurrentwidth320 scrollWidth323 andelementoverflow0notguessmeasuredculprit. Checkatlas.css inherited typography/pre/code/summary/style ratherthanblindrepeatinputwidth. KeepALLnewSource212policy/role/CSRF/sessioncopy/init/clipboard/guidemembershipuncertainty andfreshOtherneverheld existingHomeholder actors. No testcapraise/weakening3pxfuzz/hidingcontent. Source215~3minsmallrealresponsivefixorcloseddiagready; stopParentfocusedNativeFull40+pubfirst-run0 oncePASS. ReliabilityNEXT216 thenprivateDraft217Whole4queueSTILLOPENno stopafterfirstRun. Current214closed04:56:31.1634548entries215logs5wholeomissions0rescan419files24830615. Publicguide3tilesParentviewedgood; sourcefresh53/pass17notfinalNative. No newscopes/providercalls/clockchanges/services/flags/Git/QUALITYcounts. Needlegiblefunctionalbrandfreshflowonlynotunrelatedcleanup. CorrectresponsivewithincontrolCSSasneededtaskauthorizedcodeonlyNOrealcontrolpageoperations. Returnactualchangedpaths/focusedresults/knownNativepending.\n"
+  }
+]
+````
+
+### 4550. 2026-10-27T05:00:14.482Z — assistant (source line 17079)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "The element boxes fit, so I’ll check text ranges as well and add wrapping for long text, code and status content within the private control main area. The 320/390/1280 assertions will stay exact; I won’t add a 3px allowance or hide overflow.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 4551. 2026-10-27T05:00:15.318Z — tool call (source line 17080)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_59f9d0e1933942cc8fe99383e6873cc9",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '164,205p' scripts/browser-smoke-onboarding.js; rg -n 'code|pre|word-break|overflow-wrap|white-space' public/atlas.css public/control.css\",\"max_output_tokens\":1200})).output)\n"
+}
+````
+
+### 4552. 2026-10-27T05:00:15.422Z — tool result (source line 17083)
+
+````text
+{
+  "call_id": "call_59f9d0e1933942cc8fe99383e6873cc9",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "          '#first-keep',\n          '#first-seek',\n          '#first-run ol',\n          '#first-run li',\n          '#first-copy-status',\n          '#first-freshness',\n          '#first-queue',\n          '#keeper-summary',\n          '#authorization-status',\n          '#ledger',\n          '#setup',\n          '#keeper',\n          '#raid',\n          '#p7-consent-url',\n          '#intent-confirm',\n          'header',\n          'main',\n        ];\n        let overflowPx = 0,\n          offenderCode = 0;\n        for (const node of document.querySelectorAll('body *')) {\n          const rect = node.getBoundingClientRect();\n          const overflow = Math.max(0, rect.right - innerWidth, -rect.left);\n          if (overflow > overflowPx) {\n            overflowPx = overflow;\n            offenderCode = known.findIndex((selector) => node.matches(selector)) + 1;\n          }\n        }\n        return {\n          width: innerWidth,\n          scrollWidth: document.documentElement.scrollWidth,\n          offenderCode,\n          overflowPx: Math.min(10000, Math.ceil(overflowPx)),\n        };\n      }),\n    );\n    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));\n  }\n\n  checks.push({\n    name: 'Fresh own account explicitly sets up five subscriptions, opts in, copies/acknowledges OBS and chooses Seeker without a raid',\n    passed: true,\npublic/control.css:23:  overflow-wrap: anywhere;\npublic/control.css:24:  white-space: pre-wrap;\npublic/control.css:186:  overflow-wrap: anywhere;\npublic/control.css:196:  white-space: normal;\npublic/control.css:197:  overflow-wrap: anywhere;\npublic/atlas.css:88:  overflow-wrap: normal;\npublic/atlas.css:89:  word-break: normal;\npublic/atlas.css:232:  overflow-wrap: anywhere;\npublic/atlas.css:281:  overflow-wrap: anywhere;\npublic/atlas.css:392:@media (prefers-reduced-motion: reduce) {\npublic/atlas.css:399:  overflow-wrap: normal;\npublic/atlas.css:400:  word-break: normal;\npublic/atlas.css:446:  overflow-wrap: anywhere;\npublic/atlas.css:469:#score-preview {\npublic/atlas.css:542:  overflow-wrap: anywhere;\npublic/atlas.css:587:  white-space: nowrap;\npublic/atlas.css:674:@media (prefers-reduced-motion: reduce) {\npublic/atlas.css:706:  overflow-wrap: anywhere;\npublic/atlas.css:715:  white-space: normal;\npublic/atlas.css:721:  overflow-wrap: anywhere;\npublic/atlas.css:735:  overflow-wrap: anywhere;\npublic/atlas.css:792:@media (prefers-reduced-motion: reduce) {\n"
+    }
+  ]
+}
+````
+
+### 4553. 2026-10-27T05:00:47.798Z — tool call (source line 17087)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_d89341bde5424c1187ba261b60360f4b",
+  "input": "text(await tools.exec_command({cmd:\"cat >> public/control.css <<'EOF'\\n\\n/* Private status can contain long closed-vocabulary diagnostics, permission\\n   names or a Simulator result. Keep the complete text readable at 320px. */\\nmain {\\n  overflow-wrap: anywhere;\\n}\\nmain :is(code, pre) {\\n  white-space: pre-wrap;\\n  overflow-wrap: anywhere;\\n  word-break: normal;\\n  max-width: 100%;\\n}\\nmain :is(button, summary) {\\n  white-space: normal;\\n  overflow-wrap: anywhere;\\n}\\nEOF\\npython3 - <<'PY'\\np='scripts/browser-smoke-onboarding.js';s=open(p).read().replace(\\\"          'main',\\\\n        ];\\\", \\\"          'main',\\\\n          '#result',\\\\n          '#p7-setup code',\\\\n          '#p7-setup',\\\\n          '#ledger dd',\\\\n        ];\\\");needle='        return {\\\\n          width: innerWidth,\\\\n          scrollWidth: document.documentElement.scrollWidth,';s=s.replace(needle,'''        let textOverflowPx = 0, textOffenderCode = 0, textNodesMeasured = 0;\\n        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);\\n        let textNode;\\n        while (textNodesMeasured < 1024 && (textNode = walker.nextNode())) {\\n          textNodesMeasured++;\\n          const range = document.createRange();\\n          range.selectNodeContents(textNode);\\n          for (const rect of Array.from(range.getClientRects()).slice(0, 128)) {\\n            const overflow = Math.max(0, rect.right - innerWidth, -rect.left);\\n            if (overflow > textOverflowPx) {\\n              textOverflowPx = overflow;\\n              let parent = textNode.parentElement;\\n              textOffenderCode = 0;\\n              while (parent && !textOffenderCode) {\\n                textOffenderCode = known.findIndex(selector => parent.matches(selector)) + 1;\\n                parent = parent.parentElement;\\n              }\\n            }\\n          }\\n          range.detach();\\n        }\\n        return {\\n          textOffenderCode, textNodesMeasured,\\n          textOverflowPx: Math.min(10000, Math.ceil(textOverflowPx)),\\n          width: innerWidth,\\n          scrollWidth: document.documentElement.scrollWidth,''');open(p,'w').write(s)\\np='test/onboarding.test.js';s=open(p).read();s += '''\\n\\ntest('private control permission/result text wraps completely without clipping or reducing type', async () => {\\n  const { readFile } = await import('node:fs/promises');\\n  const css = await readFile('public/control.css', 'utf8');\\n  const block = css.slice(css.indexOf('/* Private status can contain'));\\n  assert.match(block, /main\\\\\\\\s*\\\\\\\\{\\\\\\\\s*overflow-wrap:\\\\\\\\s*anywhere;/);\\n  assert.match(block, /main :is\\\\\\\\(code, pre\\\\\\\\)\\\\\\\\s*\\\\\\\\{[^}]*white-space:\\\\\\\\s*pre-wrap;[^}]*overflow-wrap:\\\\\\\\s*anywhere;/s);\\n  assert.doesNotMatch(block, /overflow(?:-x)?:\\\\\\\\s*(?:hidden|clip)|text-overflow:\\\\\\\\s*ellipsis|font-size/);\\n});\\n''';open(p,'w').write(s)\\nPY\\n./node_modules/.bin/prettier --write public/control.css scripts/browser-smoke-onboarding.js test/onboarding.test.js\\nnode test/onboarding.test.js > /tmp/onboarding215-tests.txt 2>&1\\ntail -10 /tmp/onboarding215-tests.txt\\nnode test/control.test.js | tail -9\\nnode --check scripts/browser-smoke-onboarding.js\",\"max_output_tokens\":850}))\n"
+}
+````
+
+### 4554. 2026-10-27T05:00:48.666Z — tool result (source line 17090)
+
+````text
+{
+  "call_id": "call_d89341bde5424c1187ba261b60360f4b",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.9 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "7a4902",
+        "wall_time_seconds": 0.667811271,
+        "exit_code": 0,
+        "original_token_count": 166,
+        "output": "public/control.css 67ms (unchanged)\nscripts/browser-smoke-onboarding.js 106ms\ntest/onboarding.test.js 44ms\n✔ own checklist uses scoped shrink/wrap rules without hiding overflow or truncating content (1.09937ms)\n✔ private control permission/result text wraps completely without clipping or reducing type (0.611685ms)\nℹ tests 8\nℹ suites 0\nℹ pass 8\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 108.088731\n✔ firestore: OAuth redirects/callbacks and private control responses deny framing and referrers (1.888056ms)\nℹ tests 10\nℹ suites 0\nℹ pass 10\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 55.466718\n"
+      }
+    }
+  ]
+}
+````
+
+### 4555. 2026-10-27T05:01:10.457Z — assistant (source line 17095)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Updated only `control.css`, the onboarding browser test and its unit tests.\n\n- Long private status/code/button text now wraps without clipping or font shrinkage.\n- Exact width assertions remain unchanged.\n- Added closed diagnostics: `textOffenderCode`, `textOverflowPx`, `textNodesMeasured`; no text or URLs logged.\n\n**18 focused tests passed, zero skips; syntax/format passed.** The specific overflowing text and native fix still need parent confirmation.",
     "annotations": [],
     "logprobs": []
   }

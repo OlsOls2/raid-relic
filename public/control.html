@@ -27,6 +27,45 @@
         Keeper authorization explicitly if needed.
       </p>
       <p id="keeper-summary" role="status">Read status before taking action.</p>
+      <details id="first-run">
+        <summary>Get started in two minutes — own-channel checklist</summary>
+        <p>
+          Timing assumes Twitch and OBS are already available. Consent and installation can take
+          longer. This checklist never starts a raid.
+        </p>
+        <ol>
+          <li id="first-session">○ Matching private session not checked</li>
+          <li id="first-optin">○ Explicit Keeper opt-in not checked</li>
+          <li id="first-subscriptions">○ Subscriptions not checked</li>
+          <li id="first-obs">○ OBS installation not verified</li>
+        </ol>
+        <p id="first-freshness" role="status">Not freshly verified.</p>
+        <div class="actions">
+          <button id="first-bootstrap" disabled>Set up channel</button
+          ><button id="first-keep" disabled>Opt in this channel</button>
+        </div>
+        <p>
+          Setup reconciles only the existing five subscriptions. The bot must already have its
+          approved grant and be a moderator; these ticks do not prove optional permissions.
+        </p>
+        <label for="first-obs-url">Own canonical OBS Browser Source URL</label
+        ><input id="first-obs-url" readonly /><button id="first-obs-copy" disabled>
+          Copy my OBS URL
+        </button>
+        <p id="first-copy-status" role="status">
+          Add a Browser Source at 1920×1080. Copying is not installation.
+        </p>
+        <label
+          ><input id="first-obs-confirm" type="checkbox" /> I manually checked this source in OBS
+          (page-only, not server verified)</label
+        >
+        <p id="first-queue" role="status">Queue: not checked.</p>
+        <button id="first-seek" disabled>Become a Seeker</button>
+        <p>
+          Joining is explicit and does not prove live eligibility. Current holders cannot join;
+          former holders may rejoin after passing. <a href="/start">Public setup guide</a>
+        </p>
+      </details>
       <section>
         <h2>Send Off</h2>
         <p id="target-help">

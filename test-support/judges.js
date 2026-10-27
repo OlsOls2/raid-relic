@@ -21,6 +21,12 @@ const actions = [
   'reset',
 ];
 const assets = new Set([
+  '/start',
+  '/start/',
+  '/start.js',
+  '/start.css',
+  '/onboarding.js',
+  '/first-run.js',
   '/demo/film',
   '/demo/film/',
   '/film.js',

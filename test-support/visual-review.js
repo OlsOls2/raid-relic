@@ -3,9 +3,17 @@ import { createServer } from 'node:https';
 import { createLocalTLS } from './local-tls.js';
 import { attachOverlaySockets } from '../src/overlay-sockets.js';
 import { pilotFixture } from './pilot-fixture.js';
-export async function visualReview() {
+export async function visualReview({ seekers = false } = {}) {
   const origin = 'https://localhost:5191',
-    fixture = await pilotFixture('memory', { origin });
+    fixture = await pilotFixture('memory', {
+      origin,
+      ...(seekers === true
+        ? {
+            extraBotScopes: ['user:read:moderated_channels'],
+            chronicleEnv: { SEEKERS_ENABLED: 'true' },
+          }
+        : {}),
+    });
   const tls = await createLocalTLS(),
     server = createServer(tls.options, fixture.runtime.handler);
   const sockets = attachOverlaySockets(server, fixture.runtime.overlayFeeds, {

@@ -1,6 +1,7 @@
 import { keeperNames as networkNames } from './keeper-network.js';
 import { actionMessage, botConsentStartURL } from './control-view.js';
 import { boundedResponse } from './control-read.js';
+import { mountFirstRun } from './first-run.js';
 const forgeLink = document.getElementById('forge-owner-link');
 if (forgeLink) forgeLink.href = `${location.pathname}/forge`;
 const consentURL = document.getElementById('p7-consent-url'),
@@ -26,6 +27,7 @@ if (id) {
   document.getElementById('own-overlay').href = `/overlay/${id}`;
   document.getElementById('own-overlay-sound').href = `/overlay/${id}?sound=1`;
 }
+const firstRun = mountFirstRun(id, (action) => run(action));
 const names = networkNames;
 let recovery = null;
 let simulated = false;
@@ -60,8 +62,10 @@ function disable(value) {
   document.getElementById('expire-handoff').disabled = value || !expiryRecovery?.canExpire;
   target.disabled = value || !csrf || !candidates.length;
   document.getElementById('cancel-queued').disabled = value || !recovery?.canCancel;
+  firstRun.setBusy(value || !csrf);
 }
 function invalidate() {
+  firstRun.clear();
   if (consentURL) {
     consentURL.value = '';
     copyConsent.disabled = true;
@@ -117,6 +121,7 @@ async function refresh({ preserveResult = false } = {}) {
     document.getElementById('authorization-status').textContent =
       'Fresh Keeper authorization is not checked by status. If targets are missing, use Check / refresh my Keeper authorization; reconnect this matching Keeper if it fails. Refresh status never renews tokens.';
     csrf = value.csrf;
+    firstRun.observe(value.pilot, value.actions);
     document.getElementById('simulator').hidden = value.pilot.mode !== 'simulator';
     simulated = value.pilot.mode === 'simulator';
     document.getElementById('ledger').hidden = !simulated;
@@ -319,6 +324,7 @@ document.getElementById('logout').onclick = () => run('logout');
 disable(true);
 refresh();
 addEventListener('pagehide', () => {
+  firstRun.dispose();
   readGeneration++;
   readController?.abort();
   invalidate();
