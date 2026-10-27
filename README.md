@@ -112,3 +112,7 @@ The live baseline includes Seeker-first suggestions while allowing other ready, 
 Existing Keeper/bot grants are maintained before use on access-token rejection or within 120 seconds of expiry, using per-role singleflight, distributed leases and atomic encrypted pair rotation. Fresh valid grants need no token-lease writes; cached control status makes no extra provider calls. Transient failures mean retry later; definitive refresh rejection requires reconnecting. The operator recovered all three Keeper grants on 26 October at 22:10 UTC without reconsent; this is a dated result, not a promise that future grants remain valid. [Authorization maintenance](docs/AUTHORIZATION_RECOVERY.md). The source author performed no account recovery or live provider action.
 
 Freeze: **31 October 2026, 18:00 UK/UTC**.
+
+### Film the fictional loop
+
+Source 208 adds a client-only **`/demo/film`** storyboard: 150 seconds from Send Off through arrival, two-chat binding, engraving, simulated Keeper spotlight, journey replay and a manually exported simulated card. Space pauses, Next skips, and Restart resets the local story. It is permanently labelled FILM / SIMULATOR, with no Twitch connection, audio or real transfers. [Film controls and bounded recording handoff](docs/DEMO_FILM.md). This new route awaits its own native/capture gate and read-only preview publication; earlier quality results do not validate it.

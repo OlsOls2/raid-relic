@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>SIMULATED FILM · Raid Relic</title>
+    <link rel="stylesheet" href="/fonts.css" />
+    <link rel="stylesheet" href="/film.css" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script type="module" src="/film.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to film</a>
+    <header id="film-banner">FILM / SIMULATOR — no Twitch connection or real transfers</header>
+    <main id="main-content" tabindex="-1">
+      <div class="intro">
+        <p class="eyeline">One relic. Two communities. A story that stays.</p>
+        <h1>Pass something worth keeping.</h1>
+        <p>A 2½-minute fictional loop · muted, no audio · all sample data stays in this page.</p>
+      </div>
+      <section id="film-stage" class="stage" aria-label="Simulated relic and community story">
+        <div class="relic-column">
+          <div id="film-art" class="archive">
+            <img class="crystal" src="/crystal.svg" alt="Original faceted moon-silver relic" />
+            <div id="film-comet" hidden></div>
+            <div id="film-impact" hidden></div>
+          </div>
+          <p id="film-holder">No holder yet · fictional fixture</p>
+          <p id="film-count">Recorded rings: 0</p>
+        </div>
+        <div class="story">
+          <p id="film-scene-number"></p>
+          <h2 id="film-heading">Send Off</h2>
+          <p id="film-caption" role="status"></p>
+          <div id="film-meter" aria-label="Simulated two-chat claim">
+            <p id="film-votes"></p>
+            <progress
+              id="film-quorum"
+              max="2"
+              value="0"
+              aria-label="Simulated committed votes"
+            ></progress>
+            <p id="film-claim"></p>
+          </div>
+          <div id="film-engraving" hidden>
+            <svg viewBox="0 0 100 100" role="img" aria-label="Original sample moon rune">
+              <path d="M50 8 92 50 50 92 8 50Z M23 70 38 24 66 59 79 31" />
+            </svg>
+            <p>Approved sample engraving · <strong>moon</strong></p>
+          </div>
+          <div id="film-spotlight" hidden>
+            <h3>SIMULATED LIVE</h3>
+            <p>@demo_keeper_b holds the relic</p>
+            <p>No real stream, viewers or audience measurement.</p>
+          </div>
+          <div id="film-journey" hidden>
+            <svg viewBox="0 0 400 80" role="img" aria-label="One simulated completed journey">
+              <path d="M35 40 Q200 5 365 40" />
+              <circle cx="35" cy="40" r="8" />
+              <circle cx="365" cy="40" r="8" />
+            </svg>
+            <p>@demo_keeper_a → @demo_keeper_b</p>
+            <p>1 retained simulated hop · replay adds no history</p>
+          </div>
+        </div>
+      </section>
+      <section id="film-card-section" hidden aria-label="Simulated ring card preview">
+        <h2>A shared story, ready to carry.</h2>
+        <img
+          id="film-card"
+          alt="Permanently simulated card with original relic, sample engraving and fictional journey"
+        />
+        <p id="film-card-status" role="status">Preparing the simulated preview.</p>
+        <button id="film-export" disabled>Export simulated ring card</button>
+      </section>
+      <nav class="transport" aria-label="Film controls">
+        <button id="film-play">Pause film</button><button id="film-next">Next scene</button
+        ><button id="film-restart">Restart film</button><label for="film-seek">Story position</label
+        ><input id="film-seek" type="range" min="0" max="150000" step="1000" value="0" /><output
+          id="film-time"
+          for="film-seek"
+          >0:00 / 2:30</output
+        >
+      </nav>
+      <p class="keys">
+        Space pauses/resumes and → advances when focus is on the page. Focused controls keep their
+        native keys.
+      </p>
+      <footer>
+        Unofficial fan edition; not affiliated with or endorsed by Twitch/TwitchCon.
+        <a href="/demo/">35-second interactive demo</a> ·
+        <a href="/demo/wander">Simulated Wander film</a>
+      </footer>
+    </main>
+  </body>
+</html>
