@@ -2,7 +2,7 @@
 
 Session: 01a1705c-a87d-7143-80f6-021e47b78ced
 
-Snapshot cutoff: 2026-10-27T13:39:02.821Z (last timestamped record; not a claim that future/active conversation is included).
+Snapshot cutoff: 2026-10-27T13:49:43.575Z (last timestamped record; not a claim that future/active conversation is included).
 
 This is a readable selected native-JSONL export, NOT a complete raw transcript. User/assistant messages and tool calls/results are retained; duplicate native event records are labelled. Private system/developer/bootstrap instructions, reasoning/analysis, opaque encrypted fields, media/base64 and other internal metadata are omitted. Each item is capped at 32768 characters with an explicit omission count and sanitized-item digest. No raw-backup links or private credentials are published. Credential-looking literals, headers or sensitive fields cause whole-item content omission, with source line and reason retained; counts are in the manifest. Strong key patterns remain fatal across all selected visible fields, even in otherwise omitted items. Existing synthetic fixture literals are explicitly classified, not proof of real authentication.
 
@@ -79604,6 +79604,137 @@ This is a readable selected native-JSONL export, NOT a complete raw transcript. 
   {
     "type": "output_text",
     "text": "Changed only `scripts/ci-journey.js` and `docs/CI_JOURNEY.md`.\n\nAdded closed failure-origin diagnostics and an in-sandbox preflight for nonroot identity, namespace separation, read-only mounts and scratch writability. Private `/tmp` now explicitly uses mode 1777; the child creates its own HOME/cache.\n\nAll resource and browser sandbox protections remain. No execution by source; hosted validation is pending. The running soak is untouched.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 5072. 2026-10-27T13:48:26.973Z — user (source line 19055)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "249 SAMEoriginal/sourceonlynoGit/cloud/keys/live/targetexecution. Currentpushed8ae6a58926e43f7c93ac07dd834cf58d0a03d108. Hosted40514502733UNITsuccess/chromiumdownloadsuccess. NewcloseddiagACTUALbeforetrustedpreflight: {preflightStage:report-open,childExitCode:1,errorCode:ENOENT,stderrCategory:permissionDenied,stderrOrigin:bwrapPrefix,permissionArea:none,insideStage:not-started,insideErrorCode:none}. ThusbwrapOSsetupdenied onUbuntu24 notapp/tmp/Chrome. DO NOT disableAppArmor/sysctl/userns/network/RootRO/CPU/Fd/512Mtmpfs. AvoidprivilegedROOTtarget/fallback. BetterportableSTRICTnonroot route: Ubuntu22kernelpolicyoldnonrootuserns +PINNEDbubblewrap0.9toolchain (oldUbuntu22aptbwrap0.6 lacks--size). Buildofficial0.9fromverifiedreleaseintoRUNNER_TEMP(nonroot,noSUID), runsameflags/preflight. ParentREADONLYUPSTREAMRELEASEfactsverified ghAPI: https://github.com/containers/bubblewrap/releases/download/v0.9.0/bubblewrap-0.9.0.tar.xz SHA256 c6347eaced49ac0141996f46bba3b089e5e6ea4408bc1c43bab9f2d05dd094e1. Upstreammeson>=0.49, REQUIREDlibcapdep, optionalSELinuxauto. optionsman feature/testsbool/bash_completion/zsh_completion features/require_usernsboolean. Ubuntu22meson0.61 adequate. CIsetupaptONLYsmallmeson ninja-build pkg-config libcap-dev (gccpreinstalled; no internationalfont/browserdepsweep), curl--fail--location--max-time60checksumverifybeforetar, meson setup build --prefix=$RUNNER_TEMP/raid-relic-bwrap -Dman=disabled -Dtests=false -Dbash_completion=disabled -Dzsh_completion=disabled -Drequire_userns=true (SELinuxauto keep). compile/installNONROOTuserprefix/no sudo make install/chmodSUID/no rootnamespaceapp. ToolchainbuildNOTourappcode/outsideofflineboundary; userCIrequestauthorizestoolchainsetup, nopaidnewservices. ToolchaintarverifiedSHA/prodnotincluded/destinationtrustedRunnerTemp.No repo/newremoteinstaller/plugins. npxplaywright-core install chromium (NO --with-deps) keeperpinnedSDK1.58.2. Unitjobunchangedubuntu-latest, journey STANDARDubuntu-22.04/retaintimeout10min. NonrootUIDtargetmapsoriginalrunner. Newlycompiledbwrapsupports--size whileavoidingUbuntu24OSnamespacepermissionrefusal, actualCIwillprove/fail—notclaimbeforetest.\nLaunchercurrentlyhardcoded/usr/bin/bwrap; acceptEXPLICITtrustedoperatorenv e.g RAID_RELIC_BWRAP_PATH absolute realpath executable OUTSIDErepo/scratch, fixedCIprefix usertemp/bwrap. No HTTP/userfixturepath/lookupPATHfallback; default/usr/bin/bwrapfornormalNativeoptionalconstant. Validatecapability --size/--perms/--unshare-all/trustedBinary beforeexecfile helpbounded5sec. Runverifiedabsoluteoperatorbinary viaPRLIMIT. ItneednotbinditinsideafterNSbecausealreadyrunningtrustedsetup; allnode/source/browser mountsRO/invariantsactualnonroot/NETPIDUSERdifferent/LOonly/tmp1777homechildowned/artifactregular64K unchanged. Existing248closeddiagandpreflightremain.Reviewpermissionsfeaturesno privilegeescalation.Nevernoopnschecker/skippreflight/reportORasserts. DocsCIexplainpinnedbuildandoldplatformlimits/proofpending. Allowed3filesworkflow/ciwrapper/doconly, no App/testsupport/browser/soak code change. ParentFASTCI-ONLYfresh913unit+appcodeUNCHANGEDhash44/137 thenhostedexactSHA→build0onlywhenbothGREEN. No full44rerunneededifunchanged; no invalidCIpass. If22policyalsoactualblocksafterthissafepinbuildthenexactownerblockerapprovednamespace-enabledrunner; otherlongsoakstillours.\nREAL2hgentle-otterPID1517493frozen243expected14:35:10stillRUNNINGfrom12:32:58. Neverkill/modifyactiveprocess/browser/ports; dedicatedCPU7800/general120otherssame. Current13:47roughly~45minremaining tofinishlong whileCIcould3minbuild.Toolchainscope3–4minSourceSTOP.SourceNo Hosttest/npmfetch allowed. Allprod3d100oldaliasese30fix unchanged/masterReadonlynew0. Usercarryall4notstopafterone.\n"
+  }
+]
+````
+
+### 5073. 2026-10-27T13:48:30.994Z — assistant (source line 19058)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll switch the journey job to Ubuntu 22.04 with a checksum-verified, nonroot bubblewrap 0.9.0 build. The launcher will accept that explicit tool path while retaining every isolation check; hosted execution must still prove it works.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 5074. 2026-10-27T13:48:32.247Z — tool call (source line 19059)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_e5551b04e43a450880452afdfff57bd1",
+  "input": "text(await tools.exec_command({cmd:\"cat .github/workflows/ci.yml\\nsed -n '45,130p' scripts/ci-journey.js\\nrg -n '/usr/bin/bwrap|Ubuntu 24|Ubuntu 22' scripts/ci-journey.js docs/CI_JOURNEY.md\",\"max_output_tokens\":2600}));\n"
+}
+````
+
+### 5075. 2026-10-27T13:48:32.373Z — tool result (source line 19062)
+
+````text
+{
+  "call_id": "call_e5551b04e43a450880452afdfff57bd1",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "5894b5",
+        "wall_time_seconds": 0.00000516,
+        "exit_code": 0,
+        "original_token_count": 1624,
+        "output": "name: CI\non: [push, pull_request]\npermissions:\n  contents: read\njobs:\n  test:\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v4\n        with:\n          persist-credentials: false\n      - uses: actions/setup-node@v4\n        with:\n          node-version: '22'\n          cache: npm\n      - run: npm ci\n      - run: npm run format:check\n      - run: npm test\n  journey:\n    needs: test\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v4\n        with:\n          persist-credentials: false\n      - uses: actions/setup-node@v4\n        with:\n          node-version: '22'\n          cache: npm\n      - run: npm ci\n      # Toolchain setup may download; the journey itself runs in an offline namespace.\n      - run: sudo apt-get update && sudo apt-get install -y bubblewrap\n      - run: npx playwright-core install chromium\n        env:\n          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/raid-relic-browsers\n      - run: node scripts/ci-journey.js\n        env:\n          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/raid-relic-browsers\n      insideErrorCode = match[2];\n    }\n  }\n};\nconst classifyStderr = (value) => {\n  if (/unknown option|unrecognized option|invalid option|invalid argument/i.test(value))\n    return 'invalidBwrapArg';\n  if (/user namespace|creating new namespace|unshare|uid map|gid map|uid_map|gid_map/i.test(value))\n    return 'userNamespaceUnavailable';\n  if (/no such file or directory|cannot find module|executable doesn't exist/i.test(value))\n    return 'missingMount';\n  if (/permission denied|operation not permitted/i.test(value)) return 'permissionDenied';\n  return value ? 'unclassified' : 'none';\n};\n// Trusted installed tool only; never execute target code during preflight.\nasync function supportsBoundedTmpfs() {\n  const help = spawn(\n    '/usr/bin/prlimit',\n    [\n      '--cpu=2',\n      '--data=67108864',\n      '--nofile=64',\n      '--fsize=65536',\n      '--',\n      '/usr/bin/bwrap',\n      '--help',\n    ],\n    { env: { PATH: '/usr/bin:/bin' }, stdio: ['ignore', 'pipe', 'pipe'] },\n  );\n  let output = '',\n    bytes = 0,\n    overflow = false,\n    timedOut = false;\n  for (const stream of [help.stdout, help.stderr])\n    stream.on('data', (buffer) => {\n      bytes += buffer.length;\n      if (bytes > 65536) {\n        overflow = true;\n        help.kill('SIGKILL');\n      } else output += buffer.toString('utf8');\n    });\n  const timeout = setTimeout(() => {\n    timedOut = true;\n    help.kill('SIGKILL');\n  }, 5000);\n  try {\n    const code = await new Promise((ok, fail) => {\n      help.once('error', fail);\n      help.once('close', ok);\n    });\n    return code === 0 && !overflow && !timedOut && /(?:^|\\s)--size(?:\\s|=|$)/m.test(output);\n  } finally {\n    clearTimeout(timeout);\n    output = '';\n  }\n}\ntry {\n  const repo = await realpath(process.cwd());\n  preflightStage = 'browser-cache';\n  const selected = process.env.PLAYWRIGHT_BROWSERS_PATH;\n  if (!selected || !isAbsolute(selected) || selected === '/') throw Error('Browser cache required');\n  const browsers = await realpath(selected);\n  if (browsers === '/' || browsers === repo || browsers.startsWith(repo + '/'))\n    throw Error('Separate toolchain required');\n  preflightStage = 'toolchain';\n  for (const executable of ['/usr/bin/prlimit', '/usr/bin/bwrap', process.execPath])\n    await access(executable, constants.X_OK);\n  preflightStage = 'sandbox-capabilities';\n  if (!(await supportsBoundedTmpfs())) {\n    stderrCategory = 'unsupportedSandboxVersion';\n    throw Error('Required sandbox capability unavailable');\n  }\n  preflightStage = 'identity';\n  const uid = process.getuid?.(),\n    gid = process.getgid?.();\n  if (!Number.isSafeInteger(uid) || uid <= 0 || !Number.isSafeInteger(gid) || gid <= 0)\n    throw Error('Nonroot identity required');\n  preflightStage = 'scratch';\n  scratch = await mkdtemp('/tmp/raid-relic-ci-');\n  await mkdir(join(scratch, 'artifacts'), { mode: 0o700 });\n  await mkdir(resolve(repo, 'artifacts'), { recursive: true });\n  await writeFile(join(scratch, 'hosts'), '127.0.0.1 localhost\\n::1 localhost\\n', { mode: 0o600 });\n  const hostNamespaces = {};\n  for (const name of ['user', 'pid', 'net'])\n    hostNamespaces[name] = await readlink('/proc/self/ns/' + name);\n  // Trusted bootstrap is mounted read-only. It emits closed markers and never\ndocs/CI_JOURNEY.md:3:The `journey` job in `.github/workflows/ci.yml` follows the existing Node 22 unit/format/evidence job. It selects the standard Ubuntu 24.04 runner for bubblewrap's bounded-tmpfs support without disabling host security; actual namespace availability remains a hosted execution gate. The unit job remains on Ubuntu latest. Toolchain setup installs pinned `playwright-core` 1.58.2 and its Chromium build before the test boundary. The dependency is development-only; production images still install with `--omit=dev --ignore-scripts` and exclude test scripts, browsers and fixtures.\ndocs/CI_JOURNEY.md:25:The parent subsequently established that this hosted run installed bubblewrap 0.6.1, which lacks the launcher's required `--size` option; the native toolchain uses 0.9.0. The journey runner now selects Ubuntu 24.04, and a pre-namespace capability check runs only installed bubblewrap's `--help` through a two-second CPU / five-second wall / 64 KiB output bound. Missing `--size`, excess output or a failed check produces closed category `unsupportedSandboxVersion` and fails the job. No help output is printed, and no unbounded-tmpfs fallback, host-security change or browser-sandbox exception is permitted. The updated hosted gate remains pending.\ndocs/CI_JOURNEY.md:27:Hosted run 40507287365 subsequently reached the ten-minute job deadline during Playwright's broad system-dependency/font installation, before sandbox preflight or the journey ran. Setup now uses `npx playwright-core install chromium` to download the pinned SDK's matching official browser without the `--with-deps` system-upgrade/font sweep. It relies on the standard Ubuntu 24.04 runner's baseline runtime libraries and the repository's bundled Cinzel fonts; actual browser launch must validate those prerequisites and fails if they are missing. This does not extend the job deadline, change isolation or establish a hosted test pass.\nscripts/ci-journey.js:69:      '/usr/bin/bwrap',\nscripts/ci-journey.js:110:  for (const executable of ['/usr/bin/prlimit', '/usr/bin/bwrap', process.execPath])\nscripts/ci-journey.js:182:    '/usr/bin/bwrap',\n"
+      }
+    }
+  ]
+}
+````
+
+### 5076. 2026-10-27T13:49:14.051Z — tool call (source line 19066)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_e4828a2322244a9ca02a60eb59d92f17",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/scripts/ci-journey.js\\n@@\\n-import { mkdir, mkdtemp, writeFile, realpath, open, rm, access, readlink } from 'node:fs/promises';\\n+import { mkdir, mkdtemp, writeFile, realpath, open, rm, access, readlink, stat } from 'node:fs/promises';\\n@@\\n-async function supportsBoundedTmpfs() {\\n+async function supportsBoundedTmpfs(bwrap) {\\n@@\\n-      '/usr/bin/bwrap',\\n+      bwrap,\\n@@\\n-    return code === 0 && !overflow && !timedOut && /(?:^|\\\\s)--size(?:\\\\s|=|$)/m.test(output);\\n+    return code === 0 && !overflow && !timedOut &&\\n+      ['--size', '--perms', '--unshare-all'].every((flag) =>\\n+        new RegExp('(?:^|\\\\\\\\s)' + flag + '(?:\\\\\\\\s|=|$)', 'm').test(output));\\n@@\\n   preflightStage = 'toolchain';\\n-  for (const executable of ['/usr/bin/prlimit', '/usr/bin/bwrap', process.execPath])\\n+  const selectedBwrap = process.env.RAID_RELIC_BWRAP_PATH ?? '/usr/bin/bwrap';\\n+  if (!isAbsolute(selectedBwrap)) throw Error('Absolute sandbox tool required');\\n+  const bwrap = await realpath(selectedBwrap);\\n+  const binary = await stat(bwrap);\\n+  if (bwrap === repo || bwrap.startsWith(repo + '/') || !binary.isFile() ||\\n+      (binary.mode & 0o6022) !== 0 || ![0, process.getuid?.()].includes(binary.uid))\\n+    throw Error('Trusted non-setuid sandbox tool required');\\n+  for (const executable of ['/usr/bin/prlimit', bwrap, process.execPath])\\n     await access(executable, constants.X_OK);\\n@@\\n-  if (!(await supportsBoundedTmpfs())) {\\n+  if (!(await supportsBoundedTmpfs(bwrap))) {\\n@@\\n   scratch = await mkdtemp('/tmp/raid-relic-ci-');\\n+  if (bwrap.startsWith(scratch + '/')) throw Error('Sandbox tool outside scratch required');\\n@@\\n-    '/usr/bin/bwrap',\\n+    bwrap,\\n*** End Patch\"));\ntext(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/.github/workflows/ci.yml\\n@@\\n-    runs-on: ubuntu-24.04\\n+    runs-on: ubuntu-22.04\\n@@\\n-      - run: sudo apt-get update && sudo apt-get install -y bubblewrap\\n+      - name: Build pinned non-setuid sandbox tool\\n+        shell: bash\\n+        run: |\\n+          set -euo pipefail\\n+          sudo apt-get update\\n+          sudo apt-get install -y --no-install-recommends meson ninja-build pkg-config libcap-dev\\n+          bwrap_build=$(mktemp -d \\\"$RUNNER_TEMP/raid-relic-bwrap-build.XXXXXX\\\")\\n+          curl --fail --location --max-time 60 --output \\\"$bwrap_build/bubblewrap.tar.xz\\\" https://github.com/containers/bubblewrap/releases/download/v0.9.0/bubblewrap-0.9.0.tar.xz\\n+          printf '%s  %s\\\\n' 'c6347eaced49ac0141996f46bba3b089e5e6ea4408bc1c43bab9f2d05dd094e1' \\\"$bwrap_build/bubblewrap.tar.xz\\\" | sha256sum --check --strict\\n+          mkdir \\\"$bwrap_build/src\\\"\\n+          tar -xJf \\\"$bwrap_build/bubblewrap.tar.xz\\\" -C \\\"$bwrap_build/src\\\" --strip-components=1\\n+          meson setup \\\"$bwrap_build/build\\\" \\\"$bwrap_build/src\\\" --prefix=\\\"$RUNNER_TEMP/raid-relic-bwrap\\\" -Dman=disabled -Dtests=false -Dbash_completion=disabled -Dzsh_completion=disabled -Drequire_userns=true\\n+          meson compile -C \\\"$bwrap_build/build\\\"\\n+          meson install -C \\\"$bwrap_build/build\\\"\\n@@\\n       - run: node scripts/ci-journey.js\\n         env:\\n           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/raid-relic-browsers\\n+          RAID_RELIC_BWRAP_PATH: ${{ runner.temp }}/raid-relic-bwrap/bin/bwrap\\n*** End Patch\"));\n"
+}
+````
+
+### 5077. 2026-10-27T13:49:14.161Z — tool result (source line 19070)
+
+````text
+{
+  "call_id": "call_e4828a2322244a9ca02a60eb59d92f17",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 5078. 2026-10-27T13:49:36.694Z — tool call (source line 19074)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_0ea6b73431fc436299d609d880152196",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/docs/CI_JOURNEY.md\\n@@\\n-The `journey` job in `.github/workflows/ci.yml` follows the existing Node 22 unit/format/evidence job. It selects the standard Ubuntu 24.04 runner for bubblewrap's bounded-tmpfs support without disabling host security; actual namespace availability remains a hosted execution gate. The unit job remains on Ubuntu latest. Toolchain setup installs pinned `playwright-core` 1.58.2 and its Chromium build before the test boundary. The dependency is development-only; production images still install with `--omit=dev --ignore-scripts` and exclude test scripts, browsers and fixtures.\\n+The `journey` job in `.github/workflows/ci.yml` follows the existing Node 22 unit/format/evidence job. It selects the standard Ubuntu 22.04 runner with a pinned, non-setuid bubblewrap 0.9.0 build; actual namespace availability remains a hosted execution gate. The unit job remains on Ubuntu latest. Toolchain setup installs pinned `playwright-core` 1.58.2 and its Chromium build before the test boundary. The dependency is development-only; production images still install with `--omit=dev --ignore-scripts` and exclude test scripts, browsers and fixtures.\\n@@\\n-The parent subsequently established that this hosted run installed bubblewrap 0.6.1, which lacks the launcher's required `--size` option; the native toolchain uses 0.9.0. The journey runner now selects Ubuntu 24.04, and a pre-namespace capability check runs only installed bubblewrap's `--help` through a two-second CPU / five-second wall / 64 KiB output bound. Missing `--size`, excess output or a failed check produces closed category `unsupportedSandboxVersion` and fails the job. No help output is printed, and no unbounded-tmpfs fallback, host-security change or browser-sandbox exception is permitted. The updated hosted gate remains pending.\\n+The parent subsequently established that this hosted run installed bubblewrap 0.6.1, which lacks the launcher's required `--size` option; the native toolchain uses 0.9.0. An intermediate attempt selected Ubuntu 24.04. A pre-namespace capability check runs only the selected bubblewrap's `--help` through a two-second CPU / five-second wall / 64 KiB output bound. Missing required `--size`, `--perms` or `--unshare-all`, excess output or a failed check produces closed category `unsupportedSandboxVersion` and fails the job. No help output is printed, and no unbounded-tmpfs fallback, host-security change or browser-sandbox exception is permitted. The updated hosted gate remains pending.\\n@@\\n-Hosted run 40507287365 subsequently reached the ten-minute job deadline during Playwright's broad system-dependency/font installation, before sandbox preflight or the journey ran. Setup now uses `npx playwright-core install chromium` to download the pinned SDK's matching official browser without the `--with-deps` system-upgrade/font sweep. It relies on the standard Ubuntu 24.04 runner's baseline runtime libraries and the repository's bundled Cinzel fonts; actual browser launch must validate those prerequisites and fails if they are missing. This does not extend the job deadline, change isolation or establish a hosted test pass.\\n+Hosted run 40507287365 subsequently reached the ten-minute job deadline during Playwright's broad system-dependency/font installation, before sandbox preflight or the journey ran. Setup now uses `npx playwright-core install chromium` to download the pinned SDK's matching official browser without the `--with-deps` system-upgrade/font sweep. It relies on the selected standard runner's baseline runtime libraries and the repository's bundled Cinzel fonts; actual browser launch must validate those prerequisites and fails if they are missing. This does not extend the job deadline, change isolation or establish a hosted test pass.\\n@@\\n A trusted read-only bootstrap now runs inside the same sandbox before importing the journey. It requires the expected nonroot identity, separate user/PID/network namespaces, only the loopback interface, read-only source/toolchain/bootstrap mounts, and successful create/remove probes confined to temporary storage and the artifact directory. Its markers contain only fixed stage/code enums. The 512 MiB private `/tmp` is explicitly mode 1777; the nonroot child creates its own mode-0700 HOME/cache there rather than relying on ownership of setup-created directories. Host source permissions and artifact confinement are unchanged. Any failed invariant remains fatal, and passing this bootstrap cannot substitute for the three actual journey checks. Fresh hosted execution is still required.\\n+\\n+Hosted run 40514502733 subsequently identified the denial as bubblewrap setup on Ubuntu 24.04, before the trusted bootstrap started; it did not implicate application code or Chromium. The next configuration returns to standard Ubuntu 22.04 while replacing its older packaged bubblewrap with official release 0.9.0. Setup verifies the release archive against SHA-256 `c6347eaced49ac0141996f46bba3b089e5e6ea4408bc1c43bab9f2d05dd094e1` before extraction, installs only the small Meson/Ninja/pkg-config/libcap build prerequisites, and compiles/installs under runner temporary storage as the ordinary runner user with `require_userns=true`. No setuid installation or privileged application execution is used.\\n+\\n+The trusted operator supplies the absolute `RAID_RELIC_BWRAP_PATH`; absent that setting, the native default remains `/usr/bin/bwrap`. The launcher resolves the selected executable, rejects repository-local, nonregular, setuid/setgid, group/world-writable or unexpectedly owned files, and checks required capabilities before namespace setup. It never selects a tool from HTTP, fixture data or PATH. All namespace, mount, clear-environment, resource, regular-file report and Chromium sandbox checks remain mandatory. This configuration is pending actual hosted proof; another namespace denial is a runner-capability blocker, not permission to bypass isolation.\\n*** End Patch\"));\n"
+}
+````
+
+### 5079. 2026-10-27T13:49:36.811Z — tool result (source line 19077)
+
+````text
+{
+  "call_id": "call_0ea6b73431fc436299d609d880152196",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 5080. 2026-10-27T13:49:43.539Z — assistant (source line 19082)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Updated only the workflow, CI launcher and CI documentation.\n\nJourney CI now uses Ubuntu 22.04 with checksum-verified bubblewrap 0.9.0, built and installed nonroot. The launcher validates the explicit tool path, ownership, permissions and required capabilities. All sandbox and resource checks remain mandatory.\n\nNo execution by source. Hosted validation is pending; the running soak is untouched.",
     "annotations": [],
     "logprobs": []
   }

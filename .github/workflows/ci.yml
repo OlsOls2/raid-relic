@@ -19,7 +19,7 @@ jobs:
       - run: npm test
   journey:
     needs: test
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -31,10 +31,24 @@ jobs:
           cache: npm
       - run: npm ci
       # Toolchain setup may download; the journey itself runs in an offline namespace.
-      - run: sudo apt-get update && sudo apt-get install -y bubblewrap
+      - name: Build pinned non-setuid sandbox tool
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends meson ninja-build pkg-config libcap-dev
+          bwrap_build=$(mktemp -d "$RUNNER_TEMP/raid-relic-bwrap-build.XXXXXX")
+          curl --fail --location --max-time 60 --output "$bwrap_build/bubblewrap.tar.xz" https://github.com/containers/bubblewrap/releases/download/v0.9.0/bubblewrap-0.9.0.tar.xz
+          printf '%s  %s\n' 'c6347eaced49ac0141996f46bba3b089e5e6ea4408bc1c43bab9f2d05dd094e1' "$bwrap_build/bubblewrap.tar.xz" | sha256sum --check --strict
+          mkdir "$bwrap_build/src"
+          tar -xJf "$bwrap_build/bubblewrap.tar.xz" -C "$bwrap_build/src" --strip-components=1
+          meson setup "$bwrap_build/build" "$bwrap_build/src" --prefix="$RUNNER_TEMP/raid-relic-bwrap" -Dman=disabled -Dtests=false -Dbash_completion=disabled -Dzsh_completion=disabled -Drequire_userns=true
+          meson compile -C "$bwrap_build/build"
+          meson install -C "$bwrap_build/build"
       - run: npx playwright-core install chromium
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/raid-relic-browsers
       - run: node scripts/ci-journey.js
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/raid-relic-browsers
+          RAID_RELIC_BWRAP_PATH: ${{ runner.temp }}/raid-relic-bwrap/bin/bwrap

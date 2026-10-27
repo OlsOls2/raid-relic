@@ -1,7 +1,17 @@
 // Trusted CI launcher. Toolchain download happens BEFORE this offline boundary.
 import { spawn } from 'node:child_process';
 import { constants } from 'node:fs';
-import { mkdir, mkdtemp, writeFile, realpath, open, rm, access, readlink } from 'node:fs/promises';
+import {
+  mkdir,
+  mkdtemp,
+  writeFile,
+  realpath,
+  open,
+  rm,
+  access,
+  readlink,
+  stat,
+} from 'node:fs/promises';
 import { dirname, join, resolve, isAbsolute } from 'node:path';
 let scratch,
   passed = false,
@@ -57,18 +67,10 @@ const classifyStderr = (value) => {
   return value ? 'unclassified' : 'none';
 };
 // Trusted installed tool only; never execute target code during preflight.
-async function supportsBoundedTmpfs() {
+async function supportsBoundedTmpfs(bwrap) {
   const help = spawn(
     '/usr/bin/prlimit',
-    [
-      '--cpu=2',
-      '--data=67108864',
-      '--nofile=64',
-      '--fsize=65536',
-      '--',
-      '/usr/bin/bwrap',
-      '--help',
-    ],
+    ['--cpu=2', '--data=67108864', '--nofile=64', '--fsize=65536', '--', bwrap, '--help'],
     { env: { PATH: '/usr/bin:/bin' }, stdio: ['ignore', 'pipe', 'pipe'] },
   );
   let output = '',
@@ -92,7 +94,14 @@ async function supportsBoundedTmpfs() {
       help.once('error', fail);
       help.once('close', ok);
     });
-    return code === 0 && !overflow && !timedOut && /(?:^|\s)--size(?:\s|=|$)/m.test(output);
+    return (
+      code === 0 &&
+      !overflow &&
+      !timedOut &&
+      ['--size', '--perms', '--unshare-all'].every((flag) =>
+        new RegExp('(?:^|\\s)' + flag + '(?:\\s|=|$)', 'm').test(output),
+      )
+    );
   } finally {
     clearTimeout(timeout);
     output = '';
@@ -107,10 +116,22 @@ try {
   if (browsers === '/' || browsers === repo || browsers.startsWith(repo + '/'))
     throw Error('Separate toolchain required');
   preflightStage = 'toolchain';
-  for (const executable of ['/usr/bin/prlimit', '/usr/bin/bwrap', process.execPath])
+  const selectedBwrap = process.env.RAID_RELIC_BWRAP_PATH ?? '/usr/bin/bwrap';
+  if (!isAbsolute(selectedBwrap)) throw Error('Absolute sandbox tool required');
+  const bwrap = await realpath(selectedBwrap);
+  const binary = await stat(bwrap);
+  if (
+    bwrap === repo ||
+    bwrap.startsWith(repo + '/') ||
+    !binary.isFile() ||
+    (binary.mode & 0o6022) !== 0 ||
+    ![0, process.getuid?.()].includes(binary.uid)
+  )
+    throw Error('Trusted non-setuid sandbox tool required');
+  for (const executable of ['/usr/bin/prlimit', bwrap, process.execPath])
     await access(executable, constants.X_OK);
   preflightStage = 'sandbox-capabilities';
-  if (!(await supportsBoundedTmpfs())) {
+  if (!(await supportsBoundedTmpfs(bwrap))) {
     stderrCategory = 'unsupportedSandboxVersion';
     throw Error('Required sandbox capability unavailable');
   }
@@ -121,6 +142,7 @@ try {
     throw Error('Nonroot identity required');
   preflightStage = 'scratch';
   scratch = await mkdtemp('/tmp/raid-relic-ci-');
+  if (bwrap.startsWith(scratch + '/')) throw Error('Sandbox tool outside scratch required');
   await mkdir(join(scratch, 'artifacts'), { mode: 0o700 });
   await mkdir(resolve(repo, 'artifacts'), { recursive: true });
   await writeFile(join(scratch, 'hosts'), '127.0.0.1 localhost\n::1 localhost\n', { mode: 0o600 });
@@ -179,7 +201,7 @@ await import('/app/scripts/browser-smoke-journey-ci.js');
     '--nofile=2048',
     '--fsize=16777216',
     '--',
-    '/usr/bin/bwrap',
+    bwrap,
     '--unshare-all',
     '--die-with-parent',
     '--new-session',
