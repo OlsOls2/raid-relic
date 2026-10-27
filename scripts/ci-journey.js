@@ -1,17 +1,90 @@
 // Trusted CI launcher. Toolchain download happens BEFORE this offline boundary.
 import { spawn } from 'node:child_process';
 import { constants } from 'node:fs';
-import { mkdir, mkdtemp, writeFile, realpath, open, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, writeFile, realpath, open, rm, access } from 'node:fs/promises';
 import { dirname, join, resolve, isAbsolute } from 'node:path';
 let scratch,
-  passed = false;
+  passed = false,
+  preflightStage = 'repository',
+  childExitCode = null,
+  childSignal = 'none',
+  errorCode = 'none',
+  stderrCategory = 'none';
+let stderr = '';
+const classifyStderr = (value) => {
+  if (/unknown option|unrecognized option|invalid option|invalid argument/i.test(value))
+    return 'invalidBwrapArg';
+  if (/user namespace|creating new namespace|unshare|uid map|gid map|uid_map|gid_map/i.test(value))
+    return 'userNamespaceUnavailable';
+  if (/no such file or directory|cannot find module|executable doesn't exist/i.test(value))
+    return 'missingMount';
+  if (/permission denied|operation not permitted/i.test(value)) return 'permissionDenied';
+  return value ? 'unclassified' : 'none';
+};
+// Trusted installed tool only; never execute target code during preflight.
+async function supportsBoundedTmpfs() {
+  const help = spawn(
+    '/usr/bin/prlimit',
+    [
+      '--cpu=2',
+      '--data=67108864',
+      '--nofile=64',
+      '--fsize=65536',
+      '--',
+      '/usr/bin/bwrap',
+      '--help',
+    ],
+    { env: { PATH: '/usr/bin:/bin' }, stdio: ['ignore', 'pipe', 'pipe'] },
+  );
+  let output = '',
+    bytes = 0,
+    overflow = false,
+    timedOut = false;
+  for (const stream of [help.stdout, help.stderr])
+    stream.on('data', (buffer) => {
+      bytes += buffer.length;
+      if (bytes > 65536) {
+        overflow = true;
+        help.kill('SIGKILL');
+      } else output += buffer.toString('utf8');
+    });
+  const timeout = setTimeout(() => {
+    timedOut = true;
+    help.kill('SIGKILL');
+  }, 5000);
+  try {
+    const code = await new Promise((ok, fail) => {
+      help.once('error', fail);
+      help.once('close', ok);
+    });
+    return code === 0 && !overflow && !timedOut && /(?:^|\s)--size(?:\s|=|$)/m.test(output);
+  } finally {
+    clearTimeout(timeout);
+    output = '';
+  }
+}
 try {
   const repo = await realpath(process.cwd());
+  preflightStage = 'browser-cache';
   const selected = process.env.PLAYWRIGHT_BROWSERS_PATH;
   if (!selected || !isAbsolute(selected) || selected === '/') throw Error('Browser cache required');
   const browsers = await realpath(selected);
   if (browsers === '/' || browsers === repo || browsers.startsWith(repo + '/'))
     throw Error('Separate toolchain required');
+  preflightStage = 'toolchain';
+  for (const executable of ['/usr/bin/prlimit', '/usr/bin/bwrap', process.execPath])
+    await access(executable, constants.X_OK);
+  preflightStage = 'sandbox-capabilities';
+  if (!(await supportsBoundedTmpfs())) {
+    stderrCategory = 'unsupportedSandboxVersion';
+    throw Error('Required sandbox capability unavailable');
+  }
+  preflightStage = 'identity';
+  const uid = process.getuid?.(),
+    gid = process.getgid?.();
+  if (!Number.isSafeInteger(uid) || uid <= 0 || !Number.isSafeInteger(gid) || gid <= 0)
+    throw Error('Nonroot identity required');
+  preflightStage = 'scratch';
   scratch = await mkdtemp('/tmp/raid-relic-ci-');
   await mkdir(join(scratch, 'artifacts'), { mode: 0o700 });
   await mkdir(resolve(repo, 'artifacts'), { recursive: true });
@@ -28,9 +101,9 @@ try {
     '--die-with-parent',
     '--new-session',
     '--uid',
-    '1000',
+    String(uid),
     '--gid',
-    '1000',
+    String(gid),
     '--clearenv',
     '--ro-bind',
     '/usr',
@@ -108,6 +181,7 @@ try {
     '/tool-node/node',
     'scripts/browser-smoke-journey-ci.js',
   ];
+  preflightStage = 'sandbox-spawn';
   const child = spawn('/usr/bin/prlimit', args, {
     env: { PATH: '/usr/bin:/bin' },
     stdio: ['ignore', 'pipe', 'pipe'],
@@ -118,6 +192,7 @@ try {
   for (const stream of [child.stdout, child.stderr])
     stream.on('data', (b) => {
       bytes += b.length;
+      if (stream === child.stderr && bytes <= 65536) stderr += b.toString('utf8');
       if (bytes > 65536) {
         overflow = true;
         child.kill('SIGKILL');
@@ -131,17 +206,31 @@ try {
   try {
     code = await new Promise((ok, fail) => {
       child.once('error', fail);
-      child.once('close', ok);
+      child.once('close', (exitCode, signal) => {
+        childExitCode = Number.isInteger(exitCode) ? exitCode : null;
+        childSignal = ['SIGKILL', 'SIGTERM', 'SIGABRT', 'SIGSEGV', 'SIGXCPU', 'SIGXFSZ'].includes(
+          signal,
+        )
+          ? signal
+          : signal
+            ? 'other'
+            : 'none';
+        ok(exitCode);
+      });
     });
   } finally {
     clearTimeout(timeout);
   }
+  stderrCategory = classifyStderr(stderr);
+  stderr = '';
+  preflightStage = 'report-open';
   const handle = await open(
     join(scratch, 'artifacts', 'journey-ci-browser-results.json'),
     constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK,
   );
   let report;
   try {
+    preflightStage = 'report-validate';
     const before = await handle.stat();
     if (!before.isFile() || before.nlink !== 1 || before.size > 65536)
       throw Error('Report rejected');
@@ -171,10 +260,31 @@ try {
         : 0,
       timedOut,
       outputOverflow: overflow,
+      childExitCode,
+      childSignal,
+      stderrCategory,
     }),
   );
-} catch {
-  console.log(JSON.stringify({ passed: false, stage: 'sandbox-or-toolchain' }));
+} catch (error) {
+  errorCode = ['ENOENT', 'EACCES', 'EPERM', 'EINVAL', 'ELOOP', 'ENOTDIR', 'ENOSPC'].includes(
+    error?.code,
+  )
+    ? error.code
+    : 'other';
+  if (preflightStage === 'toolchain' && errorCode === 'ENOENT') stderrCategory = 'toolchainMissing';
+  else if (stderr) stderrCategory = classifyStderr(stderr);
+  stderr = '';
+  console.log(
+    JSON.stringify({
+      passed: false,
+      stage: 'sandbox-or-toolchain',
+      preflightStage,
+      childExitCode,
+      childSignal,
+      errorCode,
+      stderrCategory,
+    }),
+  );
 } finally {
   if (scratch) await rm(scratch, { recursive: true, force: true });
 }
