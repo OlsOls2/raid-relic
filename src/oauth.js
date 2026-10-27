@@ -264,11 +264,12 @@ export function createOAuth({
         const role = id ? (id === streamerId ? 'streamer' : `keeper:${id}`) : match[1];
         const state = nonce();
         const browser = nonce();
-        await store.createState(
+        const allocated = await store.createState(
           hash(state),
           { binding: hash(browser), role, ...(p7 ? { p7: true } : {}), expiresAt: now() + 300000 },
           now(),
         );
+        if (allocated === false) return response(429, 'Authorization busy; try again shortly');
         const auth = new URL('https://id.twitch.tv/oauth2/authorize');
         auth.search = new URLSearchParams({
           client_id: clientId,

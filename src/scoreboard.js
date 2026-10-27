@@ -97,12 +97,24 @@ export function reduceScores(
     if (duplicate) reason = 'duplicate';
     else if (!safe) reason = 'policy-blocked';
     else if (acknowledged) reason = 'handled';
+    else if (
+      doc.receipts.filter((r) => r.actor === hash(`command-actor:${host}:${chat.chatterId}`))
+        .length >= 8 ||
+      doc.receipts.filter((r) => r.room === hash(`command-room:${host}`)).length >= 32
+    )
+      reason = 'cooldown-quiet';
     else if (doc.receipts.length >= 128) reason = 'capacity';
     else {
       const rate = hash(`command-rate-v2:${host}:${chat.chatterId}:${action}`),
         notice = hash(`command-notice-v2:${host}:${chat.chatterId}`),
         limited = doc.receipts.some((r) => r.rate === rate && r.at + 10000 > now);
-      const r = { key: request, until: now + 600000, ...(!limited ? { rate, at: now } : {}) };
+      const r = {
+        key: request,
+        until: now + 600000,
+        actor: hash(`command-actor:${host}:${chat.chatterId}`),
+        room: hash(`command-room:${host}`),
+        ...(!limited ? { rate, at: now } : {}),
+      };
       doc.receipts.push(r);
       let consentMessage = null;
       if (action === 'scores-on' && !limited) {

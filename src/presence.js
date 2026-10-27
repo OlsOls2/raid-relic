@@ -18,7 +18,13 @@ export function revokePresenceActor(previous, host, actor, now) {
     existing.through = Math.max(existing.through, now);
     existing.expiresAt = now + 600000;
   } else {
-    if (doc.revocations.length >= 256) throw Error('Presence revocation capacity reached');
+    if (doc.revocations.length >= 256) {
+      // Conservatively revoke every older proof when individual tombstones fill.
+      // Erasure must commit; no forgotten proof may be reintroduced by delay.
+      doc.notBefore = Math.max(doc.notBefore ?? -1, now, ...doc.revocations.map((r) => r.through));
+      doc.actors = doc.actors.filter((a) => a.seenAt > doc.notBefore);
+      doc.revocations = [];
+    }
     doc.revocations.push({ key, through: now, expiresAt: now + 600000 });
   }
   if (Buffer.byteLength(JSON.stringify(doc)) > 65536) throw Error('Presence capacity reached');
@@ -76,7 +82,7 @@ export function updatePresence(previous, host, channel, marks, chat, now, sentAt
     !marks?.blocked.includes(chat.chatterId)
   ) {
     if (!doc.actors.some((a) => a.id === chat.chatterId)) {
-      if (doc.actors.length >= 256) throw Error('Presence capacity reached');
+      if (doc.actors.length >= 256) return doc;
       doc.actors.push({ id: chat.chatterId, seenAt: sentAt });
     }
   }

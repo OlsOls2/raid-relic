@@ -253,7 +253,7 @@ export function createMemoryState({
           keeperNames,
         );
       }
-      if (claiming && chat?.markAction?.type === 'mymarks')
+      if (claiming && !proofSeen && chat?.markAction?.type === 'mymarks')
         claiming.marks[host] = reserveShare(
           claiming.marks[host],
           claiming.lineage,

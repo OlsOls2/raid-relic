@@ -458,7 +458,7 @@ for (const kind of ['memory', 'firestore']) {
     });
     assert.equal(doc.shareReceipts.length, 2);
     for (const row of doc.shareReceipts) {
-      assert.deepEqual(Object.keys(row).sort(), ['expiresAt', 'key']);
+      assert.deepEqual(Object.keys(row).sort(), ['actor', 'expiresAt', 'key']);
       assert.match(row.key, /^[a-f0-9]{64}$/);
     }
   });
@@ -554,9 +554,9 @@ test('minimal share receipts cap128, prune expired hashes, and fail closed at th
     key: String(n).padStart(64, '0'),
     expiresAt: now + 600000,
   }));
-  assert.throws(
-    () => reserveShare({ shareReceipts: receipts }, null, chat, undefined, now),
-    /receipt capacity/,
+  assert.deepEqual(
+    reserveShare({ shareReceipts: receipts }, null, chat, undefined, now).shareReceipts,
+    receipts,
   );
   const pruned = reserveShare(
     { shareReceipts: receipts, blocked: [] },
@@ -565,10 +565,64 @@ test('minimal share receipts cap128, prune expired hashes, and fail closed at th
     undefined,
     now + 600001,
   );
-  assert.equal(pruned.shareReceipts.length, 1);
+  assert.equal(pruned.shareReceipts.length, 0);
   assert.throws(
     () => reserveShare({ padding: 'x'.repeat(131072) }, null, chat, undefined, now),
     /storage capacity/,
   );
   assert.equal(receipts.length, 128);
 });
+
+for (const kind of ['memory', 'firestore']) {
+  test(`${kind}: invalid identity floods do not consume rename admission; full admission still revokes stale aliases`, async () => {
+    const f = await setup(kind);
+    const send = (login, messageId) =>
+      f.signed(
+        'channel.chat.message',
+        {
+          broadcaster_user_id: HOME,
+          chatter_user_id: '811',
+          chatter_user_login: login,
+          message_id: messageId,
+          message: { text: '!relic mymarks', fragments: [] },
+        },
+        HOME,
+        { broadcaster_user_id: HOME, user_id: BOT },
+      );
+    for (let i = 0; i < 20; i++) await send('bad name', `invalid-before-${i}`);
+    let doc = await f.runtime.state.getPrivateMarks(HOME, { broadcasterId: HOME, chatterId: HOME });
+    assert.equal(doc.shareReceipts?.length ?? 0, 0);
+    await send('old_name', 'before-rename');
+    const original = await f.row();
+    assert.equal((await f.page(original.token)).status, 200);
+    for (let i = 0; i < 6; i++) await send('old_name', `valid-rate-rejected-${i}`);
+    doc = await f.runtime.state.getPrivateMarks(HOME, { broadcasterId: HOME, chatterId: HOME });
+    assert.equal(doc.shareReceipts.length, 7);
+    for (let i = 0; i < 20; i++) await send('@invalid', `invalid-near-cap-${i}`);
+    f.advance(60001);
+    await send('new_name', 'legitimate-rename');
+    assert.equal((await f.page(original.token)).status, 403);
+    const current = await f.row();
+    assert.equal(current.login, 'new_name');
+    assert.equal(JSON.parse((await f.page(current.token)).body).total, 1);
+    await send('old_name', 'before-rename');
+    assert.equal((await f.page(current.token)).status, 200);
+    assert.equal((await f.row()).login, 'new_name');
+    doc = await f.runtime.state.getPrivateMarks(HOME, { broadcasterId: HOME, chatterId: HOME });
+    assert.equal(doc.shareReceipts.length, 8);
+    f.advance(60001);
+    await send('third_name', 'rename-at-full-admission');
+    assert.equal((await f.page(current.token)).status, 403);
+    assert.equal(await f.row(), undefined);
+    // Expiry restores bounded admission for a subsequent fresh request.
+    f.advance(600001);
+    await send('final_name', 'after-receipt-expiry');
+    const final = await f.row();
+    assert.equal(final.login, 'final_name');
+    assert.equal((await f.page(final.token)).status, 200);
+    assert.ok(
+      (await f.runtime.state.getPrivateMarks(HOME, { broadcasterId: HOME, chatterId: HOME }))
+        .shareReceipts.length <= 128,
+    );
+  });
+}

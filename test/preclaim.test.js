@@ -168,21 +168,22 @@ test('presence is stream-scoped, bounded, no text/login retention and clears rat
   );
   doc = updatePresence(doc, HOME, { ...c, paused: true }, m, null, 20, 20);
   assert.equal(updatePresence(doc, HOME, c, m, null, 30, 30).actors.length, 0);
-  assert.throws(
-    () =>
-      updatePresence(
-        {
-          streamId: '9',
-          actors: Array.from({ length: 256 }, (_, i) => ({ id: String(i), seenAt: 1 })),
-        },
-        HOME,
-        c,
-        m,
-        { broadcasterId: HOME, chatterId: '999', messageId: 'capacity' },
-        30,
-        30,
-      ),
-    /capacity/,
+  const saturated = updatePresence(
+    {
+      streamId: '9',
+      actors: Array.from({ length: 256 }, (_, i) => ({ id: String(i), seenAt: 1 })),
+    },
+    HOME,
+    c,
+    m,
+    { broadcasterId: HOME, chatterId: '999', messageId: 'capacity' },
+    30,
+    30,
+  );
+  assert.equal(saturated.actors.length, 256);
+  assert.equal(
+    saturated.actors.some((a) => a.id === '999'),
+    false,
   );
 });
 

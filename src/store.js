@@ -69,6 +69,14 @@ export function ritualFor(id, now, raid) {
 }
 
 // Generic auth records contain only state hashes, encrypted tokens and lease metadata.
+export const OAUTH_STATE_LIMITS = Object.freeze({ slots: 256, probes: 8 });
+export function oauthStateSlots(id) {
+  const first = parseInt(hash(id).slice(0, 8), 16) % OAUTH_STATE_LIMITS.slots;
+  return Array.from(
+    { length: OAUTH_STATE_LIMITS.probes },
+    (_, i) => `oauth-state-slot-v1:${(first + i) % OAUTH_STATE_LIMITS.slots}`,
+  );
+}
 export function createMemoryAuthStore() {
   const records = new Map();
   return {
@@ -113,16 +121,25 @@ export function createMemoryAuthStore() {
       records.delete(`control:${id}`);
       return true;
     },
-    async createState(id, record, now) {
-      for (const [key, value] of records)
-        if (!key.includes(':') && value.expiresAt <= now) records.delete(key);
-      if (records.has(id) || records.size >= 1024) throw new Error('OAuth state capacity reached');
-      records.set(id, structuredClone(record));
+    async createState(id, record, now = 0) {
+      const slots = oauthStateSlots(id);
+      if (
+        slots.some((key) => records.get(key)?.stateHash === id && records.get(key).expiresAt > now)
+      )
+        return false;
+      const slot = slots.find((key) => !records.has(key) || records.get(key).expiresAt <= now);
+      if (!slot) return false;
+      records.set(slot, { ...structuredClone(record), stateHash: id });
+      return true;
     },
     async consumeState(id, binding, now) {
-      const record = records.get(id);
-      if (!record || record.binding !== binding || record.expiresAt <= now) return null;
-      records.delete(id);
+      const slot = oauthStateSlots(id).find((key) => {
+        const r = records.get(key);
+        return r?.stateHash === id && r.binding === binding && r.expiresAt > now;
+      });
+      if (!slot) return null;
+      const { stateHash, ...record } = records.get(slot);
+      records.delete(slot);
       return structuredClone(record);
     },
     async getToken(role) {
@@ -335,7 +352,7 @@ export function createFirestoreStore(
             keeperNames,
           );
         }
-        if (claiming && chat?.markAction?.type === 'mymarks')
+        if (claiming && !proofSeen && chat?.markAction?.type === 'mymarks')
           claiming.marks[host] = reserveShare(
             claiming.marks[host],
             claiming.lineage,
@@ -1116,16 +1133,36 @@ export function createFirestoreStore(
         return true;
       });
     },
-    async createState(id, record) {
-      await ref('oauthStates', id).create(record);
+    async createState(id, record, now = 0) {
+      return db.runTransaction(async (tx) => {
+        const refs = oauthStateSlots(id).map((key) => ref('oauthStates', key));
+        const rows = [];
+        for (const doc of refs) rows.push((await tx.get(doc)).data());
+        if (rows.some((r) => r?.stateHash === id && r.expiresAt > now)) return false;
+        const index = rows.findIndex((r) => !r || r.expiresAt <= now);
+        if (index < 0) return false;
+        tx.set(refs[index], { ...record, stateHash: id });
+        return true;
+      });
     },
     async consumeState(id, binding, now) {
       return db.runTransaction(async (tx) => {
-        const doc = ref('oauthStates', id);
-        const snap = await tx.get(doc);
-        const record = snap.data();
-        if (!snap.exists || record.binding !== binding || record.expiresAt <= now) return null;
-        tx.delete(doc);
+        const refs = oauthStateSlots(id).map((key) => ref('oauthStates', key));
+        // One bounded legacy lookup preserves already-issued five-minute flows.
+        // Legacy orphans are not scanned, migrated or reissued by new starts.
+        const legacy = ref('oauthStates', id);
+        const rows = [];
+        for (const doc of [...refs, legacy]) rows.push((await tx.get(doc)).data());
+        const index = rows.findIndex(
+          (r, i) =>
+            r &&
+            (i === refs.length ? r.stateHash === undefined : r.stateHash === id) &&
+            r.binding === binding &&
+            r.expiresAt > now,
+        );
+        if (index < 0) return null;
+        tx.delete(index === refs.length ? legacy : refs[index]);
+        const { stateHash, ...record } = rows[index];
         return record;
       });
     },

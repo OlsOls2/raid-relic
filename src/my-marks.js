@@ -128,33 +128,51 @@ function approvedArchive(doc, lineage) {
 }
 export function reserveShare(doc, lineage, chat, share, now) {
   doc = structuredClone(doc);
+  if (Buffer.byteLength(JSON.stringify(doc)) > 131072) throw Error('Mark storage capacity reached');
   const requestHash = shareRequestHash(chat);
   // Identity grants are erasable; command idempotency must outlive their removal.
   // Check before alias invalidation, including commands previously rate-rejected.
   doc.shareReceipts = (doc.shareReceipts ?? []).filter((s) => s.expiresAt > now);
   if (doc.shareReceipts.some((s) => s.key === requestHash)) return doc;
-  if (doc.shareReceipts.length >= 128) throw Error('Share receipt capacity reached');
-  doc.shareReceipts.push({ key: requestHash, expiresAt: now + SHARE_TTL });
-  if (Buffer.byteLength(JSON.stringify(doc)) > 131072) throw Error('Mark storage capacity reached');
-  const rateKey = hash(`my-marks-rate:${chat.broadcasterId}:${chat.chatterId}`);
   doc.shareRates = (doc.shareRates ?? []).filter((s) => now - s.at < 60000);
   doc.shares = (doc.shares ?? []).filter((s) => s.expiresAt > now);
-  // Only this explicit proven request can update ephemeral aliases; ordinary chat has no identity index.
+  // Invalid identity requests cannot change aliases or consume fair admission.
   if (
-    share &&
-    chat.chatterLogin === share.login &&
-    canonicalLogin(share.login) === share.login &&
-    !chat.isBot &&
-    !chat.copied
-  ) {
-    doc.shares = doc.shares.filter(
-      (s) =>
-        !(
-          (s.actor === chat.chatterId && s.login !== share.login) ||
-          (s.actor !== chat.chatterId && s.login === share.login)
-        ),
-    );
-  }
+    !share ||
+    !share.login ||
+    canonicalLogin(share.login) !== share.login ||
+    share.login !== chat.chatterLogin ||
+    (chat.markAction.login && chat.markAction.login !== share.login) ||
+    share.host !== chat.broadcasterId ||
+    share.actor !== chat.chatterId ||
+    share.expiresAt <= now ||
+    share.expiresAt > now + SHARE_TTL ||
+    chat.isBot ||
+    chat.copied ||
+    !doc.context?.optedIn ||
+    doc.paused ||
+    doc.blocked.includes(chat.chatterId) ||
+    doc.context.blockedUserIds.includes(chat.chatterId)
+  )
+    return doc;
+  // Stores call this only for a fresh message proof. Revoke stale associations
+  // even if reply admission is full; never let a capacity limit preserve them.
+  doc.shares = doc.shares.filter(
+    (s) =>
+      !(
+        (s.actor === chat.chatterId && s.login !== share.login) ||
+        (s.actor !== chat.chatterId && s.login === share.login)
+      ),
+  );
+  const requestActor = hash(`share-request-actor:${chat.broadcasterId}:${chat.chatterId}`);
+  if (
+    doc.shareReceipts.length >= 128 ||
+    doc.shareReceipts.filter((s) => s.actor === requestActor).length >= 8
+  )
+    return doc;
+  doc.shareReceipts.push({ key: requestHash, actor: requestActor, expiresAt: now + SHARE_TTL });
+  if (Buffer.byteLength(JSON.stringify(doc)) > 131072) throw Error('Mark storage capacity reached');
+  const rateKey = hash(`my-marks-rate:${chat.broadcasterId}:${chat.chatterId}`);
   if (
     !share ||
     !share.login ||

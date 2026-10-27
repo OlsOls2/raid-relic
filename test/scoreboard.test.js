@@ -183,8 +183,10 @@ for (const kind of ['memory', 'firestore']) {
 for (const kind of ['memory', 'firestore']) {
   test(`${kind}: capacity rejects consent clearly without blocking a completed game transfer`, async () => {
     const f = await setup(kind);
-    for (let i = 0; i < 128; i++)
+    for (let i = 0; i < 128; i++) {
+      if (i && i % 32 === 0) f.advance(600001);
       await f.chat(i % 2 ? HOME : OTHER, String(1000 + i), '!relic scores on');
+    }
     f.advance(600001);
     const n = f.calls.filter((c) => c.url.endsWith('/chat/messages')).length;
     await f.chat(HOME, '9999', '!relic scores on');
@@ -349,7 +351,7 @@ test('128 consent capacity refuses new entries but completion and bounded receip
         messageId: `opt-${i}`,
         markAction: { type: 'scores-on' },
       },
-      now: 1000,
+      now: 1000 + Math.floor(i / 32) * 600001,
     }).doc;
   }
   const next = reduceScores(doc, {
@@ -362,7 +364,7 @@ test('128 consent capacity refuses new entries but completion and bounded receip
       messageId: 'extra',
       markAction: { type: 'scores-on' },
     },
-    now: 602000,
+    now: 1000 + 4 * 600001,
   });
   assert.equal(next.doc.players.length, 128);
   assert.match(next.message, /full/);
@@ -425,14 +427,16 @@ test('preview blocks EVERY mutation, OAuth/controls before store/auth/network; G
 });
 
 for (const kind of ['memory', 'firestore']) {
-  test(`${kind}: full score receipts AND score outbox cannot prevent self withdrawal or consume game ACKs`, async () => {
+  test(`${kind}: room-limited score receipts and full score outbox cannot prevent self withdrawal or consume game ACKs`, async () => {
     const f = await setup(kind);
     await f.chat(HOME, '811', '!relic scores on');
     await f.chat(OTHER, '812', '!relic scores on');
     await hop(f, HOME, OTHER);
     for (let i = 0; i < 128; i++) await f.chat(HOME, String(2000 + i), '!relic top');
     if (f.db) {
-      assert.equal(f.db.docs.get(`scoreboard/${hash('single')}`).receipts.length, 128);
+      const receipts = f.db.docs.get(`scoreboard/${hash('single')}`).receipts;
+      assert.ok(receipts.length <= 128);
+      assert.equal(receipts.filter((r) => r.room === hash(`command-room:${HOME}`)).length, 32);
       assert.equal(f.db.docs.get(`scoreAcks/${hash(HOME)}`).rows.length, 128);
     }
     const before = await f.runtime.state.getPrivateClaimAcks(HOME),

@@ -109,7 +109,11 @@ test('OAuth callback and encrypted tokens persist across instances using Firesto
   const login = await one.route({ path: '/oauth/bot/start', method: 'GET', headers: {} });
   const state = new URL(login.headers.location).searchParams.get('state');
   const cookie = login.headers['set-cookie'].split(';')[0];
-  assert.ok(db.docs.has(`oauthStates/${hash(hash(state))}`));
+  assert.ok(
+    [...db.docs.entries()].some(
+      ([key, value]) => key.startsWith('oauthStates/') && value.stateHash === hash(state),
+    ),
+  );
   const request = {
     path: `/oauth/callback?state=${state}&code=synthetic-code`,
     method: 'GET',

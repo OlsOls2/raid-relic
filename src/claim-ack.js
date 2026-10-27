@@ -24,6 +24,7 @@ export function ackDocument(
 ) {
   const doc = structuredClone(previous ?? { rows: [] });
   doc.rows = doc.rows.filter((r) => r.expiresAt > now);
+  for (const row of doc.rows) if (row.completion || row.p7Proof) row.completionReceipt = true;
   for (const row of doc.rows)
     if (row.closedRateUntil <= now) {
       delete row.closedRateKey;
@@ -63,6 +64,8 @@ export function ackDocument(
   ) {
     const key = ackKey(chat);
     if (!doc.rows.some((r) => r.key === key)) {
+      const actor = actorKey(chat.broadcasterId, chat.chatterId);
+      if (doc.rows.filter((r) => r.requestActor === actor).length >= 8) return doc;
       if (
         kind === 'closed' &&
         doc.rows.some(
@@ -75,6 +78,7 @@ export function ackDocument(
       if (doc.rows.length >= 128) return doc;
       doc.rows.push({
         key,
+        requestActor: actor,
         expiresAt: now + 600000,
         status: message ? 'queued' : 'ignored',
         ...(message && kind === 'closed'
@@ -280,9 +284,19 @@ export function completionAck(
   doc.rows = doc.rows.filter((r) => r.expiresAt > now);
   const key = completionAckKey(host, eventId);
   if (!doc.rows.some((r) => r.key === key)) {
-    if (doc.rows.length >= 128) return { doc, key: null };
+    if (doc.rows.length >= 128) {
+      // Earned notices outrank command bookkeeping; never evict another
+      // completion's at-most-once receipt, including sent/unknown outcomes.
+      const disposable = doc.rows.findIndex(
+        (r) =>
+          typeof r.requestActor === 'string' && !r.completionReceipt && !r.completion && !r.p7Proof,
+      );
+      if (disposable < 0) return { doc, key: null };
+      doc.rows.splice(disposable, 1);
+    }
     const row = {
       key,
+      completionReceipt: true,
       expiresAt: now + 600000,
       status: 'queued',
       message: claimComplete(names[hop?.to]),
