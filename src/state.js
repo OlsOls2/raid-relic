@@ -25,6 +25,8 @@ import {
   ackSeen,
   ackStep,
   completionAck,
+  attachOfferProof,
+  arrivalNotice,
   completionEligible,
   cancelCompletionNotices,
 } from './claim-ack.js';
@@ -282,6 +284,7 @@ export function createMemoryState({
               : null,
           seekersEnabled: config?.seekersEnabled,
           markOutcome,
+          sentAt,
           autoApprove: reviewPolicy.autoApprove,
           vote: claiming.scoreVote,
           completion: claiming.completedScore,
@@ -352,6 +355,32 @@ export function createMemoryState({
           ackUpdates.set(target, value.doc);
           if (value.key) completionAcks.push({ host: target, key: value.key });
           else completionSkipped++;
+        }
+      }
+      if (claiming && host && chat)
+        attachOfferProof(
+          ackUpdates.get(host),
+          chat,
+          claiming.registry.pendingHop,
+          claiming.scoreVote === chat.chatterId,
+        );
+      if (raid && claiming?.registry.pendingHop) {
+        const h = claiming.registry.pendingHop;
+        const notice = arrivalNotice(
+          ackUpdates.get(h.to) ?? ackDocs.get(h.to),
+          ackUpdates.get(h.from) ?? ackDocs.get(h.from),
+          claiming.registry,
+          Object.assign(
+            Object.fromEntries(channels),
+            transition ? { [host]: transition.channel } : {},
+          ),
+          claiming.marks,
+          now,
+          keeperNames,
+        );
+        if (notice) {
+          ackUpdates.set(h.to, notice.doc);
+          completionAcks.push({ host: h.to, key: notice.key });
         }
       }
       const scoreAckNext = isReplyCommand(chat)
@@ -673,6 +702,22 @@ export function createMemoryState({
           if (jobs.doc) p7Docs.set(host, jobs.doc);
           result = { p7Keys: jobs.keys };
         } catch {}
+      }
+      if (op.type === 'finish' && op.sent && registry?.pendingHop?.from === host) {
+        const target = registry.pendingHop.to;
+        const notice = arrivalNotice(
+          ackDocs.get(target),
+          next.doc,
+          registry,
+          cs,
+          ms,
+          now,
+          keeperNames,
+        );
+        if (notice) {
+          ackDocs.set(target, notice.doc);
+          result = { ...result, arrivalAcks: [{ host: target, key: notice.key }] };
+        }
       }
       for (const r of next.doc.rows) if (r.status !== 'dispatching') delete r.p7Proof;
       ackDocs.set(host, next.doc);

@@ -1,3 +1,4 @@
+import { overlayOptions } from '../public/overlay-client.js';
 import { RECEIVING_KEEPERS } from './receiving.js';
 import { boundedCall } from './bounded.js';
 import { EDITION_CONFIG, validEditions, editionSVG } from '../public/editions.js';
@@ -617,24 +618,84 @@ export function createApp({
       if (method !== 'GET') return result(404, 'Read only');
       const params = new URLSearchParams(feedPath[3] ?? '');
       if (feedPath[1] && feedPath[3] !== undefined) return result(400, 'Invalid query');
-      if (
-        [...params].some(
-          ([key, value]) =>
-            !['corner', 'sound'].includes(key) ||
-            params.getAll(key).length !== 1 ||
-            (key === 'corner' ? value !== '1' : !['0', '1'].includes(value)),
-        )
-      )
+      let presentation;
+      try {
+        presentation = overlayOptions(params.toString());
+      } catch {
         return result(400, 'Invalid query');
+      }
       if (feedPath[1])
         return result(200, JSON.stringify(await selected.snapshot()), 'application/json');
-      return result(200, await publicHTML('overlay-live.html'), 'text/html; charset=utf-8');
+      let overlayHTML = await publicHTML('overlay-live.html');
+      if (presentation.preview)
+        overlayHTML = overlayHTML
+          .toString()
+          .replace(
+            /<p([^>]*\bid="simulator"[^>]*)>[\s\S]*?<\/p>/,
+            (_, attrs) =>
+              `<p${attrs.replace(/\s+hidden\b/, '')}>LOCAL TEST · fictional arrival · no live connection</p>`,
+          );
+      return {
+        ...result(200, overlayHTML, 'text/html; charset=utf-8'),
+        ...(presentation.preview
+          ? {
+              headers: {
+                'cache-control': 'no-store',
+                'x-frame-options': 'SAMEORIGIN',
+                'content-security-policy':
+                  "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'self'",
+              },
+            }
+          : {}),
+      };
     }
     if (method === 'GET' && assets.has(path)) {
       const [file, type] = assets.get(path);
-      const bytes = file.endsWith('.html')
+      let bytes = file.endsWith('.html')
         ? await publicHTML(file)
         : await readFile(new URL(`../public/${file}`, import.meta.url));
+      if (path === '/') {
+        bytes = bytes
+          .toString()
+          .replace('<body>', '<body class="frontdoor">')
+          .replace(
+            '<title>Raid Relic · Atlas</title>',
+            '<title>Raid Relic · Raids that leave a story.</title>',
+          )
+          .replace('A thread between communities.', 'Raids that leave a story.')
+          .replace(
+            /<p id="description">[\s\S]*?<\/p>/,
+            '<p id="description">A living relic your chat passes to the next stream. Both chats claim it. Every hand-off adds a ring.</p>',
+          )
+          .replace(
+            '<p><a href="/demo/">Try the 35-second simulated demo</a> — no login needed.</p>',
+            '<nav class="hero-actions" aria-label="Start your story"><a class="primary-cta" href="/demo/judge">▶ Watch the 45-second demo</a><a class="secondary-cta" href="/start">Add to my stream</a><a href="/atlas/">Explore the Atlas</a></nav>',
+          )
+          .replace(
+            '<section id="receiving"',
+            '<section class="story-steps" aria-label="How it works"><h2>One relic, a shared story</h2><ol><li>Send Off to the next stream.</li><li>Both chats claim the arrival.</li><li>Keep approved engravings and a new ring.</li></ol></section><section id="receiving"',
+          )
+          .replace(
+            '<section id="journey-map"',
+            '<details class="landing-archive"><summary>Explore the recorded journey</summary><section id="journey-map"',
+          )
+          .replace('      <p class="note">', '      </details><p class="note">')
+          .replace(
+            '</main>',
+            '</main><nav class="mobile-cta" aria-label="Quick start"><a href="/demo/judge">▶ Watch demo</a><a href="/start">Add to my stream</a></nav>',
+          );
+      }
+      // Only this static local-preview parent may embed same-origin content.
+      // No application script, connection or form capability is introduced.
+      if (path === '/overlay')
+        return {
+          ...result(200, bytes, type),
+          headers: {
+            'x-frame-options': 'DENY',
+            'content-security-policy':
+              "default-src 'none'; script-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'; frame-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+          },
+        };
       return result(200, bytes, type);
     }
     if (path !== '/eventsub') return result(404, 'Not found');
@@ -792,6 +853,10 @@ export function createApp({
         'block',
         'send',
         'veto-last',
+        'pending',
+        'approve-last',
+        'reject-last',
+        'block-login',
       ].includes(accepted.commandReply.kind)
         ? accepted.commandReply.kind
         : 'other';

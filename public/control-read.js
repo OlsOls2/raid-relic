@@ -99,3 +99,95 @@ export async function boundedResponse(
     options.signal?.removeEventListener('abort', abort);
   }
 }
+
+// Visible-only, one-flight GET scheduling. It never performs or retries an action.
+export function controlPollDelay(pending, failures = 0) {
+  return Math.min(60000, (pending ? 5000 : 30000) * 2 ** Math.min(4, Math.max(0, failures)));
+}
+export function createControlPoller({
+  read,
+  pending = () => true,
+  hidden = () => false,
+  setTimer = setTimeout,
+  clearTimer = clearTimeout,
+}) {
+  let timer = null,
+    flight = null,
+    epoch = 0,
+    failures = 0,
+    stopped = true,
+    held = false;
+  const clear = () => {
+    clearTimer(timer);
+    timer = null;
+  };
+  const schedule = (delay) => {
+    clear();
+    if (stopped || held || hidden() || flight) return;
+    timer = setTimer(() => {
+      timer = null;
+      void request();
+    }, delay);
+  };
+  async function request() {
+    clear();
+    if (stopped || held || hidden()) return;
+    if (flight) return flight.promise;
+    const own = epoch,
+      controller = new AbortController();
+    const task = { controller, promise: null };
+    flight = task;
+    task.promise = Promise.resolve()
+      .then(() => read(controller.signal))
+      .then(
+        (ok) => {
+          if (own === epoch && !controller.signal.aborted)
+            failures = ok === false ? failures + 1 : 0;
+        },
+        () => {
+          if (own === epoch && !controller.signal.aborted) failures++;
+        },
+      )
+      .finally(() => {
+        if (flight === task) flight = null;
+        if (own === epoch) schedule(controlPollDelay(pending(), failures));
+      });
+    return task.promise;
+  }
+  return {
+    start() {
+      stopped = false;
+      held = false;
+      schedule(0);
+    },
+    request,
+    async pause() {
+      held = true;
+      epoch++;
+      clear();
+      flight?.controller.abort();
+      await flight?.promise;
+    },
+    resume({ immediate = false } = {}) {
+      if (stopped) return;
+      held = false;
+      schedule(immediate ? 0 : controlPollDelay(pending(), failures));
+    },
+    visibility() {
+      epoch++;
+      clear();
+      flight?.controller.abort();
+      // Join the aborted generation before a visible read; never overlap it.
+      const done = flight?.promise ?? Promise.resolve();
+      void done.then(() => {
+        if (!stopped && !held && !hidden()) schedule(0);
+      });
+    },
+    stop() {
+      stopped = true;
+      epoch++;
+      clear();
+      flight?.controller.abort();
+    },
+  };
+}

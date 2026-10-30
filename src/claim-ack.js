@@ -1,9 +1,8 @@
 import { RECEIVING_KEEPERS } from './receiving.js';
-import { claimComplete } from '../public/ritual-copy.js';
+import { claimComplete, BOT_COPY } from '../public/ritual-copy.js';
 import { ChatSendError } from './bot.js';
 import { hash } from './crypto.js';
-export const KEEPER_SETUP_HINT =
-  'Seeker queue off. Opt in as a Keeper first, then !seek to join; !seek off to leave.';
+export const KEEPER_SETUP_HINT = BOT_COPY.keeperSetup;
 const ownSetupHint = (row) =>
   /^\d{1,32}$/.test(row.keeperSetup ?? '') &&
   row.actorKey === hash(`${row.keeperSetup}:${row.keeperSetup}`) &&
@@ -115,7 +114,8 @@ export function ackStep(previous, op, channel, marks, now, completionAllowed = f
   if (op.type === 'claim' && row?.status === 'queued') {
     row.status = 'dispatching';
     result = { message: row.message };
-    if (op.p7 && row.completion) row.p7Proof = structuredClone(row.completion);
+    if (op.p7 && row.completion && row.completion.phase !== 'arrival')
+      row.p7Proof = structuredClone(row.completion);
     delete row.message;
     delete row.actorKey;
     delete row.ackUntil;
@@ -168,7 +168,9 @@ export function createClaimAcks({
   let queue = Promise.resolve();
   return {
     process(host, key) {
-      const execute = async () => {
+      const execute = async (targetHost = host, targetKey = key) => {
+        const host = targetHost,
+          key = targetKey;
         const row = await state.claimAckStep(
           host,
           { type: 'claim', key, ...(p7?.enabled ? { p7: true } : {}) },
@@ -209,6 +211,9 @@ export function createClaimAcks({
             now(),
           );
         } catch {}
+        if (Array.isArray(actions?.arrivalAcks))
+          for (const notice of actions.arrivalAcks.slice(0, 1))
+            await execute(notice.host, notice.key);
         if (p7?.enabled && Array.isArray(actions?.p7Keys))
           for (const action of actions.p7Keys.slice(0, 3)) {
             try {
@@ -240,6 +245,10 @@ export function createClaimAcks({
                       'approve',
                       'block',
                       'veto-last',
+                      'pending',
+                      'approve-last',
+                      'reject-last',
+                      'block-login',
                       'send',
                     ].includes(row.kind)
                       ? row.kind
@@ -279,10 +288,14 @@ export function completionAck(
   hop,
   channels,
   names = RECEIVING_KEEPERS,
+  phase = 'complete',
 ) {
   const doc = structuredClone(previous ?? { rows: [] });
   doc.rows = doc.rows.filter((r) => r.expiresAt > now);
-  const key = completionAckKey(host, eventId);
+  const key =
+    phase === 'arrival'
+      ? hash(`claim-arrival:${host}:${eventId}`)
+      : completionAckKey(host, eventId);
   if (!doc.rows.some((r) => r.key === key)) {
     if (doc.rows.length >= 128) {
       // Earned notices outrank command bookkeeping; never evict another
@@ -297,13 +310,15 @@ export function completionAck(
     const row = {
       key,
       completionReceipt: true,
+      ...(phase === 'arrival' ? { arrivalReceipt: true } : {}),
       expiresAt: now + 600000,
       status: 'queued',
-      message: claimComplete(names[hop?.to]),
+      message: phase === 'arrival' ? BOT_COPY.arrival : claimComplete(names[hop?.to]),
       ackUntil: now + 30000,
       ...(hop
         ? {
             completion: {
+              ...(phase === 'arrival' ? { phase } : {}),
               eventId,
               from: hop.from,
               to: hop.to,
@@ -330,12 +345,14 @@ export function completionEligible(doc, key, registry, channels, marks, now) {
     hop = registry?.pendingHop;
   if (
     !proof ||
-    !hop?.finalized ||
+    !hop ||
+    hop.cancelled ||
+    (proof.phase === 'arrival' ? hop.finalized || now >= hop.endsAt : !hop.finalized) ||
     hop.verified !== true ||
     hop.eventId !== proof.eventId ||
     hop.from !== proof.from ||
     hop.to !== proof.to ||
-    registry.holderId !== hop.to ||
+    registry.holderId !== (proof.phase === 'arrival' ? hop.from : hop.to) ||
     registry.raidWatermark < hop.raidSentAt ||
     now >= row.ackUntil
   )
@@ -385,4 +402,56 @@ export function cancelCompletionNotices(previous) {
     }
   }
   return doc;
+}
+
+const offerProofKey = (h) =>
+  hash(
+    JSON.stringify([
+      'offer-prompt-v1',
+      h.intentId ?? h.eventId,
+      h.from,
+      h.to,
+      h.sourceStreamId,
+      h.targetStreamId,
+    ]),
+  );
+export function attachOfferProof(doc, chat, hop, counted) {
+  const row = doc?.rows.find((r) => r.key === ackKey(chat));
+  if (
+    counted &&
+    chat?.markAction?.type === 'offer' &&
+    chat.broadcasterId === hop?.from &&
+    row?.status === 'queued' &&
+    !row.offerProof
+  )
+    row.offerProof = offerProofKey(hop);
+  return doc;
+}
+export function arrivalNotice(previous, sourceAcks, registry, channels, marks, now, names) {
+  const h = registry?.pendingHop;
+  if (
+    !h?.verified ||
+    h.cancelled ||
+    h.finalized ||
+    !h.offers?.length ||
+    now >= h.endsAt ||
+    !sourceAcks?.rows.some(
+      (r) => r.status === 'sent' && r.expiresAt > now && r.offerProof === offerProofKey(h),
+    )
+  )
+    return null;
+  const value = completionAck(
+    previous,
+    h.to,
+    h.eventId,
+    h.endsAt,
+    now,
+    h,
+    channels,
+    names,
+    'arrival',
+  );
+  if (!value.key || !completionEligible(value.doc, value.key, registry, channels, marks, now))
+    return null;
+  return value;
 }

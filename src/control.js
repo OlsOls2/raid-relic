@@ -149,7 +149,10 @@ export function createControl({
             !/^[a-f0-9]{64}$/.test(body.generation ?? '')
           )
             return reply(403, 'Control authorization required');
-          const record = await boundedCall(() => session(id, headers));
+          const record = await boundedCall(
+            () => session(id, headers),
+            Math.min(8000, Math.max(1, activityTimeoutMs)),
+          );
           if (!record || typeof body.csrf !== 'string' || hash(body.csrf) !== record.csrfHash)
             return reply(403, 'Control authorization required');
           await activity(record);
@@ -174,7 +177,10 @@ export function createControl({
             typeof body.acknowledge !== 'boolean'
           )
             return reply(403, 'Control authorization required');
-          const record = await boundedCall(() => session(id, headers));
+          const record = await boundedCall(
+            () => session(id, headers),
+            Math.min(8000, Math.max(1, activityTimeoutMs)),
+          );
           if (!record || typeof body.csrf !== 'string' || hash(body.csrf) !== record.csrfHash)
             return reply(403, 'Control authorization required');
           const description = forgeDescription(body.description);
@@ -211,7 +217,12 @@ export function createControl({
             ['expire-handoff'],
           );
           if (!auth || !pilot) return reply(403, 'Control authorization required');
-          await activity(await boundedCall(() => session(id, headers)));
+          await activity(
+            await boundedCall(
+              () => session(id, headers),
+              Math.min(8000, Math.max(1, activityTimeoutMs)),
+            ),
+          );
           return reply(
             200,
             JSON.stringify(await pilot.expireHandoff(id, body.intentId, body.hopId)),
@@ -225,7 +236,12 @@ export function createControl({
           ]);
           if (!auth) return reply(403, 'Control authorization required');
           if (auth.action !== 'logout') {
-            await activity(await boundedCall(() => session(id, headers)));
+            await activity(
+              await boundedCall(
+                () => session(id, headers),
+                Math.min(8000, Math.max(1, activityTimeoutMs)),
+              ),
+            );
             const result = await pilot.execute(id, auth.action);
             return reply(
               result.status === 'failed' ? 502 : result.status === 'busy' ? 409 : 200,
@@ -240,7 +256,10 @@ export function createControl({
           });
         }
         if (method !== 'GET') return reply(405, 'Method not allowed');
-        const record = await boundedCall(() => session(id, headers));
+        const record = await boundedCall(
+          () => session(id, headers),
+          Math.min(8000, Math.max(1, activityTimeoutMs)),
+        );
         if (!record)
           return reply(
             401,
@@ -263,7 +282,8 @@ export function createControl({
           } catch {
             return reply(503, JSON.stringify({ error: 'Status unavailable' }), 'application/json');
           }
-          const fresh = await activity(record);
+          // Status reads do not renew sessions, grants, subscriptions or gameplay.
+          const fresh = record;
           return reply(
             200,
             JSON.stringify({
@@ -283,6 +303,10 @@ export function createControl({
             200,
             await readFile(new URL('../public/control.html', import.meta.url)),
             'text/html; charset=utf-8',
+            {
+              'content-security-policy':
+                "frame-src 'self'; frame-ancestors 'none'; base-uri 'none'",
+            },
           );
         return reply(
           200,

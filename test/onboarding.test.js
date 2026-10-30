@@ -40,7 +40,7 @@ test('public setup links use only configured exact accounts and canonical app st
       copyOBS(url, { writeText: async () => assert.fail('invalid clipboard write') }),
     );
 });
-test('readiness distinguishes own fresh session, expiry, manual OBS and holder-excluded queue without fresh-grant claims', () => {
+test('checklist preserves known own-session observations past ten seconds, age, manual OBS and holder-excluded queue without fresh-grant claims', () => {
   const pilot = {
     optedIn: true,
     botGrantStored: true,
@@ -53,7 +53,12 @@ test('readiness distinguishes own fresh session, expiry, manual OBS and holder-e
   assert.equal(r.optedIn, true);
   assert.equal(r.queue, 'joined');
   assert.equal(r.obs, false);
-  for (const patch of [{ own: false }, { now: 11001 }, { now: 999 }]) {
+  const older = setupReadiness(pilot, { ...opts, now: 11001 });
+  assert.equal(older.session, true);
+  assert.equal(older.optedIn, true);
+  assert.equal(older.ageSeconds, 10);
+  assert.equal(older.queue, 'joined');
+  for (const patch of [{ own: false }, { now: 999 }]) {
     const stale = setupReadiness(pilot, { ...opts, ...patch });
     assert.equal(stale.fresh, false);
     assert.equal(stale.queue, 'unchecked');
@@ -196,10 +201,9 @@ test('own checklist uses scoped shrink/wrap rules without hiding overflow or tru
   );
   assert.match(block, /overflow-wrap:\s*anywhere/);
   assert.match(block, /white-space:\s*normal/);
-  assert.doesNotMatch(
-    block,
-    /overflow(?:-x)?:\s*(?:hidden|clip)|text-overflow:\s*ellipsis|font-size/,
-  );
+  assert.doesNotMatch(block, /overflow(?:-x)?:\s*(?:hidden|clip)|text-overflow:\s*ellipsis/);
+  for (const match of block.matchAll(/font-size:\s*([\d.]+)px/g))
+    assert.ok(Number(match[1]) >= 15, 'Wizard type must remain readable');
 });
 
 test('private control permission/result text wraps completely without clipping or reducing type', async () => {
@@ -211,8 +215,7 @@ test('private control permission/result text wraps completely without clipping o
     block,
     /main :is\(code, pre\)\s*\{[^}]*white-space:\s*pre-wrap;[^}]*overflow-wrap:\s*anywhere;/s,
   );
-  assert.doesNotMatch(
-    block,
-    /overflow(?:-x)?:\s*(?:hidden|clip)|text-overflow:\s*ellipsis|font-size/,
-  );
+  assert.doesNotMatch(block, /overflow(?:-x)?:\s*(?:hidden|clip)|text-overflow:\s*ellipsis/);
+  for (const match of block.matchAll(/font-size:\s*([\d.]+)px/g))
+    assert.ok(Number(match[1]) >= 15, 'Wizard type must remain readable');
 });

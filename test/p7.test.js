@@ -219,7 +219,7 @@ for (const kind of ['memory', 'firestore']) {
       await complete(f);
       assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
       assert.equal(actions(p).length, 0);
-      assert.equal(f.calls.filter((c) => c.url.endsWith('/chat/messages')).length, 3);
+      assert.equal(f.calls.filter((c) => c.url.endsWith('/chat/messages')).length, 4);
     }
   });
   test(`${kind}:401/429/500/timeout never retry action or completion; exact dispatch marker survives`, async () => {
@@ -401,14 +401,14 @@ for (const kind of ['memory', 'firestore']) {
     const posts = f.calls
       .filter((c) => c.url.endsWith('/chat/messages'))
       .map((c) => JSON.parse(c.body));
-    assert.equal(posts.length, 4);
+    assert.equal(posts.length, 5);
     assert.equal(posts.filter((c) => c.message.startsWith('Claim complete')).length, 2);
     assert.equal(
       posts.at(-1).message,
-      'No Send Off is active yet. The keeper starts one on the control page, then raid and !offer.',
+      'No Send Off is active yet. The Keeper starts one in private control; after the raid arrives, sending chat uses !offer and receiving chat uses !accept.',
     );
     await f.chat(OTHER, '812', '!accept', { messageId: 'new-after-finalize-fault' });
-    assert.equal(f.calls.filter((c) => c.url.endsWith('/chat/messages')).length, 4);
+    assert.equal(f.calls.filter((c) => c.url.endsWith('/chat/messages')).length, 5);
     assert.equal(actions(p).length, 0);
     const p2 = fakeP7(),
       g = await prepared(kind, p2),

@@ -223,3 +223,106 @@ main :is(button, summary) {
   white-space: normal;
   overflow-wrap: anywhere;
 }
+
+/* Four sequential tasks, one active native disclosure, quiet operator details. */
+.wizard-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+  margin: 0;
+  padding-left: 24px;
+}
+/* Include the native ordinal inside each flex item's measured footprint. */
+.wizard-steps > li {
+  list-style-position: inside;
+}
+.wizard-steps a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 16px;
+}
+.wizard-steps [aria-current='step'] {
+  color: var(--moon);
+  text-decoration-thickness: 3px;
+}
+#first-run {
+  border: 0;
+  padding: 0;
+}
+#first-run > details {
+  margin-block: 12px;
+  border-top: 1px solid #52617a;
+  padding-block: 4px;
+}
+#first-run summary h2 {
+  display: inline;
+  margin: 0;
+  font-size: 24px;
+}
+#first-run p,
+.status-lights p,
+main > section:first-of-type p {
+  font-size: 16px;
+}
+#control-advanced {
+  border-block: 1px solid #52617a;
+  margin-top: 24px;
+}
+#local-overlay-preview {
+  width: 100%;
+  max-width: 960px;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--amber);
+  display: block;
+}
+#send-progress {
+  color: var(--moon);
+  border-left: 3px solid var(--amber);
+  padding-left: 12px;
+}
+#send-step[aria-busy='true'] #send-progress::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  border: 2px solid var(--muted);
+  border-top-color: var(--amber);
+  border-radius: 50%;
+  animation: control-wait 1s linear infinite;
+}
+@keyframes control-wait {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #send-step[aria-busy='true'] #send-progress::before {
+    animation: none;
+  }
+}
+#send-step #raid button,
+#first-run button {
+  max-width: 100%;
+}
+@media (max-width: 599px) {
+  .wizard-steps {
+    gap: 4px 22px;
+  }
+  #first-run summary h2 {
+    font-size: 22px;
+  }
+}
+
+nav[aria-label='Setup steps'] {
+  margin: 8px 0;
+}
+#first-run > details {
+  margin-block: 4px;
+  padding-block: 0;
+}
+#first-run > details > summary {
+  padding-block: 8px;
+}

@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';
 import { claimThreshold, sendState } from '../src/send-state.js';
+import { BOT_COPY } from '../public/ritual-copy.js';
 import { ackDocument, ackKey, createClaimAcks } from '../src/claim-ack.js';
 async function setup(kind, viewers = 2) {
   const f = await pilotFixture(kind);
@@ -58,31 +59,33 @@ for (const kind of ['memory', 'firestore']) {
       vote(f, HOME, HOME, 'offer-one', '!offer'),
       vote(f, HOME, HOME, 'offer-one', '!offer'),
     ]);
-    assert.equal(posts().length, 1);
+    assert.equal(posts().length, 2);
     assert.equal(JSON.parse(posts()[0].body).broadcaster_id, HOME);
     assert.match(JSON.parse(posts()[0].body).message, /Offers 1\/1/);
+    assert.equal(JSON.parse(posts()[1].body).broadcaster_id, OTHER);
+    assert.match(JSON.parse(posts()[1].body).message, /The relic has arrived.*!accept.*!offer/);
     assert.equal(posts()[0].headers.Authorization, `Bearer access-${BOT}`);
     await vote(f, OTHER, HOME, 'same-user', '!accept');
-    assert.equal(posts().length, 2);
+    assert.equal(posts().length, 3);
     assert.equal(
-      JSON.parse(posts()[1].body).message,
+      JSON.parse(posts()[2].body).message,
       'That vote was not counted. Check the ritual, chat role and deadline.',
     );
     await vote(f, OTHER, HOME, 'same-user', '!accept');
-    assert.equal(posts().length, 2);
+    assert.equal(posts().length, 3);
     await vote(f, OTHER, OTHER, 'accept-one', '!accept');
-    assert.equal(posts().length, 4);
+    assert.equal(posts().length, 5);
     assert.deepEqual(
       posts()
-        .slice(2)
+        .slice(3)
         .map((p) => JSON.parse(p.body).broadcaster_id),
       [HOME, OTHER],
     );
-    for (const p of posts().slice(2)) assert.match(JSON.parse(p.body).message, /Claim complete/);
+    for (const p of posts().slice(3)) assert.match(JSON.parse(p.body).message, /Claim complete/);
     assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, OTHER);
     assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
     await vote(f, OTHER, OTHER, 'accept-one', '!accept');
-    assert.equal(posts().length, 4);
+    assert.equal(posts().length, 5);
     f.advance();
     await f.control(OTHER, `send:${HOME}`);
     f.advance();
@@ -290,7 +293,17 @@ test('Firestore failed vote commit rolls back count and ACK together with no ext
   assert.equal(f.calls.filter((c) => c.url.endsWith('/chat/messages')).length, 0);
   await vote(f, HOME, HOME, 'rollback-vote', '!offer');
   assert.equal((await f.runtime.state.getKeeperRegistry()).pendingHop.offers.length, 1);
-  assert.equal(f.calls.filter((c) => c.url.endsWith('/chat/messages')).length, 1);
+  const replies = f.calls
+    .filter((c) => c.url.endsWith('/chat/messages'))
+    .map((c) => JSON.parse(c.body));
+  assert.deepEqual(replies, [
+    {
+      broadcaster_id: HOME,
+      sender_id: BOT,
+      message: 'Offers 1/1. Waiting for 1 accept in @olsols2.',
+    },
+    { broadcaster_id: OTHER, sender_id: BOT, message: BOT_COPY.arrival },
+  ]);
 });
 test('claim ACK bot option never retries actual mocked401 chat POST', async () => {
   const { createBot } = await import('../src/bot.js');
@@ -334,8 +347,43 @@ for (const kind of ['memory', 'firestore']) {
       const doc = await f.runtime.state.getPrivateClaimAcks(HOME),
         row = doc.rows[0];
       assert.equal(row.status, mode === null ? 'sent' : 'unknown');
-      assert.equal(logs.filter((l) => l.event === 'raid_relic_claim_ack').length, 1);
-      const diagnostic = logs[0].diagnostic;
+      const ackLogs = logs.filter((l) => l.event === 'raid_relic_claim_ack');
+      assert.equal(ackLogs.length, mode === null ? 2 : 1);
+      assert.deepEqual(
+        ackLogs.map((l) => l.host).sort(),
+        mode === null ? [HOME, OTHER].sort() : [HOME],
+      );
+      const sourceLog = ackLogs.find((l) => l.host === HOME);
+      assert.equal(
+        sourceLog.key,
+        ackKey({ broadcasterId: HOME, chatterId: HOME, messageId: `runtime-${mode}` }),
+      );
+      assert.equal(sourceLog.event, 'raid_relic_claim_ack');
+      assert.equal(sourceLog.severity, mode === null ? 'INFO' : 'WARNING');
+      assert.equal(sourceLog.outcome, mode === null ? 'sent' : 'unknown');
+      const diagnostic = sourceLog.diagnostic;
+      assert.deepEqual(Object.keys(diagnostic).sort(), [
+        'dropKind',
+        'httpStatus',
+        'isSent',
+        'stage',
+      ]);
+      assert.equal(diagnostic.isSent, mode === null ? true : mode === 'drop' ? false : null);
+      if (mode === null) {
+        const receiverLog = ackLogs.find((l) => l.host === OTHER);
+        const receiverDoc = await f.runtime.state.getPrivateClaimAcks(OTHER);
+        const prompt = receiverDoc.rows.find((r) => r.arrivalReceipt);
+        assert.equal(prompt.status, 'sent');
+        assert.equal(receiverLog.key, prompt.key);
+        assert.equal(receiverLog.severity, 'INFO');
+        assert.equal(receiverLog.outcome, 'sent');
+        assert.deepEqual(receiverLog.diagnostic, {
+          stage: 'response',
+          httpStatus: 200,
+          dropKind: null,
+          isSent: true,
+        });
+      }
       assert.equal(
         diagnostic.stage,
         mode === 'grant' ? 'bot-grant' : mode === 'transport' ? 'transport' : 'response',
@@ -345,12 +393,30 @@ for (const kind of ['memory', 'firestore']) {
         mode === 'grant' || mode === 'transport' ? null : mode === '401' ? 401 : 200,
       );
       assert.equal(diagnostic.dropKind, mode === 'drop' ? 'other' : null);
+      const bodies = f.calls
+        .filter((c) => c.url.endsWith('/chat/messages'))
+        .map((c) => JSON.parse(c.body));
+      assert.deepEqual(
+        bodies,
+        mode === 'grant'
+          ? []
+          : [
+              {
+                broadcaster_id: HOME,
+                sender_id: BOT,
+                message: 'Offers 1/1. Waiting for 1 accept in @olsols2.',
+              },
+              ...(mode === null
+                ? [{ broadcaster_id: OTHER, sender_id: BOT, message: BOT_COPY.arrival }]
+                : []),
+            ],
+      );
       assert.ok(!JSON.stringify(logs).includes('synthetic-sensitive'));
       assert.ok(!JSON.stringify(logs).includes('untrusted-sensitive'));
       await vote(f, HOME, HOME, `runtime-${mode}`, '!offer');
       assert.equal(
         f.calls.filter((c) => c.url.endsWith('/chat/messages')).length,
-        mode === 'grant' ? 0 : 1,
+        mode === 'grant' ? 0 : mode === null ? 2 : 1,
       );
     }
   });

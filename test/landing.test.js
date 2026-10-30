@@ -200,7 +200,7 @@ for (const kind of ['memory', 'firestore']) {
       extra.every(
         (c) =>
           c.message ===
-          'No Send Off is active yet. The keeper starts one on the control page, then raid and !offer.',
+          'No Send Off is active yet. The Keeper starts one in private control; after the raid arrives, sending chat uses !offer and receiving chat uses !accept.',
       ),
     );
     assert.equal((await f.runtime.state.getPublicJourney()).rings, 0);

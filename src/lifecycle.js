@@ -1,6 +1,6 @@
 import { dequeueSeeker } from './seeker-state.js';
 import { wanderActivity } from './wander-state.js';
-import { emptyMarkDocument, reduceMark, setMarkContext } from './marks.js';
+import { emptyMarkDocument, reduceMark, setMarkContext, isReviewCommand } from './marks.js';
 
 export const INITIAL_HOME = '1591805230';
 export const LIFECYCLE_LIMITS = Object.freeze({
@@ -309,11 +309,12 @@ export function reduceLifecycle({
   if (action && !['keep', 'opt-out'].includes(action.type)) {
     // A delayed chat mark from an older stream must not spend the new stream budget.
     if (
-      action.type !== 'mark' ||
+      (action.type !== 'mark' && !isReviewCommand(action.type)) ||
       (channel.online &&
         sentAt >= channel.startedAt &&
         sentAt >= channel.consentAt &&
-        sentAt > channel.closedThrough)
+        sentAt > channel.closedThrough &&
+        (!isReviewCommand(action.type) || (sentAt <= now && now - sentAt <= 600000)))
     ) {
       marks = reduceMark(marks, host, chat, action, now, reviewPolicy);
     }

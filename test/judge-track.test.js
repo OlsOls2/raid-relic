@@ -40,7 +40,10 @@ for (const kind of ['memory', 'firestore']) {
       assert.match(posts(f).at(-3).message, /Recorded Keepers/);
       assert.match(posts(f).at(-2).message, /Keeper badges/);
       await f.chat(host, '812', '!offer');
-      assert.match(posts(f).at(-1).message, /No Send Off is active yet.*control page.*!offer/);
+      assert.match(
+        posts(f).at(-1).message,
+        /No Send Off is active yet.*private control.*!offer.*!accept/,
+      );
     }
     assert.equal((await f.runtime.state.getPublicJourney()).rings, 0);
     assert.equal(JSON.parse((await f.request('/api/scores')).body).raiders.length, 0);
@@ -348,7 +351,24 @@ test('demo and real completion share bounded trusted-login presentation copy', a
   for (const type of ['offer', 'raid', 'accept']) s = demoStep(s, { type });
   assert.equal(s.notice, claimComplete('demo_keeper_b'));
   const real = await readFile('src/claim-ack.js', 'utf8');
-  assert.match(real, /message:\s*claimComplete\(\s*names\[hop\?\.to\]\s*\)/);
+  assert.match(
+    real,
+    /import\s*\{\s*claimComplete\s*,\s*BOT_COPY\s*\}\s*from\s*'\.\.\/public\/ritual-copy\.js'/,
+  );
+  assert.match(real, /names\s*=\s*RECEIVING_KEEPERS\s*,\s*phase\s*=\s*'complete'/);
+  assert.match(
+    real,
+    /message:\s*phase\s*===\s*'arrival'\s*\?\s*BOT_COPY\.arrival\s*:\s*claimComplete\(\s*names\[hop\?\.to\]\s*\)/,
+  );
+  assert.equal(
+    claimComplete('a'.repeat(25)),
+    `Claim complete: the relic transferred to @${'a'.repeat(25)}; one new ring.`,
+  );
+  for (const login of ['a'.repeat(26), 'UPPERCASE', '', null, 'https://example.invalid'])
+    assert.equal(
+      claimComplete(login),
+      'Claim complete: the relic transferred to its new Keeper; one new ring.',
+    );
 });
 test('cleanup API array is dry-run preparation only, untagged-only delete plus five-version keep', async () => {
   const rules = JSON.parse(await readFile('ops/artifact-cleanup-dry-run.json', 'utf8'));

@@ -1,3 +1,4 @@
+import { marksShareReply } from '../public/ritual-copy.js';
 import { createHmac, randomBytes } from 'node:crypto';
 import { createTokenCipher, hash } from './crypto.js';
 import { runeSvg } from './marks.js';
@@ -265,10 +266,9 @@ export function createShareReplies({ state, shares, bots, now = Date.now }) {
       let sent = false;
       try {
         const page = await state.getOwnMarks(shares.open(row.token), now(), 0, 1);
-        await bots[host].sendChat(
-          `@${page.login}: ${page.total} approved retained entries. PUBLIC CHAT share; anyone can open (10min): ${shares.link(row.token)}`,
-          { retryUnauthorized: false },
-        );
+        await bots[host].sendChat(marksShareReply(page.login, page.total, shares.link(row.token)), {
+          retryUnauthorized: false,
+        });
         sent = true;
       } catch {
         /* Revoked/expired or ambiguous chat: never automatically retry. */

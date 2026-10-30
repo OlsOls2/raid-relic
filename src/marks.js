@@ -1,3 +1,4 @@
+import { verifiedMentionTarget } from './bot.js';
 import { hash } from './crypto.js';
 
 export const MARK_LIMITS = Object.freeze({
@@ -27,7 +28,9 @@ export function normalizeMark(input) {
   const text = input.normalize('NFKC').toLowerCase().replaceAll('ß', 'ss').replaceAll('ς', 'σ');
   if (!text || Buffer.byteLength(text) > 128 || [...text].length > 32) return null;
   const word = /^\p{L}[\p{L}\p{M}]*$/u.test(text);
-  if (word && !blockedWords.some((term) => text.includes(term))) return text;
+  // The grammar accepts exactly one Unicode word, so the whole normalized
+  // value is the word boundary. Substrings such as skill are not kill.
+  if (word && !blockedWords.includes(text)) return text;
   if (emoji.test(text) && [...segmenter.segment(text)].length === 1) return text;
   return null;
 }
@@ -66,11 +69,11 @@ export function markPrivacyChange(previous, next, actor, host, action) {
     return false;
   const count = (d) => (d?.sessions ?? []).reduce((n, s) => n + s.marks.length, 0),
     removed = count(next) < count(previous);
-  if (action.type === 'veto-last') return removed;
+  if (action.type === 'veto-last' || action.type === 'reject-last') return removed;
   if (action.type === 'pause') return next?.paused === true && previous?.paused !== true;
   if (action.type === 'opt-out')
     return removed || (previous?.context?.optedIn === true && next?.context?.optedIn === false);
-  if (action.type === 'block')
+  if (action.type === 'block' || action.type === 'block-login')
     return removed || (next?.blocked?.length ?? 0) > (previous?.blocked?.length ?? 0);
   return false;
 }
@@ -122,6 +125,12 @@ export function parseMarkCommand(text) {
   if (text === '!relic resume') return { type: 'pause', paused: false };
   if (text === '!relic opt-out') return { type: 'opt-out' };
   if (text === '!relic keep' || text === '!relic opt-in') return { type: 'keep' };
+  if (text === '!relic pending') return { type: 'pending' };
+  if (text === '!relic approve last') return { type: 'approve-last' };
+  if (text === '!relic reject last') return { type: 'reject-last' };
+  const namedBlock = /^!relic block @([a-zA-Z0-9_]{1,25})$/.exec(text);
+  if (namedBlock && namedBlock[0] === text)
+    return { type: 'block-login', login: namedBlock[1].toLowerCase() };
   const approve = /^!relic approve (m[1-9]\d{0,8})$/.exec(text);
   if (approve) return { type: 'approve', markId: approve[1] };
   const block = /^!relic block (\d{1,32})$/.exec(text);
@@ -212,6 +221,28 @@ const active = (doc, host) =>
   doc.context?.optedIn === true && doc.context.holdsRelic === true && doc.context.keeperId === host;
 
 // Pure reducer shared by memory and Firestore; invoke only with trusted identities.
+// These commands never resolve a login through public score names or another room.
+export const isReviewCommand = (type) =>
+  ['pending', 'approve-last', 'reject-last', 'block-login'].includes(type);
+const reviewAllowed = (doc, host, actor) =>
+  isModerator(actor, host) &&
+  !actor?.isBot &&
+  !actor?.copied &&
+  active(doc, host) &&
+  !doc.paused &&
+  !doc.blocked.includes(actor.chatterId) &&
+  !doc.context.blockedUserIds.includes(actor.chatterId) &&
+  doc.sessions.some((s) => s.streamId === doc.context.streamId && !s.closed);
+const pendingReview = (doc) =>
+  doc.sessions
+    .find((s) => s.streamId === doc.context.streamId && !s.closed)
+    ?.marks.filter(
+      (m) =>
+        m.status === 'pending' &&
+        !doc.blocked.includes(m.userId) &&
+        !doc.context.blockedUserIds.includes(m.userId),
+    ) ?? [];
+
 export function reduceMark(previous, host, actor, action, now, reviewPolicy) {
   const doc = structuredClone(previous ?? empty());
   if (
@@ -224,6 +255,32 @@ export function reduceMark(previous, host, actor, action, now, reviewPolicy) {
     !action
   )
     return doc;
+  if (isReviewCommand(action.type)) {
+    if (!reviewAllowed(doc, host, actor)) return doc;
+    // Counts and unresolved names are read-only, including private share grants.
+    if (action.type === 'pending') return doc;
+    if (action.type === 'block-login') {
+      const id = verifiedMentionTarget(actor, action);
+      if (!id) return doc;
+      if (!doc.blocked.includes(id)) {
+        if (doc.blocked.length >= MARK_LIMITS.blockedUsers) throw Error('Block capacity reached');
+        doc.blocked.push(id);
+      }
+      delete doc.shares;
+      for (const session of doc.sessions)
+        session.marks = session.marks.filter((m) => m.userId !== id);
+      return bounded(doc);
+    }
+    const last = pendingReview(doc).at(-1);
+    if (!last) return doc;
+    delete doc.shares;
+    if (action.type === 'approve-last') last.status = 'approved';
+    else {
+      const session = doc.sessions.find((s) => s.streamId === doc.context.streamId);
+      session.marks = session.marks.filter((m) => m.id !== last.id);
+    }
+    return bounded(doc);
+  }
   doc.cooldowns = doc.cooldowns.filter((entry) => now - entry.at < MARK_LIMITS.cooldownMs);
   if (
     [
@@ -372,6 +429,25 @@ export function createMarkService(store, { now = Date.now } = {}) {
 
 // Derived from the same transaction's before/after documents, never an external pre-read.
 export function markCommandOutcome(previous, next, host, actor, action) {
+  if (isReviewCommand(action?.type)) {
+    if (!previous || !next || !reviewAllowed(previous, host, actor)) return 'review-denied';
+    const pending = pendingReview(previous),
+      last = pending.at(-1);
+    if (action.type === 'pending') return `pending:${pending.length}`;
+    if (action.type === 'block-login') {
+      const id = verifiedMentionTarget(actor, action);
+      if (!id) return 'login-unresolved';
+      return next.blocked.includes(id) ? 'login-blocked' : 'review-inactive';
+    }
+    if (!last) return 'review-empty';
+    const selected = next.sessions
+      .find((s) => s.streamId === previous.context.streamId)
+      ?.marks.find((m) => m.id === last.id);
+    if (action.type === 'approve-last' && selected?.status === 'approved') return 'approved-last';
+    if (action.type === 'reject-last' && !selected) return 'rejected-last';
+    return 'review-inactive';
+  }
+
   if (action?.type === 'mark') {
     const all = (doc) => (doc?.sessions ?? []).flatMap((s) => s.marks);
     const oldIds = new Set(all(previous).map((m) => m.id));

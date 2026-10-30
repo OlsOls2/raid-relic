@@ -21,13 +21,17 @@ for (const kind of ['memory', 'firestore']) {
     const f = await pilotFixture(kind);
     await ready(f);
     let count = f.calls.length;
+    const registryBeforeRead = await f.runtime.state.getKeeperRegistry();
     const home = await status(f, HOME);
     assert.deepEqual(home.candidates, [
       { id: OTHER, login: 'olsols2', observedOnline: true, optedIn: true, eligible: true },
     ]);
-    assert.equal(home.candidatesObservedAt, f.now());
+    // Seekers are disabled here: lifecycle-derived candidate hints have no
+    // provider observation cache. A GET must not manufacture a checked-at time.
+    assert.equal(home.candidatesObservedAt, null);
     assert.deepEqual((await status(f, OTHER)).candidates, []);
     assert.equal(f.calls.length, count);
+    assert.deepEqual(await f.runtime.state.getKeeperRegistry(), registryBeforeRead);
     assert.ok(!JSON.stringify(home.candidates).includes('token'));
     assert.ok(!JSON.stringify(home.candidates).includes('streamId'));
     f.advance();
@@ -35,9 +39,13 @@ for (const kind of ['memory', 'firestore']) {
     await f.chat(HOME, HOME, '!offer');
     await f.chat(OTHER, OTHER, '!accept');
     count = f.calls.length;
-    assert.equal((await status(f, OTHER)).candidates[0].id, HOME);
+    const reverseBeforeRead = await f.runtime.state.getKeeperRegistry();
+    const reverse = await status(f, OTHER);
+    assert.equal(reverse.candidatesObservedAt, null);
+    assert.equal(reverse.candidates[0].id, HOME);
     assert.deepEqual((await status(f, HOME)).candidates, []);
     assert.equal(f.calls.length, count);
+    assert.deepEqual(await f.runtime.state.getKeeperRegistry(), reverseBeforeRead);
     const before = f.calls.length;
     assert.equal(
       (await f.request(`/control/${HOME}/status`, 'GET', { cookie: f.cookies[OTHER] })).status,

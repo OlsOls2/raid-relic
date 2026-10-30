@@ -1,6 +1,6 @@
 import { keeperNames as networkNames } from './keeper-network.js';
-import { actionMessage, botConsentStartURL } from './control-view.js';
-import { boundedResponse } from './control-read.js';
+import { actionMessage, botConsentStartURL, setupRetryAllowed } from './control-view.js';
+import { boundedResponse, createControlPoller } from './control-read.js';
 import { mountFirstRun } from './first-run.js';
 const forgeLink = document.getElementById('forge-owner-link');
 if (forgeLink) forgeLink.href = `${location.pathname}/forge`;
@@ -33,6 +33,34 @@ let recovery = null;
 let simulated = false;
 let csrf;
 let busy = false;
+let latestPilot = null,
+  sendLocked = false,
+  setupTimer = null,
+  setupLeft = 0,
+  setupDeadline = 0,
+  actionInFlight = false,
+  dispatchInFlight = false;
+const stopSetup = () => {
+  clearTimeout(setupTimer);
+  setupTimer = null;
+  setupLeft = 0;
+  document.getElementById('stop-setup').hidden = true;
+};
+document.getElementById('stop-setup').onclick = () => {
+  stopSetup();
+  document.getElementById('setup-flow-status').textContent =
+    'Setup checks stopped; no new action will run.';
+};
+document.getElementById('copy-mod').onclick = async () => {
+  try {
+    await navigator.clipboard.writeText('/mod raidrelicbot');
+    document.getElementById('mod-copy-status').textContent =
+      'Command copied; paste it in your own chat. Moderator permission is not verified here.';
+  } catch {
+    document.getElementById('mod-copy-status').textContent =
+      'Copy unavailable. Type /mod raidrelicbot in your own chat.';
+  }
+};
 let candidates = [];
 let readGeneration = 0,
   readController;
@@ -53,6 +81,7 @@ const labels = {
   process: 'Process queued own send',
 };
 const status = document.getElementById('result');
+const sendResult = document.getElementById('send-result');
 function disable(value) {
   busy = value;
   document.querySelectorAll('button').forEach((b) => {
@@ -62,9 +91,28 @@ function disable(value) {
   document.getElementById('expire-handoff').disabled = value || !expiryRecovery?.canExpire;
   target.disabled = value || !csrf || !candidates.length;
   document.getElementById('cancel-queued').disabled = value || !recovery?.canCancel;
+  for (const button of document.querySelectorAll('#raid button.send-off'))
+    button.disabled =
+      value ||
+      !csrf ||
+      sendLocked ||
+      Boolean(latestPilot?.intent && latestPilot.intent !== 'expired-handoff');
+  document.getElementById('send-progress').hidden = !dispatchInFlight;
+  document.getElementById('send-step').setAttribute('aria-busy', String(dispatchInFlight));
+  document.getElementById('send-disabled-reason').textContent = actionInFlight
+    ? 'Wait for the current request to finish; never submit it twice.'
+    : sendLocked
+      ? 'This request is locked after dispatch or an uncertain outcome; review the saved status before any new Send Off.'
+      : !csrf
+        ? 'Sign in first; a matching private session is required.'
+        : !candidates.length
+          ? 'No currently observed eligible recipient; admission, live state and opt-in are checked again on Send Off.'
+          : 'Send Off rechecks all current server permissions and eligibility.';
   firstRun.setBusy(value || !csrf);
+  document.getElementById('stop-setup').disabled = false;
 }
 function invalidate() {
+  latestPilot = null;
   firstRun.clear();
   if (consentURL) {
     consentURL.value = '';
@@ -86,14 +134,18 @@ function invalidate() {
   for (const group of ['setup', 'keeper', 'raid']) document.getElementById(group).replaceChildren();
   disable(busy);
 }
-async function refresh({ preserveResult = false } = {}) {
+async function refresh({ preserveResult = true, signal } = {}) {
   const generation = ++readGeneration;
   readController?.abort();
   const request = new AbortController();
   readController = request;
-  invalidate();
+  const abort = () => request.abort();
+  signal?.addEventListener('abort', abort, { once: true });
+  if (signal?.aborted) request.abort();
+  disable(true);
   if (!preserveResult) status.textContent = 'Reading your session…';
   document.getElementById('ledger').replaceChildren();
+  const selectedTarget = target.value;
   candidates = [];
   target.replaceChildren();
   target.disabled = true;
@@ -119,8 +171,9 @@ async function refresh({ preserveResult = false } = {}) {
     if (authorization !== undefined && !['not-checked'].includes(authorization))
       throw Error('Invalid authorization status');
     document.getElementById('authorization-status').textContent =
-      'Fresh Keeper authorization is not checked by status. If targets are missing, use Check / refresh my Keeper authorization; reconnect this matching Keeper if it fails. Refresh status never renews tokens.';
+      'Fresh Keeper authorization is not checked by status. If targets are missing, use Check my Twitch connection; reconnect this matching Keeper if it fails. Refresh status never renews tokens.';
     csrf = value.csrf;
+    latestPilot = value.pilot;
     firstRun.observe(value.pilot, value.actions);
     document.getElementById('simulator').hidden = value.pilot.mode !== 'simulator';
     simulated = value.pilot.mode === 'simulator';
@@ -130,11 +183,27 @@ async function refresh({ preserveResult = false } = {}) {
       subscriptions: value.pilot.subscriptions?.ready === true,
       live: value.pilot.online === true,
     };
+    const enabledSubscriptions = value.pilot.subscriptions?.conditions?.filter(
+      (c) => c.status === 'enabled',
+    ).length;
     for (const [key, ready] of Object.entries(lights)) {
       const light = document.getElementById(`light-${key}`);
       light.dataset.state = ready ? 'ready' : key === 'live' ? 'offline' : 'unknown';
-      light.textContent = `${{ bot: 'Bot', subscriptions: 'Subscriptions', live: 'Stream' }[key]}: ${ready ? { bot: 'saved grant connected (not a live check)', subscriptions: 'all five enabled', live: 'observed live' }[key] : { bot: 'not connected', subscriptions: 'not ready', live: 'offline' }[key]}`;
+      light.textContent = ready
+        ? {
+            bot: 'Bot: saved grant connected (not a live moderator check).',
+            subscriptions: 'Subscriptions: all five enabled at the last setup.',
+            live: 'Stream: observed live; Send Off rechecks it.',
+          }[key]
+        : {
+            bot: 'Bot: not connected; ask the owner to connect raidrelicbot.',
+            subscriptions: `Subscriptions: ${Number.isInteger(enabledSubscriptions) ? enabledSubscriptions + '/5 enabled' : 'not listening for raids yet'}; use Set up channel.`,
+            live: "Stream: you're offline at the last observation; Send Off requires a live stream.",
+          }[key];
+      light.title = light.textContent;
     }
+    document.getElementById('bot-fix').hidden = !lights.bot;
+    document.getElementById('copy-mod').hidden = !lights.bot;
     if (consentURL) {
       consentURL.value = '';
       copyConsent.disabled = true;
@@ -223,6 +292,7 @@ async function refresh({ preserveResult = false } = {}) {
       option.textContent = `${candidate.login} · observed online${Number.isSafeInteger(candidate.viewers) && candidate.viewers >= 0 ? ' · ' + candidate.viewers + ' Twitch-reported viewers' : ''}`;
       target.append(option);
     }
+    if (candidates.some((c) => c.id === selectedTarget)) target.value = selectedTarget;
     target.disabled = busy || !candidates.length;
     empty.hidden = candidates.length > 0;
     if (candidates.length) {
@@ -233,14 +303,20 @@ async function refresh({ preserveResult = false } = {}) {
       };
       label();
       target.onchange = label;
+      send.setAttribute('aria-describedby', 'send-disabled-reason target-help');
       send.onclick = () => run(`send:${target.value}`);
       document.getElementById('raid').append(send);
     }
-    for (const action of value.actions.filter((a) => a !== 'logout' && !a.startsWith('send:'))) {
+    for (const action of value.actions.filter(
+      (a) =>
+        !['logout', 'bootstrap', 'keep', 'seek-on', 'refresh-authorization'].includes(a) &&
+        !a.startsWith('send:'),
+    )) {
       const button = document.createElement('button');
       button.textContent = action.startsWith('send:')
         ? `Send Off to ${names[action.slice(5)]}`
         : labels[action];
+      button.setAttribute('aria-describedby', 'first-action-reason');
       button.onclick = () => run(action);
       document
         .getElementById(
@@ -254,6 +330,7 @@ async function refresh({ preserveResult = false } = {}) {
     }
     if (!preserveResult)
       status.textContent = 'Status refreshed. Review both channels before Send Off.';
+    return true;
   } catch (error) {
     if (generation !== readGeneration || request.signal.aborted) return;
     invalidate();
@@ -264,18 +341,50 @@ async function refresh({ preserveResult = false } = {}) {
     document.getElementById('cancel-queued').disabled = true;
     document.getElementById('recovery-status').textContent =
       'Recovery status unavailable. Reconnect and refresh; never repeat dispatch.';
-    status.textContent =
-      error?.code === 'timeout'
-        ? 'Status timed out. Retry Refresh status; reconnect only this matching Keeper if authorization expired.'
-        : error?.code === 'authorization'
-          ? 'Control session expired or unauthorized. Reconnect this matching Keeper, then Retry Refresh status.'
-          : 'Status unavailable or invalid. Retry Refresh status; actions are disabled until a fresh authorized status is read.';
+    if (error?.code === 'authorization') {
+      stopSetup();
+      poller.stop();
+    }
+    if (!preserveResult || !sendLocked)
+      status.textContent =
+        error?.code === 'timeout'
+          ? 'Status timed out. Retry Refresh status; reconnect only this matching Keeper if authorization expired.'
+          : error?.code === 'authorization'
+            ? 'Control session expired or unauthorized. Reconnect this matching Keeper, then Retry Refresh status.'
+            : 'Status unavailable or invalid. Retry Refresh status; actions are disabled until a fresh authorized status is read.';
+    return false;
   } finally {
-    if (generation === readGeneration) disable(false);
+    signal?.removeEventListener('abort', abort);
+    if (generation === readGeneration) disable(actionInFlight);
   }
 }
-async function run(action) {
-  if (busy || !csrf) return;
+const poller = createControlPoller({
+  hidden: () => document.hidden,
+  pending: () =>
+    firstRun.pending() ||
+    Boolean(latestPilot?.intent && latestPilot.intent !== 'expired-handoff') ||
+    Boolean(
+      latestPilot?.claimProgress &&
+      !latestPilot.claimProgress.finalized &&
+      !latestPilot.claimProgress.cancelled,
+    ),
+  read: (signal) => refresh({ preserveResult: true, signal }),
+});
+async function run(action, { continued = false } = {}) {
+  if (continued) {
+    if (actionInFlight || document.hidden || Date.now() >= setupDeadline) {
+      stopSetup();
+      return;
+    }
+    await poller.pause();
+  }
+  if (busy || !csrf || document.hidden) {
+    if (continued) {
+      stopSetup();
+      poller.resume();
+    }
+    return;
+  }
   if (action.startsWith('send:')) {
     if (!candidates.some((c) => c.id === action.slice(5))) {
       status.textContent = 'Refresh status to choose an observed eligible Keeper.';
@@ -288,7 +397,21 @@ async function run(action) {
     )
       return;
   }
+  if (action === 'bootstrap' && !continued) {
+    stopSetup();
+    setupLeft = 3;
+    setupDeadline = Date.now() + 45000;
+  }
+  if (action === 'bootstrap') {
+    setupLeft--;
+    document.getElementById('stop-setup').hidden = false;
+  }
+  actionInFlight = true;
+  dispatchInFlight = action.startsWith('send:') || action === 'process';
+  if (dispatchInFlight) sendLocked = true;
   disable(true);
+  await poller.pause();
+  let retrySetup = false;
   try {
     const response = await boundedResponse(`/control/${id}`, {
       method: 'POST',
@@ -306,24 +429,84 @@ async function run(action) {
     } catch {}
     status.textContent =
       simulated && response.ok ? response.text : actionMessage(value, names[target.value]);
-    await refresh({ preserveResult: true });
+    if (dispatchInFlight) sendResult.textContent = status.textContent;
+    if (
+      dispatchInFlight &&
+      value?.status === 'blocked' &&
+      [
+        'subscriptions-not-ready',
+        'grants-unavailable',
+        'source-offline',
+        'target-offline',
+        'not-holder',
+        'reservation-unavailable',
+        'preflight-rejected',
+        'dispatch-rejected',
+      ].includes(value.reason)
+    )
+      sendLocked = false;
+    retrySetup =
+      action === 'bootstrap' &&
+      setupRetryAllowed(value, {
+        remaining: setupLeft,
+        deadline: setupDeadline,
+        visible: !document.hidden,
+      });
+    if (action === 'bootstrap')
+      document.getElementById('setup-flow-status').textContent =
+        value?.status === 'reconciled' && value.ready
+          ? 'Setup observed all five subscriptions enabled; opt in only when you choose.'
+          : retrySetup
+            ? 'Waiting for enabled callbacks; this explicit setup flow checks at most three times.'
+            : 'Setup stopped. Check your connection and try explicitly again.';
+    if (!document.hidden) await refresh({ preserveResult: true });
+    if (action === 'keep' && response.ok) firstRun.focusStep('overlay-step');
+    if (action === 'refresh-authorization' && value?.authorization === 'ready')
+      firstRun.focusStep('setup-step');
   } catch {
     invalidate();
     status.textContent =
       'Request outcome unavailable. Refresh status; never blindly repeat a raid request.';
+    if (dispatchInFlight) sendResult.textContent = status.textContent;
   } finally {
+    actionInFlight = false;
+    dispatchInFlight = false;
     disable(false);
+    poller.resume();
+    if (retrySetup && setupLeft > 0 && !document.hidden && Date.now() < setupDeadline) {
+      setupTimer = setTimeout(() => {
+        void run('bootstrap', { continued: true });
+      }, 5000);
+    } else if (action === 'bootstrap') stopSetup();
   }
 }
-document.getElementById('refresh').onclick = async () => {
-  if (busy) return;
-  disable(true);
-  await refresh();
+document.getElementById('refresh').onclick = () => {
+  if (!busy) {
+    poller.start();
+  }
 };
 document.getElementById('logout').onclick = () => run('logout');
 disable(true);
-refresh();
+poller.start();
+const visibility = () => {
+  if (document.hidden) {
+    stopSetup();
+    readController?.abort();
+  }
+  firstRun.age();
+  poller.visibility();
+};
+document.addEventListener('visibilitychange', visibility);
+addEventListener('pageshow', (event) => {
+  if (event.persisted) {
+    document.addEventListener('visibilitychange', visibility);
+    poller.start();
+  }
+});
 addEventListener('pagehide', () => {
+  stopSetup();
+  poller.stop();
+  document.removeEventListener('visibilitychange', visibility);
   firstRun.dispose();
   readGeneration++;
   readController?.abort();
@@ -341,7 +524,9 @@ document.getElementById('cancel-queued').onclick = async () => {
     )
   )
     return;
+  actionInFlight = true;
   disable(true);
+  await poller.pause();
   try {
     const result = await boundedResponse(`${location.pathname}/cancel-queued`, {
       method: 'POST',
@@ -350,13 +535,16 @@ document.getElementById('cancel-queued').onclick = async () => {
     });
     const body = JSON.parse(result.text);
     status.textContent = result.ok ? actionMessage(body) : 'Recovery authorization failed';
-    await refresh({ preserveResult: true });
+    if (body?.status === 'cancelled-queued') sendLocked = false;
+    if (!document.hidden) await refresh({ preserveResult: true });
   } catch {
     invalidate();
     status.textContent = 'Recovery unavailable. Refresh and inspect; do not repeat dispatch.';
   } finally {
     document.getElementById('intent-confirm').value = '';
+    actionInFlight = false;
     disable(false);
+    poller.resume();
   }
 };
 document.getElementById('expire-handoff').onclick = async () => {
@@ -370,7 +558,9 @@ document.getElementById('expire-handoff').onclick = async () => {
   )
     return;
   const expected = expiryRecovery;
+  actionInFlight = true;
   disable(true);
+  await poller.pause();
   try {
     const response = await boundedResponse(`/control/${id}/expire-handoff`, {
       method: 'POST',
@@ -382,12 +572,15 @@ document.getElementById('expire-handoff').onclick = async () => {
       value = JSON.parse(response.text);
     } catch {}
     status.textContent = actionMessage(value);
-    await refresh({ preserveResult: true });
+    if (value?.status === 'expired-handoff') sendLocked = false;
+    if (!document.hidden) await refresh({ preserveResult: true });
   } catch {
     invalidate();
     status.textContent = 'Outcome unavailable. Refresh; do not blindly repeat Send Off.';
   } finally {
+    actionInFlight = false;
     disable(false);
+    poller.resume();
     document.getElementById('expire-handoff').disabled = !expiryRecovery?.canExpire;
   }
 };

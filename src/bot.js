@@ -9,6 +9,64 @@ import { httpTransport } from './oauth.js';
 import { hash } from './crypto.js';
 import { normalizeMark, parseMarkCommand } from './marks.js';
 
+// Per-request provenance only: never serialized, retained by ID/login, or
+// transferred by object spread/structuredClone into a new authority object.
+const mentionBlocks = new WeakMap();
+export function verifiedMentionTarget(chat, action) {
+  const proof = chat && mentionBlocks.get(chat);
+  return proof &&
+    action === proof.action &&
+    chat.markAction === proof.action &&
+    chat.broadcasterId === proof.host &&
+    chat.chatterId === proof.actor &&
+    chat.messageId === proof.messageId &&
+    action.type === 'block-login' &&
+    action.login === proof.login
+    ? proof.id
+    : null;
+}
+function mentionBlock(event, action) {
+  const parts = event.message.fragments;
+  if (
+    parts.length !== 2 ||
+    parts[0].type !== 'text' ||
+    parts[0].text !== '!relic block ' ||
+    parts[1].type !== 'mention' ||
+    parts.map((p) => p.text).join('') !== event.message.text
+  )
+    return null;
+  const fields = ['type', 'text', 'mention', 'emote', 'cheermote'];
+  if (
+    parts.some(
+      (p) =>
+        Object.keys(p).some((k) => !fields.includes(k)) || p.emote != null || p.cheermote != null,
+    ) ||
+    parts[0].mention != null
+  )
+    return null;
+  const value = parts[1].mention;
+  if (
+    !value ||
+    typeof value !== 'object' ||
+    Array.isArray(value) ||
+    Object.keys(value).some((k) => !['user_id', 'user_login', 'user_name'].includes(k)) ||
+    typeof value.user_id !== 'string' ||
+    !/^\d{1,32}$/.test(value.user_id) ||
+    typeof value.user_login !== 'string' ||
+    !/^[a-zA-Z0-9_]{1,25}$/.test(value.user_login)
+  )
+    return null;
+  const login = value.user_login.toLowerCase();
+  if (
+    ['__proto__', 'constructor', 'prototype'].includes(login) ||
+    login !== action.login ||
+    parts[1].text.toLowerCase() !== '@' + login
+  )
+    return null;
+  // user_name is display text only, intentionally ignored.
+  return value.user_id;
+}
+
 export function parseChat(payload, { streamerId, botId, includeMarkCommands = false }) {
   const event = payload.event;
   const condition = payload.subscription?.condition;
@@ -74,6 +132,22 @@ export function parseChat(payload, { streamerId, botId, includeMarkCommands = fa
       chat.isModerator = (event.badges ?? []).some(
         (badge) => badge?.set_id === 'moderator' && badge.id === '1',
       );
+      if (
+        action.type === 'block-login' &&
+        !chat.isBot &&
+        (chat.chatterId === streamerId || chat.isModerator)
+      ) {
+        const id = mentionBlock(event, action);
+        if (id)
+          mentionBlocks.set(chat, {
+            id,
+            action,
+            host: streamerId,
+            actor: chat.chatterId,
+            messageId: chat.messageId,
+            login: action.login,
+          });
+      }
     }
   }
   return chat;

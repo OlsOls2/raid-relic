@@ -99,3 +99,30 @@ test('kiosk entry accepts only the two exact local playback flags, never arbitra
     'method',
   );
 });
+
+// ring-card -> publicDate is a real transitive film/judge module dependency.
+test('film date-module admission stays exact, same-origin and GET-only', () => {
+  assert.equal(
+    filmResourceReason(request(origin + '/streak-view.js', { resourceType: 'script' }), policy),
+    'static',
+  );
+  assert.equal(
+    filmResourceReason(request(origin + '/streak-view.js', { method: 'POST' }), policy),
+    'method',
+  );
+  assert.equal(
+    filmResourceReason(request('https://other.invalid/streak-view.js'), policy),
+    'external',
+  );
+  for (const path of [
+    '/streak-view.js?extra=1',
+    '/streak-view.js#extra',
+    '/streak-view-extra.js',
+    '/api/streak-view.js',
+  ])
+    assert.equal(filmResourceReason(request(origin + path), policy), 'unknown-static');
+  assert.equal(
+    filmResourceReason(request('blob:' + origin + '/streak-view.js'), policy),
+    'unowned-blob',
+  );
+});

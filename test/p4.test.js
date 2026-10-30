@@ -10,7 +10,7 @@ import { validSnapshot } from '../public/overlay-client.js';
 import { actionMessage } from '../public/control-view.js';
 import { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';
 for (const kind of ['memory', 'firestore']) {
-  test(`${kind}: twelve-hour session renewal is throttled, same-secret and denies expired/cross-role/CSRF activity`, async () => {
+  test(`${kind}: GET never renews; explicit twelve-hour action renewal is throttled, same-secret and denies expired/cross-role/CSRF activity`, async () => {
     const store =
       kind === 'memory' ? createMemoryAuthStore() : createFirestoreStore(fakeFirestore());
     let now = 1792929600000;
@@ -49,7 +49,16 @@ for (const kind of ['memory', 'firestore']) {
     const next = await request(`/control/${HOME}/status`);
     assert.equal(next.status, 200);
     assert.equal(JSON.parse(next.body).csrf, value.csrf);
-    assert.match(next.headers['set-cookie'], /Max-Age=43200/);
+    assert.equal(next.headers['set-cookie'], undefined);
+    assert.deepEqual(await store.getControlSession(HOME, sessionHash, now), original);
+    const explicit = await request(
+      `/control/${HOME}`,
+      'POST',
+      { origin: 'https://local.example', 'content-type': 'application/json' },
+      { action: 'keep', csrf: value.csrf },
+    );
+    assert.equal(explicit.status, 200);
+    assert.match(explicit.headers['set-cookie'], /Max-Age=43200/);
     const renewed = await store.getControlSession(HOME, sessionHash, now);
     assert.equal(renewed.expiresAt, now + 43200000);
     now += 300000;
@@ -259,7 +268,7 @@ for (const kind of ['memory', 'firestore'])
         else
           store.getControlSession = async (...args) => {
             gets++;
-            if (gets === (method === 'GET' ? 2 : 3)) await gate;
+            if (gets === (method === 'GET' ? 1 : 3)) await gate;
             return originalGet(...args);
           };
         const response = await control.route({
@@ -268,7 +277,7 @@ for (const kind of ['memory', 'firestore'])
           headers: { cookie, origin: 'https://local.example', 'content-type': 'application/json' },
           rawBody: Buffer.from(JSON.stringify({ action: 'keep', csrf })),
         });
-        assert.equal(response.status, 403);
+        assert.equal(response.status, method === 'GET' && hung === 'renew' ? 200 : 403);
         assert.equal(response.headers['set-cookie'], undefined);
         assert.equal(executed, 0);
         assert.equal(await store.revokeControlSession(HOME, sessionHash, time), true);
@@ -277,8 +286,8 @@ for (const kind of ['memory', 'firestore'])
         assert.equal(await originalGet(HOME, sessionHash, time), null);
         assert.equal(response.headers['set-cookie'], undefined);
         assert.equal(executed, 0);
-        if (hung === 'renew') assert.equal(renews, 1);
-        else assert.equal(gets, method === 'GET' ? 2 : 3);
+        if (hung === 'renew') assert.equal(renews, method === 'GET' ? 0 : 1);
+        else assert.equal(gets, method === 'GET' ? 1 : 3);
       });
 
 for (const kind of ['memory', 'firestore'])

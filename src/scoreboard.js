@@ -1,3 +1,12 @@
+import { isReviewCommand } from './marks.js';
+import {
+  BOT_COPY,
+  scoreMessage,
+  ownScoreStatus,
+  whereReply,
+  scoreConsentReply,
+  pendingReviewReply,
+} from '../public/ritual-copy.js';
 import { seekerState, seekerStatusMessage } from './seeker-state.js';
 import { RECEIVING_KEEPERS } from './receiving.js';
 import { streakView, stopStreak } from './streaks.js';
@@ -50,6 +59,7 @@ export function reduceScores(
     marks,
     chat,
     now,
+    sentAt = now,
     vote,
     completion,
     hop,
@@ -91,7 +101,22 @@ export function reduceScores(
     !channels[host].banned &&
     !channels[host].blockedUserIds?.includes(chat.chatterId) &&
     !marks[host]?.blocked?.includes(chat.chatterId) &&
-    !marks[host]?.context?.blockedUserIds?.includes(chat.chatterId);
+    !marks[host]?.context?.blockedUserIds?.includes(chat.chatterId) &&
+    (!isReviewCommand(action) ||
+      ((chat.chatterId === host || chat.isModerator === true) &&
+        channels[host].online &&
+        !channels[host].paused &&
+        !marks[host]?.paused &&
+        marks[host]?.context?.holdsRelic === true &&
+        marks[host].context.keeperId === host &&
+        marks[host].context.streamId === channels[host].streamId &&
+        Number.isFinite(sentAt) &&
+        sentAt <= now &&
+        now - sentAt <= 600000 &&
+        sentAt >= channels[host].startedAt &&
+        sentAt >= channels[host].consentAt &&
+        sentAt > channels[host].closedThrough &&
+        !['review-denied', 'review-inactive'].includes(markOutcome)));
   if (command) {
     reason = safe ? 'queued' : 'policy-blocked';
     if (duplicate) reason = 'duplicate';
@@ -119,15 +144,11 @@ export function reduceScores(
       let consentMessage = null;
       if (action === 'scores-on' && !limited) {
         if (!channels[host].online || !allowed(host, channels, marks, chat.chatterId))
-          consentMessage =
-            'Scores on requires this opted-in Keeper to be live and unpaused. Reading the ledger does not opt you in.';
-        else if (!login(chat.chatterLogin))
-          consentMessage = 'Scores need your verified Twitch login. No public score was created.';
+          consentMessage = BOT_COPY.scoresOnRequiresThisOpted;
+        else if (!login(chat.chatterLogin)) consentMessage = BOT_COPY.scoresNeedYourVerifiedTwitch;
         else {
           let row = doc.players.find((p) => p.key === key);
-          if (!row && doc.players.length >= 128)
-            consentMessage =
-              'The public score register is full. Your claims still work; no score was created.';
+          if (!row && doc.players.length >= 128) consentMessage = BOT_COPY.thePublicScoreRegisterIs;
           else {
             if (!row) {
               row = { key, login: chat.chatterLogin, channels: [], joined: 0, since: now };
@@ -135,7 +156,7 @@ export function reduceScores(
             }
             row.login = chat.chatterLogin;
             if (!row.channels.length) row.channels.push(host);
-            consentMessage = `@${row.login}: public scores on for future completed claims. Anyone can see this name and count. Use !relic scores off to erase them.`;
+            consentMessage = scoreConsentReply(row.login);
           }
         }
       }
@@ -152,90 +173,90 @@ export function reduceScores(
         if (limited) {
           r.notice = notice;
           r.noticeUntil = now + 10000;
-          message = 'Please wait ten seconds before repeating that command.';
+          message = BOT_COPY.cooldown;
           reason = 'cooldown';
-        } else if (action === 'scores-off')
-          message =
-            'Public scores off. Your score name, participation count and links have been erased.';
+        } else if (action === 'scores-off') message = BOT_COPY.publicScoresOffYourScore;
         else if (action === 'scores-on') message = consentMessage;
         else if (['seek-on', 'seek-off', 'seek-status'].includes(action))
           message =
             chat.chatterId !== host
-              ? 'Only this broadcaster can change or read their Seeker choice.'
+              ? BOT_COPY.onlyThisBroadcasterCanChange
               : !seekersEnabled
-                ? 'The authorised Keeper Seeker pilot is off.'
+                ? BOT_COPY.theAuthorisedKeeperSeekerPilot
                 : action === 'seek-status'
                   ? channels[host]?.optedIn === true
                     ? seekerStatusMessage(seekerState(registry, lineage, channels, marks, host))
                     : KEEPER_SETUP_HINT
                   : registry?.holderId === host
-                    ? 'You hold the relic. Seeker queue off; pass it on before joining again.'
+                    ? BOT_COPY.youHoldTheRelicSeeker
                     : seekerState(registry, lineage, channels, marks, host).member
-                      ? 'Seeker queue on. Your configured channel may be suggested while live and eligible. !seek off to leave.'
+                      ? BOT_COPY.seekerQueueOnYourConfigured
                       : channels[host]?.optedIn === true
-                        ? 'Seeker queue off. Type !seek to rejoin.'
+                        ? BOT_COPY.seekerQueueOffTypeSeek
                         : KEEPER_SETUP_HINT;
         else if (action === 'where') {
           const holder = names[registry?.holderId];
-          message = holder
-            ? `@${holder} holds the relic. Held since: ${Number.isSafeInteger(holderSince) && holderSince >= 0 ? new Date(holderSince).toISOString().slice(0, 19).replace('T', ' ') + ' UTC' : 'not recorded'}. Watch: https://twitch.tv/${holder} · https://raid-relic-760724762396.us-central1.run.app/keeper/${holder}`
-            : 'The current relic holder is not recorded.';
+          message = holder ? whereReply(holder, holderSince) : BOT_COPY.theCurrentRelicHolderIs;
         } else if (action === 'scores-status') {
           message = ownScoreStatus(doc, key);
         } else if (['top', 'badges'].includes(action)) message = action;
-        else if (action === 'offer' && awaitingRaid)
-          message =
-            'Raid accepted. Wait for it to land, then send !offer again. This early offer was not saved.';
+        else if (action === 'offer' && awaitingRaid) message = BOT_COPY.earlyOffer;
         else if (['offer', 'accept'].includes(action))
           message =
             hop && !hop.cancelled && !hop.finalized && now < hop.endsAt
-              ? 'That vote was not counted. Check the ritual, chat role and deadline.'
-              : 'No Send Off is active yet. The keeper starts one on the control page, then raid and !offer.';
-        else if (action === 'forgetme')
-          message =
-            'Your retained marks, shared links and public scores were erased. Stream quota and cooldown are not refunded.';
-        else if (action === 'mymarks')
-          message =
-            'Mark-history link not queued. Use your own verified login and wait one minute between requests. Shared links are public to anyone who receives them.';
+              ? BOT_COPY.thatVoteWasNotCounted
+              : BOT_COPY.noSend;
+        else if (action === 'forgetme') message = BOT_COPY.yourRetainedMarksSharedLinks;
+        else if (action === 'mymarks') message = BOT_COPY.markHistoryLinkNotQueued;
         else if (
           ['approve', 'block', 'veto-last', 'pause'].includes(action) &&
           chat.chatterId !== host &&
           !chat.isModerator
         )
-          message = 'Only this broadcaster or an authorized moderator can use that command.';
-        else if (action === 'veto-last')
+          message = BOT_COPY.onlyThisBroadcasterOrAn;
+        else if (isReviewCommand(action)) {
+          const count = /^pending:(\d{1,3})$/.exec(markOutcome ?? '');
+          message =
+            action === 'pending' && count && Number(count[1]) <= 160
+              ? pendingReviewReply(Number(count[1]))
+              : markOutcome === 'approved-last'
+                ? BOT_COPY.reviewApproved
+                : markOutcome === 'rejected-last'
+                  ? BOT_COPY.reviewRejected
+                  : markOutcome === 'review-empty'
+                    ? BOT_COPY.reviewEmpty
+                    : markOutcome === 'login-blocked'
+                      ? BOT_COPY.reviewBlocked
+                      : markOutcome === 'login-unresolved'
+                        ? BOT_COPY.reviewUnknownLogin
+                        : null;
+        } else if (action === 'veto-last')
           message =
             markOutcome === 'vetoed'
               ? 'Vetoed latest mark.'
               : markOutcome === 'empty'
-                ? 'Nothing is retained to veto in this channel. Moderators can remove the latest approved or pending mark; veto never refunds the five-mark allowance or waiting time.'
-                : 'Veto unavailable: an eligible retained mark and authorized same-channel moderator are required.';
+                ? BOT_COPY.nothingIsRetainedToVeto
+                : BOT_COPY.vetoUnavailableAnEligibleRetained;
         else if (action === 'mark' && ['approved', 'pending'].includes(markOutcome))
           message =
             markOutcome === 'approved'
               ? 'Your mark is public on the relic.'
-              : 'Waiting for moderator approval. Your mark is private and is not visible on the relic.';
+              : BOT_COPY.waitingForModeratorApprovalYour;
         else if (action === 'mark' && markOutcome === 'not-added')
           message =
             !channels[host]?.online || channels[host]?.paused || !marks[host]?.context?.holdsRelic
-              ? 'Marks are open only while this channel is live, unpaused and holding the relic. No mark was added.'
-              : 'No mark was added. Use one allowed word or emoji, wait 30 seconds between marks, and use at most five marks per stream. Private review text is never public.';
+              ? BOT_COPY.marksAreOpenOnlyWhile
+              : BOT_COPY.noMarkWasAddedUse;
         else if (action === 'mark')
           message =
             channels[host].online && !channels[host].paused && marks[host]?.context?.holdsRelic
               ? autoApprove
-                ? 'Mark request checked under quota and cooldown. Clean valid marks become public automatically; held marks stay private until moderator approval.'
-                : 'Mark request processed under the stream quota and cooldown. Only moderator-approved marks become public.'
-              : 'Marks are open only while this channel is live, unpaused and holding the relic. No mark was added.';
-        else if (action === 'send')
-          message =
-            'Send Off request checked. The Keeper uses private control to process an eligible queued request; never repeat an unknown dispatch.';
-        else if (action === 'help')
-          message =
-            'Raid Relic: !mark word, !offer, !accept, !relic mymarks, !relic top, !relic badges, !relic scores (your status), !relic scores on/off, !relic forgetme, !relic veto (moderators). Keeper setup and Send Off use private controls.';
-        else
-          message =
-            'Keeper command checked. Refresh your private control for the authoritative result; role and stream safety rules still apply.';
+                ? BOT_COPY.markRequestCheckedUnderQuota
+                : BOT_COPY.markRequestProcessedUnderThe
+              : BOT_COPY.marksAreOpenOnlyWhile;
+        else if (action === 'send') message = BOT_COPY.sendOffRequestCheckedThe;
+        else if (action === 'help') message = BOT_COPY.help;
+        else message = BOT_COPY.keeperCommandCheckedRefreshYour;
       }
     }
   }
@@ -379,35 +400,13 @@ export function scoreboard(lineage, registry, scores, config, now, publicProfile
       ? { wanderStops: stops.filter((s) => s.kind === 'wander').length }
       : {}),
     ...(config?.streakEnabled ? { streak: streakView(registry, now) } : {}),
-    coverage:
-      'Retained completed archive only. Initial home hold start is unknown; historical raider participation is not available. Raider counts start after explicit score opt-in, never retroactively.',
+    coverage: BOT_COPY.retainedCompletedArchiveOnlyInitial,
     channels: rows,
     ...(config.seekersEnabled ? { publicProfiles } : {}),
     raiders,
     event: EVENT_DAYS,
   };
 }
-export function scoreMessage(kind, view, host) {
-  if (kind === 'badges')
-    return `Keeper badges: ${view.channels.find((r) => r.channelId === host)?.badges.join(', ') || 'none recorded yet'}. Retained completed archive only.`.slice(
-      0,
-      500,
-    );
-  return `Recorded Keepers: ${view.channels.map((r) => `${r.login ?? r.channelId}: ${r.hopsCarried} hops, ${r.knownHoldSeconds}s known hold`).join('; ')}. Opted-in raiders: ${
-    view.raiders
-      .slice(0, 3)
-      .map((r) => `@${r.login} ${r.claimsJoined}`)
-      .join(', ') || 'none recorded'
-  }. Not all-time history.`.slice(0, 500);
-}
-
-function ownScoreStatus(scores, key) {
-  const own = scores?.players?.find((player) => player.key === key);
-  return own
-    ? `Scores are on for you: ${own.joined} recorded raids. !relic scores off to leave.`
-    : 'Scores are off for you. !relic scores on to join; off to leave.';
-}
-
 export function scoreAckDocument(previous, chat, message, channel, marks, now) {
   const read = true; // This outbox delivers status only, never game authority.
   const policyChannel = read
@@ -545,3 +544,5 @@ export function scoreAckMutation(
     }
   return next;
 }
+
+export { scoreMessage } from '../public/ritual-copy.js';

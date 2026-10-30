@@ -88,3 +88,22 @@ export function botConsentStartURL(value, mode, pageOrigin) {
     return null;
   }
 }
+
+// Only a user-started setup flow may repeat the existing idempotent reconcile.
+// It cannot retry a raid, failed/unknown request, or continue after hide/deadline.
+export function setupRetryAllowed(
+  value,
+  { remaining, deadline, now = Date.now(), visible = true } = {},
+) {
+  return (
+    visible === true &&
+    Number.isInteger(remaining) &&
+    remaining > 0 &&
+    remaining <= 2 &&
+    Number.isFinite(deadline) &&
+    Number.isFinite(now) &&
+    now < deadline &&
+    deadline - now <= 45000 &&
+    (value?.status === 'busy' || (value?.status === 'reconciled' && value.ready === false))
+  );
+}

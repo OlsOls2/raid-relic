@@ -18,178 +18,224 @@
     <main id="main-content" tabindex="-1">
       <p id="simulator" hidden>Local Simulator · mocked OAuth and Twitch API</p>
       <h1 id="account">Keeper control</h1>
+      <p id="result" role="status" aria-live="polite">Reading your session…</p>
+      <p><a id="reconnect" href="/oauth/keeper/1591805230/start">Connect Twitch</a></p>
       <div class="status-lights" role="group" aria-label="Channel readiness">
         <p id="light-bot" data-state="unknown">Bot: not yet checked</p>
         <p id="light-subscriptions" data-state="unknown">Subscriptions: not yet checked</p>
         <p id="light-live" data-state="unknown">Stream: not yet checked</p>
       </div>
-      <p id="authorization-status" role="status">
-        Authorization is not checked yet. Refresh status never renews tokens; use Check / refresh my
-        Keeper authorization explicitly if needed.
-      </p>
-      <p id="keeper-summary" role="status">Read status before taking action.</p>
-      <details id="first-run">
-        <summary>Get started in two minutes — own-channel checklist</summary>
-        <p>
-          Timing assumes Twitch and OBS are already available. Consent and installation can take
-          longer. This checklist never starts a raid.
-        </p>
-        <ol>
-          <li id="first-session">○ Matching private session not checked</li>
-          <li id="first-optin">○ Explicit Keeper opt-in not checked</li>
-          <li id="first-subscriptions">○ Subscriptions not checked</li>
-          <li id="first-obs">○ OBS installation not verified</li>
+      <nav aria-label="Setup steps">
+        <ol class="wizard-steps">
+          <li><a href="#connect-step">Connect</a></li>
+          <li><a href="#setup-step">Set up channel</a></li>
+          <li><a href="#overlay-step">Add overlay</a></li>
+          <li><a href="#send-step">Send Off</a></li>
         </ol>
-        <p id="first-freshness" role="status">Not freshly verified.</p>
-        <div class="actions">
-          <button id="first-bootstrap" disabled>Set up channel</button
-          ><button id="first-keep" disabled>Opt in this channel</button>
-        </div>
-        <p>
-          Setup reconciles only the existing five subscriptions. The bot must already have its
-          approved grant and be a moderator; these ticks do not prove optional permissions.
-        </p>
-        <label for="first-obs-url">Own canonical OBS Browser Source URL</label
-        ><input id="first-obs-url" readonly /><button id="first-obs-copy" disabled>
-          Copy my OBS URL
-        </button>
-        <p id="first-copy-status" role="status">
-          Add a Browser Source at 1920×1080. Copying is not installation.
-        </p>
-        <label
-          ><input id="first-obs-confirm" type="checkbox" /> I manually checked this source in OBS
-          (page-only, not server verified)</label
-        >
-        <p id="first-queue" role="status">Queue: not checked.</p>
-        <button id="first-seek" disabled>Become a Seeker</button>
-        <p>
-          Joining is explicit and does not prove live eligibility. Current holders cannot join;
-          former holders may rejoin after passing. <a href="/start">Public setup guide</a>
-        </p>
-      </details>
-      <section>
-        <h2>Send Off</h2>
-        <p id="target-help">
-          Send Off requests a real Twitch raid to this observed Keeper. The relic moves only after
-          Twitch confirms the raid and both chats bind it; sending rechecks eligibility.
-        </p>
-        <label for="raid-target">Observed eligible raid target</label
-        ><select id="raid-target" aria-describedby="target-help target-empty" disabled></select>
-        <p id="target-empty" role="status">
-          No observed eligible Keeper targets. Refresh status after setup or a state change.
-        </p>
-        <div id="raid" class="actions"></div>
-      </section>
-      <p id="result" role="status" aria-live="polite">Reading your session…</p>
-      <p>Private Keeper control. Actions apply only to your authenticated account.</p>
-      <p>
-        <a id="reconnect" href="/oauth/keeper/1591805230/start">Reconnect this matching Keeper</a> ·
-        Refresh status is read-only and never renews authorization. Use the explicit authorization
-        button to try renewal for your account.
-      </p>
-      <dl id="ledger" hidden></dl>
-      <section>
-        <h2>Set up this channel</h2>
-        <p>
-          Bootstrap reconciles subscriptions and observes your current stream. It never starts a
-          raid.
-        </p>
-        <div id="setup" class="actions"></div>
-      </section>
-      <section>
-        <h2>Keeper state</h2>
-        <div id="keeper" class="actions"></div>
-      </section>
-      <section aria-labelledby="recovery-title">
-        <h2 id="recovery-title">Own Send Off recovery</h2>
-        <p id="recovery-status">
-          Refresh status to inspect your own intent. Accepted, unknown or claimed processing
-          outcomes require operator read-only review; never clear or retry them.
-        </p>
-        <label for="intent-confirm">Exact queued intent ID from your private status</label
-        ><input id="intent-confirm" autocomplete="off" spellcheck="false" maxlength="64" /><button
-          id="cancel-queued"
-          disabled
-        >
-          Cancel confirmed never-dispatched queue
-        </button>
+      </nav>
+      <section id="first-run" aria-label="Four-step own-channel setup">
+        <details id="connect-step" aria-labelledby="connect-title">
+          <summary><h2 id="connect-title">1 · Connect</h2></summary>
+          <p id="first-session">○ Matching private session not checked</p>
+          <p id="authorization-status" role="status">
+            Sign in first; a status read is not a fresh grant check.
+          </p>
+          <button id="first-authorize" disabled aria-describedby="first-action-reason">
+            Check my Twitch connection
+          </button>
+        </details>
+        <details id="setup-step" aria-labelledby="setup-title">
+          <summary><h2 id="setup-title">2 · Set up channel</h2></summary>
+          <p id="bot-fix">
+            If the bot is not a moderator, type /mod raidrelicbot in your own chat.
+          </p>
+          <button id="copy-mod" aria-describedby="bot-fix">Copy /mod raidrelicbot</button>
+          <p id="mod-copy-status" role="status"></p>
+          <p id="first-subscriptions">○ Subscriptions not checked</p>
+          <button id="first-bootstrap" disabled aria-describedby="first-action-reason">
+            Set up channel
+          </button>
+          <p id="setup-flow-status" role="status">
+            Setup runs only after your click; it never starts a raid.
+          </p>
+          <button id="stop-setup" hidden>Stop setup checks</button>
+          <p id="first-optin">○ Explicit Keeper opt-in not checked</p>
+          <button id="first-keep" disabled aria-describedby="first-action-reason">
+            Opt in this channel
+          </button>
+        </details>
+        <details id="overlay-step" aria-labelledby="overlay-title">
+          <summary><h2 id="overlay-title">3 · Add overlay</h2></summary>
+          <p id="first-obs">○ OBS installation not verified</p>
+          <label for="first-obs-url">Own canonical OBS Browser Source URL</label
+          ><input id="first-obs-url" readonly />
+          <button id="first-obs-copy" disabled aria-describedby="first-copy-status">
+            Copy my OBS URL
+          </button>
+          <p id="first-copy-status" role="status">
+            Add a Browser Source at 1920×1080; copying does not prove installation.
+          </p>
+          <label
+            ><input id="first-obs-confirm" type="checkbox" aria-describedby="first-copy-status" />
+            I've added it in OBS (my manual check, not server verified)</label
+          >
+          <button id="preview-arrival" disabled aria-describedby="preview-status">
+            ▶ Play test arrival on my overlay
+          </button>
+          <p id="preview-status" role="status">
+            LOCAL TEST · embedded fictional preview only; it cannot affect your live source.
+          </p>
+          <iframe
+            id="local-overlay-preview"
+            title="LOCAL TEST · fictional overlay arrival, no live connection"
+            width="960"
+            height="540"
+            hidden
+          ></iframe>
+        </details>
+        <details id="send-step" aria-labelledby="send-title">
+          <summary><h2 id="send-title">4 · Send Off</h2></summary>
+          <p id="keeper-summary" role="status">Read status before taking action.</p>
+          <p id="target-help">
+            Send Off requests a real Twitch raid to this observed Keeper. The relic moves only after
+            Twitch confirms the raid and both chats bind it; sending rechecks eligibility.
+          </p>
+          <label for="raid-target">Observed eligible raid target</label
+          ><select id="raid-target" aria-describedby="target-help target-empty" disabled></select>
+          <p id="target-empty" role="status">
+            No one's ready to receive the relic right now. Targets appear when another admitted
+            Keeper is live and opted in. We'll update this list automatically from existing
+            observations; ask the owner for an invitation if your channel isn't admitted.
+          </p>
+          <p id="send-disabled-reason">Read your own status before requesting a raid.</p>
+          <div id="raid" class="actions"></div>
+          <p id="send-progress" role="status" hidden>Sending… Wait; do not repeat this request.</p>
+          <p id="send-result" role="status" aria-live="polite">
+            No Send Off requested in this page.
+          </p>
+        </details>
+        <p id="first-action-reason">Sign in first; no action runs automatically.</p>
+        <p id="first-freshness" aria-live="off">Status is not checked.</p>
       </section>
       <div class="actions">
         <button id="refresh">Refresh status</button><button id="logout">End control session</button>
       </div>
-      <p>
-        <a id="own-overlay" href="/overlay/1591805230">Own OBS overlay</a> ·
-        <a id="own-overlay-sound" href="/overlay/1591805230?sound=1"
-          >Optional overlay sound (muted until gesture)</a
-        >
-      </p>
-      <p>
-        Sound uses original quiet oscillators only. Open the optional sound link and click Sound
-        once; browser permission still applies. No initial/reconnect or Shared-chat echo sounds.
-      </p>
-      <p><a id="forge-owner-link" href="/forge">Relic Forge previews</a></p>
-      <p>
-        This control session rolls for 12 hours while you use authenticated status or actions
-        (renewal checked every five minutes). Idle or replaced sessions need reconnection. Ending
-        this session does not disconnect Twitch. No automatic background worker or status polling
-        runs.
-      </p>
-      <section id="p7-setup">
-        <h2>Optional bot actions</h2>
-        <p id="p7-status" role="status">
-          Off by default. A separate operator gate is required for announcements, pins and shoutouts
-          after a new completed claim. The three readiness lights do not prove these optional
-          permissions.
+      <details id="control-verify">
+        <summary>How we verify</summary>
+        <p>
+          Status uses saved channel/subscription observations, not fresh token permission. Send Off
+          rechecks current identity, consent, streams, grants and admission. Transfer needs a
+          verified arrival and both eligible chats. OBS checks and local preview are not live
+          installation proof.
+        </p>
+      </details>
+      <details id="control-advanced">
+        <summary>Advanced · operator details and recovery</summary>
+        <dl id="ledger" hidden></dl>
+        <section>
+          <h2>Set up this channel</h2>
+          <p>
+            Bootstrap reconciles subscriptions and observes your current stream. It never starts a
+            raid.
+          </p>
+          <div id="setup" class="actions"></div>
+        </section>
+        <section>
+          <h2>Keeper state</h2>
+          <p id="first-queue" role="status">Queue: not checked.</p>
+          <button id="first-seek" disabled aria-describedby="first-queue">Become a Seeker</button>
+          <div id="keeper" class="actions"></div>
+        </section>
+        <section aria-labelledby="recovery-title">
+          <h2 id="recovery-title">Own Send Off recovery</h2>
+          <p id="recovery-status">
+            Refresh status to inspect your own intent. Accepted, unknown or claimed processing
+            outcomes require operator read-only review; never clear or retry them.
+          </p>
+          <label for="intent-confirm">Exact queued intent ID from your private status</label
+          ><input id="intent-confirm" autocomplete="off" spellcheck="false" maxlength="64" /><button
+            id="cancel-queued"
+            disabled
+          >
+            Cancel confirmed never-dispatched queue
+          </button>
+        </section>
+
+        <p>
+          <a id="own-overlay" href="/overlay/1591805230">Own OBS overlay</a> ·
+          <a id="own-overlay-sound" href="/overlay/1591805230?sound=1"
+            >Optional overlay sound (muted until gesture)</a
+          >
         </p>
         <p>
-          <a id="p7-consent-link" role="link" aria-disabled="true"
-            >Authorize optional P7 bot permissions</a
-          >. Open this link in a browser signed in as raidrelicbot. Copy the app start URL below
-          first, then open it in that bot browser to create its own fresh state cookie. Never copy
-          the redirected Twitch authorize URL between browsers.
+          Sound uses original quiet oscillators only. Open the optional sound link and click Sound
+          once; browser permission still applies. No initial/reconnect or Shared-chat echo sounds.
         </p>
-        <label for="p7-consent-url">App start URL (not a Twitch redirect)</label
-        ><input id="p7-consent-url" readonly autocomplete="off" spellcheck="false" /><button
-          id="p7-copy"
-          type="button"
-          disabled
-        >
-          Copy app start URL
-        </button>
-        <p id="p7-copy-status" role="status"></p>
+        <p><a id="forge-owner-link" href="/forge">Relic Forge previews</a></p>
         <p>
-          4 ADDITIONAL permissions + 3 existing baseline = 7 total Twitch scopes. Baseline:
-          <code>user:read:chat</code>, <code>user:write:chat</code>, <code>user:bot</code>.
-          Additional: <code>moderator:manage:announcements</code>,
-          <code>moderator:manage:chat_messages</code>, <code>moderator:manage:shoutouts</code>,
-          <code>user:read:moderated_channels</code>. Ordinary bot consent still requests only the
-          baseline three. Consent does not switch gates. The bot must be moderator in both Keeper
-          rooms.
+          This control session rolls for 12 hours on explicit authenticated actions (renewal checked
+          every five minutes); status reads do not extend it. Idle or replaced sessions need
+          reconnection. Ending this session does not disconnect Twitch. Visible status reads are 5
+          seconds while pending and 30 seconds when idle; hidden pages stop. Only explicit
+          authenticated actions renew this 12-hour session. No background action worker runs.
         </p>
-        <p id="p7-gates">Refresh to read operator-configured gates.</p>
-        <p>
-          Operator-managed Cloud Run environment; request the operator, not a Keeper UI switch:
-          <code>P7_BOT_ACTIONS_ENABLED</code>, <code>P7_ANNOUNCEMENTS_ENABLED</code>,
-          <code>P7_PIN_ENABLED</code>, <code>P7_SHOUTOUTS_ENABLED</code>,
-          <code>P7_ALLOW_PIN_REPLACE</code> (true/false),
-          <code>P7_PIN_DURATION_SECONDS</code> (normally 300). Pins require explicit operator
-          acknowledgement that an existing moderator pin will be replaced. No historical claims are
-          replayed.
-        </p>
-      </section>
-      <section>
-        <h2>Ended claim recovery</h2>
-        <p id="expiry-state">
-          Refresh status. Recovery never transfers the relic or cancels a Twitch raid.
-        </p>
-        <button id="expire-handoff" disabled>Expire ended handoff</button>
-        <p>
-          Future verified raids of 0–2 viewers need one distinct participant per chat. Send !offer
-          in source and !accept in host promptly, within the new 180-second voting window opened by
-          API acceptance (or verified receipt for manual raids). Transfer still requires the
-          verified raid. Existing thresholds do not change.
-        </p>
-      </section>
+        <section id="p7-setup">
+          <h2>Optional bot actions</h2>
+          <p id="p7-status" role="status">
+            Off by default. A separate operator gate is required for announcements, pins and
+            shoutouts after a new completed claim. The three readiness lights do not prove these
+            optional permissions.
+          </p>
+          <p>
+            <a id="p7-consent-link" role="link" aria-disabled="true"
+              >Authorize optional P7 bot permissions</a
+            >. Open this link in a browser signed in as raidrelicbot. Copy the app start URL below
+            first, then open it in that bot browser to create its own fresh state cookie. Never copy
+            the redirected Twitch authorize URL between browsers.
+          </p>
+          <label for="p7-consent-url">App start URL (not a Twitch redirect)</label
+          ><input id="p7-consent-url" readonly autocomplete="off" spellcheck="false" /><button
+            id="p7-copy"
+            type="button"
+            disabled
+          >
+            Copy app start URL
+          </button>
+          <p id="p7-copy-status" role="status"></p>
+          <p>
+            4 ADDITIONAL permissions + 3 existing baseline = 7 total Twitch scopes. Baseline:
+            <code>user:read:chat</code>, <code>user:write:chat</code>, <code>user:bot</code>.
+            Additional: <code>moderator:manage:announcements</code>,
+            <code>moderator:manage:chat_messages</code>, <code>moderator:manage:shoutouts</code>,
+            <code>user:read:moderated_channels</code>. Ordinary bot consent still requests only the
+            baseline three. Consent does not switch gates. The bot must be moderator in both Keeper
+            rooms.
+          </p>
+          <p id="p7-gates">Refresh to read operator-configured gates.</p>
+          <p>
+            Operator-managed Cloud Run environment; request the operator, not a Keeper UI switch:
+            <code>P7_BOT_ACTIONS_ENABLED</code>, <code>P7_ANNOUNCEMENTS_ENABLED</code>,
+            <code>P7_PIN_ENABLED</code>, <code>P7_SHOUTOUTS_ENABLED</code>,
+            <code>P7_ALLOW_PIN_REPLACE</code> (true/false),
+            <code>P7_PIN_DURATION_SECONDS</code> (normally 300). Pins require explicit operator
+            acknowledgement that an existing moderator pin will be replaced. No historical claims
+            are replayed.
+          </p>
+        </section>
+        <section>
+          <h2>Ended claim recovery</h2>
+          <p id="expiry-state">
+            Refresh status. Recovery never transfers the relic or cancels a Twitch raid.
+          </p>
+          <button id="expire-handoff" disabled>Expire ended handoff</button>
+          <p>
+            Future verified raids of 0–2 viewers need one distinct participant per chat. Send !offer
+            in source and !accept in host promptly, within the new 180-second voting window opened
+            by API acceptance (or verified receipt for manual raids). Transfer still requires the
+            verified raid. Existing thresholds do not change.
+          </p>
+        </section>
+      </details>
     </main>
   </body>
 </html>

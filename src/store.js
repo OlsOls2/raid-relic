@@ -25,6 +25,8 @@ import {
   ackSeen,
   ackStep,
   completionAck,
+  attachOfferProof,
+  arrivalNotice,
   completionEligible,
   cancelCompletionNotices,
 } from './claim-ack.js';
@@ -252,9 +254,15 @@ export function createFirestoreStore(
         if (
           p7Enabled &&
           managed &&
-          (['forgetme', 'pause', 'opt-out', 'block', 'veto-last'].includes(
-            chat?.markAction?.type,
-          ) ||
+          ([
+            'forgetme',
+            'pause',
+            'opt-out',
+            'block',
+            'veto-last',
+            'reject-last',
+            'block-login',
+          ].includes(chat?.markAction?.type) ||
             event?.type === 'ban')
         )
           for (const id of config.channels)
@@ -380,6 +388,7 @@ export function createFirestoreStore(
             seekersEnabled: config?.seekersEnabled,
             wanderEnabled: wander?.enabled,
             markOutcome,
+            sentAt,
             autoApprove: reviewPolicy.autoApprove,
             vote: claiming.scoreVote,
             completion: claiming.completedScore,
@@ -468,6 +477,29 @@ export function createFirestoreStore(
             ackUpdates.set(target, value.doc);
             if (value.key) completionAcks.push({ host: target, key: value.key });
             else completionSkipped++;
+          }
+        }
+        if (claiming && host && chat)
+          attachOfferProof(
+            ackUpdates.get(host),
+            chat,
+            claiming.registry.pendingHop,
+            claiming.scoreVote === chat.chatterId,
+          );
+        if (raid && claiming?.registry.pendingHop) {
+          const h = claiming.registry.pendingHop;
+          const notice = arrivalNotice(
+            ackUpdates.get(h.to) ?? ackMap[h.to],
+            ackUpdates.get(h.from) ?? ackMap[h.from],
+            claiming.registry,
+            channelMap,
+            claiming.marks,
+            now,
+            keeperNames,
+          );
+          if (notice) {
+            ackUpdates.set(h.to, notice.doc);
+            completionAcks.push({ host: h.to, key: notice.key });
           }
         }
         if (privacyChanged)
@@ -569,6 +601,10 @@ export function createFirestoreStore(
           );
         const history = active ? (await tx.get(ref('lineage', 'single'))).data() : null,
           jobs = active ? (await tx.get(ref('p7Actions', host))).data() : null;
+        const promptTarget = registry?.pendingHop?.to;
+        const receiverRef =
+          promptTarget && promptTarget !== host ? ref('claimAcks', promptTarget) : null;
+        const receiverAcks = receiverRef ? (await tx.get(receiverRef)).data() : previous;
         const next = ackStep(
           previous,
           op,
@@ -595,6 +631,21 @@ export function createFirestoreStore(
             );
             result = { p7Keys: queued.keys };
           } catch {}
+        }
+        if (op.type === 'finish' && op.sent && registry?.pendingHop?.from === host && receiverRef) {
+          const notice = arrivalNotice(
+            receiverAcks,
+            next.doc,
+            registry,
+            channels,
+            markMap,
+            now,
+            keeperNames,
+          );
+          if (notice) {
+            tx.set(receiverRef, notice.doc);
+            result = { ...result, arrivalAcks: [{ host: promptTarget, key: notice.key }] };
+          }
         }
         for (const r of next.doc.rows) if (r.status !== 'dispatching') delete r.p7Proof;
         if (queued?.doc) tx.set(ref('p7Actions', host), queued.doc);
@@ -667,7 +718,15 @@ export function createFirestoreStore(
           const p7Cancel = {};
           if (
             p7Enabled &&
-            ['forgetme', 'pause', 'opt-out', 'block', 'veto-last'].includes(action.type)
+            [
+              'forgetme',
+              'pause',
+              'opt-out',
+              'block',
+              'veto-last',
+              'reject-last',
+              'block-login',
+            ].includes(action.type)
           )
             for (const id of config.channels)
               p7Cancel[id] = (await tx.get(ref('p7Actions', id))).data();

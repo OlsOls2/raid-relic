@@ -289,10 +289,13 @@ export function createReceiving({
         ? { ...latest, position: index + 1, total: observed.seekers.length }
         : latest;
     },
-    async candidates(source) {
+    observedAt() {
+      return cached && now() >= cached.at && now() - cached.at < 60000 ? cached.at : null;
+    },
+    async candidates(source, { cachedOnly = false } = {}) {
       if (!enabled) return state.getKeeperCandidates(source);
       const value = await state.getReceivingView(now());
-      const observation = await observations();
+      const observation = cachedOnly ? cached : await observations();
       if (!observation || now() < observation.at || now() - observation.at >= 60000) return [];
       const eligible = await state.getKeeperCandidates(source);
       const seekers = new Set(value.seekers.map((row) => row.id));
@@ -305,7 +308,11 @@ export function createReceiving({
           !stream ||
           stream.streamId !== channel?.streamId ||
           !observation.moderators.has(row.id) ||
-          !(await grants(row.id))
+          !(cachedOnly
+            ? Boolean(
+                await store.getToken(row.id === streamerId ? 'streamer' : `keeper:${row.id}`),
+              ) && (await store.getJob(row.id))?.ready === true
+            : await grants(row.id))
         )
           continue;
         rows.push({ ...row, viewers: stream.viewers });

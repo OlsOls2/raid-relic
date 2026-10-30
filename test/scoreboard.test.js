@@ -561,7 +561,15 @@ test('every earned badge has a human meaning; event label is only a locked UI af
   assert.equal(badgeDescription('__proto__'), '');
   const { readFile } = await import('node:fs/promises');
   const html = await readFile('public/atlas.html', 'utf8');
-  assert.ok(html.indexOf('id="keeper-scores"') < html.indexOf('<nav'));
+  const scores = html.indexOf('id="keeper-scores"');
+  const archiveNav = html.indexOf('<nav aria-label="Atlas controls">');
+  assert.ok(scores >= 0 && archiveNav > scores);
+  const publicNav = /<nav class="public-nav" aria-label="Public navigation">([\s\S]*?)<\/nav>/.exec(
+    html,
+  );
+  assert.ok(publicNav && publicNav.index < scores);
+  for (const href of ['/demo/judge', '/atlas/', '/start'])
+    assert.ok(publicNav[1].includes(`href="${href}"`));
   assert.equal(html.includes('Reading recorded scores'), false);
   assert.match(html, /Recorded journeys only; the first hold and past raiders are unknown/);
 });

@@ -35,7 +35,7 @@ for (const kind of ['memory', 'firestore'])
     await f.chat(HOME, '9601', '!offer');
     assert.equal(
       replies().at(-1),
-      'No Send Off is active yet. The keeper starts one on the control page, then raid and !offer.',
+      'No Send Off is active yet. The Keeper starts one in private control; after the raid arrives, sending chat uses !offer and receiving chat uses !accept.',
     );
     await f.chat(HOME, '9602', '!mark moon');
     assert.equal(replies().at(-1), 'Your mark is public on the relic.');

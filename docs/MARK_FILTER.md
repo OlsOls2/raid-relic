@@ -1,0 +1,11 @@
+# Offline mark filter · Group 5B, filter only
+
+The built-in blocked-word list matches the **entire normalized word**, not a substring. `skill`, `skilled` and `skillet` therefore remain eligible input; `kill`, including case and NFKC-equivalent forms, is rejected. Eligibility is not approval or a claim that content is harmless.
+
+The grammar is unchanged: one Unicode word composed of letters/combining marks, or one emoji sequence supported by the existing bounded expression and single-grapheme check. Raw and normalized input remain limited to 128 UTF-8 bytes and normalized input to 32 code points. NFKC, lowercase, sharp-s and final-sigma normalization remain. Digits, punctuation, phrases, links, email addresses, the tested zero-width separators/joiners and controls do not become words. Supported numeric keycap emoji retain their existing exception. Common digit/punctuation leetspeak remains rejected by this grammar; the filter is not comprehensive toxicity, Unicode homoglyph or semantic-obfuscation detection.
+
+Emoji and benign words remain pending by default. Only the existing trusted operator review-policy constructor can enable automatic approval for a newly accepted mark. A caller-supplied object, action status or policy lookalike cannot enable it. Existing operator review terms still conservatively hold matching substrings for manual review; this increment changes only the built-in input rejection list. Existing pending records are never reclassified when a policy changes. No default environment setting changes.
+
+Five marks per viewer per stream, 30-second cooldowns, signed original-chat identity, bot/copy exclusion, current consent/ownership context, moderator approval, replay receipts and forget-without-refund remain unchanged. Nothing performs network lookups or adds dependencies.
+
+Parent execution is pending. `test/mark-filter.test.js` contains explicitly named normalization vectors and targeted pure-policy/signed memory/Firestore cases. Existing `test/marks.test.js` and `test/auto-approve.test.js` retain their authority, quota, privacy and approval assertions. Source authoring did not execute tests or inspect private evidence. Moderator command UI/identity resolution and operations remain outside this small increment.

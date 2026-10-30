@@ -210,7 +210,40 @@ export function createPilot({
       }
     }
     await store.finishJob(id, owner, result);
+    // Only an explicitly authenticated Setup action may refresh provider observations.
+    if (result.status === 'reconciled' && receiving?.enabled) {
+      try {
+        await boundedCall(() => receiving.candidates(id));
+      } catch {
+        /* Status stays unknown; no implicit retry. */
+      }
+    }
     return result;
+  }
+  async function retireEnded(id) {
+    let registry = await state.getKeeperRegistry();
+    if (
+      registry.holderId === id &&
+      registry.send?.sourceId === id &&
+      registry.send.status === 'confirmed' &&
+      registry.pendingHop &&
+      !registry.pendingHop.finalized &&
+      now() >= registry.pendingHop.endsAt
+    ) {
+      await state.sendOffStep(
+        {
+          type: 'reconcile-ended',
+          source: id,
+          actor: id,
+          id: registry.send.id,
+          generation: registry.send.generation,
+          hopId: registry.pendingHop.eventId,
+        },
+        now(),
+      );
+      registry = await state.getKeeperRegistry();
+    }
+    return registry;
   }
   return {
     forgeEnabled: forge?.enabled === true,
@@ -277,6 +310,10 @@ export function createPilot({
       if (action === 'bootstrap') return bootstrap(id);
       if (action === 'process' || action.startsWith('send:')) {
         try {
+          // Reserve already retires an ended confirmed window atomically with
+          // its fresh request. A separate retirement at this same clock would
+          // correctly fence the following request as stale. Process has no reserve.
+          if (action === 'process') await retireEnded(id);
           let intentId;
           if (action === 'process') {
             const intent = (await state.getKeeperRegistry()).send;
@@ -334,28 +371,7 @@ export function createPilot({
     async status(id) {
       if (!ids.includes(id)) throw new Error('Unconfigured Keeper');
       const channel = await state.getStreamStatus(id);
-      let registry = await state.getKeeperRegistry();
-      if (
-        registry.holderId === id &&
-        registry.send?.sourceId === id &&
-        registry.send.status === 'confirmed' &&
-        registry.pendingHop &&
-        !registry.pendingHop.finalized &&
-        now() >= registry.pendingHop.endsAt
-      ) {
-        await state.sendOffStep(
-          {
-            type: 'reconcile-ended',
-            source: id,
-            actor: id,
-            id: registry.send.id,
-            generation: registry.send.generation,
-            hopId: registry.pendingHop.eventId,
-          },
-          now(),
-        );
-        registry = await state.getKeeperRegistry();
-      }
+      const registry = await state.getKeeperRegistry();
       const authorization = 'not-checked';
       return {
         authorization,
@@ -371,9 +387,10 @@ export function createPilot({
             }
           : { enabled: false, joined: false },
         candidates: receiving
-          ? await receiving.candidates(id)
+          ? await receiving.candidates(id, { cachedOnly: true })
           : await state.getKeeperCandidates(id),
-        candidatesObservedAt: now(),
+        candidatesObservedAt: receiving?.observedAt?.() ?? null,
+        statusReadAt: now(),
         mode: simulator ? 'simulator' : 'live',
         account: keepers[id],
         online: channel?.online ?? false,

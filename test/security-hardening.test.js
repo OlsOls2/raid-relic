@@ -517,7 +517,7 @@ for (const kind of ['memory', 'firestore']) {
     );
     for (const host of [HOME, OTHER]) {
       const acks = await f.runtime.state.getPrivateClaimAcks(host);
-      assert.equal(acks.rows.filter((r) => r.completionReceipt).length, 1);
+      assert.equal(acks.rows.filter((r) => r.completionReceipt && !r.arrivalReceipt).length, 1);
       assert.ok(acks.rows.length <= 128);
     }
     await f.chat(OTHER, '103', '!accept', { messageId: 'honest-accept' });

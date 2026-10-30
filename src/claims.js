@@ -1,3 +1,4 @@
+import { claimVoteCopy, BOT_COPY } from '../public/ritual-copy.js';
 import { dequeueSeeker } from './seeker-state.js';
 import { RECEIVING_KEEPERS } from './receiving.js';
 import { observeStreak, completeStreak, stopStreak } from './streaks.js';
@@ -196,17 +197,7 @@ export function reduceClaims(
           hop.movedOffers ??= [];
           hop.movedOffers.push(chat.chatterId);
         }
-        const needOffers = Math.max(0, hop.threshold - hop.offers.length),
-          needAccepts = Math.max(0, hop.threshold - hop.accepts.length);
-        const missing = [
-          needOffers
-            ? `${needOffers} ${needOffers === 1 ? 'offer' : 'offers'} in @${names[hop.from] ?? hop.from}`
-            : null,
-          needAccepts
-            ? `${needAccepts} ${needAccepts === 1 ? 'accept' : 'accepts'} in @${names[hop.to] ?? hop.to}`
-            : null,
-        ].filter(Boolean);
-        acknowledgement = `${side === 'offers' ? 'Offers' : 'Accepts'} ${hop[side].length}/${hop.threshold}. ${hop.verified ? '' : 'Waiting for Twitch to confirm the raid. '}${missing.length ? 'Waiting for ' + missing.join(' and ') + '.' : hop.verified ? 'Both chats reached the threshold.' : 'Both chats reached the threshold; waiting for Twitch to confirm the raid.'}`;
+        acknowledgement = claimVoteCopy(side, hop, names);
       }
     }
     if (
@@ -307,8 +298,7 @@ export function reduceClaims(
         (id) => !channels[id].blockedUserIds.includes(actor) && !marks[id].blocked.includes(actor),
       )
     ) {
-      acknowledgement =
-        'The binding window has closed… The relic stays with its Keeper. Begin a new Send Off to try again.';
+      acknowledgement = BOT_COPY.closedClaim;
       acknowledgementKind = 'closed';
       ackDeadline = now;
     }

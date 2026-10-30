@@ -25,12 +25,40 @@ for (const kind of ['memory', 'firestore'])
     const f = await ready(kind),
       before = await f.runtime.state.getKeeperRegistry(),
       end = before.pendingHop.endsAt;
+    const expire = async () => {
+      const own = await f.request(`/control/${HOME}/status`, 'GET', { cookie: f.cookies[HOME] });
+      assert.equal(own.status, 200);
+      return f.request(
+        `/control/${HOME}/expire-handoff`,
+        'POST',
+        {
+          cookie: f.cookies[HOME],
+          origin: 'https://pilot.example',
+          'content-type': 'application/json',
+        },
+        Buffer.from(
+          JSON.stringify({
+            csrf: JSON.parse(own.body).csrf,
+            intentId: before.send.id,
+            hopId: before.pendingHop.eventId,
+          }),
+        ),
+      );
+    };
     f.advance(end - f.now() - 1);
     await f.runtime.pilot.status(HOME);
     assert.equal((await f.runtime.state.getKeeperRegistry()).send.status, 'confirmed');
-    f.advance();
     const providerCalls = f.calls.length;
+    assert.equal(JSON.parse((await expire()).body).reason, 'handoff-expiry-proof');
+    assert.deepEqual(await f.runtime.state.getKeeperRegistry(), before);
+    f.advance();
     await Promise.all([f.runtime.pilot.status(HOME), f.runtime.pilot.status(HOME)]);
+    assert.deepEqual(await f.runtime.state.getKeeperRegistry(), before);
+    const outcomes = await Promise.all([expire(), expire()]);
+    for (const response of outcomes) {
+      assert.equal(response.status, 200);
+      assert.equal(JSON.parse(response.body).status, 'expired-handoff');
+    }
     const after = await f.runtime.state.getKeeperRegistry();
     assert.equal(after.send.status, 'expired-handoff');
     assert.equal(after.holderId, HOME);
@@ -462,14 +490,38 @@ test('native HTTP transport bounds oversized body and never retries known provid
 });
 
 for (const kind of ['memory', 'firestore'])
-  test(`${kind}: automatic retirement then fresh T1 completion returns consistent authenticated control status`, async () => {
+  test(`${kind}: read-only status then explicit-send fenced retirement and fresh T1 completion returns consistent authenticated control status`, async () => {
     const f = await ready(kind);
     const old = await f.runtime.state.getKeeperRegistry();
     f.advance(old.pendingHop.endsAt - f.now() + 1000);
     const get = (id) => f.request(`/control/${id}/status`, 'GET', { cookie: f.cookies[id] });
     assert.equal((await get(HOME)).status, 200);
+    assert.deepEqual(await f.runtime.state.getKeeperRegistry(), old);
     f.advance();
-    assert.equal(JSON.parse((await f.control(HOME, `send:${OTHER}`)).body).status, 'accepted');
+    const retryResponse = await f.control(HOME, `send:${OTHER}`);
+    assert.equal(retryResponse.status, 200);
+    const retry = JSON.parse(retryResponse.body);
+    assert.deepEqual(
+      { status: retry.status, reason: retry.reason ?? null },
+      { status: 'accepted', reason: null },
+    );
+    const fresh = await f.runtime.state.getKeeperRegistry();
+    assert.notEqual(fresh.send.id, old.send.id);
+    assert.ok(fresh.send.requestedAt > old.pendingHop.endsAt);
+    assert.ok(fresh.sendWatermark >= old.sendWatermark);
+    // Exact old proof cannot refence or replace this new accepted intent.
+    await f.runtime.state.sendOffStep(
+      {
+        type: 'reconcile-ended',
+        source: HOME,
+        actor: HOME,
+        id: old.send.id,
+        generation: old.send.generation,
+        hopId: old.pendingHop.eventId,
+      },
+      f.now(),
+    );
+    assert.deepEqual((await f.runtime.state.getKeeperRegistry()).send, fresh.send);
     f.advance();
     await f.raid(HOME, OTHER, 2);
     await f.chat(HOME, HOME, '!offer');
