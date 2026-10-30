@@ -13,7 +13,11 @@
   <body>
     <a class="skip-link" href="#main-content">Skip to setup guide</a>
     <header>
-      <a class="brand" href="/atlas/">Raid Relic</a><span>Configured Keeper pilot</span>
+      <a class="brand" href="/">Raid Relic</a>
+      <nav class="public-nav" aria-label="Public navigation">
+        <a href="/demo/judge">Watch demo</a><a href="/atlas/">Atlas</a
+        ><a href="/start">Add to my stream</a>
+      </nav>
     </header>
     <main id="main-content" tabindex="-1">
       <div class="start-intro">
@@ -30,19 +34,25 @@
         </div>
         <img src="/crystal.svg" alt="Original moon-silver Raid Relic" />
       </div>
-      <label for="start-channel">Your configured channel</label
-      ><select id="start-channel">
-        <option value="">Choose your channel</option>
-        <option value="unconfigured">My channel is not listed</option>
-      </select>
+      <label for="start-channel">Your Twitch channel name</label
+      ><input
+        id="start-channel"
+        type="text"
+        maxlength="25"
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
+        aria-describedby="start-status"
+        placeholder="Your channel name"
+      />
       <p id="start-status" role="status">
-        Choose your own channel; no login or action happens automatically.
+        Enter your channel to see your own connection link. This does not sign you in or opt you in.
       </p>
       <ol class="start-steps">
         <li>
           <h2>Connect your matching Twitch account</h2>
           <p>
-            Use a private browser signed in as the selected Keeper. The app creates its own fresh
+            Use a private browser signed in as the matching Keeper. The app creates its own fresh
             OAuth state; never copy a redirected Twitch consent URL.
           </p>
           <a id="start-connect" aria-disabled="true">Connect Twitch</a>
@@ -91,8 +101,8 @@
         </li>
       </ol>
       <p>
-        <a href="/demo/">Try the no-login simulated demo first</a>. Not configured? Contact the
-        pilot owner through your existing private contact; they must add your verified channel
+        <a href="/demo/judge">Watch the 45-second no-login demo first</a>. Not configured? Contact
+        the pilot owner through your existing private contact; they must add your verified channel
         before you can consent. No email, Twitch password or stream key is collected here.
       </p>
     </main>

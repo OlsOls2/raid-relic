@@ -77,7 +77,10 @@ try {
       await blocked;
       await route.continue();
     });
-    await page.goto(origin + (i % 2 ? '/atlas/' : '/'), { waitUntil: 'domcontentloaded' });
+    // Compare like-for-like cold loads: the front door and Atlas intentionally
+    // have different text/intro geometry. Atlas is exercised separately
+    // by the Atlas3D workflow; all three uncached hero loads remain real.
+    await page.goto(origin + '/', { waitUntil: 'domcontentloaded' });
     await page.bringToFront();
     await page.waitForFunction(() => document.querySelector('#atlas-relic')?.dataset.rings === '1');
     await page.evaluate(async () => {
@@ -167,6 +170,12 @@ try {
     }
     await page.close();
   }
+  stage = 'three-cold-loads-same-route';
+  diagnostic.coldLoadRects = loads.map((load) =>
+    Object.fromEntries(
+      ['x', 'y', 'width', 'height'].map((key) => [key, Math.round(load.root[key] * 100) / 100]),
+    ),
+  );
   for (const load of loads.slice(1))
     for (const key of ['x', 'y', 'width', 'height'])
       assert.ok(Math.abs(load.root[key] - loads[0].root[key]) <= 2);

@@ -197,3 +197,39 @@ export async function downloadKeeperCard(
     signal?.removeEventListener('abort', abort);
   }
 }
+
+// A real rendered card preview from the current public profile, not an export grant.
+// Downloads still use the independent fresh-read/recheck path above.
+export async function keeperCardThumbnail(profile, stop, mode) {
+  keeperCardFilename(stop.ringIndex, profile.login, 'landscape');
+  if (stop.to !== profile.login) throw Error('Keeper preview mismatch');
+  const model = ringCardModel(
+    {
+      stopId: stop.stopId,
+      keeper: '@' + profile.login,
+      ringIndex: stop.ringIndex,
+      claimedAt: stop.claimedAt,
+    },
+    {
+      mode,
+      ...(stop.kind === 'wander' ? { kind: 'wander' } : {}),
+    },
+  );
+  const original = await keeperCardPNG(model, 'landscape', stop.raidAudience);
+  const bitmap = await createImageBitmap(original);
+  const canvas = document.createElement('canvas');
+  canvas.width = 320;
+  canvas.height = 180;
+  try {
+    const context = canvas.getContext('2d');
+    if (!context) throw Error('Preview canvas unavailable');
+    context.drawImage(bitmap, 0, 0, 320, 180);
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+    if (!blob || blob.type !== 'image/png' || blob.size > 32768)
+      throw Error('Bounded preview required');
+    return blob;
+  } finally {
+    bitmap.close();
+    canvas.width = canvas.height = 0;
+  }
+}

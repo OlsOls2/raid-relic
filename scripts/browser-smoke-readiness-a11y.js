@@ -198,14 +198,44 @@ try {
   page.setDefaultTimeout(15000);
   stage = 'landing-empty-keyboard';
   await page.goto(origin + '/');
-  await page.locator('#status.empty-state').waitFor();
-  await page.locator('#map-status').filter({ hasText: 'No completed journeys yet' }).waitFor();
+  await page.waitForFunction(() => document.querySelector('#atlas-relic')?.dataset.rings === '0');
+  assert.equal(await page.locator('#title').innerText(), 'Raids that leave a story.');
+  assert.equal(await page.locator('.primary-cta').getAttribute('href'), '/demo/judge');
+  assert.equal(await page.locator('.secondary-cta').getAttribute('href'), '/start');
+  await skip();
+  // The landing is a front door, not the expanded archive. Exercise native
+  // keyboard disclosures before checking the same actual empty projections.
+  await page.locator('#how-we-verify > summary').focus();
+  await page.keyboard.press('Enter');
+  assert.equal(await page.locator('#how-we-verify').evaluate((n) => n.open), true);
+  assert.match(await page.locator('#how-we-verify').innerText(), /verified.*both eligible chats/s);
+  assert.equal(await page.locator('.landing-archive').evaluate((n) => n.open), false);
+  await page.locator('.landing-archive > summary').focus();
+  await page.keyboard.press('Enter');
+  assert.equal(await page.locator('.landing-archive').evaluate((n) => n.open), true);
+  await page.locator('#status.empty-state').filter({ hasText: 'First journey begins' }).waitFor();
+  // The landing's new empty copy is #status above. Keyboard anchor navigation
+  // can clear transient #map-status via popstate; assert the settled actual map
+  // and its persistent empty caption, rather than obsolete transient copy.
+  await page.waitForFunction(
+    () => document.querySelector('#journey-map').getAttribute('aria-busy') === 'false',
+  );
+  assert.equal(await page.locator('#map-status').getAttribute('role'), 'status');
+  assert.match(await page.locator('#status.empty-state').innerText(), /First journey begins/);
+  assert.equal(
+    await page.locator('#map-caption').innerText(),
+    'No completed journeys yet. No route has been invented.',
+  );
+  assert.equal(await page.locator('#journey-map').getAttribute('data-rings'), '0');
   assert.ok(await page.locator('#map-play').isDisabled());
   assert.equal(await page.locator('#map-stops button').count(), 0);
-  await skip();
   await colors();
   for (const width of [320, 375, 390, 768, 1280]) {
     await page.setViewportSize({ width, height: 900 });
+    if (width < 600) {
+      await page.waitForFunction(() => !document.querySelector('#ledger-details').open);
+      assert.equal(await page.locator('#ledger-details').evaluate((n) => n.open), false);
+    }
     await layout();
   }
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -271,6 +301,10 @@ try {
   await page.locator('#keeper-rows>li').first().waitFor();
   await page.locator('#scores-refresh:not(:disabled)').waitFor();
   await page.setViewportSize({ width: 390, height: 844 });
+  await page.waitForFunction(() => !document.querySelector('#ledger-details').open);
+  await page.locator('#ledger-details > summary').focus();
+  await page.keyboard.press('Enter');
+  assert.equal(await page.locator('#ledger-details').evaluate((n) => n.open), true);
   await page.locator('#keeper-scores').scrollIntoViewIfNeeded();
   await shot('ready-atlas.png');
   checks.push({
@@ -339,6 +373,9 @@ try {
   passed = true;
   stage = 'complete';
 } catch (error) {
+  diagnostic.assertionLine = Number(
+    /browser-smoke-readiness-a11y[.]js:(\d+)/.exec(error?.stack ?? '')?.[1] ?? 0,
+  );
   failureCategory =
     error?.name === 'TimeoutError'
       ? 'timeout'

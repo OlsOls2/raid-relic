@@ -175,7 +175,8 @@ try {
   });
   stage = 'verified-arrival-no-anticipated-win';
   const h = await openHop(f);
-  await page.goto(origin + '/overlay/' + h.to);
+  // Legacy full-composition contract; default-card coverage remains in full-overlay.
+  await page.goto(origin + '/overlay/' + h.to + '?layout=full');
   await page.waitForFunction(() => document.body.dataset.connection === 'connected');
   await page.locator('#lineage[data-streak="3"]').waitFor();
   assert.equal((await f.runtime.state.getKeeperRegistry()).streak.current, 3);

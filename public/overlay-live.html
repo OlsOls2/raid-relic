@@ -34,6 +34,19 @@
       </div>
       <div id="claim-meter" role="status" hidden><span id="claim-label"></span></div>
       <h1>Raid Relic</h1>
+      <section id="arrival-panel" hidden aria-label="Verified arrival claim">
+        <h2 id="arrival-title">The relic has arrived</h2>
+        <span id="arrival-countdown" aria-label="Seconds remaining"></span>
+        <p id="arrival-action"></p>
+        <p id="arrival-counts"></p>
+        <progress
+          id="arrival-progress"
+          max="1"
+          value="1"
+          aria-label="Claim time remaining"
+        ></progress>
+      </section>
+      <p id="command-coach" hidden>Leave a rune with !mark word</p>
       <p id="status" role="status" aria-live="polite">Connecting to relic state…</p>
       <div class="charge-track" aria-hidden="true"><span id="charge"></span></div>
       <p id="count">No current state</p>

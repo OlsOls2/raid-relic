@@ -74,7 +74,8 @@ try {
           ['TypeError', 'ReferenceError', 'SyntaxError'].includes(e.name) ? e.name : 'Error',
         );
     });
-    await page.goto(`${origin}/overlay/${OTHER}`);
+    // Legacy full-composition contract; default-card coverage remains in full-overlay.
+    await page.goto(`${origin}/overlay/${OTHER}?layout=full`);
     await page.bringToFront();
     if (mode === 'webgl') {
       await page.locator('.webgl-relic canvas').waitFor({ state: 'visible' });

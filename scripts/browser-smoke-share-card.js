@@ -51,6 +51,8 @@ try {
   review = await visualReview();
   const { fixture: f, page, context, origin } = review;
   await context.addInitScript(() => {
+    // This workflow explicitly covers the format-menu fallback, not OS sharing.
+    Object.defineProperty(navigator, 'share', { configurable: true, value: undefined });
     window.__shareLabels = { recorded: false, current: false, engraving: false, journey: false };
     const original = CanvasRenderingContext2D.prototype.fillText;
     CanvasRenderingContext2D.prototype.fillText = function (text, ...args) {
@@ -109,12 +111,25 @@ try {
   stage = 'keeper-orientations';
   f.advance(31000);
   await page.goto(origin + '/keeper/olsols2');
+  const ring = page
+    .locator('.keeper-arrival')
+    .filter({ has: page.getByRole('button', { name: 'Share · Ring 1', exact: true }) });
+  await ring.locator('.keeper-card-preview').waitFor({ state: 'visible' });
+  assert.equal(await ring.locator('button').count(), 2);
+  assert.equal(await page.getByLabel('Share format · Ring 1', { exact: true }).isVisible(), false);
+  await page.getByRole('button', { name: 'Share · Ring 1', exact: true }).click();
+  await page.getByLabel('Share format · Ring 1', { exact: true }).waitFor({ state: 'visible' });
   for (const [orientation, w, h] of [
     ['landscape', 1200, 675],
     ['vertical', 720, 1280],
   ]) {
     stage = 'keeper-' + orientation;
     f.advance(31000);
+    await page.getByLabel('Share format · Ring 1', { exact: true }).selectOption(orientation);
+    assert.equal(await ring.locator('button').count(), 2);
+    await page.evaluate(() => {
+      window.__shareLabels = { recorded: false, current: false, engraving: false, journey: false };
+    });
     pending = page.waitForEvent('download');
     await page
       .getByRole('button', { name: 'Download ' + orientation + ' card · Ring 1', exact: true })
@@ -152,6 +167,7 @@ try {
     }
     await route.continue();
   });
+  await page.getByLabel('Share format · Ring 1', { exact: true }).selectOption('landscape');
   await page.getByRole('button', { name: 'Download landscape card · Ring 1', exact: true }).click();
   await page.locator('#receiving-status').filter({ hasText: 'Card unavailable' }).waitFor();
   assert.equal(stopReads, 2);

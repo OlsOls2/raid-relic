@@ -92,7 +92,16 @@ try {
   page = await context.newPage();
   stage = 'empty-coverage';
   await page.goto(origin + '/atlas/');
-  await page.locator('#scores-status').filter({ hasText: '0 recorded rings' }).waitFor();
+  await page.locator('#scores-status').filter({ hasText: 'First journey begins' }).waitFor();
+  assert.equal((await active.runtime.state.getPublicJourney()).rings, 0);
+  const emptyScores = await page.evaluate(async () => {
+    const response = await fetch('/api/scores', { cache: 'no-store' });
+    if (!response.ok) throw Error('Local score read failed');
+    const value = await response.json();
+    return { rings: value.rings, joined: value.raiders.map((row) => row.claimsJoined) };
+  });
+  // Both signed opt-ins exist already; neither has earned a claim yet.
+  assert.deepEqual(emptyScores, { rings: 0, joined: [0, 0] });
   assert.match(await page.locator('#scores-coverage').textContent(), /unknown|not available/);
   assert(await page.locator('#simulator').isVisible());
   stage = 'completed-score';
@@ -146,6 +155,10 @@ try {
   assert.equal(await page.locator('#score-preview').isVisible(), false);
   await capture('scoreboard-desktop.png');
   await page.setViewportSize({ width: 393, height: 800 });
+  await page.waitForFunction(() => !document.querySelector('#ledger-details').open);
+  await page.locator('#ledger-details > summary').focus();
+  await page.keyboard.press('Enter');
+  assert.equal(await page.locator('#ledger-details').evaluate((n) => n.open), true);
   await page.locator('#scores-refresh').focus();
   assert.equal(
     await page.locator('#scores-refresh').evaluate((n) => n === document.activeElement),
@@ -237,6 +250,11 @@ try {
     chronicleEnv: { P5_PREVIEW_READ_ONLY: 'true' },
   });
   await page.goto(origin + '/atlas/');
+  // At 375px the intended ledger disclosure is closed. Use its native control;
+  // read-only admission and mutation denials remain assertions below.
+  if (!(await page.locator('#ledger-details').evaluate((n) => n.open)))
+    await page.locator('#ledger-details > summary').click();
+  assert.equal(await page.locator('#ledger-details').evaluate((n) => n.open), true);
   await page.locator('#score-preview').filter({ hasText: 'Read-only preview' }).waitFor();
   assert.equal(await page.locator('#score-preview').count(), 1);
   assert.equal(await page.locator('body>aside:not(#p5-simulator-label)').count(), 0);

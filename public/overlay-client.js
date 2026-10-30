@@ -85,6 +85,96 @@ export function validSnapshot(value) {
   );
 }
 
+// Closed presentation options; shared with HTTP query validation.
+export function overlayOptions(search = '', userAgent = '') {
+  const params = new URLSearchParams(search);
+  const rules = {
+    layout: /^(card|full|corner)$/,
+    pos: /^(bl|br|tl|tr)$/,
+    scale: /^(?:0\.\d{1,3}|1(?:\.\d{1,3})?)$/,
+    corner: /^1$/,
+    sound: /^[01]$/,
+    obs: /^1$/,
+    preview: /^arrival$/,
+  };
+  for (const [key, value] of params)
+    if (!rules[key]?.test(value) || params.getAll(key).length !== 1)
+      throw Error('Invalid overlay options');
+  if (params.has('corner') && params.has('layout') && params.get('layout') !== 'corner')
+    throw Error('Conflicting overlay layout');
+  const scale = Number(params.get('scale') ?? 1);
+  if (!Number.isFinite(scale) || scale < 0.75 || scale > 1.5) throw Error('Invalid overlay scale');
+  return Object.freeze({
+    layout: params.get('layout') ?? (params.has('corner') ? 'corner' : 'card'),
+    pos: params.get('pos') ?? 'bl',
+    scale,
+    obs: params.get('obs') === '1' || /obsstudio|obs studio|obs\/\d/i.test(userAgent),
+    preview: params.get('preview') === 'arrival',
+  });
+}
+export function overlayArrival(snapshot, time) {
+  const h = snapshot?.handoff;
+  if (
+    !['ready', 'incoming', 'waiting'].includes(snapshot?.status) ||
+    !h ||
+    !validHandoff(h) ||
+    h.clockPolicy !== 'landing-v2' ||
+    h.completed ||
+    snapshot.claimMeter?.awaitingRaid ||
+    !Number.isFinite(time) ||
+    time < h.startedAt ||
+    time >= h.endsAt
+  )
+    return null;
+  return {
+    seconds: Math.ceil((h.endsAt - time) / 1000),
+    remaining: (h.endsAt - time) / 180000,
+    command: h.role === 'source' ? '!offer' : '!accept',
+    role: h.role === 'source' ? 'Sending chat' : 'Receiving chat',
+    offers: h.offers,
+    accepts: h.accepts,
+    threshold: h.threshold,
+  };
+}
+export function localOverlayArrival(role, now) {
+  if (!['source', 'host'].includes(role) || !Number.isFinite(now))
+    throw Error('Invalid local preview');
+  return {
+    type: 'snapshot',
+    mode: 'simulator',
+    status: 'incoming',
+    serverNow: now,
+    revision: 0,
+    lineageRings: 0,
+    approvedCount: 0,
+    marks: [],
+    handoff: {
+      role,
+      clockPolicy: 'landing-v2',
+      startedAt: now,
+      claimStartedAt: now,
+      endsAt: now + 180000,
+      offers: 0,
+      accepts: 0,
+      threshold: 2,
+      completed: false,
+    },
+  };
+}
+export function acceptedOverlayPreview(event, parent, origin) {
+  const value = event?.data;
+  return (
+    parent &&
+    parent !== globalThis.window &&
+    event.source === parent &&
+    event.origin === origin &&
+    value &&
+    Object.keys(value).sort().join(',') === 'role,type' &&
+    value.type === 'raid-relic-preview-arrival' &&
+    ['source', 'host'].includes(value.role)
+  );
+}
+
 export function connectOverlay({
   url,
   render,
@@ -95,7 +185,9 @@ export function connectOverlay({
   windowEvents = globalThis.window,
   documentEvents = globalThis.document,
   idleMs = 600000,
+  persistentRead = false,
 }) {
+  persistentRead = persistentRead === true;
   let socket = null,
     stopped = false,
     retry = null,
@@ -104,7 +196,7 @@ export function connectOverlay({
     backoff = 500,
     epoch = 0,
     idle = null,
-    suspended = Boolean(documentEvents?.hidden);
+    suspended = !persistentRead && Boolean(documentEvents?.hidden);
   const idleDelay = Number.isFinite(idleMs) && idleMs > 0 ? Math.min(idleMs, 600000) : 600000;
   const clear = () => {
     clearTimer(watchdog);
@@ -112,7 +204,8 @@ export function connectOverlay({
     watchdog = opening = null;
   };
   function lost(own, kind = 'reconnecting') {
-    if (stopped || suspended || documentEvents?.hidden || own !== epoch) return;
+    if (stopped || suspended || (!persistentRead && documentEvents?.hidden) || own !== epoch)
+      return;
     const old = socket;
     socket = null;
     epoch++;
@@ -135,7 +228,7 @@ export function connectOverlay({
     backoff = Math.min(backoff * 2, 10000);
   }
   function connect() {
-    if (stopped || suspended || documentEvents?.hidden || socket) return;
+    if (stopped || suspended || (!persistentRead && documentEvents?.hidden) || socket) return;
     const own = ++epoch;
     let revision = -1;
     status('connecting');
@@ -206,10 +299,10 @@ export function connectOverlay({
   }
   function armIdle() {
     clearTimer(idle);
-    idle = setTimer(suspend, idleDelay);
+    if (!persistentRead) idle = setTimer(suspend, idleDelay);
   }
   const wake = (event) => {
-    if (stopped || documentEvents?.hidden) return;
+    if (stopped || (!persistentRead && documentEvents?.hidden)) return;
     // Only visibility/focus/trusted local interaction resets the human idle window.
     if (event?.type === 'online') {
       if (suspended) return;
@@ -230,7 +323,7 @@ export function connectOverlay({
     connect();
   };
   const visibility = () =>
-    documentEvents?.hidden ? suspend() : wake({ type: 'visibilitychange' });
+    !persistentRead && documentEvents?.hidden ? suspend() : wake({ type: 'visibilitychange' });
   windowEvents?.addEventListener?.('online', wake);
   windowEvents?.addEventListener?.('focus', wake);
   documentEvents?.addEventListener?.('visibilitychange', visibility);

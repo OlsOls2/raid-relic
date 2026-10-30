@@ -37,7 +37,7 @@ footer,
   font-size: 13px;
 }
 .brand {
-  font-family: Georgia, serif;
+  font-family: Cinzel, Georgia, serif;
   font-size: 26px;
   text-decoration: none;
   color: var(--moon);
@@ -77,7 +77,7 @@ button:disabled {
 }
 h1,
 h2 {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: Cinzel, Georgia, serif;
   font-weight: 400;
 }
 h1 {
@@ -144,7 +144,7 @@ nav > * {
   min-height: 2em;
 }
 #status.empty-state {
-  font-family: Georgia, serif;
+  font-family: Cinzel, Georgia, serif;
   font-size: 24px;
   line-height: 1.5;
   padding: 24px 0 24px 20px;
@@ -290,7 +290,7 @@ nav > * {
   margin-top: 56px;
 }
 .empty {
-  font-family: Georgia, serif;
+  font-family: Cinzel, Georgia, serif;
   font-size: 25px;
   padding: 30px 0;
 }
@@ -867,4 +867,199 @@ nav > a {
   #atlas-relic > canvas.relic3d {
     transition: none;
   }
+}
+
+/* Front door: the existing relic leads; the public record remains at /atlas/. */
+body {
+  font-size: 16px;
+}
+.public-nav {
+  display: flex;
+  gap: 18px;
+  margin: 0;
+  align-items: center;
+  font-size: 16px;
+}
+.public-nav a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+#how-we-verify,
+#ledger-details {
+  margin: 24px 0;
+}
+summary {
+  cursor: pointer;
+  min-height: 44px;
+  padding: 12px 0;
+  color: var(--amber);
+}
+summary:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 4px;
+}
+.frontdoor main {
+  padding-top: 0;
+}
+.frontdoor .intro {
+  min-height: 620px;
+  gap: 20px;
+}
+.frontdoor h1 {
+  font-size: clamp(40px, 4.2vw, 72px);
+  max-width: 13ch;
+}
+.frontdoor #description {
+  font-size: 20px;
+  line-height: 1.55;
+  max-width: 42ch;
+}
+.hero-actions {
+  gap: 14px;
+  margin: 24px 0;
+  align-items: center;
+}
+.primary-cta,
+.secondary-cta {
+  display: inline-flex;
+  min-height: 52px;
+  align-items: center;
+  padding: 12px 18px;
+  border: 1px solid var(--amber);
+  text-decoration: none;
+}
+.primary-cta {
+  background: var(--amber);
+  color: var(--deep);
+  font-weight: 600;
+}
+.secondary-cta {
+  color: var(--moon);
+}
+.story-steps {
+  border-block: 1px solid #39485e;
+  padding: 24px 0;
+}
+.story-steps ol {
+  display: flex;
+  gap: 32px;
+  padding-left: 24px;
+}
+.mobile-cta {
+  display: none;
+}
+.keeper-arrival {
+  padding: 24px 0;
+  border-top: 1px solid #39485e;
+}
+.keeper-card-preview {
+  display: block;
+  width: 320px;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  max-width: 100%;
+  object-fit: contain;
+  background: var(--deep);
+  margin: 16px 0;
+}
+.keeper-share-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.keeper-share-options select {
+  font: inherit;
+  background: var(--deep);
+  color: var(--moon);
+  min-height: 44px;
+  max-width: 100%;
+}
+@media (max-width: 599px) {
+  header {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .public-nav {
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .frontdoor .intro {
+    min-height: 0;
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .frontdoor .intro > div {
+    grid-row: 1;
+  }
+  .frontdoor h1 {
+    margin: 16px 0;
+    font-size: 40px;
+  }
+  .frontdoor #description {
+    font-size: 18px;
+    margin: 12px 0;
+  }
+  .hero-actions {
+    margin: 16px 0;
+    gap: 12px;
+  }
+  .frontdoor .atlas-relic-figure {
+    margin-block: 8px;
+  }
+  .story-steps ol {
+    display: block;
+  }
+  .story-steps li {
+    margin-block: 12px;
+  }
+  .frontdoor {
+    padding-bottom: calc(56px + env(safe-area-inset-bottom));
+  }
+  .mobile-cta {
+    position: fixed;
+    z-index: 20;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-around;
+    gap: 8px;
+    height: calc(56px + env(safe-area-inset-bottom));
+    padding: 0 12px env(safe-area-inset-bottom);
+    background: var(--deep);
+    border-top: 1px solid var(--amber);
+    margin: 0;
+  }
+  .mobile-cta a {
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+  }
+}
+
+.primary-cta:hover {
+  color: var(--deep);
+  background: #e8bf78;
+}
+
+/* G4 narrow records: intrinsic card pixels stay 320×180; display may shrink.
+   Controls must fit their padded receiving panel rather than overflow it. */
+#receiving-refresh {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+#keeper-title {
+  overflow-wrap: anywhere;
+}
+.keeper-share-options > * {
+  min-width: 0;
+  max-width: 100%;
+}
+.keeper-arrival button {
+  max-width: calc(100% - 12px);
 }

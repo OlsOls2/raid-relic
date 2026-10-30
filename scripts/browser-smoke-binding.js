@@ -104,7 +104,8 @@ try {
           ['TypeError', 'ReferenceError', 'SyntaxError'].includes(e.name) ? e.name : 'Error',
         );
     });
-    await page.goto(`${origin}/overlay/${OTHER}`);
+    // Legacy full-composition contract; default-card coverage remains in full-overlay.
+    await page.goto(`${origin}/overlay/${OTHER}?layout=full`);
     await page.bringToFront();
     if (mode === 'webgl') {
       await page.locator('.webgl-relic canvas').waitFor({ state: 'visible' });
@@ -179,6 +180,23 @@ try {
     for (const ms of [200, 1500, 2800]) {
       stage = `${mode}-comet-${ms}`;
       await seek(ms);
+      // Verified arrival must keep full-mode cinematics, not adopt the card takeover.
+      assert.equal(
+        await page
+          .locator('body')
+          .getAttribute('class')
+          .then((c) => c.split(/\s+/).includes('arrival-takeover')),
+        false,
+      );
+      assert.equal(await page.locator('#arrival-panel').isVisible(), false);
+      assert.equal(
+        await page.locator('body').evaluate((n) => getComputedStyle(n).paddingTop),
+        '0px',
+      );
+      assert.equal(
+        await page.locator('.relic-overlay').evaluate((n) => getComputedStyle(n).scale),
+        '1',
+      );
       await page.waitForFunction(
         () =>
           document.querySelector('.archive').dataset.phase === 'streak' &&

@@ -71,6 +71,14 @@ async function press(page, id, label, expected) {
             : /accepted/i,
     })
     .waitFor();
+  if (expected === 'accepted') {
+    if (
+      !(await page.locator('#send-result').isVisible()) ||
+      (await page.locator('#send-result').textContent()) !==
+        (await page.locator('#result').textContent())
+    )
+      throw new Error('Adjacent dispatch result mismatch');
+  }
   if (expected === 'reconciled' && result.ready !== true)
     throw new Error('Mocked subscriptions not enabled');
   checks.push({ name: label, status: result.status, passed: true });
@@ -186,12 +194,10 @@ try {
   page.on('pageerror', () => frontendPageErrorCount++);
   for (const id of [HOME, OTHER]) {
     await page.goto(`${origin}/control/${id}`);
-    await page
-      .getByRole('button', { name: 'Bootstrap / reconcile this channel', exact: true })
-      .waitFor();
+    await page.getByRole('button', { name: 'Set up channel', exact: true }).waitFor();
     if (await page.locator('#simulator').isHidden()) throw new Error('Simulator label missing');
-    await press(page, id, 'Bootstrap / reconcile this channel', 'reconciled');
-    await press(page, id, 'Opt in / Keep', 'processed');
+    await press(page, id, 'Set up channel', 'reconciled');
+    await press(page, id, 'Opt in this channel', 'processed');
     phase = 'capture-control';
     await capture(page, `pilot-control-${id}`);
     phase = 'control-capture-complete';

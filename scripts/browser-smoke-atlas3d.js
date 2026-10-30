@@ -6,7 +6,8 @@ const judges = await createJudges({ intent: true, env: {} });
 let browser,
   stage = 'startup',
   failed = false;
-const checks = [];
+const checks = [],
+  diagnostic = {};
 try {
   await judges.listen();
   const { chromium } = await import('playwright');
@@ -45,8 +46,18 @@ try {
       });
     });
     await page.locator('#refresh').click();
-    await page.waitForFunction(() =>
-      document.querySelector('#rings').textContent.includes('0 completed'),
+    await page.waitForFunction(
+      () =>
+        document.querySelector('#atlas-relic')?.dataset.rings === '0' &&
+        document.querySelector('#rings').textContent === 'First journey begins',
+    );
+    assert.equal(await page.locator('#atlas-relic .atlas-ring-pill').isVisible(), false);
+    assert.equal(
+      await page.evaluate(
+        async () =>
+          (await (await fetch('/api/atlas?offset=0&limit=8', { cache: 'no-store' })).json()).rings,
+      ),
+      0,
     );
     const hero = page.locator('#atlas-relic');
     await page.evaluate(async () => {
@@ -142,15 +153,21 @@ try {
     });
     await context.close();
   }
-} catch {
+} catch (error) {
   failed = true;
+  diagnostic.assertionLine = Number(
+    /browser-smoke-atlas3d[.]js:(\d+)/.exec(error?.stack ?? '')?.[1] ?? 0,
+  );
+  diagnostic.failureCategory = ['AssertionError', 'TimeoutError', 'TypeError'].includes(error?.name)
+    ? error.name
+    : 'fixture-or-browser';
 } finally {
   await browser?.close();
   await judges.close();
   await mkdir('artifacts', { recursive: true });
   await writeFile(
     'artifacts/atlas3d-browser-results.json',
-    JSON.stringify({ simulator: true, passed: !failed, stage, checks }, null, 2),
+    JSON.stringify({ simulator: true, passed: !failed, stage, checks, diagnostic }, null, 2),
   );
 }
 if (failed) process.exitCode = 1;

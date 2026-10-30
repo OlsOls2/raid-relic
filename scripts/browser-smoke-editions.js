@@ -232,7 +232,7 @@ try {
   assert.equal(await overlay.locator('canvas.relic3d').getAttribute('data-particles'), '64');
   assert.ok(Number(await overlay.locator('canvas.relic3d').getAttribute('data-triangles')) < 20000);
   assert.ok(await pixels(overlay));
-  assert.equal(await overlay.locator('.edition-label').isVisible(), true);
+  assert.equal(await overlay.locator('.edition-label').isVisible(), false); // Overlay plate deliberately omits the edition line.
   page = overlay;
   await capture('edition-overlay.png');
   stage = 'actual-claim-no-new-relic';

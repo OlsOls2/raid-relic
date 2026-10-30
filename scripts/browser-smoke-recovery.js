@@ -82,7 +82,12 @@ try {
   await page.locator('#result').filter({ hasText: 'Status timed out' }).waitFor();
   if (await page.locator('#raid button').count()) throw Error('stale Send enabled');
   await page.getByRole('button', { name: 'Refresh status', exact: true }).click();
-  await page.locator('#result').filter({ hasText: 'Status refreshed' }).waitFor();
+  await page.waitForFunction(
+    () =>
+      Boolean(document.querySelector('#account').textContent.includes('Keeper control')) &&
+      !document.querySelector('#refresh').disabled,
+  );
+  await page.locator('#control-advanced > summary').click();
   await page.waitForTimeout(1100);
   if ((await page.locator('#ledger').textContent()).includes('obsolete'))
     throw Error('obsolete read overwrote status');

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { visualReview, growthPixels } from '../test-support/visual-review.js';
 import { HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';
+import { BOT_COPY, claimComplete } from '../public/ritual-copy.js';
 let review,
   timer,
   stage = 'setup',
@@ -192,12 +193,46 @@ try {
   );
   await f.chat(OTHER, '202', '!accept', { messageId: 'journey-host-two' });
   assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
-  for (const host of [HOME, OTHER])
-    assert.equal(
-      (await f.runtime.state.getPrivateClaimAcks(host)).rows.filter((r) => r.completionReceipt)
-        .length,
-      1,
-    );
+  // Arrival and earned completion share immutable receipts but have distinct purposes.
+  for (const host of [HOME, OTHER]) {
+    const rows = (await f.runtime.state.getPrivateClaimAcks(host)).rows;
+    const completions = rows.filter((r) => r.completionReceipt && !r.arrivalReceipt);
+    assert.equal(completions.length, 1);
+    assert.equal(completions[0].status, 'sent');
+    // Sent receipts retain purpose, never the dispatched private payload.
+    assert.equal(Object.hasOwn(completions[0], 'message'), false);
+    assert.equal(Object.hasOwn(completions[0], 'completion'), false);
+    const arrival = rows.filter((r) => r.arrivalReceipt);
+    assert.equal(arrival.length, host === OTHER ? 1 : 0);
+    if (host === OTHER) {
+      assert.equal(arrival[0].status, 'sent');
+      assert.equal(Object.hasOwn(arrival[0], 'message'), false);
+      assert.equal(Object.hasOwn(arrival[0], 'completion'), false);
+    }
+  }
+  const notices = f.calls
+    .filter(
+      (c) =>
+        new URL(c.url).origin === 'https://api.twitch.tv' &&
+        new URL(c.url).pathname === '/helix/chat/messages' &&
+        c.method === 'POST',
+    )
+    .map((c) => JSON.parse(c.body));
+  assert.deepEqual(
+    notices
+      .filter((r) => r.message === BOT_COPY.arrival)
+      .map((r) => [r.broadcaster_id, r.sender_id]),
+    [[OTHER, BOT]],
+  );
+  assert.deepEqual(
+    notices
+      .filter((r) => r.message === claimComplete('olsols2'))
+      .map((r) => [r.broadcaster_id, r.sender_id]),
+    [
+      [HOME, BOT],
+      [OTHER, BOT],
+    ],
+  );
   assert.equal(raids().length, 1);
   await overlay.close();
   await page.bringToFront();

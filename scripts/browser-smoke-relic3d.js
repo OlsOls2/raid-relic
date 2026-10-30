@@ -88,7 +88,8 @@ try {
   const page = await context.newPage();
   activePage = page;
   stage = 'webgl';
-  await page.goto(`${JUDGES_ORIGIN}/overlay/1591805230`);
+  // Legacy full-composition contract; default-card coverage remains in full-overlay.
+  await page.goto(`${JUDGES_ORIGIN}/overlay/1591805230?layout=full`);
   await page.bringToFront();
   await page.locator('.webgl-relic canvas.relic3d').waitFor({ state: 'visible' });
   if ((await page.locator('canvas.relic3d').getAttribute('data-antialias-requested')) !== 'true')
@@ -125,7 +126,7 @@ try {
     if (response.status !== 200) throw Error('mock kernel action');
     if (action === 'send') {
       stage = 'target-open';
-      await page.goto(`${JUDGES_ORIGIN}/overlay/1591806023`);
+      await page.goto(`${JUDGES_ORIGIN}/overlay/1591806023?layout=full`);
       await page.bringToFront();
       await page.locator('.webgl-relic canvas').waitFor({ state: 'visible' });
       await page.locator('#claim-label').filter({ hasText: 'Awaiting verified raid' }).waitFor();

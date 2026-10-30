@@ -13,7 +13,14 @@ import { createRelic3D, ringSummary } from './relic3d.js';
 import { meterProgress } from './claim-meter.js';
 import { createOverlayAudio, createCueTracker } from './overlay-audio.js';
 import { arrivalPhase } from './arrival.js';
-import { connectOverlay, resonanceActive } from './overlay-client.js';
+import {
+  connectOverlay,
+  resonanceActive,
+  overlayOptions,
+  overlayArrival,
+  localOverlayArrival,
+  acceptedOverlayPreview,
+} from './overlay-client.js';
 // Avoid replacing live-region text nodes on every animation frame.
 const updateText = (selector, value) => {
   const node = document.querySelector(selector);
@@ -31,10 +38,30 @@ const holderLink = document.createElement('a');
 holderLink.id = 'holder-link';
 holderLink.href = '/atlas/';
 holderLink.textContent = ' View the journey';
-document.body.classList.toggle(
-  'corner',
-  new URLSearchParams(location.search).get('corner') === '1',
-);
+const options = overlayOptions(location.search, navigator.userAgent);
+document.body.classList.add('layout-' + options.layout, 'pos-' + options.pos);
+document.body.classList.toggle('corner', options.layout === 'corner');
+document.body.dataset.obs = String(options.obs);
+// Full defaults retain the historical centred composition; only explicit pos opts out.
+if (options.layout === 'full' && new URLSearchParams(location.search).has('pos'))
+  document.body.dataset.fullPosition = 'true';
+const fitOverlay = () => {
+  const fit = Math.min(innerWidth / 1920, innerHeight / 1080);
+  document.body.style.setProperty('--overlay-scale', String(options.scale * fit));
+  // Full mode uses its original responsive CSS, without FHD fitting or safe-area shrink.
+  document.body.style.setProperty('--overlay-requested-scale', String(options.scale));
+  document.body.style.setProperty('--overlay-safe', `${48 * fit}px`);
+  document.body.style.setProperty(
+    '--corner-safe',
+    `${Math.min(innerWidth, innerHeight) <= 256 ? 0 : 48 * fit}px`,
+  );
+  document.body.style.setProperty(
+    '--corner-scale',
+    String(Math.min(options.scale, innerWidth / 160, innerHeight / 160)),
+  );
+};
+fitOverlay();
+addEventListener('resize', fitOverlay);
 const audio = createOverlayAudio({
   optedIn: new URLSearchParams(location.search).get('sound') === '1',
 });
@@ -46,7 +73,7 @@ const effect = (name) => {
   node.className = `p3-${name}`;
   node.hidden = true;
   node.setAttribute('aria-hidden', 'true');
-  (document.body.classList.contains('corner') || !['comet', 'flash', 'shock'].includes(name)
+  (options.layout !== 'full' || !['comet', 'flash', 'shock'].includes(name)
     ? archiveNode
     : document.body
   ).append(node);
@@ -141,6 +168,9 @@ addEventListener('pagehide', () => {
   soundButton.setAttribute('aria-label', 'Enable optional overlay sounds');
 });
 let current = null;
+let activityAt = performance.now(),
+  activityKey = null;
+let disconnectOverlay = null;
 let receivedAt = 0;
 let receiptServerTime = 0;
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -156,7 +186,7 @@ function loadRelicView() {
     signal: relic3dAbort.signal,
     archive: document.querySelector('.archive'),
     reducedMotion: motion,
-    corner: document.body.classList.contains('corner'),
+    corner: options.layout !== 'full',
   }).then((view) => {
     if (relic3dClosed || own !== relic3dEpoch) {
       view?.dispose();
@@ -181,6 +211,19 @@ addEventListener('pagehide', () => {
   relic3d?.dispose();
 });
 function render(snapshot) {
+  const nextActivity = snapshot
+    ? `${snapshot.status}:${snapshot.approvedCount}:${snapshot.lineageRings}:${snapshot.handoff?.startedAt ?? ''}:${snapshot.handoff?.offers ?? ''}:${snapshot.handoff?.accepts ?? ''}`
+    : null;
+  if (nextActivity !== activityKey) {
+    activityAt = performance.now();
+    activityKey = nextActivity;
+  }
+  document.querySelector('#lineage').hidden = !snapshot?.lineageRings;
+  if (options.preview) {
+    document.querySelector('#simulator').hidden = false;
+    document.querySelector('#simulator').textContent =
+      'LOCAL TEST · fictional arrival · no live connection';
+  }
   const cue = cueFor(snapshot);
   if (
     !snapshot ||
@@ -231,6 +274,8 @@ function render(snapshot) {
     document.querySelector('#lineage').removeAttribute('data-streak');
     document.querySelector('#lineage').removeAttribute('title');
   }
+  if (options.layout === 'card' && snapshot)
+    document.querySelector('#lineage').textContent = `Ring ${snapshot.lineageRings}`;
   for (let i = 0; i < Math.min(16, snapshot?.lineageRings ?? 0); i++) {
     const ring = document.createElement('span');
     ring.style.inset = `${4 + i * 1.8}%`;
@@ -244,9 +289,10 @@ function render(snapshot) {
     document.querySelector('#compact-count').textContent = 'No current state';
     return;
   }
-  document.querySelector('#simulator').textContent =
-    snapshot.mode === 'simulator' ? 'SIMULATOR · local test data' : '';
-  document.querySelector('#simulator').hidden = snapshot.mode !== 'simulator';
+  if (!options.preview)
+    document.querySelector('#simulator').textContent =
+      snapshot.mode === 'simulator' ? 'SIMULATOR · local test data' : '';
+  if (!options.preview) document.querySelector('#simulator').hidden = snapshot.mode !== 'simulator';
   const simulated = snapshot.mode === 'simulator';
   const messages = {
     incoming: 'The relic arrives… bind it with two chats',
@@ -273,6 +319,16 @@ function render(snapshot) {
   state.textContent = snapshot.claimMeter?.awaitingRaid
     ? 'The relic stirs… waiting for Twitch to confirm the raid'
     : messages[snapshot.status];
+  if (options.layout === 'card' && !snapshot.claimMeter?.awaitingRaid)
+    state.textContent = snapshot.holderLogin
+      ? `With @${snapshot.holderLogin}`
+      : {
+          ready: 'The relic is here',
+          incoming: 'Claim the relic',
+          waiting: 'Waiting for a Keeper',
+          paused: 'Keeper paused',
+          unavailable: 'State unavailable',
+        }[snapshot.status];
   if (snapshot.wanderArrival)
     state.textContent = `The relic wandered here to @${ownLogin} · no raid or audience transfer. Marks require a live opted-in stream.`;
   if (idleHolder && snapshot.holderLogin !== ownLogin) state.append(holderLink);
@@ -317,6 +373,7 @@ function render(snapshot) {
   count.textContent = simulated
     ? `${snapshot.approvedCount} approved marks · charge ${snapshot.approvedCount}/160`
     : `${snapshot.approvedCount} approved runes`;
+  if (options.layout === 'card') count.textContent = `${snapshot.approvedCount} approved runes`;
   document.querySelector('#charge').style.width = `${(snapshot.approvedCount / 160) * 100}%`;
   document.querySelector('.charge-track').hidden = !simulated;
   snapshot.marks.forEach((mark, index) => {
@@ -333,10 +390,12 @@ function render(snapshot) {
     image.style.setProperty('--y', `${Math.sin(angle) * radius}%`);
     runes.append(image);
   });
+  if (options.layout === 'full') fitOverlay();
 }
 let frameId = null;
-if (channel)
-  connectOverlay({
+if (channel && !options.preview)
+  disconnectOverlay = connectOverlay({
+    persistentRead: options.obs,
     url: `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/${channel}`,
     render,
     status(value) {
@@ -370,10 +429,30 @@ if (channel)
     },
   });
 
+const previewMessage = (event) => {
+  if (acceptedOverlayPreview(event, parent, location.origin))
+    render(localOverlayArrival(event.data.role, Date.now()));
+};
+if (options.preview) {
+  document.body.dataset.connection = 'local-test';
+  render(localOverlayArrival('host', Date.now()));
+  addEventListener('message', previewMessage);
+  // Local listener readiness only: never a live connection or game-readiness claim.
+  document.body.dataset.localPreviewReady = 'true';
+}
+addEventListener('pagehide', () => {
+  disconnectOverlay?.();
+  disconnectOverlay = null;
+  removeEventListener('resize', fitOverlay);
+  removeEventListener('message', previewMessage);
+  delete document.body.dataset.localPreviewReady;
+  cancelAnimationFrame(frameId);
+  frameId = null;
+});
 let lastReduced = motion.matches,
   lastHidden = document.hidden;
 function frame() {
-  presentEdition(archiveNode);
+  presentEdition(archiveNode, Date.now(), { label: false });
   frameId = null;
   if (document.hidden || document.body.dataset.connection === 'suspended') return;
   if (motion.matches !== lastReduced || document.hidden !== lastHidden) {
@@ -393,6 +472,37 @@ function frame() {
     : '';
   if (echoNote.textContent !== note) echoNote.textContent = note;
   const time = receiptServerTime + performance.now() - receivedAt;
+  const takeover = options.layout === 'card' ? overlayArrival(current, time) : null;
+  document.body.classList.toggle('arrival-takeover', Boolean(takeover));
+  document.querySelector('#arrival-panel').hidden = !takeover;
+  if (takeover) {
+    updateText('#arrival-countdown', String(takeover.seconds));
+    updateText('#arrival-action', `${takeover.role}: ${takeover.command}`);
+    updateText(
+      '#arrival-counts',
+      `Offers ${takeover.offers}/${takeover.threshold} · Accepts ${takeover.accepts}/${takeover.threshold}`,
+    );
+    document.querySelector('#arrival-progress').value = takeover.remaining;
+  }
+  document.body.classList.toggle(
+    'ring-forged',
+    Boolean(
+      options.layout === 'card' &&
+      current?.handoff?.clockPolicy === 'landing-v2' &&
+      current.handoff.completed &&
+      current.handoff.completedAt &&
+      time >= current.handoff.completedAt &&
+      time < current.handoff.completedAt + 600,
+    ),
+  );
+  const idleAge = performance.now() - activityAt;
+  document.querySelector('#command-coach').hidden =
+    options.layout !== 'card' ||
+    Boolean(takeover) ||
+    !current ||
+    idleAge < 600000 ||
+    idleAge % 600000 >= 8000;
+  document.body.classList.toggle('coach-visible', !document.querySelector('#command-coach').hidden);
   if (current?.handoff && time >= current.handoff.endsAt) audio.silence();
   const meter =
     current && ['ready', 'incoming', 'waiting'].includes(current.status)

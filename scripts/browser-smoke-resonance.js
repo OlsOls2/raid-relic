@@ -58,7 +58,8 @@ try {
   ])
     await step(action);
   const overlay = await context.newPage();
-  await overlay.goto(`${JUDGES_ORIGIN}/overlay/1591806023`);
+  // Legacy full-composition contract; default-card coverage remains in full-overlay.
+  await overlay.goto(`${JUDGES_ORIGIN}/overlay/1591806023?layout=full`);
   await overlay.locator('.rune.faded').waitFor();
   const capture = async (name) => captures.set(name, await overlay.screenshot({ fullPage: true }));
   await capture('resonance-simulator-before');

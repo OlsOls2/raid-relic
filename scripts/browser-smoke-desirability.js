@@ -90,6 +90,10 @@ try {
     acceptDownloads: true,
     serviceWorkers: 'block',
   });
+  // Exercise the explicit fallback menu; no OS share sheet in this local fixture.
+  await c.addInitScript(() =>
+    Object.defineProperty(navigator, 'share', { configurable: true, value: undefined }),
+  );
   await c.route('**/*', (r) => {
     if (new URL(r.request().url()).origin !== origin) {
       external++;
@@ -119,13 +123,22 @@ try {
   stage = 'own-seeker-control';
   await page.goto(origin + '/control/' + OTHER);
   assert.equal(errors, 0);
-  await page.getByRole('button', { name: 'Join public Seeker queue', exact: true }).waitFor();
+  await page.locator('#control-advanced > summary').click();
+  assert.equal(await page.locator('#control-advanced').evaluate((n) => n.open), true);
+  await page.getByRole('button', { name: 'Become a Seeker', exact: true }).waitFor();
   const result = page.waitForResponse(
     (r) => new URL(r.url()).pathname === '/control/' + OTHER && r.request().method() === 'POST',
   );
-  await page.getByRole('button', { name: 'Join public Seeker queue', exact: true }).click();
-  assert.equal((await result).status(), 200);
+  await page.getByRole('button', { name: 'Become a Seeker', exact: true }).click();
+  const seekerResponse = await result;
+  assert.equal(seekerResponse.status(), 200);
+  const seekerBody = seekerResponse.request().postDataJSON();
+  assert.deepEqual(Object.keys(seekerBody).sort(), ['action', 'csrf']);
+  assert.equal(seekerBody.action, 'seek-on');
+  assert.equal(typeof seekerBody.csrf, 'string');
   stage = 'own-seeker-refresh';
+  await page.getByRole('link', { name: 'Send Off', exact: true }).click();
+  assert.equal(await page.locator('#send-step').evaluate((n) => n.open), true);
   await page
     .locator('#keeper-summary')
     .filter({ hasText: 'Public Seeker queue: joined.' })
@@ -209,11 +222,58 @@ try {
   );
   assert.doesNotMatch(await page.locator('#receiving-content').innerText(), /spoiler|8101/);
   assert.equal(await page.locator('.keeper-glyphs img').count(), 1);
+  await page.locator('.keeper-card-preview').first().waitFor({ state: 'visible' });
+  const thumbnail = await page
+    .locator('.keeper-card-preview')
+    .first()
+    .evaluate(async (img) => {
+      await img.decode();
+      const canvas = document.createElement('canvas');
+      canvas.width = 320;
+      canvas.height = 180;
+      try {
+        const c = canvas.getContext('2d');
+        c.drawImage(img, 0, 0, 320, 180);
+        const pixels = c.getImageData(0, 0, 320, 180).data;
+        let lit = 0;
+        for (let i = 0; i < pixels.length; i += 4)
+          if (pixels[i + 3] && Math.max(pixels[i], pixels[i + 1], pixels[i + 2]) > 80) lit++;
+        const rect = img.getBoundingClientRect();
+        return {
+          width: img.naturalWidth,
+          height: img.naturalHeight,
+          renderedWidth: rect.width,
+          renderedHeight: rect.height,
+          lit,
+        };
+      } finally {
+        canvas.width = canvas.height = 0;
+      }
+    });
+  assert.equal(thumbnail.width, 320);
+  assert.equal(thumbnail.height, 180);
+  assert.ok(thumbnail.lit > 100);
+  assert.equal(await page.locator('.keeper-arrival').first().locator('button').count(), 2);
+  assert.doesNotMatch(
+    await page.locator('#receiving-content').innerText(),
+    /\d{4}-\d{2}-\d{2}T\d{2}:/,
+  );
+  for (const width of [1280, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    const bounds = await page.locator('.keeper-card-preview').first().boundingBox();
+    assert.ok(bounds.width <= 320 && Math.abs(bounds.width / bounds.height - 16 / 9) < 0.01);
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  }
+
   for (const [orientation, w, h] of [
     ['landscape', 1200, 675],
     ['vertical', 720, 1280],
   ]) {
     stage = orientation === 'landscape' ? 'card-landscape' : 'card-vertical';
+    if (orientation === 'vertical') {
+      await page.getByRole('button', { name: 'Share · Ring 1', exact: true }).click();
+      await page.getByLabel('Share format · Ring 1', { exact: true }).selectOption('vertical');
+    }
     const downloaded = page.waitForEvent('download');
     await page
       .getByRole('button', { name: `Download ${orientation} card · Ring 1`, exact: true })
@@ -239,10 +299,61 @@ try {
   await page.route('**/api/atlas/stops/*', (r) => r.fulfill({ status: 404, body: 'Unavailable' }));
   let downloads = 0;
   page.on('download', () => downloads++);
+  // Refresh resets the menu; choose the same vertical format through the new Share UI.
+  await page.getByRole('button', { name: 'Share · Ring 1', exact: true }).click();
+  await page.getByLabel('Share format · Ring 1', { exact: true }).selectOption('vertical');
   await page.getByRole('button', { name: 'Download vertical card · Ring 1', exact: true }).click();
   stage = 'removed-stop-card';
   await page.locator('#receiving-status').filter({ hasText: 'Card unavailable' }).waitFor();
   assert.equal(downloads, 0);
+
+  stage = 'keeper-repeat-disclosure';
+  // Restore the malformed mock observation used above, then let its freshness expire.
+  for (const stream of f.streams.values()) stream.viewer_count = 1;
+  f.advance(61000);
+  // Genuine signed mock hops create four received rings; no fabricated profile DTO.
+  for (let i = 0; i < 6; i++) {
+    const from = (await f.runtime.state.getKeeperRegistry()).holderId;
+    const to = from === HOME ? OTHER : HOME;
+    f.advance(31000);
+    const sent = await f.control(from, 'send:' + to);
+    assert.equal(sent.status, 200);
+    assert.equal(JSON.parse(sent.body).status, 'accepted');
+    f.advance();
+    await f.raid(from, to, 1);
+    await f.chat(from, '8102', '!offer', { messageId: 'frontdoor-repeat-offer-' + i });
+    await f.chat(to, '8103', '!accept', { messageId: 'frontdoor-repeat-accept-' + i });
+    assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, to);
+  }
+  assert.equal((await f.runtime.state.getPublicJourney()).rings, 7);
+  await page.goto(origin + '/keeper/olsols2');
+  await page
+    .locator('.keeper-more > summary')
+    .filter({ hasText: '+1 more received rings' })
+    .waitFor();
+  assert.equal(await page.locator('.keeper-arrival').count(), 4);
+  assert.equal(await page.locator('.keeper-arrival:visible').count(), 3);
+  assert.equal(await page.locator('.keeper-more').evaluate((n) => n.open), false);
+  assert.ok(
+    await page
+      .locator('.keeper-arrival')
+      .evaluateAll((nodes) => nodes.every((n) => n.querySelectorAll('button').length <= 2)),
+  );
+  await page.locator('.keeper-more > summary').click();
+  await page.waitForFunction(
+    () => document.querySelectorAll('.keeper-card-preview:not([hidden])').length === 4,
+  );
+  assert.equal(await page.locator('.keeper-arrival:visible').count(), 4);
+  assert.ok(
+    await page.locator('.keeper-card-preview').evaluateAll(async (nodes) => {
+      await Promise.all(nodes.map((n) => n.decode()));
+      return nodes.every((n) => n.naturalWidth === 320 && n.naturalHeight === 180);
+    }),
+  );
+  checks.push({
+    name: 'Genuine retained four-ring profile starts with three entries, expands +1, real320x180 cards and at most two buttons per ring',
+    passed: true,
+  });
   assert.equal((await page.goto(origin + '/keeper/unknown')).status(), 404);
   assert.equal(errors, 0);
   assert.equal(external, 0);

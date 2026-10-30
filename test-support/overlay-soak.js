@@ -3,18 +3,31 @@ export function overlaySoakOptions(args = []) {
   if (
     args.some(
       (a) =>
-        !/^--(?:mode=(?:smoke|wall|wall-probe|logical)|duration-ms=(?:7200000|600000))$/.test(a),
+        !/^--(?:mode=(?:smoke|wall|wall-probe|obs-wall|obs-probe|logical)|duration-ms=(?:7200000|600000|3600000|20000))$/.test(
+          a,
+        ),
     ) ||
     new Set(args.map((a) => a.split('=')[0])).size !== args.length
   )
     throw Error('Invalid soak options');
   const mode = args.find((a) => a.startsWith('--mode='))?.slice(7) ?? 'smoke';
   const requested = args.find((a) => a.startsWith('--duration-ms='));
-  const required = { wall: '--duration-ms=7200000', 'wall-probe': '--duration-ms=600000' }[mode];
+  const required = {
+    wall: '--duration-ms=7200000',
+    'wall-probe': '--duration-ms=600000',
+    'obs-wall': '--duration-ms=3600000',
+    'obs-probe': '--duration-ms=20000',
+  }[mode];
   if (requested !== required) throw Error('Wall modes require their exact explicit duration');
   return {
     mode,
-    durationMs: mode === 'smoke' ? 20000 : mode === 'wall-probe' ? 600000 : OVERLAY_WALL_MS,
+    durationMs: ['smoke', 'obs-probe'].includes(mode)
+      ? 20000
+      : mode === 'wall-probe'
+        ? 600000
+        : mode === 'obs-wall'
+          ? 3600000
+          : OVERLAY_WALL_MS,
     warmupMs: mode === 'wall' ? 120000 : 2000,
     logical: mode === 'logical',
   };

@@ -1,3 +1,4 @@
+import { publicDate } from './streak-view.js';
 import { keeperNames } from './keeper-network.js';
 const keeperName = (id) => (keeperNames[id] ? '@' + keeperNames[id] : 'Unknown Keeper');
 const $ = (id) => document.getElementById(id);
@@ -69,7 +70,7 @@ async function read() {
       const item = document.createElement('li'),
         link = document.createElement('a');
       link.href = `/stops/${stop.stopId}`;
-      link.textContent = `Ring ${stop.ringIndex}: ${keeperName(stop.from)} → ${keeperName(stop.to)} · ${stop.retainedEntries} retained entries · ${new Date(stop.claimedAt).toLocaleString('en-GB', { timeZone: 'UTC', dateStyle: 'medium', timeStyle: 'short' }) + ' UTC'}`;
+      link.textContent = `Ring ${stop.ringIndex}: ${keeperName(stop.from)} → ${keeperName(stop.to)} · ${stop.retainedEntries} retained entries · ${publicDate(stop.claimedAt)}`;
       item.append(link);
       $('route').append(item);
     }

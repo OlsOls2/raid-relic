@@ -60,8 +60,10 @@ try {
     { name, value, url: origin, secure: true, httpOnly: true, sameSite: 'Lax' },
   ]);
   stage = 'keyboard-layout';
-  for (const path of ['/atlas/', '/keeper/raidrelichq', '/control/' + HOME]) {
+  const layoutPaths = ['/atlas/', '/keeper/raidrelichq', '/control/' + HOME];
+  for (const [pathIndex, path] of layoutPaths.entries()) {
     await page.goto(origin + path);
+    await page.evaluate(() => document.fonts.ready);
     await page.keyboard.press('Tab');
     assert.equal(
       await page.evaluate(() => document.activeElement.classList.contains('skip-link')),
@@ -81,7 +83,59 @@ try {
     assert.equal(await page.evaluate(() => document.activeElement.id), 'main-content');
     for (const width of [320, 390, 1280, 1920]) {
       await page.setViewportSize({ width, height: 1080 });
-      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+      // Closed numeric evidence: no text, DOM markup, account IDs or URLs.
+      diagnostic.layout = await page.evaluate(
+        ({ pathIndex, width }) => {
+          const tags = [
+            'HEADER',
+            'MAIN',
+            'NAV',
+            'A',
+            'H1',
+            'H2',
+            'BUTTON',
+            'SELECT',
+            'IMG',
+            'SECTION',
+            'DETAILS',
+            'INPUT',
+            'IFRAME',
+          ];
+          const offenders = [];
+          let index = 0;
+          for (const node of document.body.querySelectorAll('*')) {
+            const b = node.getBoundingClientRect(),
+              style = getComputedStyle(node);
+            if (
+              b.width > 0 &&
+              b.height > 0 &&
+              style.position !== 'absolute' &&
+              style.position !== 'fixed' &&
+              (b.right > innerWidth || b.left < 0) &&
+              offenders.length < 8
+            )
+              offenders.push({
+                index,
+                tagCode: tags.indexOf(node.tagName) + 1,
+                x: Math.round(b.x),
+                y: Math.round(b.y),
+                width: Math.round(b.width),
+                height: Math.round(b.height),
+              });
+            index++;
+          }
+          return {
+            pathIndex,
+            requestedWidth: width,
+            viewportWidth: innerWidth,
+            documentWidth: document.documentElement.scrollWidth,
+            offenders,
+          };
+        },
+        { pathIndex, width },
+      );
+      assert.equal(diagnostic.layout.viewportWidth, width);
+      assert.ok(diagnostic.layout.documentWidth <= width);
     }
     assert.ok(
       (await minimumContrast(

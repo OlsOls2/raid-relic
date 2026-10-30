@@ -125,6 +125,7 @@ try {
   stage = 'off-control';
   await page.goto(origin + '/control/' + HOME);
   await page.locator('#keeper-summary').filter({ hasText: 'Relic Keeper:' }).waitFor();
+  await page.locator('#control-advanced > summary').click();
   assert.equal(
     await page.locator('#p7-consent-link').getAttribute('href'),
     origin + '/oauth/bot/start?features=p7',
@@ -230,6 +231,7 @@ try {
   ]);
   page = await localContext.newPage();
   await page.goto(localOrigin + '/control/' + HOME);
+  await page.locator('#control-advanced > summary').click();
   await page.locator('#p7-copy').waitFor();
   await page.waitForFunction(() => !document.getElementById('p7-copy').disabled);
   assert.equal(

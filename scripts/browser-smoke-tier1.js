@@ -55,7 +55,8 @@ try {
   assert.equal(await page.locator('footer .edition-disclaimer').count(), 1);
   await capture('tier1-hero.png');
   stage = 'idle-holder';
-  await page.goto(origin + '/overlay/1591806023');
+  // Legacy full-composition contract; default-card coverage remains in full-overlay.
+  await page.goto(origin + '/overlay/1591806023?layout=full');
   await page.locator('body[data-connection="connected"]').waitFor();
   await page
     .locator('#status')
@@ -86,7 +87,7 @@ try {
   );
   assert.ok(pixel);
   await capture('tier1-holder.png');
-  await page.goto(origin + '/overlay/1591805230');
+  await page.goto(origin + '/overlay/1591805230?layout=full');
   await page.locator('#status').filter({ hasText: 'The relic has moved on to @olsols2' }).waitFor();
   assert.equal(await page.locator('#holder-link').getAttribute('href'), '/atlas/');
   for (const host of ['1591805230', '1591806023']) {

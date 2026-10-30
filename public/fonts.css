@@ -8,11 +8,26 @@
 }
 h1,
 h2,
+h3,
 .brand {
-  font-family: Cinzel, Georgia, serif;
+  font-family: Cinzel, Georgia, serif !important;
 }
 
 .corner #compact-count {
   font-family: Cinzel, Georgia, serif;
   font-size: 9px;
+}
+
+/* Shared public navigation only; no renderer or overlay composition selectors. */
+.public-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: center;
+  font: 16px/1.5 system-ui;
+}
+.public-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
 }

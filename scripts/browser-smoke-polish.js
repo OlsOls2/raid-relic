@@ -226,7 +226,8 @@ try {
   await contrast(atlas, ['#description', '#search-help', '#search-submit']);
   await capture(atlas, 'polish-simulator-atlas-empty-1920');
   const overlay = await page();
-  await overlay.goto(`${JUDGES_ORIGIN}/overlay/1591806023`);
+  // Legacy full-composition contract; default-card coverage remains in full-overlay.
+  await overlay.goto(`${JUDGES_ORIGIN}/overlay/1591806023?layout=full`);
   await overlay.locator('#waiting-note').waitFor({ state: 'visible' });
   if (await overlay.locator('.rune, #rings span').count())
     throw Error('New channel invented marks/rings');
@@ -256,7 +257,7 @@ try {
     throw Error('Empty corner label/bounds');
   await capture(overlay, 'polish-simulator-new-channel-waiting-corner-160');
   await overlay.setViewportSize({ width: 1920, height: 1080 });
-  await overlay.goto(`${JUDGES_ORIGIN}/overlay/1591806023`);
+  await overlay.goto(`${JUDGES_ORIGIN}/overlay/1591806023?layout=full`);
   await overlay.locator('#waiting-note').waitFor({ state: 'visible' });
   await atlas.setViewportSize({ width: 375, height: 800 });
   await capture(atlas, 'polish-simulator-atlas-empty-375');

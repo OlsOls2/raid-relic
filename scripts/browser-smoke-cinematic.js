@@ -116,7 +116,8 @@ try {
   await f.chat(HOME, '811', '!mark moon');
   await f.chat(HOME, HOME, '!relic approve m1');
   const gl = await context.newPage();
-  await gl.goto(`${origin}/overlay/${OTHER}?sound=1`);
+  // Legacy full-composition contract; default-card coverage remains in full-overlay.
+  await gl.goto(`${origin}/overlay/${OTHER}?layout=full&sound=1`);
   await gl.bringToFront();
   await gl.locator('.webgl-relic canvas').waitFor({ state: 'visible' });
   if ((await gl.evaluate(() => window.__p3Audio.contexts)) !== 0)
@@ -142,7 +143,7 @@ try {
   const svg = await fallbackContext.newPage();
   await svg.goto(`${origin}/overlay/${OTHER}?corner=1`);
   const source = await context.newPage();
-  await source.goto(`${origin}/overlay/${HOME}`);
+  await source.goto(`${origin}/overlay/${HOME}?layout=full`);
   stage = 'accepted-only';
   await f.control(HOME, `send:${OTHER}`);
   await source.bringToFront();

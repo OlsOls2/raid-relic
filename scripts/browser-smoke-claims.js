@@ -1,5 +1,7 @@
 // Optional host-only LOCAL HTTPS mocked browser gate. Fixed registered5191.
 import { createServer } from 'node:https';
+import assert from 'node:assert/strict';
+import { BOT_COPY, claimComplete } from '../public/ritual-copy.js';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';
 import { createLocalTLS } from '../test-support/local-tls.js';
@@ -12,6 +14,17 @@ const checks = [],
   safeGets = [],
   pageErrors = [];
 
+const claimDiagnostic = {
+  claimAckHomeSent: -1,
+  claimAckOtherSent: -1,
+  chatPostCount: -1,
+  arrivalPromptCount: -1,
+  completionHomeCount: -1,
+  completionOtherCount: -1,
+  postReplayChatPosts: -1,
+  journeyRings: -1,
+  sourceAssertionLine: 0,
+};
 const reloadDiagnostic = {
   reason: null,
   status: null,
@@ -125,6 +138,29 @@ try {
   await page.goto(`${origin}/control/${HOME}`);
   await page.waitForFunction(
     () =>
+      !document.querySelector('#refresh').disabled &&
+      document.querySelector('#ledger').textContent.includes('confirmed'),
+  );
+  assert.equal(
+    (await f.runtime.state.getKeeperRegistry()).send.status,
+    'confirmed',
+    'GET must not retire the handoff',
+  );
+  await page.locator('#control-advanced > summary').click();
+  const callsBeforeExpiry = f.calls.length;
+  await page.getByRole('button', { name: 'Expire ended handoff', exact: true }).click();
+  await page.waitForFunction(
+    () =>
+      !document.querySelector('#refresh').disabled &&
+      document.querySelector('#ledger').textContent.includes('expired-handoff'),
+  );
+  assert.equal(
+    f.calls.length,
+    callsBeforeExpiry,
+    'Explicit app-window expiry cannot call a provider',
+  );
+  await page.waitForFunction(
+    () =>
       document.querySelector('#ledger').textContent.includes('expired-handoff') &&
       !document.getElementById('refresh').disabled,
   );
@@ -136,9 +172,9 @@ try {
     retired.holderId !== HOME ||
     (await f.runtime.state.getPublicJourney()).rings !== 0
   )
-    throw Error('Automatic confirmed recovery proof failed');
+    throw Error('Explicit confirmed recovery proof failed');
   checks.push({
-    name: 'SIMULATOR authenticated status retires only proved ended confirmed handoff without a POST',
+    name: 'SIMULATOR authenticated explicit expiry retires only proved ended confirmed handoff after a read-only GET without a POST',
     passed: true,
   });
   stage = 'post-expiry-send';
@@ -149,18 +185,85 @@ try {
   f.advance();
   await f.raid(HOME, OTHER, 2);
   stage = 't1-votes-ack';
-  await f.chat(HOME, HOME, '!offer');
-  await f.chat(OTHER, OTHER, '!accept');
+  await f.chat(HOME, HOME, '!offer', { messageId: 'claims-t1-offer' });
+  await f.chat(OTHER, OTHER, '!accept', { messageId: 'claims-t1-accept' });
+  // Sender vote ACK, one receiver arrival prompt, then one completion per room.
+  const chatPosts = () => f.calls.filter((c) => c.url.endsWith('/chat/messages'));
+  const replies = chatPosts().map((c) => JSON.parse(c.body));
+  let replayObserved = false;
+  const recordClaimDiagnostic = async () => {
+    const home = await f.runtime.state.getPrivateClaimAcks(HOME);
+    const other = await f.runtime.state.getPrivateClaimAcks(OTHER);
+    const posts = chatPosts().map((c) => JSON.parse(c.body));
+    claimDiagnostic.claimAckHomeSent = home.rows.filter((r) => r.status === 'sent').length;
+    claimDiagnostic.claimAckOtherSent = other.rows.filter((r) => r.status === 'sent').length;
+    claimDiagnostic.chatPostCount = posts.length;
+    claimDiagnostic.arrivalPromptCount = posts.filter((r) => r.message === BOT_COPY.arrival).length;
+    claimDiagnostic.completionHomeCount = home.rows.filter(
+      (r) => r.completionReceipt && !r.arrivalReceipt,
+    ).length;
+    claimDiagnostic.completionOtherCount = other.rows.filter(
+      (r) => r.completionReceipt && !r.arrivalReceipt,
+    ).length;
+    claimDiagnostic.postReplayChatPosts = replayObserved ? posts.length : -1;
+    claimDiagnostic.journeyRings = (await f.runtime.state.getPublicJourney()).rings;
+  };
+  await recordClaimDiagnostic();
+  assert.equal(replies.length, 4);
+  await recordClaimDiagnostic();
+  assert.deepEqual(
+    replies.map((r) => ({ host: r.broadcaster_id, sender: r.sender_id, message: r.message })),
+    [
+      { host: HOME, sender: BOT, message: 'Offers 1/1. Waiting for 1 accept in @olsols2.' },
+      { host: OTHER, sender: BOT, message: BOT_COPY.arrival },
+      { host: HOME, sender: BOT, message: claimComplete('olsols2') },
+      { host: OTHER, sender: BOT, message: claimComplete('olsols2') },
+    ],
+  );
+  await recordClaimDiagnostic();
+  assert.deepEqual(
+    replies.filter((r) => r.message === BOT_COPY.arrival).map((r) => r.broadcaster_id),
+    [OTHER],
+  );
   for (const host of [HOME, OTHER]) {
     const doc = await f.runtime.state.getPrivateClaimAcks(host);
-    if (doc.rows.filter((r) => r.status === 'sent').length !== (host === HOME ? 2 : 1))
-      throw Error('mock ACK not sent');
+    await recordClaimDiagnostic();
+    assert.equal(doc.rows.filter((r) => r.status === 'sent').length, 2);
+    const arrival = doc.rows.filter((r) => r.arrivalReceipt);
+    await recordClaimDiagnostic();
+    assert.equal(arrival.length, host === OTHER ? 1 : 0);
+    if (host === OTHER) {
+      await recordClaimDiagnostic();
+      assert.equal(arrival[0].status, 'sent');
+      await recordClaimDiagnostic();
+      // Dispatch erases payload; exact delivered text is checked on mock POSTs above.
+      assert.equal(Object.hasOwn(arrival[0], 'message'), false);
+      await recordClaimDiagnostic();
+      assert.equal(Object.hasOwn(arrival[0], 'completion'), false);
+    }
+    const completion = doc.rows.filter((r) => r.completionReceipt && !r.arrivalReceipt);
+    await recordClaimDiagnostic();
+    assert.equal(completion.length, 1);
+    await recordClaimDiagnostic();
+    assert.equal(completion[0].status, 'sent');
+    await recordClaimDiagnostic();
+    assert.equal(Object.hasOwn(completion[0], 'message'), false);
+    await recordClaimDiagnostic();
+    assert.equal(Object.hasOwn(completion[0], 'completion'), false);
   }
-  if (
-    (await f.runtime.state.getPublicJourney()).rings !== 1 ||
-    f.calls.filter((c) => c.url.endsWith('/chat/messages')).length !== 3
-  )
-    throw Error('Mocked T1/ACK failed');
+  await recordClaimDiagnostic();
+  assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
+  await f.chat(HOME, HOME, '!offer', { messageId: 'claims-t1-offer' });
+  await f.chat(OTHER, OTHER, '!accept', { messageId: 'claims-t1-accept' });
+  replayObserved = true;
+  await recordClaimDiagnostic();
+  assert.equal(
+    chatPosts().length,
+    4,
+    'replayed votes cannot repeat arrival or completion delivery',
+  );
+  await recordClaimDiagnostic();
+  assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
   // #account exists in initial HTML: it cannot prove the async status fetch rendered.
   // Arm status BEFORE navigation, then assert both response and committed DOM.
   const statusReload = page.waitForResponse(
@@ -241,19 +344,27 @@ try {
   });
   // Functional hotfix gate only: no screenshot capture or visual-proof assertion.
   checks.push({
-    name: 'SIMULATOR T1 two-account claim, three SENT ACKs including both completion channels and postclaim control response/DOM',
+    name: 'SIMULATOR T1 two-account claim, four SENT notices: sender ACK, single receiver prompt and both completion channels and postclaim control response/DOM',
     passed: true,
   });
   stage = 'complete';
 } catch (error) {
   failure = true;
+  const assertionLine = /browser-smoke-claims\.js:(\d+):\d+/.exec(error?.stack ?? '');
+  claimDiagnostic.sourceAssertionLine = assertionLine ? Number(assertionLine[1]) : 0;
   failureCategory = ['EPERM', 'EADDRINUSE', 'ENOENT'].includes(error?.code)
     ? error.code
     : pageErrors.length
       ? 'page-error'
       : error?.name === 'TimeoutError'
         ? 'timeout'
-        : 'assertion-or-browser';
+        : error?.name === 'AssertionError'
+          ? 'assertion-error'
+          : error?.name === 'ProtocolError'
+            ? 'protocol-error'
+            : error?.name === 'TypeError'
+              ? 'type-error'
+              : 'assertion-or-browser';
 } finally {
   await browser?.close().catch(() => {});
   if (server?.listening) await new Promise((resolve) => server.close(resolve));
@@ -268,6 +379,7 @@ try {
         stage,
         failureCategory,
         reloadDiagnostic,
+        claimDiagnostic,
         safeGets,
         pageErrors,
         checks,
@@ -280,6 +392,15 @@ try {
   );
 }
 if (failure) {
-  console.log(JSON.stringify({ stage, failureCategory, reloadDiagnostic, safeGets, pageErrors }));
+  console.log(
+    JSON.stringify({
+      stage,
+      failureCategory,
+      claimDiagnostic,
+      reloadDiagnostic,
+      safeGets,
+      pageErrors,
+    }),
+  );
   process.exitCode = 1;
 }

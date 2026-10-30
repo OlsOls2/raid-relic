@@ -7,6 +7,17 @@ import {
 } from '../test-support/overlay-soak.js';
 test('overlay soak explicitly distinguishes real two-hour wall time from accelerated fixture time', () => {
   assert.equal(overlaySoakOptions().mode, 'smoke');
+  assert.throws(() => overlaySoakOptions(['--mode=obs-probe']));
+  assert.throws(() => overlaySoakOptions(['--mode=obs-probe', '--duration-ms=3600000']));
+  assert.throws(() => overlaySoakOptions(['--mode=obs-wall', '--duration-ms=20000']));
+  const probe = overlaySoakOptions(['--mode=obs-probe', '--duration-ms=20000']);
+  assert.equal(probe.durationMs, 20000);
+  assert.equal(probe.logical, false);
+  assert.equal(probe.warmupMs, 2000);
+  const hour = overlaySoakOptions(['--mode=obs-wall', '--duration-ms=3600000']);
+  assert.equal(hour.durationMs, 3600000);
+  assert.equal(hour.logical, false);
+
   assert.throws(() => overlaySoakOptions(['--mode=wall']));
   assert.equal(overlaySoakOptions(['--mode=wall', '--duration-ms=7200000']).logical, false);
   assert.equal(overlaySoakOptions(['--mode=logical']).logical, true);

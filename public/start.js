@@ -1,17 +1,11 @@
 import { keeperNames } from './keeper-network.js';
-import { setupLinks, copyOBS } from './onboarding.js';
+import { setupChannel, copyOBS } from './onboarding.js';
 const $ = (id) => document.getElementById(id),
   select = $('start-channel');
 $('start-confirm').checked = false;
-for (const [id, login] of Object.entries(keeperNames)) {
-  if (!setupLinks(id, keeperNames)) continue;
-  const option = document.createElement('option');
-  option.value = id;
-  option.textContent = '@' + login;
-  select.insertBefore(option, select.lastElementChild);
-}
-select.onchange = () => {
-  const links = setupLinks(select.value, keeperNames);
+// Public configured-name matching only, not account lookup or open enrollment.
+select.oninput = () => {
+  const links = setupChannel(select.value, keeperNames);
   for (const [id, url] of [
     ['start-connect', links?.connect],
     ['start-control', links?.control],
@@ -28,7 +22,7 @@ select.onchange = () => {
     'Not copied. Check the source manually after adding it to OBS.';
   $('start-status').textContent = links
     ? `@${links.login} is configured, not verified ready. Only you can connect and opt in.`
-    : 'Private pilot: ask the owner to configure your verified channel first. This page cannot enroll it.';
+    : 'Your channel is not admitted yet. Ask the owner for an invitation through your existing private contact. No account, consent or readiness has been verified here.';
 };
 $('start-copy').onclick = async () => {
   try {

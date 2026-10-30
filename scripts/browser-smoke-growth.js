@@ -230,7 +230,8 @@ try {
   await f.chat(OTHER, '912', '!accept');
   f.advance(21000);
   stage = 'overlay-live-count';
-  await p.goto(origin + '/overlay/' + OTHER);
+  // Historical full-size badge pixel contract; card geometry has dedicated coverage.
+  await p.goto(origin + '/overlay/' + OTHER + '?layout=full');
   await p.waitForFunction(
     () => Number(document.querySelector('canvas.relic3d')?.dataset.frames) > 0,
   );

@@ -14,7 +14,8 @@ let browser,
   failed = false;
 const checks = [],
   captures = new Map(),
-  errors = [];
+  errors = [],
+  diagnostic = {};
 async function capture(page, name) {
   if (process.env.P4_CAPTURE !== '1') return;
   const b = await page.screenshot({ fullPage: false });
@@ -113,8 +114,26 @@ try {
   await control.goto(`${origin}/control/${HOME}`);
   await control.locator('#result').filter({ hasText: 'Status timed out' }).waitFor();
   assert.equal(await control.locator('#raid button').count(), 0);
+  const freshRead = control.waitForResponse(
+    (r) =>
+      new URL(r.url()).pathname === `/control/${HOME}/status` && r.request().method() === 'GET',
+  );
   await control.getByRole('button', { name: 'Refresh status', exact: true }).click();
-  await control.locator('#result').filter({ hasText: 'Status refreshed' }).waitFor();
+  assert.equal((await freshRead).status(), 200);
+  await control.waitForFunction(
+    () =>
+      !document.getElementById('refresh').disabled &&
+      document.getElementById('light-live').dataset.state === 'ready',
+  );
+  // A successful read preserves the last result; real lights/read completion
+  // prove recovery instead of expecting an unrelated replacement message.
+  assert.equal(await control.locator('#result').isVisible(), true);
+  for (const selector of ['#result', '#first-run p', '#first-run button', '#first-run summary h2'])
+    assert.ok(
+      await control
+        .locator(selector)
+        .evaluateAll((nodes) => nodes.every((n) => parseFloat(getComputedStyle(n).fontSize) >= 15)),
+    );
   for (const key of ['bot', 'subscriptions', 'live'])
     assert.equal(await control.locator(`#light-${key}`).getAttribute('data-state'), 'ready');
   assert.equal(await control.locator('#ledger').isVisible(), false);
@@ -135,13 +154,26 @@ try {
   );
   stage = 'ready-top-layout';
   await control.evaluate(() => scrollTo(0, 0));
-  for (const selector of ['.status-lights', '#raid .send-off'])
-    assert(
-      await control.locator(selector).evaluate((n) => {
-        const r = n.getBoundingClientRect();
-        return r.top >= 0 && r.bottom <= innerHeight;
-      }),
-    );
+  assert(
+    await control.locator('.status-lights').evaluate((n) => {
+      const r = n.getBoundingClientRect();
+      return r.top >= 0 && r.bottom <= innerHeight;
+    }),
+  );
+  // Four-step layout: the actual step link opens and scrolls the Send Off panel.
+  await control.getByRole('link', { name: 'Send Off', exact: true }).click();
+  await control.locator('#raid .send-off').scrollIntoViewIfNeeded();
+  assert(
+    await control.locator('#raid .send-off').evaluate((n) => {
+      const r = n.getBoundingClientRect();
+      return r.top >= 0 && r.bottom <= innerHeight;
+    }),
+  );
+  assert.equal(await control.locator('#send-step').evaluate((n) => n.open), true);
+  assert.equal(
+    await control.locator('#raid .send-off').getAttribute('aria-describedby'),
+    'send-disabled-reason target-help',
+  );
   await capture(control, 'p4-polish-control.png');
   stage = 'human-raid-settings';
   let posts = 0;
@@ -180,7 +212,8 @@ try {
   await f.chat(OTHER, OTHER, '!accept');
   assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
   const source = await c.newPage();
-  await source.goto(`${origin}/overlay/${HOME}`);
+  // Legacy full-composition contract; default-card coverage remains in full-overlay.
+  await source.goto(`${origin}/overlay/${HOME}?layout=full`);
   await source.bringToFront();
   await source
     .locator('#status')
@@ -199,8 +232,11 @@ try {
   f.advance(6 * 3600000);
   const after = await f.request(`/control/${HOME}/status`, 'GET', { cookie: f.cookies[HOME] });
   assert.equal(after.status, 200);
-  assert(JSON.parse(after.body).expiresAt > JSON.parse(before.body).expiresAt);
-  assert.match(after.headers['set-cookie'], /Max-Age=43200/);
+  assert.equal(JSON.parse(after.body).expiresAt, JSON.parse(before.body).expiresAt);
+  assert.equal(after.headers['set-cookie'], undefined);
+  const explicitRenewal = await f.control(HOME, 'refresh-authorization');
+  assert.equal(explicitRenewal.status, 200);
+  assert.match(explicitRenewal.headers['set-cookie'], /Max-Age=43200/);
   await control.getByRole('button', { name: 'Refresh status', exact: true }).click();
   await control.locator('#keeper-summary').filter({ hasText: '@olsols2' }).waitFor();
   await control.setViewportSize({ width: 375, height: 800 });
@@ -233,11 +269,17 @@ try {
   assert(await fallbackPage.locator('.crystal').isVisible());
   assert.equal(errors.length, 0);
   checks.push({
-    name: 'SIMULATOR actual transfer/moved-on voice, twelve-hour renewal, 375px/160px pips and font/SVG fallback',
+    name: 'SIMULATOR actual transfer/moved-on voice, explicit-action twelve-hour renewal with read-only GET, 375px/160px pips and font/SVG fallback',
     passed: true,
   });
-} catch {
+} catch (error) {
   failed = true;
+  diagnostic.assertionLine = Number(
+    /browser-smoke-p4[.]js:(\d+)/.exec(error?.stack ?? '')?.[1] ?? 0,
+  );
+  diagnostic.failureCategory = ['AssertionError', 'TimeoutError', 'TypeError'].includes(error?.name)
+    ? error.name
+    : 'fixture-or-browser';
 } finally {
   await browser?.close().catch(() => {});
   sockets?.close();
@@ -253,6 +295,7 @@ try {
         simulator: true,
         passed: !failed,
         stage,
+        diagnostic,
         pageErrors: errors,
         checks,
         captures: [...captures.keys()],

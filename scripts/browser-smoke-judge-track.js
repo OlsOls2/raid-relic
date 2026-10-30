@@ -331,7 +331,8 @@ try {
     });
   });
   page = await live.newPage();
-  const overlayResponse = await page.goto(origin + '/overlay/' + OTHER);
+  // Legacy full-composition contract; default-card coverage remains in full-overlay.
+  const overlayResponse = await page.goto(origin + '/overlay/' + OTHER + '?layout=full');
   assert.equal((await overlayResponse.allHeaders())['cache-control'], 'no-store');
   await page.waitForFunction(() => document.body.dataset.connection === 'connected');
   assert.equal(sockets.clients.size, 1);

@@ -1,5 +1,5 @@
 import { keeperNames } from './keeper-network.js';
-import { validStreak, streakText } from './streak-view.js';
+import { publicDate, validStreak, streakText } from './streak-view.js';
 import { EDITION_CONFIG, editionWindowLabel } from './editions.js';
 const $ = (id) => document.getElementById(id);
 let generation = 0,
@@ -216,7 +216,7 @@ async function loadScores() {
       li.append(
         profileName(row.login, v.publicProfiles ?? []),
         document.createTextNode(
-          ` · ${row.claimsJoined} completed ${row.claimsJoined === 1 ? 'claim' : 'claims'} joined · since opt-in ${new Date(row.since).toLocaleString()}`,
+          ` · ${row.claimsJoined} completed ${row.claimsJoined === 1 ? 'claim' : 'claims'} joined · since opt-in ${publicDate(row.since)}`,
         ),
       );
       $('raider-rows').append(li);
@@ -225,7 +225,7 @@ async function loadScores() {
       $('raider-rows').append(node('li', 'Raiders: type !relic scores on to join the ledger.'));
     $('scores-coverage').textContent = v.coverage;
     $('scores-status').textContent =
-      `${v.rings} recorded ${v.rings === 1 ? 'ring' : 'rings'}${v.wanderStops ? ' · ' + v.wanderStops + ' Wandered (not raids)' : ''} · as of ${new Date(v.asOf).toLocaleString()}. Refresh manually.${v.streak ? ' ' + streakText(v.streak) : ''}`;
+      `${v.rings ? v.rings + ' recorded ' + (v.rings === 1 ? 'ring' : 'rings') : 'First journey begins'}${v.wanderStops ? ' · ' + v.wanderStops + ' Wandered (not raids)' : ''} · as of ${publicDate(v.asOf)}. Refresh manually.${v.streak ? ' ' + streakText(v.streak) : ''}`;
   } catch {
     if (current === generation) {
       clear();

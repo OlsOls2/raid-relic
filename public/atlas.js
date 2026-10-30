@@ -1,13 +1,15 @@
 import { keeperNames } from './keeper-network.js';
 const keeperName = (id) => (keeperNames[id] ? '@' + keeperNames[id] : 'Unknown Keeper');
-const utcDate = (value) =>
-  new Date(value).toLocaleString('en-GB', {
-    timeZone: 'UTC',
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }) + ' UTC';
+import { publicDate as utcDate } from './streak-view.js';
 import { createAtlasHero, atlasRings } from './atlas-hero.js';
 const $ = (id) => document.getElementById(id);
+const ledgerDetails = $('ledger-details'),
+  ledgerWidth = matchMedia('(max-width: 599px)');
+const fitLedger = () => {
+  if (ledgerDetails) ledgerDetails.open = !ledgerWidth.matches;
+};
+fitLedger();
+ledgerWidth.addEventListener('change', fitLedger);
 const hero = createAtlasHero({ archive: $('atlas-relic') });
 const stopId = /^\/stops\/([a-f0-9]{64})$/.exec(location.pathname)?.[1];
 let offset = 0;
@@ -72,12 +74,12 @@ async function load() {
       document.querySelector('.note').textContent =
         'Raid stops require verified arrivals and two-chat binding. Dotted Wander stops are idle transfers, not raids.';
     $('rings').textContent =
-      `${data.rings} completed growth rings${data.wanderStops ? ' · ' + data.wanderStops + ' Wandered (no raid) · ' + (data.rings - data.wanderStops) + ' raid/legacy stops' : ''}`;
+      `${data.rings ? data.rings + ' completed growth rings' : 'First journey begins'}${data.wanderStops ? ' · ' + data.wanderStops + ' Wandered (no raid) · ' + (data.rings - data.wanderStops) + ' raid/legacy stops' : ''}`;
     $('status').textContent = data.total
       ? `Showing ${offset + 1}–${Math.min(offset + (stopId ? data.marks.length : data.stops.length), data.total)} of ${data.total}`
       : stopId
         ? 'No approved marks retained at this stop.'
-        : 'No completed hops yet. The relic has no recorded journey. Refresh after a completed two-chat claim.';
+        : 'First journey begins with a completed two-chat claim. No completed hops yet.';
     if (stopId) {
       $('title').textContent = `Stop ${data.stop.ringIndex}`;
       $('description').textContent =
@@ -102,7 +104,17 @@ async function load() {
           node('p', chronicleCaption(stop.chronicle)),
           node('p', `${keeperName(stop.from)} to ${keeperName(stop.to)}`),
           node('p', utcDate(stop.claimedAt)),
-          node('p', `${stop.approvedCount} approved marks retained`),
+          node(
+            'p',
+            stop.kind === 'wander'
+              ? 'Wandered — no raid or audience transfer'
+              : Number.isInteger(stop.raidSize) && stop.raidSize >= 0
+                ? `${stop.raidSize} Twitch-reported raiders`
+                : 'Raid audience not recorded',
+          ),
+          ...(stop.approvedCount
+            ? [node('p', `${stop.approvedCount} approved marks retained`)]
+            : []),
           link,
         );
         $('journey').append(item);
@@ -133,12 +145,17 @@ $('next').onclick = () => {
 };
 // No polling. Hide old content when leaving; a restored page must read anew.
 addEventListener('pagehide', () => {
+  ledgerWidth.removeEventListener('change', fitLedger);
   generation++;
   controller?.abort();
   clear();
 });
 addEventListener('pageshow', (event) => {
-  if (event.persisted) load();
+  if (event.persisted) {
+    ledgerWidth.addEventListener('change', fitLedger);
+    fitLedger();
+    load();
+  }
 });
 load();
 

@@ -65,7 +65,8 @@ try {
     ]);
     await page.goto(origin + '/control/' + id);
     await page.locator('#account').filter({ hasText: NETWORK3[id] }).waitFor();
-    await page.getByRole('button', { name: 'Join public Seeker queue', exact: true }).waitFor();
+    await page.locator('#control-advanced > summary').click();
+    await page.getByRole('button', { name: 'Become a Seeker', exact: true }).waitFor();
     assert.equal(errors, 0);
   }
   const before = await f.runtime.state.getStreamStatus(OTHER);

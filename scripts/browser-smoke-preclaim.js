@@ -80,7 +80,8 @@ try {
     stage = corner ? 'corner-meter' : 'full-meter';
     const page = await context.newPage();
     if (corner) await page.setViewportSize({ width: 160, height: 160 });
-    await page.goto(`${origin}/overlay/${host}${corner ? '?corner=1' : ''}`);
+    // Legacy full-composition contract; default-card coverage remains in full-overlay.
+    await page.goto(`${origin}/overlay/${host}${corner ? '?corner=1' : '?layout=full'}`);
     await page.bringToFront();
     await page.locator('#claim-meter').waitFor({ state: 'visible' });
     if (!(await page.locator('#claim-label').textContent()).includes('Awaiting verified raid'))

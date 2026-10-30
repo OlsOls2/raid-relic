@@ -1,3 +1,4 @@
+import { localOverlayArrival, validSnapshot } from '../public/overlay-client.js';
 // Native local QA only: explicit synthetic grants, self-only TLS, Chromium sandbox.
 import { createServer } from 'node:https';
 import { createLocalTLS } from './local-tls.js';
@@ -26,7 +27,10 @@ export async function visualReview({
   backgroundThrottling = false,
   headed = false,
   fixtureOnly = false,
+  readProjection = false,
 } = {}) {
+  if (readProjection && (durable || fixtureOnly))
+    throw Error('Isolated projection fixture required');
   const origin = 'https://localhost:5191',
     fixture = await pilotFixture(durable === true ? 'firestore' : 'memory', {
       origin,
@@ -39,7 +43,37 @@ export async function visualReview({
     });
   const tls = await createLocalTLS(),
     server = createServer(tls.options, (req, res) => fixture.runtime.handler(req, res));
-  let sockets = attachOverlaySockets(server, fixture.runtime.overlayFeeds, {
+  // Local transport seam only: no change to the runtime, stores or routes.
+  // The same socket upgrade/read-policy/Origin checks still own admission.
+  const projectionValues = new Map();
+  const projectionListeners = new Map();
+  const wireFeeds = readProjection
+    ? Object.fromEntries(
+        Object.entries(fixture.runtime.overlayFeeds).map(([id, feed]) => {
+          const listeners = new Set();
+          projectionListeners.set(id, listeners);
+          return [
+            id,
+            {
+              ...feed,
+              snapshot: () =>
+                projectionValues.has(id)
+                  ? Promise.resolve({ ...projectionValues.get(id), serverNow: Date.now() })
+                  : feed.snapshot(),
+              subscribe(listener) {
+                listeners.add(listener);
+                const unsubscribe = feed.subscribe(listener);
+                return () => {
+                  listeners.delete(listener);
+                  unsubscribe();
+                };
+              },
+            },
+          ];
+        }),
+      )
+    : fixture.runtime.overlayFeeds;
+  let sockets = attachOverlaySockets(server, wireFeeds, {
     origins: [origin],
     allowRead: fixture.runtime.allowPublicRead,
   });
@@ -94,6 +128,18 @@ export async function visualReview({
     return {
       origin,
       fixture,
+      async projectArrival(channel) {
+        if (!readProjection || !projectionListeners.has(channel) || projectionValues.has(channel))
+          throw Error('Closed projection fixture');
+        const base = await fixture.runtime.overlayFeeds[channel].snapshot();
+        const now = Date.now();
+        const value = { ...localOverlayArrival('host', now), revision: base.revision + 1 };
+        if (!validSnapshot(value) || Buffer.byteLength(JSON.stringify(value)) > 131072)
+          throw Error('Invalid projection fixture');
+        projectionValues.set(channel, value);
+        for (const listener of projectionListeners.get(channel)) listener(structuredClone(value));
+        return { startedAt: now, endsAt: now + 180000, revision: value.revision };
+      },
       dropConnections() {
         for (const socket of sockets.clients) socket.terminate();
       },
@@ -112,6 +158,8 @@ export async function visualReview({
       stats: () => ({ errors, external }),
       close: async () => {
         sockets.close();
+        projectionValues.clear();
+        projectionListeners.clear();
         await browser?.close();
         server.closeAllConnections();
         await new Promise((r) => server.close(r));

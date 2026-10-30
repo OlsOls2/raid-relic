@@ -1,15 +1,8 @@
 import { keeperNames } from './keeper-network.js';
-import { downloadKeeperCard } from './keeper-card.js';
+import { downloadKeeperCard, keeperCardThumbnail } from './keeper-card.js';
 const root = document.getElementById('receiving');
 const configured = new Set(Object.values(keeperNames));
-const utc = (v) =>
-  Number.isSafeInteger(v) && v >= 0
-    ? new Date(v).toLocaleString('en-GB', {
-        timeZone: 'UTC',
-        dateStyle: 'medium',
-        timeStyle: 'short',
-      }) + ' UTC'
-    : 'Time not recorded';
+import { publicDate as utc } from './streak-view.js';
 const node = (tag, text) => {
   const n = document.createElement(tag);
   if (text !== undefined) n.textContent = text;
@@ -48,12 +41,20 @@ if (root) {
   let generation = 0,
     controller,
     busy = false;
+  const previewURLs = new Set();
+  let previewBytes = 0;
+  const clearPreviews = () => {
+    for (const url of previewURLs) URL.revokeObjectURL(url);
+    previewURLs.clear();
+    previewBytes = 0;
+  };
   async function refresh() {
     const own = ++generation;
     controller?.abort();
     controller = new AbortController();
     const active = controller;
     const timer = setTimeout(() => active.abort(), 8000);
+    clearPreviews();
     content.replaceChildren();
     status.textContent = 'Reading the current public record…';
     try {
@@ -79,7 +80,12 @@ if (root) {
         card.className = 'holder-spotlight';
         card.append(
           node('h3', '@' + v.holder.login + ' holds the relic'),
-          node('p', 'Ring ' + v.holder.ringCount + ' · Held since: ' + utc(v.holder.heldSince)),
+          node(
+            'p',
+            (v.holder.ringCount ? 'Ring ' + v.holder.ringCount + ' · ' : '') +
+              'Held since: ' +
+              utc(v.holder.heldSince),
+          ),
         );
         card.append(
           node(
@@ -138,8 +144,16 @@ if (root) {
         )
           throw Error('Invalid Keeper');
         document.getElementById('keeper-title').textContent = '@' + login + ' · received rings';
-        content.append(node('h3', p.received.length + ' retained received rings'));
-        content.append(node('p', 'Approved community glyphs on the latest received ring:'));
+        content.append(
+          node(
+            'h3',
+            p.received.length
+              ? p.received.length + ' retained received rings'
+              : 'First journey begins',
+          ),
+        );
+        if (p.glyphs.length)
+          content.append(node('p', 'Approved community glyphs on the latest received ring:'));
         const glyphs = node('div');
         glyphs.className = 'keeper-glyphs';
         for (const g of p.glyphs) {
@@ -160,7 +174,15 @@ if (root) {
           glyphs.append(figure);
         }
         content.append(glyphs);
-        for (const s of p.received) {
+        const more = node('details'),
+          moreBody = node('div');
+        more.className = 'keeper-more';
+        more.append(
+          node('summary', '+' + Math.max(0, p.received.length - 3) + ' more received rings'),
+          moreBody,
+        );
+        const previews = [];
+        for (const [index, s] of p.received.entries()) {
           if (
             !/^[a-f0-9]{64}$/.test(s.stopId) ||
             s.to !== login ||
@@ -192,39 +214,129 @@ if (root) {
                   : 'Raid audience not recorded',
             ),
           );
-          for (const orientation of ['landscape', 'vertical']) {
-            const b = node('button', 'Download ' + orientation + ' card · Ring ' + s.ringIndex);
-            b.type = 'button';
-            b.onclick = async () => {
-              if (busy || own !== generation) return;
-              busy = true;
-              for (const button of content.querySelectorAll('.keeper-arrival button'))
-                button.disabled = true;
-              status.textContent = 'Checking the current record and preparing PNG…';
+          const thumbnail = node('img');
+          thumbnail.className = 'keeper-card-preview';
+          thumbnail.width = 320;
+          thumbnail.height = 180;
+          thumbnail.alt = 'Card preview · Ring ' + s.ringIndex + ' received by @' + login;
+          thumbnail.hidden = true;
+          article.append(thumbnail);
+          previews.push({ thumbnail, stop: s, deferred: index >= 3 });
+          const actions = node('div'),
+            menu = node('select'),
+            share = node('button', 'Share · Ring ' + s.ringIndex);
+          actions.className = 'keeper-share-options';
+          menu.setAttribute('aria-label', 'Share format · Ring ' + s.ringIndex);
+          menu.hidden = true;
+          for (const [value, label] of [
+            ['landscape', 'Landscape PNG'],
+            ['vertical', 'Vertical PNG'],
+            ['copy', 'Copy stop link'],
+          ]) {
+            const option = node('option', label);
+            option.value = value;
+            menu.append(option);
+          }
+          const download = node('button', 'Download landscape card · Ring ' + s.ringIndex);
+          share.type = download.type = 'button';
+          share.onclick = async () => {
+            if (own !== generation || busy) return;
+            const url = new URL('/stops/' + s.stopId, location.origin).href;
+            if (navigator.share) {
               try {
-                await downloadKeeperCard(p, s, orientation, {
+                await navigator.share({ title: 'Raid Relic · Ring ' + s.ringIndex, url });
+              } catch {
+                if (own === generation) {
+                  menu.hidden = false;
+                  menu.focus();
+                }
+              }
+            } else {
+              menu.hidden = false;
+              menu.focus();
+            }
+          };
+          menu.onchange = () => {
+            download.textContent =
+              menu.value === 'copy'
+                ? 'Copy stop link · Ring ' + s.ringIndex
+                : 'Download ' + menu.value + ' card · Ring ' + s.ringIndex;
+          };
+          download.onclick = async () => {
+            if (busy || own !== generation) return;
+            busy = true;
+            for (const button of content.querySelectorAll('.keeper-arrival button'))
+              button.disabled = true;
+            status.textContent = 'Checking the current record and preparing PNG…';
+            try {
+              if (menu.value === 'copy') {
+                await navigator.clipboard.writeText(
+                  new URL('/stops/' + s.stopId, location.origin).href,
+                );
+                if (own === generation)
+                  status.textContent = 'Stop link copied. It reads the current public record.';
+              } else {
+                await downloadKeeperCard(p, s, menu.value, {
                   signal: active.signal,
                   current: () => own === generation,
                 });
-                status.textContent = 'Card downloaded. Saved files cannot be recalled.';
-              } catch {
+                if (own === generation)
+                  status.textContent = 'Card downloaded. Saved files cannot be recalled.';
+              }
+            } catch {
+              if (own === generation)
                 status.textContent =
                   'Card unavailable. Refresh; removed or changed records cannot be exported.';
-              } finally {
-                busy = false;
+            } finally {
+              busy = false;
+              if (own === generation)
                 for (const button of content.querySelectorAll('.keeper-arrival button'))
                   button.disabled = false;
-              }
-            };
-            article.append(b);
-          }
-          content.append(article);
+            }
+          };
+          actions.append(share, menu, download);
+          article.append(actions);
+          (index < 3 ? content : moreBody).append(article);
         }
+        if (p.received.length > 3) content.append(more);
+        // Sequential bounded raster work; retained URLs are revoked on refresh/leave.
+        let previewBusy = false;
+        const paintPreviews = async () => {
+          if (previewBusy) return;
+          previewBusy = true;
+          try {
+            for (const job of previews) {
+              if (own !== generation || active.signal.aborted) break;
+              if (job.done || (job.deferred && !more.open)) continue;
+              job.done = true;
+              try {
+                const blob = await keeperCardThumbnail(p, job.stop, v.mode);
+                if (own !== generation || active.signal.aborted) break;
+                if (previewBytes + blob.size > 524288) break;
+                const url = URL.createObjectURL(blob);
+                previewURLs.add(url);
+                previewBytes += blob.size;
+                job.thumbnail.src = url;
+                job.thumbnail.hidden = false;
+              } catch {
+                /* Retain the truthful textual stop; never substitute a mock image. */
+              }
+            }
+          } finally {
+            previewBusy = false;
+          }
+        };
+        more.ontoggle = () => {
+          if (more.open) void paintPreviews();
+        };
+        void paintPreviews();
       }
       status.textContent =
         'Current retained record. Presence and audience are not proof of new or retained viewers.';
     } catch {
       if (own === generation) {
+        active.abort();
+        clearPreviews();
         content.replaceChildren();
         status.textContent =
           'Keeper record unavailable. Previous content was cleared; refresh to try again.';
@@ -237,6 +349,7 @@ if (root) {
   addEventListener('pagehide', () => {
     generation++;
     controller?.abort();
+    clearPreviews();
     content.replaceChildren();
   });
   refresh();

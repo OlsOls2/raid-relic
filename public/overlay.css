@@ -1057,3 +1057,367 @@ body:not(.corner) #handoff:empty {
   height: 36.3%;
   width: auto;
 }
+
+/* Group 3: OBS logical-FHD card. Full retains the historical composition. */
+body.layout-card {
+  display: block;
+  color: #e3e8ef;
+}
+body.layout-card .relic-overlay {
+  position: fixed;
+  width: 560px;
+  height: 180px;
+  padding: 20px;
+  background: rgba(16, 29, 48, 0.86);
+  border: 1px solid #dba95c55;
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+  filter: none;
+  transform: scale(var(--overlay-scale, 1));
+  text-align: left;
+}
+body.layout-card .archive {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  width: 140px;
+  height: 140px;
+  margin: 0;
+  overflow: hidden;
+}
+body.layout-card .crystal {
+  width: 76%;
+}
+body.layout-card h1 {
+  position: absolute;
+  top: 12px;
+  left: 180px;
+  margin: 0;
+  font:
+    400 36px/1.2 Cinzel,
+    Georgia,
+    serif;
+  letter-spacing: 0;
+}
+body.layout-card #status {
+  position: absolute;
+  top: 60px;
+  left: 180px;
+  width: 358px;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: #e3e8ef;
+  font: 28px/1.16 system-ui;
+  background: #101d30;
+}
+body.layout-card #count {
+  position: absolute;
+  top: 132px;
+  left: 180px;
+  margin: 0;
+  padding: 0;
+  color: #e3e8ef;
+  background: #101d30;
+  font: 24px/1.2 system-ui;
+}
+body.layout-card #lineage {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  margin: 0;
+  font: 24px/1.2 system-ui;
+  color: #e3e8ef;
+  background: #101d30;
+}
+body.layout-card
+  :is(
+    .charge-track,
+    #handoff,
+    #waiting-note,
+    #claim-meter,
+    .ring-pips,
+    .compact-state,
+    .p31-source,
+    .echo-note
+  ) {
+  display: none;
+}
+body.layout-card .simulator {
+  position: absolute;
+  left: 20px;
+  bottom: 2px;
+  margin: 0;
+  padding: 0;
+  background: #101d30;
+  border: 0;
+  color: #e3e8ef;
+  font-size: 12px;
+}
+body.layout-card #sound-toggle {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  z-index: 9;
+}
+body :is(.edition-label, .edition-badge),
+.growth-fallback[data-total='0'] {
+  display: none !important;
+}
+body.layout-card .archive .growth-fallback {
+  width: 32px;
+  height: 24px;
+  top: auto;
+  left: auto;
+  right: 0;
+  bottom: 0;
+  transform: none;
+}
+body.layout-card.pos-bl .relic-overlay,
+body.layout-card.pos-tl .relic-overlay {
+  left: var(--overlay-safe);
+  transform-origin: left bottom;
+}
+body.layout-card.pos-br .relic-overlay,
+body.layout-card.pos-tr .relic-overlay {
+  right: var(--overlay-safe);
+  transform-origin: right bottom;
+}
+body.layout-card.pos-bl .relic-overlay,
+body.layout-card.pos-br .relic-overlay {
+  bottom: var(--overlay-safe);
+}
+body.layout-card.pos-tl .relic-overlay,
+body.layout-card.pos-tr .relic-overlay {
+  top: var(--overlay-safe);
+  transform-origin: left top;
+}
+body.layout-card.pos-tr .relic-overlay {
+  transform-origin: right top;
+}
+/* Explicit full/corner scale is consumed; the legacy footprint remains default. */
+body:is(.layout-full, .layout-corner) .relic-overlay {
+  scale: var(--overlay-requested-scale, 1);
+  transform-origin: top left;
+}
+body.layout-full[data-full-position].pos-bl .relic-overlay,
+body.layout-full[data-full-position].pos-tl .relic-overlay {
+  justify-self: start;
+}
+body.layout-full[data-full-position].pos-br .relic-overlay,
+body.layout-full[data-full-position].pos-tr .relic-overlay {
+  justify-self: end;
+}
+body.layout-full[data-full-position].pos-tl .relic-overlay,
+body.layout-full[data-full-position].pos-tr .relic-overlay {
+  align-self: start;
+}
+body.layout-full[data-full-position].pos-bl .relic-overlay,
+body.layout-full[data-full-position].pos-br .relic-overlay {
+  align-self: end;
+}
+#arrival-panel[hidden],
+#command-coach[hidden] {
+  display: none;
+}
+body.layout-card.arrival-takeover .relic-overlay {
+  position: fixed;
+  width: 900px;
+  height: 300px;
+  left: 50%;
+  right: auto;
+  bottom: var(--overlay-safe);
+  top: auto;
+  padding: 20px;
+  transform: translateX(-50%) scale(var(--overlay-scale, 1));
+  scale: 1;
+  transform-origin: center bottom;
+  background: rgba(16, 29, 48, 0.86);
+  border: 1px solid #dba95c55;
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+  filter: none;
+}
+body.layout-card.arrival-takeover .archive {
+  position: absolute;
+  top: 80px;
+  left: 20px;
+  width: 140px;
+  height: 140px;
+  margin: 0;
+  overflow: hidden;
+}
+body.layout-card.arrival-takeover
+  :is(
+    h1,
+    #status,
+    #count,
+    #lineage,
+    #handoff,
+    #claim-meter,
+    #waiting-note,
+    .compact-state,
+    .charge-track,
+    .ring-pips,
+    .p31-source
+  ) {
+  display: none;
+}
+#arrival-panel {
+  color: #e3e8ef;
+}
+#arrival-title {
+  position: absolute;
+  top: 20px;
+  left: 180px;
+  margin: 0;
+  font:
+    44px/1.2 Cinzel,
+    Georgia,
+    serif;
+}
+#arrival-countdown {
+  position: absolute;
+  top: 80px;
+  left: 180px;
+  font: 72px/1.1 system-ui;
+  font-variant-numeric: tabular-nums;
+}
+#arrival-action {
+  position: absolute;
+  top: 102px;
+  left: 360px;
+  margin: 0;
+  max-width: none;
+  font: 32px/1.2 system-ui;
+}
+#arrival-counts {
+  position: absolute;
+  top: 176px;
+  left: 180px;
+  margin: 0;
+  font: 28px/1.2 system-ui;
+}
+#arrival-progress {
+  position: absolute;
+  height: 28px;
+  left: 180px;
+  bottom: 22px;
+  width: 680px;
+  accent-color: #dba95c;
+}
+#command-coach {
+  position: absolute;
+  bottom: 2px;
+  right: 20px;
+  margin: 0;
+  font: 24px/1.2 system-ui;
+  color: #e3e8ef;
+  background: #101d30;
+}
+body.coach-visible.layout-card #count {
+  visibility: hidden;
+}
+body.layout-card.ring-forged .archive {
+  animation: obs-ring-forged 600ms ease-out;
+}
+@keyframes obs-ring-forged {
+  50% {
+    filter: drop-shadow(0 0 12px #dba95c);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.layout-card.ring-forged .archive {
+    animation: none;
+  }
+}
+body.layout-card #status {
+  overflow-wrap: anywhere;
+}
+body.layout-corner .relic-overlay {
+  position: fixed;
+  scale: var(--corner-scale, 1);
+}
+body.layout-corner.pos-bl .relic-overlay,
+body.layout-corner.pos-tl .relic-overlay {
+  left: var(--corner-safe);
+  transform-origin: left bottom;
+}
+body.layout-corner.pos-br .relic-overlay,
+body.layout-corner.pos-tr .relic-overlay {
+  right: var(--corner-safe);
+  transform-origin: right bottom;
+}
+body.layout-corner.pos-bl .relic-overlay,
+body.layout-corner.pos-br .relic-overlay {
+  bottom: var(--corner-safe);
+}
+body.layout-corner.pos-tl .relic-overlay,
+body.layout-corner.pos-tr .relic-overlay {
+  top: var(--corner-safe);
+  transform-origin: left top;
+}
+body.layout-corner.pos-tr .relic-overlay {
+  transform-origin: right top;
+}
+body.layout-card.arrival-takeover .relic-overlay {
+  left: 50%;
+  right: auto;
+  top: auto;
+  bottom: var(--overlay-safe);
+  transform-origin: center bottom;
+}
+
+body.layout-card.arrival-takeover #simulator {
+  top: 4px;
+  right: 16px;
+  bottom: auto;
+  left: auto;
+  width: auto;
+  height: auto;
+  font: 12px/1.4 system-ui;
+  background: #101d30;
+}
+body.layout-card .crystal {
+  width: 76%;
+  height: 100%;
+  object-fit: contain;
+}
+body.layout-card.ring-forged .archive::after {
+  content: '';
+  position: absolute;
+  inset: 14%;
+  border: 2px solid #dba95c;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: obs-forged-ring 600ms ease-out both;
+}
+@keyframes obs-forged-ring {
+  from {
+    transform: scale(0.7);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.layout-card.ring-forged .archive::after {
+    display: none;
+  }
+}
+/* Full defaults inherit the historical unpadded body and centred responsive archive. */
+body.layout-full[data-full-position].pos-bl .relic-overlay {
+  transform-origin: left bottom;
+}
+body.layout-full[data-full-position].pos-br .relic-overlay {
+  transform-origin: right bottom;
+}
+body.layout-full[data-full-position].pos-tl .relic-overlay {
+  transform-origin: left top;
+}
+body.layout-full[data-full-position].pos-tr .relic-overlay {
+  transform-origin: right top;
+}

@@ -17,6 +17,7 @@ const staticPaths = new Set([
   '/edition-view.js',
   '/edition-crystal/season-one-autumn-2026.svg',
   '/ring-card.js',
+  '/streak-view.js',
   '/keeper-network.js',
   '/vendor/three.module.js',
   '/vendor/three.core.js',

@@ -241,6 +241,11 @@ try {
   });
   stage = 'atlas-legacy-and-filenames';
   await page.goto(origin + '/atlas/');
+  // Mobile intentionally folds the ledger; open its real native disclosure
+  // before inspecting badge history. The map remains the recorded projection.
+  if (!(await page.locator('#ledger-details').evaluate((n) => n.open)))
+    await page.locator('#ledger-details > summary').click();
+  assert.equal(await page.locator('#ledger-details').evaluate((n) => n.open), true);
   await page.locator('#map-stops .map-stop-select').nth(2).waitFor();
   const legacy = page.locator('.score-badge[data-badge="Chain of 3"]').first();
   await legacy.locator('summary').click();

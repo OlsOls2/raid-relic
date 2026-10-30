@@ -1,6 +1,8 @@
 // Local signed/mock OAuth only. Never follows a real login or control URL.
 import assert from 'node:assert/strict';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile, open } from 'node:fs/promises';
+import { constants } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { visualReview } from '../test-support/visual-review.js';
 import { BOT, OTHER, HOME } from '../test-support/pilot-fixture.js';
 import { capturePage } from '../test-support/capture-page.js';
@@ -12,6 +14,237 @@ const checks = [],
   diagnostic = {},
   captures = new Map(),
   captureCoverage = [];
+const axeResults = {
+  status: process.env.FRONTDOOR_AXE === '1' ? 'pending' : 'not-run',
+  version: null,
+  scans: [],
+};
+let axeSource;
+async function scanFrontdoor(page, name) {
+  if (process.env.FRONTDOOR_AXE !== '1') return;
+  stage = 'frontdoor-axe-' + name;
+  if (axeSource === undefined) {
+    // Trusted parent-mounted public tool only; never search the host or fetch an engine.
+    const file = await open('/qa-tools/axe.min.js', constants.O_RDONLY | constants.O_NOFOLLOW);
+    try {
+      const meta = await file.stat();
+      assert.ok(meta.isFile() && meta.size === 652140);
+      const bytes = await file.readFile();
+      assert.equal(bytes.length, 652140);
+      assert.equal(
+        createHash('sha256').update(bytes).digest('hex'),
+        '20c09fe157a8a34a30e241aaa1fcdade657734f08ab379ecfbeb7d45cc46e878',
+      );
+      axeSource = bytes.toString('utf8');
+    } finally {
+      await file.close();
+    }
+  }
+  const session = await page.context().newCDPSession(page);
+  try {
+    const injected = await session.send('Runtime.evaluate', {
+      expression: axeSource,
+      returnByValue: true,
+    });
+    assert.equal(Boolean(injected.exceptionDetails), false);
+  } finally {
+    await session.detach();
+  }
+  const result = await page.evaluate(async () => {
+    if (globalThis.axe?.version !== '4.14.0')
+      return { version: globalThis.axe?.version ?? 'missing' };
+    const v = await globalThis.axe.run(document); // All default rules; no excludes or disabled checks.
+    const target = (s) =>
+      typeof s === 'string' && s.length <= 160 && !/[<>\u0000-\u001f]/.test(s)
+        ? s
+        : '[bounded selector unavailable]';
+    return {
+      version: globalThis.axe.version,
+      violations: v.violations.length,
+      serious: v.violations.filter((r) => r.impact === 'serious').length,
+      critical: v.violations.filter((r) => r.impact === 'critical').length,
+      passes: v.passes.length,
+      incomplete: v.incomplete.length,
+      inapplicable: v.inapplicable.length,
+      rules: v.violations.slice(0, 8).map((r) => ({
+        id: /^[a-z0-9-]{1,80}$/.test(r.id) ? r.id : 'other',
+        impact: ['minor', 'moderate', 'serious', 'critical'].includes(r.impact)
+          ? r.impact
+          : 'unknown',
+        nodeCount: r.nodes.length,
+        targets: r.nodes.slice(0, 2).map((n) => n.target.slice(0, 2).map(target)),
+      })),
+      ruleDetailsTruncated: v.violations.length > 8,
+    };
+  });
+  assert.equal(result.version, '4.14.0');
+  axeResults.version = result.version;
+  axeResults.scans.push({ name, ...result });
+  axeResults.status = result.serious || result.critical ? 'failed' : 'running';
+  assert.equal(result.serious, 0);
+  assert.equal(result.critical, 0);
+}
+async function captureFrontdoor(page, viewport) {
+  if (process.env.FRONTDOOR_CAPTURE !== '1') return;
+  stage = 'frontdoor-capture-' + viewport.width;
+  await page.evaluate(() => scrollTo({ top: 0, left: 0, behavior: 'instant' }));
+  await page.waitForFunction(() => scrollX === 0 && scrollY === 0);
+  await page.evaluate(() => document.fonts.ready);
+  await page.waitForFunction(() => {
+    const root = document.querySelector('#atlas-relic'),
+      image = root?.querySelector(':scope > img');
+    const canvas = root?.querySelector('canvas.relic3d');
+    return (
+      image?.complete &&
+      image.naturalWidth > 0 &&
+      (matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? Number(getComputedStyle(image).opacity) === 1
+        : canvas &&
+          Number(canvas.dataset.frames) > 0 &&
+          Number(getComputedStyle(canvas).opacity) === 1 &&
+          Number(getComputedStyle(image).opacity) === 0)
+    );
+  });
+  const read = () =>
+    page.evaluate(() => {
+      const r = document.querySelector('#atlas-relic').getBoundingClientRect();
+      return {
+        width: innerWidth,
+        height: innerHeight,
+        scrollX,
+        scrollY,
+        heroX: r.x,
+        heroY: r.y,
+        heroWidth: r.width,
+        heroHeight: r.height,
+      };
+    });
+  const before = await read();
+  assert.equal(before.width, viewport.width);
+  assert.equal(before.height, viewport.height);
+  const names =
+    viewport.width === 1920
+      ? [
+          ['frontdoor-desktop-top', { x: 0, y: 0, width: 1920, height: 540 }],
+          ['frontdoor-desktop-bottom', { x: 0, y: 540, width: 1920, height: 540 }],
+        ]
+      : [['frontdoor-mobile', null]];
+  for (const [name, clip] of names) {
+    assert.ok(captures.size < 6 && !captures.has(name));
+    const width = clip?.width ?? viewport.width,
+      height = clip?.height ?? viewport.height;
+    assert.ok(width * height * 4 <= 4 * 1024 * 1024);
+    const bytes = await page.screenshot({ fullPage: false, ...(clip ? { clip } : {}) });
+    assert.ok(bytes.length <= 524288);
+    assert.deepEqual([...bytes.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+    assert.equal(bytes.readUInt32BE(16), width);
+    assert.equal(bytes.readUInt32BE(20), height);
+    assert.ok(
+      [...captures.values()].reduce((n, b) => n + b.length, bytes.length) <= 4 * 1024 * 1024,
+    );
+    assert.deepEqual(page.viewportSize(), viewport);
+    assert.deepEqual(await read(), before);
+    captures.set(name, bytes);
+    captureCoverage.push({
+      name,
+      viewportWidth: viewport.width,
+      viewportHeight: viewport.height,
+      clipX: clip?.x ?? 0,
+      clipY: clip?.y ?? 0,
+      width,
+      height,
+      bytes: bytes.length,
+    });
+  }
+}
+
+// Optional evidence of this actual authenticated mock DOM, never a dispatch.
+async function captureControl(page) {
+  if (process.env.CONTROL_CAPTURE !== '1') return;
+  const savedViewport = page.viewportSize();
+  const steps = {
+    'connect-step': 'Connect',
+    'setup-step': 'Set up channel',
+    'overlay-step': 'Add overlay',
+    'send-step': 'Send Off',
+  };
+  const saved = await page.evaluate(() => ({
+    step: [...document.querySelectorAll('#first-run > details')].find((n) => n.open)?.id,
+    advanced: document.querySelector('#control-advanced').open,
+    x: scrollX,
+    y: scrollY,
+  }));
+  assert.ok(Object.hasOwn(steps, saved.step));
+  try {
+    if (saved.advanced) await page.locator('#control-advanced > summary').click();
+    await page.getByRole('link', { name: 'Send Off', exact: true }).click();
+    for (const viewport of [
+      { width: 1280, height: 900 },
+      { width: 390, height: 844 },
+    ]) {
+      stage = 'control-capture-' + viewport.width;
+      await page.setViewportSize(viewport);
+      await page.waitForFunction(
+        () =>
+          !document.querySelector('#refresh').disabled &&
+          document.querySelector('#first-session').dataset.state === 'ready' &&
+          document.querySelector('#send-step').open,
+      );
+      await page.evaluate(() => document.fonts.ready);
+      await page.evaluate(() => scrollTo({ top: 0, left: 0, behavior: 'instant' }));
+      await page.waitForFunction(() => scrollX === 0 && scrollY === 0);
+      const read = () =>
+        page.evaluate(() => ({ width: innerWidth, height: innerHeight, x: scrollX, y: scrollY }));
+      const before = await read();
+      assert.deepEqual(before, { width: viewport.width, height: viewport.height, x: 0, y: 0 });
+      assert.equal(await page.locator('#first-run > details > summary').count(), 4);
+      assert.equal(await page.locator('#send-result').isVisible(), true);
+      const clips =
+        viewport.width === 1280
+          ? [
+              ['control-desktop-top', { x: 0, y: 0, width: 1280, height: 450 }],
+              ['control-desktop-bottom', { x: 0, y: 450, width: 1280, height: 450 }],
+            ]
+          : [['control-mobile', null]];
+      for (const [name, clip] of clips) {
+        assert.ok(captures.size < 6 && !captures.has(name));
+        const width = clip?.width ?? viewport.width,
+          height = clip?.height ?? viewport.height;
+        assert.ok(width * height * 4 <= 4 * 1024 * 1024);
+        const bytes = await page.screenshot({ fullPage: false, ...(clip ? { clip } : {}) });
+        assert.ok(bytes.length <= 524288);
+        assert.deepEqual([...bytes.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+        assert.equal(bytes.readUInt32BE(16), width);
+        assert.equal(bytes.readUInt32BE(20), height);
+        assert.ok(
+          [...captures.values()].reduce((n, b) => n + b.length, bytes.length) <= 4 * 1024 * 1024,
+        );
+        assert.deepEqual(page.viewportSize(), viewport);
+        assert.deepEqual(await read(), before);
+        captures.set(name, bytes);
+        captureCoverage.push({
+          name,
+          viewportWidth: viewport.width,
+          viewportHeight: viewport.height,
+          clipX: clip?.x ?? 0,
+          clipY: clip?.y ?? 0,
+          width,
+          height,
+          bytes: bytes.length,
+        });
+      }
+    }
+  } finally {
+    await page.setViewportSize(savedViewport);
+    await page.getByRole('link', { name: steps[saved.step], exact: true }).click();
+    if (saved.advanced) await page.locator('#control-advanced > summary').click();
+    await page.evaluate(({ x, y }) => scrollTo({ left: x, top: y, behavior: 'instant' }), saved);
+    assert.deepEqual(page.viewportSize(), savedViewport);
+    assert.equal(await page.locator('#' + saved.step).evaluate((n) => n.open), true);
+    assert.equal(await page.locator('#control-advanced').evaluate((n) => n.open), saved.advanced);
+  }
+}
+
 try {
   review = await visualReview({ seekers: true });
   const { page, context, fixture: f, origin } = review;
@@ -28,17 +261,95 @@ try {
       },
     });
   });
-  await page.clock.install();
+  stage = 'frontdoor-layout';
+  for (const viewport of [
+    { width: 1920, height: 1080 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto(origin + '/');
+    await page.evaluate(() => document.fonts.ready);
+    await page.getByRole('heading', { name: 'Raids that leave a story.', exact: true }).waitFor();
+    await page.waitForFunction(
+      () => document.querySelector('#ledger-details').open === innerWidth >= 600,
+    );
+    const proof = await page.evaluate(() => {
+      const rect = (selector) => {
+        const b = document.querySelector(selector).getBoundingClientRect();
+        return { top: b.top, bottom: b.bottom, width: b.width, height: b.height };
+      };
+      return {
+        primary: rect('.hero-actions .primary-cta'),
+        secondary: rect('.hero-actions .secondary-cta'),
+        hero: rect('#atlas-relic'),
+        sticky: rect('.mobile-cta'),
+        scrollWidth: document.documentElement.scrollWidth,
+        viewport: innerWidth,
+        height: document.documentElement.scrollHeight,
+        ledgerOpen: document.querySelector('#ledger-details').open,
+        font: getComputedStyle(document.querySelector('h1')).fontFamily,
+        bodyFont: parseFloat(getComputedStyle(document.body).fontSize),
+        verification: document.querySelectorAll('#how-we-verify').length,
+        isoVisible: /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(document.body.innerText),
+      };
+    });
+    diagnostic.frontdoorWidth = viewport.width;
+    diagnostic.frontdoorHeight = proof.height;
+    diagnostic.primaryBottom = Math.ceil(proof.primary.bottom);
+    assert.ok(proof.primary.top >= 0 && proof.primary.bottom <= viewport.height);
+    assert.ok(proof.scrollWidth <= proof.viewport);
+    assert.match(proof.font, /Cinzel/);
+    assert.ok(proof.bodyFont >= 15);
+    assert.equal(proof.verification, 1);
+    assert.equal(proof.isoVisible, false);
+    if (viewport.width === 1920) {
+      assert.ok(proof.secondary.bottom <= viewport.height);
+      assert.ok(proof.hero.top >= 0 && proof.hero.bottom <= viewport.height);
+      assert.ok(proof.hero.width >= 440);
+    } else {
+      assert.equal(proof.ledgerOpen, false);
+      assert.ok(proof.height <= 4500);
+      assert.ok(proof.hero.width >= viewport.width * 0.6);
+      assert.equal(proof.sticky.height, 56);
+      assert.equal(proof.sticky.bottom, viewport.height);
+    }
+    assert.equal(
+      await page.locator('.hero-actions .primary-cta').getAttribute('href'),
+      '/demo/judge',
+    );
+    assert.equal(await page.locator('.hero-actions .secondary-cta').getAttribute('href'), '/start');
+    await scanFrontdoor(page, viewport.width === 1920 ? 'landing-desktop' : 'landing-mobile');
+    await captureFrontdoor(page, viewport);
+    await page.keyboard.press('Tab');
+    assert.ok(
+      await page.evaluate(() => {
+        const n = document.activeElement,
+          s = getComputedStyle(n);
+        return n !== document.body && s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) >= 2;
+      }),
+    );
+  }
+  assert.equal(f.calls.length, 0);
+  checks.push({
+    name: 'Front door actual1920/390 rectangles: above-fold actions/relic, mobile56px safe-area bar, collapsed ledger, bounded height, named navigation and no visible ISO',
+    passed: true,
+  });
   stage = 'public-guide';
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(origin + '/start');
   assert.equal(f.calls.length, 0);
-  await page.locator('#start-channel').selectOption(OTHER);
+  assert.equal(await page.locator('select').count(), 0);
+  assert.match(await page.locator('h1').evaluate((n) => getComputedStyle(n).fontFamily), /Cinzel/);
+  await page.evaluate(() => document.fonts.ready);
+  await scanFrontdoor(page, 'start-default');
+  await page.locator('#start-channel').fill('olsols2');
   const canonical = 'https://raid-relic-760724762396.us-central1.run.app';
   assert.equal(
     await page.locator('#start-connect').getAttribute('href'),
     canonical + '/oauth/keeper/' + OTHER + '/start',
   );
   assert.match(await page.locator('#start-status').innerText(), /not verified ready/);
+  await scanFrontdoor(page, 'start-configured');
   assert.deepEqual(await page.evaluate(() => window.__onboardCopies), []);
   await page.locator('#start-copy').click();
   assert.match(
@@ -52,9 +363,17 @@ try {
   await page.locator('#start-copy').click();
   assert.match(await page.locator('#start-copy-status').innerText(), /Copy failed/);
   assert.equal(await page.locator('#start-confirm').isChecked(), false);
-  await page.locator('#start-channel').selectOption('unconfigured');
+  await page.locator('#start-channel').fill('not_admitted_dummy');
   assert.equal(await page.locator('#start-connect').getAttribute('href'), null);
   assert.equal(await page.locator('#start-copy').isDisabled(), true);
+  assert.match(await page.locator('#start-status').innerText(), /not admitted yet/);
+  await scanFrontdoor(page, 'start-invitation');
+  if (process.env.FRONTDOOR_AXE === '1') {
+    assert.equal(axeResults.scans.length, 5);
+    axeResults.status = 'complete';
+  }
+  // Private-control stale-tick assertions retain their virtual-clock contract.
+  await page.clock.install();
   for (const width of [320, 390, 1280]) {
     await page.setViewportSize({ width, height: 844 });
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
@@ -75,6 +394,14 @@ try {
   assert.equal((await f.control(HOME, 'keep')).status, 200);
   assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, HOME);
   const baselineSubscriptions = f.subscriptions.length;
+  let controlReads = 0;
+  page.on('request', (request) => {
+    if (
+      request.method() === 'GET' &&
+      /^\/control\/\d+\/status$/.test(new URL(request.url()).pathname)
+    )
+      controlReads++;
+  });
   stage = 'holder-cannot-join';
   const [holderCookieName, holderCookieValue] = f.cookies[HOME].split('=');
   await context.addCookies([
@@ -89,7 +416,8 @@ try {
   ]);
   await page.goto(origin + '/control/' + HOME);
   await page.waitForFunction(() => !document.querySelector('#refresh').disabled);
-  await page.locator('#first-run > summary').click();
+  await page.getByRole('link', { name: 'Set up channel', exact: true }).click();
+  await page.locator('#control-advanced > summary').click();
   assert.match(await page.locator('#first-queue').innerText(), /You hold the relic/);
   assert.equal(await page.locator('#first-seek').isDisabled(), true);
   assert.notEqual((await f.runtime.state.getStreamStatus(HOME)).seeking, true);
@@ -105,11 +433,22 @@ try {
   ]);
   await page.goto(origin + '/control/' + OTHER);
   await page.waitForFunction(() => !document.querySelector('#refresh').disabled);
-  await page.locator('#first-run > summary').click();
+  await page.getByRole('link', { name: 'Set up channel', exact: true }).click();
   assert.equal(await page.locator('#first-optin').getAttribute('data-state'), 'unknown');
   assert.equal(await page.locator('#first-subscriptions').getAttribute('data-state'), 'unknown');
   assert.equal(await page.locator('#first-obs-confirm').isChecked(), false);
   assert.equal(f.subscriptions.length, baselineSubscriptions);
+  const pendingReadCount = controlReads,
+    callsBeforePending = f.calls.length;
+  const pendingPoll = page.waitForResponse(
+    (r) =>
+      new URL(r.url()).pathname === `/control/${OTHER}/status` && r.request().method() === 'GET',
+  );
+  await page.clock.runFor(5001);
+  await pendingPoll;
+  await page.waitForFunction(() => !document.querySelector('#refresh').disabled);
+  assert.equal(controlReads, pendingReadCount + 1);
+  assert.equal(f.calls.length, callsBeforePending, 'Pending GET cannot call the provider');
   async function action(id) {
     const [response] = await Promise.all([
       page.waitForResponse(
@@ -134,6 +473,7 @@ try {
     () => document.querySelector('#first-optin').dataset.state === 'ready',
   );
   assert.notEqual((await f.runtime.state.getStreamStatus(OTHER)).seeking, true);
+  await page.getByRole('link', { name: 'Add overlay', exact: true }).click();
   await page.locator('#first-obs-copy').click();
   assert.match(await page.locator('#first-copy-status').innerText(), /URL copied/);
   assert.equal(await page.locator('#first-obs').getAttribute('data-state'), 'unknown');
@@ -142,6 +482,7 @@ try {
   stage = 'explicit-seeker';
   assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, HOME);
   assert.equal(await page.locator('#first-seek').isDisabled(), false);
+  await page.locator('#control-advanced > summary').click();
   await action('first-seek');
   await page.waitForFunction(() =>
     document.querySelector('#first-queue').textContent.startsWith('Explicit Seeker'),
@@ -150,6 +491,44 @@ try {
   stage = 'checklist-width';
   for (const width of [320, 390, 1280]) {
     await page.setViewportSize({ width, height: 844 });
+    const wizardGeometry = await page.locator('.wizard-steps > li').evaluateAll((items) => {
+      const rows = items.map((n) => {
+        const box = n.getBoundingClientRect(),
+          link = n.querySelector('a').getBoundingClientRect();
+        return {
+          x: box.x,
+          y: box.y,
+          right: box.right,
+          bottom: box.bottom,
+          containsLink: link.left >= box.left && link.right <= box.right,
+          markerInside: getComputedStyle(n).listStylePosition === 'inside',
+        };
+      });
+      let overlaps = 0;
+      for (let i = 0; i < rows.length; i++)
+        for (let j = i + 1; j < rows.length; j++) {
+          const a = rows[i],
+            b = rows[j];
+          if (
+            Math.min(a.right, b.right) > Math.max(a.x, b.x) &&
+            Math.min(a.bottom, b.bottom) > Math.max(a.y, b.y)
+          )
+            overlaps++;
+        }
+      return {
+        count: rows.length,
+        containsLinks: rows.every((r) => r.containsLink),
+        markersInside: rows.every((r) => r.markerInside),
+        overlaps,
+      };
+    });
+    diagnostic.wizardGeometry = { width, ...wizardGeometry };
+    assert.deepEqual(wizardGeometry, {
+      count: 4,
+      containsLinks: true,
+      markersInside: true,
+      overlaps: 0,
+    });
     Object.assign(
       diagnostic,
       await page.evaluate(() => {
@@ -234,6 +613,32 @@ try {
     name: 'Fresh own account explicitly sets up five subscriptions, opts in, copies/acknowledges OBS and chooses Seeker without a raid',
     passed: true,
   });
+  await scanFrontdoor(page, 'control-ready');
+  if (process.env.FRONTDOOR_AXE === '1') {
+    assert.equal(axeResults.scans.length, 6);
+    axeResults.status = 'complete';
+  }
+  await captureControl(page);
+  stage = 'control-local-preview';
+  await page.getByRole('link', { name: 'Add overlay', exact: true }).click();
+  const beforePreview = await f.runtime.state.getKeeperRegistry(),
+    callsBeforePreview = f.calls.length;
+  let previewSockets = 0;
+  page.on('websocket', () => previewSockets++);
+  await page
+    .getByRole('button', { name: '▶ Play test arrival on my overlay', exact: true })
+    .click();
+  const child = page.frameLocator('#local-overlay-preview');
+  await child.locator('body[data-local-preview-ready="true"]').waitFor();
+  await child.locator('#simulator').filter({ hasText: 'LOCAL TEST' }).waitFor();
+  assert.equal(await child.locator('body').getAttribute('data-connection'), 'local-test');
+  assert.equal(previewSockets, 0);
+  assert.equal(f.calls.length, callsBeforePreview);
+  assert.deepEqual(await f.runtime.state.getKeeperRegistry(), beforePreview);
+  checks.push({
+    name: 'Own control embeds only a ready LOCAL TEST preview; no provider/game mutation or live read socket',
+    passed: true,
+  });
   stage = 'boundaries';
   assert.equal(
     (await f.request('/control/' + HOME + '/status', 'GET', { cookie: f.cookies[OTHER] })).status,
@@ -252,11 +657,30 @@ try {
     403,
   );
   assert.ok(f.calls.every((c) => !c.url.endsWith('/raids') && !c.url.endsWith('/chat/messages')));
-  const before = f.calls.length;
+  // Anchor this cadence check to an actual completed own GET, independent of optional axe/capture duration.
+  const cadenceRead = page.waitForResponse(
+    (r) =>
+      new URL(r.url()).pathname === `/control/${OTHER}/status` && r.request().method() === 'GET',
+  );
+  await page.getByRole('button', { name: 'Refresh status', exact: true }).click();
+  await cadenceRead;
+  await page.waitForFunction(() => !document.querySelector('#refresh').disabled);
+  const before = f.calls.length,
+    idleReadCount = controlReads;
   await page.clock.runFor(11000);
-  assert.equal(await page.locator('#first-optin').getAttribute('data-state'), 'unknown');
-  assert.match(await page.locator('#first-freshness').innerText(), /Not freshly verified/);
+  assert.equal(controlReads, idleReadCount, 'Known idle wizard uses30s, not5s polling');
+  assert.equal(await page.locator('#first-optin').getAttribute('data-state'), 'ready');
+  assert.match(await page.locator('#first-freshness').innerText(), /Status read \d+ s ago/);
   assert.equal(f.calls.length, before);
+  const idlePoll = page.waitForResponse(
+    (r) =>
+      new URL(r.url()).pathname === `/control/${OTHER}/status` && r.request().method() === 'GET',
+  );
+  await page.clock.runFor(19001);
+  await idlePoll;
+  await page.waitForFunction(() => !document.querySelector('#refresh').disabled);
+  assert.equal(controlReads, idleReadCount + 1);
+  assert.equal(f.calls.length, before, 'Idle GET cannot rotate grants or reconcile');
   f.advance(12 * 3600000 + 1);
   await page.locator('#refresh').click();
   await page.waitForFunction(() =>
@@ -266,7 +690,7 @@ try {
   assert.equal(await page.locator('#first-keep').isDisabled(), true);
   assert.deepEqual(review.stats(), { errors: 0, external: 0 });
   checks.push({
-    name: 'Own-room/origin/CSRF boundaries, ten-second stale ticks and expired session fail closed without polling or game effects',
+    name: 'Own-room/origin/CSRF boundaries, observed ticks survive ten seconds; read-only polling and expired session still fail closed without game effects',
     passed: true,
   });
   for (const b of captures.values()) assert.ok(b.length <= 524288);
@@ -291,6 +715,7 @@ try {
     checks,
     diagnostic,
     captureCoverage,
+    axeResults,
   });
   assert.ok(Buffer.byteLength(report) <= 65536);
   await writeFile('artifacts/onboarding-browser-results.json', report + '\n');

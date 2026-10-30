@@ -1,3 +1,4 @@
+import { publicDate } from './streak-view.js';
 import { keeperNames } from './keeper-network.js';
 import { selectEdition, FAN_DISCLAIMER } from './editions.js';
 export const CARD_WIDTH = 1200,
@@ -50,13 +51,7 @@ export function ringCardModel(value, options = {}) {
           share: shareCardModel(options.share, { keeper, ringIndex, stopId, claimedAt, demo, now }),
         }),
     dateCaption:
-      claimedAt === null
-        ? 'Completion time unavailable'
-        : new Date(claimedAt).toLocaleString('en-GB', {
-            timeZone: 'UTC',
-            dateStyle: 'medium',
-            timeStyle: 'short',
-          }) + ' UTC',
+      claimedAt === null ? 'Completion time unavailable' : publicDate(claimedAt, now, false),
     caption: demo
       ? 'SIMULATED DEMO—no Twitch connection'
       : mode === 'simulator'

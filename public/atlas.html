@@ -17,7 +17,11 @@
     <a class="skip-link" href="#main-content">Skip to main content</a
     ><a class="skip-link" href="#mark-history">Skip to mark text search</a>
     <header>
-      <a class="brand" href="/atlas/">Raid Relic</a><span>A community rune archive</span>
+      <a class="brand" href="/">Raid Relic</a>
+      <nav class="public-nav" aria-label="Public navigation">
+        <a href="/demo/judge">Watch demo</a><a href="/atlas/">Atlas</a
+        ><a href="/start">Add to my stream</a>
+      </nav>
     </header>
     <main id="main-content" tabindex="-1">
       <p id="simulator" hidden></p>
@@ -41,39 +45,51 @@
           </div>
         </figure>
       </div>
+      <details id="how-we-verify">
+        <summary>How we verify</summary>
+        <p>
+          A raid must be verified and both eligible chats must claim it before the relic moves. Chat
+          location is not proof of raid membership. Labelled Wander stops are separate idle
+          transfers without a raid or audience transfer. Only approved engravings are public;
+          forgotten content is cleared from future reads, but saved files cannot be recalled.
+        </p>
+      </details>
       <section id="receiving" aria-labelledby="receiving-title">
         <h2 id="receiving-title">The relic's current Keeper</h2>
         <p id="receiving-status" role="status">Reading the current public record…</p>
         <button id="receiving-refresh" type="button">Refresh spotlight &amp; Seekers</button>
         <div id="receiving-content"></div>
       </section>
-      <section
-        id="keeper-scores"
-        class="keeper-ledger"
-        aria-labelledby="scores-title"
-        aria-busy="true"
-      >
-        <div class="ledger-heading">
-          <h2 id="scores-title">Keeper ledger</h2>
-          <button id="scores-refresh" type="button">Refresh scores</button>
-        </div>
-        <p id="score-preview" role="status" hidden></p>
-        <p class="ledger-coverage">
-          Recorded journeys only; the first hold and past raiders are unknown.
-        </p>
-        <p id="scores-status" role="status" aria-live="polite" class="score-status"></p>
-        <ol id="keeper-rows" class="score-list keeper-leaderboard"></ol>
-        <button id="scores-all" type="button" hidden aria-expanded="false">All Keepers</button>
-        <div class="raider-ledger">
-          <h3>Raiders</h3>
-          <p id="raider-consent">
-            !relic scores on shares your name publicly for future completed claims. !relic scores
-            off to leave; !relic forgetme also erases your entry.
+      <details id="ledger-details" open>
+        <summary>Keeper ledger</summary>
+        <section
+          id="keeper-scores"
+          class="keeper-ledger"
+          aria-labelledby="scores-title"
+          aria-busy="true"
+        >
+          <div class="ledger-heading">
+            <h2 id="scores-title">Keeper ledger</h2>
+            <button id="scores-refresh" type="button">Refresh scores</button>
+          </div>
+          <p id="score-preview" role="status" hidden></p>
+          <p class="ledger-coverage">
+            Recorded journeys only; the first hold and past raiders are unknown.
           </p>
-          <ol id="raider-rows" class="score-list"></ol>
-        </div>
-        <p id="scores-coverage" class="sr-only"></p>
-      </section>
+          <p id="scores-status" role="status" aria-live="polite" class="score-status"></p>
+          <ol id="keeper-rows" class="score-list keeper-leaderboard"></ol>
+          <button id="scores-all" type="button" hidden aria-expanded="false">All Keepers</button>
+          <div class="raider-ledger">
+            <h3>Raiders</h3>
+            <p id="raider-consent">
+              !relic scores on shares your name publicly for future completed claims. !relic scores
+              off to leave; !relic forgetme also erases your entry.
+            </p>
+            <ol id="raider-rows" class="score-list"></ol>
+          </div>
+          <p id="scores-coverage" class="sr-only"></p>
+        </section>
+      </details>
       <section id="journey-map" aria-labelledby="map-title">
         <h2 id="map-title">A constellation of Keepers</h2>
         <p>

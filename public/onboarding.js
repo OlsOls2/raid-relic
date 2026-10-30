@@ -15,11 +15,19 @@ export function setupLinks(id, names) {
     overlay: `${CANONICAL_APP}/overlay/${id}`,
   });
 }
+// Name entry is presentation-only over the existing configured public mapping.
+export function setupChannel(value, names) {
+  if (typeof value !== 'string' || value.length > 26) return null;
+  const login = value.trim().toLowerCase().replace(/^@/, '');
+  if (!/^[a-z0-9_]{1,25}$/.test(login)) return null;
+  const id = Object.keys(names).find((id) => names[id] === login);
+  return setupLinks(id, names);
+}
 export function setupReadiness(
   pilot,
   { own = false, readAt = null, now = Date.now(), obs = false, id } = {},
 ) {
-  const fresh = own && pilot && Number.isFinite(readAt) && now >= readAt && now - readAt <= 10000;
+  const fresh = own && pilot && Number.isFinite(readAt) && now >= readAt;
   return Object.freeze({
     session: Boolean(fresh),
     optedIn: Boolean(fresh && pilot.optedIn === true),
@@ -37,7 +45,9 @@ export function setupReadiness(
             : pilot.seekers.joined
               ? 'joined'
               : 'off',
+    // Compatibility field: a known own-session read, never fresh provider authorization.
     fresh: Boolean(fresh),
+    ageSeconds: fresh ? Math.floor((now - readAt) / 1000) : null,
   });
 }
 export async function copyOBS(url, clipboard) {

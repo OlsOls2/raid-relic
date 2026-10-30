@@ -94,7 +94,8 @@ try {
     });
     const page = await context.newPage();
     stage = 'previous-holder';
-    await page.goto(`${origin}/overlay/${OTHER}`);
+    // Legacy full-composition contract; default-card coverage remains in full-overlay.
+    await page.goto(`${origin}/overlay/${OTHER}?layout=full`);
     await page.bringToFront();
     await page
       .locator('#status')

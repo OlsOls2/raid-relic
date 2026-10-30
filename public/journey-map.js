@@ -1,3 +1,4 @@
+import { publicDate } from './streak-view.js';
 import { downloadStopCard } from './ring-card-client.js';
 import { editionImageURL } from './editions.js';
 import { presentEdition } from './edition-view.js';
@@ -221,7 +222,7 @@ if (typeof document !== 'undefined' && document.querySelector('#journey-map')) {
       caption.textContent =
         value === 0
           ? 'Origin — before first recorded completion'
-          : `${reached} recorded ${reached === 1 ? 'ring' : 'rings'} · ${data.nodes.find((n) => n.id === h.from).label} to ${data.nodes.find((n) => n.id === h.to).label} · ${h.kind === 'wander' ? 'Wandered · no raid or audience transfer' : raiderCount(h.raidSize)} · ${new Date(h.claimedAt).toLocaleString('en-GB', { timeZone: 'UTC', dateStyle: 'medium', timeStyle: 'short' }) + ' UTC'}`;
+          : `${reached} recorded ${reached === 1 ? 'ring' : 'rings'} · ${data.nodes.find((n) => n.id === h.from).label} to ${data.nodes.find((n) => n.id === h.to).label} · ${h.kind === 'wander' ? 'Wandered · no raid or audience transfer' : raiderCount(h.raidSize)} · ${publicDate(h.claimedAt)}`;
     } else caption.textContent = 'No completed journeys yet. No route has been invented.';
     range.setAttribute('aria-valuetext', caption.textContent);
     share.disabled = !h || value === 0;
