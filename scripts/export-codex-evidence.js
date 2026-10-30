@@ -226,13 +226,19 @@ export function transcriptFrom(raw) {
         body.slice(0, MAX_TEXT) +
         `\n[bounded output: ${body.length - MAX_TEXT} characters omitted; sanitized item SHA256 ${sha(body)}]`;
     }
+    // Presentation only, after source-length accounting and sanitized digest:
+    // a bounded slice can end mid-line on whitespace immediately before its marker.
+    body = body.replace(/[ \t]+(?=\r?$)/gm, '');
     entries.push(
       `### ${entries.length + 1}. ${stamp ?? 'timestamp unavailable'} — ${label} (source line ${n + 1})\n\n\`\`\`\`text\n${body.replaceAll('````', '[four-backtick delimiter escaped]')}\n\`\`\`\`\n`,
     );
   }
   if (meta !== 1) throw Error('Exactly one matching session_meta required');
   const header = `# Sanitized Codex transcript\n\nSession: ${SESSION_ID}\n\nSnapshot cutoff: ${lastTimestamp ?? 'unavailable'} (last timestamped record; not a claim that future/active conversation is included).\n\nThis is a readable selected native-JSONL export, NOT a complete raw transcript. User/assistant messages and tool calls/results are retained; duplicate native event records are labelled. Private system/developer/bootstrap instructions, reasoning/analysis, opaque encrypted fields, media/base64 and other internal metadata are omitted. Each item is capped at ${MAX_TEXT} characters with an explicit omission count and sanitized-item digest. No raw-backup links or private credentials are published. Credential-looking literals, headers or sensitive fields cause whole-item content omission, with source line and reason retained; counts are in the manifest. Strong key patterns remain fatal across all selected visible fields, even in otherwise omitted items. Existing synthetic fixture literals are explicitly classified, not proof of real authentication.\n\n`;
-  const markdown = header + entries.join('\n');
+  const markdown =
+    header +
+    'Rendered body lines have trailing spaces/tabs removed; source digests and truncation counts refer to the pre-rendered content.\n\n' +
+    entries.join('\n');
   scan(markdown);
   return {
     markdown,

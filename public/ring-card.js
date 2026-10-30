@@ -152,7 +152,7 @@ export async function ringCardPNG(model) {
       text(model.editionCaption, 510, 447, 16);
       text(model.dateCaption, 510, 472, 15);
       if (model.disclaimer)
-        text('Unofficial fan edition; not endorsed by Twitch/TwitchCon.', 510, 496, 14);
+        text('Unofficial fan project. Not affiliated with Twitch.', 510, 496, 14);
       const route = model.share.route.slice(-6);
       text(
         `Retained journey from ${route[0].from} · ${route.length} of ${model.share.hops} stops shown${model.share.hops > 6 ? ' · earlier stops omitted' : ''}`,
@@ -188,8 +188,8 @@ export async function ringCardPNG(model) {
       text(model.caption, 70, 535, 24, p[3]);
       text(model.editionCaption, 510, 345, 22);
       if (model.disclaimer) {
-        text('Unofficial fan edition; not affiliated with or', 510, 400, 18);
-        text('endorsed by Twitch/TwitchCon.', 510, 426, 18);
+        text('Unofficial fan project.', 510, 400, 18);
+        text('Not affiliated with Twitch.', 510, 426, 18);
       }
       text(model.dateCaption, 510, 470, 18);
       text('Saved downloads cannot be recalled after erasure.', 70, 580, 18);

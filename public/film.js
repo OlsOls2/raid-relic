@@ -145,7 +145,7 @@ async function prepareCard() {
       c.fillText('1 retained fictional hop · @demo_keeper_a', 620, 385, 490);
       c.fillText('→ @demo_keeper_b · current fixture holder', 620, 415, 490);
       c.font = '14px system-ui';
-      c.fillText('Unofficial fan art · not affiliated with Twitch/TwitchCon.', 520, 475, 580);
+      c.fillText('Unofficial fan project. Not affiliated with Twitch.', 520, 475, 580);
       const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
       if (!blob || blob.type !== 'image/png' || blob.size > 524288) throw Error('Card encoding');
       if (!alive) return;

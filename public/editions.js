@@ -1,5 +1,4 @@
-export const FAN_DISCLAIMER =
-  'Unofficial fan edition; not affiliated with or endorsed by Twitch/TwitchCon.';
+export const FAN_DISCLAIMER = 'Unofficial fan project. Not affiliated with Twitch.';
 // Versioned cosmetic configuration only. No game state, network, storage or identity lookup.
 const freeze = (v) => {
   if (v && typeof v === 'object') {
@@ -11,9 +10,9 @@ const freeze = (v) => {
 export const EDITION_CONFIG = freeze([
   {
     version: 1,
-    id: 'twitchcon-2026',
-    name: 'TwitchCon 2026',
-    badgeLabel: 'Carried during TwitchCon 2026 edition',
+    id: 'season-one-autumn-2026',
+    name: 'Season One · Autumn 2026',
+    badgeLabel: 'Carried during Season One Autumn 2026',
     startsAt: '2026-10-23T00:00:00Z',
     endsAt: '2026-12-01T00:00:00Z',
     design: {
@@ -45,7 +44,7 @@ export function validEditions(list) {
       !/^[a-z0-9-]{1,40}$/.test(e.id) ||
       seen.has(e.id) ||
       typeof e.name !== 'string' ||
-      !/^[A-Za-z0-9 -]{1,64}$/.test(e.name)
+      !/^[A-Za-z0-9 ·-]{1,64}$/.test(e.name)
     )
       return false;
     const time = (s) =>

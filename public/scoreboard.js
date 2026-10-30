@@ -12,7 +12,7 @@ const badgeNames = new Set([
   'Ring 5',
   'Ring 10',
   'Chain of 3',
-  'Carried during TwitchCon San Diego 2026',
+  'Event-days badge · 13–15 Nov',
   'Unbroken streak · 3 hand-offs',
 ]);
 export function validScores(v) {
@@ -43,8 +43,8 @@ export function validScores(v) {
       v.coverage.length <= 500 &&
       v.event &&
       Object.keys(v.event).sort().join(',') === 'checked,endsAt,label,source,startsAt' &&
-      v.event.label === 'TwitchCon San Diego 2026' &&
-      v.event.source === 'https://www.twitchcon.com/san-diego-2026/' &&
+      v.event.label === 'Event-days badge · 13–15 Nov' &&
+      v.event.source === 'Retained-hold calendar (UTC)' &&
       v.event.checked === '2026-10-25' &&
       v.event.startsAt === Date.parse('2026-11-13T08:00:00Z') &&
       v.event.endsAt === Date.parse('2026-11-16T08:00:00Z') &&
@@ -99,7 +99,7 @@ export function holdDuration(seconds) {
   }
   return parts.join(' ') || '0s';
 }
-export const EVENT_BADGE = 'Carried during TwitchCon San Diego 2026';
+export const EVENT_BADGE = 'Event-days badge · 13–15 Nov';
 export function badgeDescription(name) {
   if (name === 'Unbroken streak · 3 hand-offs')
     return 'Received the relic after three consecutive tracked successful bindings, without a known verified-window lapse or Wander transfer. Earlier hand-offs are not tracked.';
@@ -118,7 +118,7 @@ export function badgeDescription(name) {
     'Chain of 3':
       'Legacy journey badge: carried the relic on the third or later recorded hand-off. Failed-window history was not recorded; this is not proof of an unbroken streak.',
     [EVENT_BADGE]:
-      'Event-days badge: recorded holding during San Diego, 13–15 Nov 2026; not proof of conference attendance.',
+      'Event-days badge: recorded holding during 13–15 Nov 2026; not proof of conference attendance.',
   };
   if (/^Ring (1|5|10)$/.test(name))
     return `Carried the relic on recorded raid/legacy hand-off ${name.slice(5)}. Wander growth is excluded from this milestone.`;
@@ -158,7 +158,7 @@ function badge(name, earned) {
     details = node('details', undefined, 'score-badge');
   details.dataset.earned = String(earned);
   details.dataset.badge = name;
-  const label = name === EVENT_BADGE ? 'Event-days badge · San Diego · 13–15 Nov' : name;
+  const label = name === EVENT_BADGE ? 'Event-days badge · 13–15 Nov' : name;
   const summary = node('summary', `${earned ? '◇' : 'Locked ·'} ${label}`);
   summary.setAttribute('aria-label', `${earned ? 'Earned' : 'Locked'}: ${label}`);
   summary.title = badgeDescription(name);

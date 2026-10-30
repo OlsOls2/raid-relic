@@ -15,7 +15,7 @@ const staticPaths = new Set([
   '/claim-meter.js',
   '/editions.js',
   '/edition-view.js',
-  '/edition-crystal/twitchcon-2026.svg',
+  '/edition-crystal/season-one-autumn-2026.svg',
   '/ring-card.js',
   '/keeper-network.js',
   '/vendor/three.module.js',

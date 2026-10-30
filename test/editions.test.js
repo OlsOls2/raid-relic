@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readdir, readFile } from 'node:fs/promises';
 import {
   EDITION_CONFIG,
   EDITION_BADGE,
@@ -11,7 +12,7 @@ import {
   editionSVG,
 } from '../public/editions.js';
 import { validRelicDesign, crystalMesh, DEFAULT_DESIGN } from '../public/relic3d.js';
-import { scoreboard, TWITCHCON } from '../src/scoreboard.js';
+import { scoreboard, EVENT_DAYS } from '../src/scoreboard.js';
 import { validScores, badgeDescription } from '../public/scoreboard.js';
 import { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';
 const edition = EDITION_CONFIG[0],
@@ -100,11 +101,9 @@ test('edition hold evidence is independent from official November conference evi
   );
   const current = read(Date.parse('2026-10-26T12:00:00Z'));
   assert.ok(current.channels.find((r) => r.channelId === OTHER).badges.includes(EDITION_BADGE));
-  assert.ok(
-    !current.channels.some((r) => r.badges.includes('Carried during TwitchCon San Diego 2026')),
-  );
-  assert.equal(TWITCHCON.startsAt, Date.parse('2026-11-13T08:00:00Z'));
-  assert.equal(TWITCHCON.endsAt, Date.parse('2026-11-16T08:00:00Z'));
+  assert.ok(!current.channels.some((r) => r.badges.includes('Event-days badge · 13–15 Nov')));
+  assert.equal(EVENT_DAYS.startsAt, Date.parse('2026-11-13T08:00:00Z'));
+  assert.equal(EVENT_DAYS.endsAt, Date.parse('2026-11-16T08:00:00Z'));
   assert.equal(editionBadgeForInterval(start - 1, start), false);
   assert.equal(editionBadgeForInterval(start - 1, start, { ongoing: true }), true);
   assert.equal(editionBadgeForInterval(end, end + 1), false);
@@ -183,7 +182,7 @@ test('presentation clears edition on a later BASE render without duplicate label
   };
   assert.equal(presentEdition(archive, start).id, edition.id);
   assert.equal(labels, 1);
-  assert.equal(src, '/edition-crystal/twitchcon-2026.svg');
+  assert.equal(src, '/edition-crystal/season-one-autumn-2026.svg');
   presentEdition(archive, start + 1);
   assert.equal(labels, 1);
   presentEdition(archive, end);
@@ -227,15 +226,23 @@ test('same-origin edition SVG is decoded art, pure before OAuth/store and reject
       },
     ),
     app = createApp({ state: trap, oauth: trap });
-  const r = await app.dispatch({ method: 'GET', path: '/edition-crystal/twitchcon-2026.svg' });
+  const r = await app.dispatch({
+    method: 'GET',
+    path: '/edition-crystal/season-one-autumn-2026.svg',
+  });
   assert.equal(r.status, 200);
   assert.equal(r.type, 'image/svg+xml');
   assert.equal(String(r.body), editionSVG(edition));
   assert.equal((String(r.body).match(/<path /g) || []).length, edition.design.facets);
-  for (const path of ['/edition-crystal/unknown.svg', '/edition-crystal/twitchcon-2026.svg?x=1'])
+  for (const path of [
+    '/edition-crystal/unknown.svg',
+    '/edition-crystal/season-one-autumn-2026.svg?x=1',
+    '/edition-crystal/twitchcon-2026.svg',
+  ])
     assert.equal((await app.dispatch({ method: 'GET', path })).status, 404);
   assert.equal(
-    (await app.dispatch({ method: 'POST', path: '/edition-crystal/twitchcon-2026.svg' })).status,
+    (await app.dispatch({ method: 'POST', path: '/edition-crystal/season-one-autumn-2026.svg' }))
+      .status,
     405,
   );
   assert.equal(touched, 0);
@@ -243,15 +250,12 @@ test('same-origin edition SVG is decoded art, pure before OAuth/store and reject
 
 test('edition branding is explicitly unofficial, while event-day badge and time proofs stay distinct', async () => {
   const { FAN_DISCLAIMER } = await import('../public/editions.js');
-  assert.equal(
-    FAN_DISCLAIMER,
-    'Unofficial fan edition; not affiliated with or endorsed by Twitch/TwitchCon.',
-  );
+  assert.equal(FAN_DISCLAIMER, 'Unofficial fan project. Not affiliated with Twitch.');
   assert.ok(!badgeDescription(EDITION_BADGE).includes(FAN_DISCLAIMER));
   assert.match(badgeDescription(EDITION_BADGE), /cosmetic.*not.*conference attendance/);
-  assert.match(badgeDescription('Carried during TwitchCon San Diego 2026'), /Event-days badge/);
-  assert.equal(TWITCHCON.startsAt, Date.parse('2026-11-13T08:00:00Z'));
-  assert.equal(TWITCHCON.endsAt, Date.parse('2026-11-16T08:00:00Z'));
+  assert.match(badgeDescription('Event-days badge · 13–15 Nov'), /Event-days badge/);
+  assert.equal(EVENT_DAYS.startsAt, Date.parse('2026-11-13T08:00:00Z'));
+  assert.equal(EVENT_DAYS.endsAt, Date.parse('2026-11-16T08:00:00Z'));
 });
 
 test('changing label mode on same edition removes then restores presentation label without another relic', async () => {
@@ -285,4 +289,78 @@ test('changing label mode on same edition removes then restores presentation lab
   assert.equal(removed, 1);
   presentEdition(archive, start, { label: true });
   assert.equal(labels, 2);
+});
+
+test('neutral season presentation preserves dated evidence and strict public score metadata', () => {
+  assert.equal(edition.id, 'season-one-autumn-2026');
+  assert.equal(edition.name, 'Season One · Autumn 2026');
+  assert.equal(edition.startsAt, '2026-10-23T00:00:00Z');
+  assert.equal(edition.endsAt, '2026-12-01T00:00:00Z');
+  const at = EVENT_DAYS.startsAt;
+  const value = {
+    ...scoreboard(
+      {
+        stops: [
+          {
+            eventId: 'neutral-calendar-stop',
+            from: HOME,
+            to: OTHER,
+            claimedAt: at,
+            ringIndex: 1,
+          },
+        ],
+      },
+      { holderId: OTHER, originated: true },
+      undefined,
+      config,
+      at,
+    ),
+    mode: 'live',
+    previewReadOnly: false,
+  };
+  assert.equal(validScores(value), true);
+  assert.equal(value.event.label, 'Event-days badge · 13–15 Nov');
+  assert.equal(value.event.source, 'Retained-hold calendar (UTC)');
+  assert.ok(value.channels.some((row) => row.badges.includes(value.event.label)));
+  assert.equal(
+    validScores({ ...value, event: { ...value.event, source: 'https://untrusted.example/' } }),
+    false,
+  );
+  assert.equal(validScores({ ...value, event: { ...value.event, startsAt: at - 1 } }), false);
+});
+
+test('all public and server source paths and text remain free of removed event branding', async () => {
+  const forbidden = /twitchcon|san[ -]diego/i;
+  async function scan(root) {
+    for (const entry of await readdir(root, { withFileTypes: true })) {
+      const path = new URL(entry.name, root);
+      assert.doesNotMatch(entry.name, forbidden);
+      if (entry.isDirectory()) await scan(new URL(entry.name + '/', root));
+      else if (/\.(?:js|html|css|svg|json|txt)$/i.test(entry.name))
+        assert.doesNotMatch(await readFile(path, 'utf8'), forbidden, path.pathname);
+    }
+  }
+  await scan(new URL('../public/', import.meta.url));
+  await scan(new URL('../src/', import.meta.url));
+});
+
+test('edition DOM uses the exact neutral season title with dated accessible context', async () => {
+  const { presentEdition } = await import('../public/edition-view.js');
+  let label, title;
+  const archive = {
+    dataset: {},
+    querySelector: () => null,
+    ownerDocument: {
+      body: { classList: { contains: () => false } },
+      createElement: () => (label = { style: {} }),
+    },
+    after() {},
+    setAttribute: (name, value) => {
+      if (name === 'title') title = value;
+    },
+  };
+  presentEdition(archive, start);
+  assert.equal(label.textContent, 'Season One · Autumn 2026');
+  assert.equal(archive.dataset.edition, edition.id);
+  assert.match(title, /23 Oct.*30 Nov.*cosmetic/);
 });

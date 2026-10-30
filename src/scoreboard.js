@@ -6,9 +6,9 @@ import { ackDocument, ackKey, ackStep, KEEPER_SETUP_HINT } from './claim-ack.js'
 import { hash } from './crypto.js';
 import { INITIAL_HOME } from './lifecycle.js';
 export const SCORE_LIMITS = Object.freeze({ players: 128, bytes: 65536, top: 20 });
-export const TWITCHCON = Object.freeze({
-  label: 'TwitchCon San Diego 2026',
-  source: 'https://www.twitchcon.com/san-diego-2026/',
+export const EVENT_DAYS = Object.freeze({
+  label: 'Event-days badge · 13–15 Nov',
+  source: 'Retained-hold calendar (UTC)',
   checked: '2026-10-25',
   startsAt: Date.parse('2026-11-13T08:00:00Z'),
   endsAt: Date.parse('2026-11-16T08:00:00Z'),
@@ -321,22 +321,22 @@ export function scoreboard(lineage, registry, scores, config, now, publicProfile
       row(stops[i - 1].to).badges.push(
         ...editionBadgesForInterval(stops[i - 1].claimedAt, s.claimedAt),
       );
-    if (i === 0 && s.claimedAt >= TWITCHCON.startsAt && s.claimedAt < TWITCHCON.endsAt)
-      r.badges.push('Carried during TwitchCon San Diego 2026');
+    if (i === 0 && s.claimedAt >= EVENT_DAYS.startsAt && s.claimedAt < EVENT_DAYS.endsAt)
+      r.badges.push('Event-days badge · 13–15 Nov');
     if (i && stops[i - 1].kind !== 'wander') {
       const held = row(stops[i - 1].to),
         start = stops[i - 1].claimedAt;
       held.knownHoldSeconds += (s.claimedAt - start) / 1000;
-      if (start < TWITCHCON.endsAt && s.claimedAt > TWITCHCON.startsAt && s.claimedAt > start)
-        held.badges.push('Carried during TwitchCon San Diego 2026');
+      if (start < EVENT_DAYS.endsAt && s.claimedAt > EVENT_DAYS.startsAt && s.claimedAt > start)
+        held.badges.push('Event-days badge · 13–15 Nov');
     }
   }
   if (stops.length && stops.at(-1).kind !== 'wander' && registry?.holderId === stops.at(-1).to) {
     const held = row(registry.holderId),
       start = stops.at(-1).claimedAt;
     held.knownHoldSeconds += (now - start) / 1000;
-    if (start < TWITCHCON.endsAt && now >= TWITCHCON.startsAt)
-      held.badges.push('Carried during TwitchCon San Diego 2026');
+    if (start < EVENT_DAYS.endsAt && now >= EVENT_DAYS.startsAt)
+      held.badges.push('Event-days badge · 13–15 Nov');
   }
   if (stops.length && stops.at(-1).kind !== 'wander' && registry?.holderId === stops.at(-1).to)
     row(registry.holderId).badges.push(
@@ -384,7 +384,7 @@ export function scoreboard(lineage, registry, scores, config, now, publicProfile
     channels: rows,
     ...(config.seekersEnabled ? { publicProfiles } : {}),
     raiders,
-    event: TWITCHCON,
+    event: EVENT_DAYS,
   };
 }
 export function scoreMessage(kind, view, host) {

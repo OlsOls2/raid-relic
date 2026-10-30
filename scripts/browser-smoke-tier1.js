@@ -62,7 +62,7 @@ try {
     .filter({ hasText: '@olsols2 holds the relic · Ring 3 · raid to pass it on' })
     .waitFor();
   assert.equal(await page.locator('.edition-disclaimer').count(), 0);
-  assert.doesNotMatch(await page.locator('body').innerText(), /Unofficial fan edition/);
+  assert.doesNotMatch(await page.locator('body').innerText(), /Unofficial fan project/);
   await page.locator('canvas.relic3d').waitFor({ state: 'visible' });
   assert.ok(Number(await page.locator('canvas.relic3d').getAttribute('data-frames')) > 0);
   const pixel = await page.locator('canvas.relic3d').evaluate(

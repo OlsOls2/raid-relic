@@ -209,7 +209,7 @@ try {
         diagnostic.resourceReasonCode = FILM_RESOURCE_REASONS.indexOf(reason);
         try {
           diagnostic.resourcePathCode =
-            ['/favicon.ico', '/edition-crystal/twitchcon-2026.svg'].indexOf(
+            ['/favicon.ico', '/edition-crystal/season-one-autumn-2026.svg'].indexOf(
               new URL(request.url).pathname,
             ) + 1;
         } catch {

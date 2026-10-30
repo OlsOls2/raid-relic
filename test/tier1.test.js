@@ -59,8 +59,14 @@ for (const kind of ['memory', 'firestore'])
 test('one footer fan notice on normal pages, no OBS branding disclaimer, permanent demo banner and identity', async () => {
   for (const name of ['atlas', 'demo']) {
     const html = await readFile(`public/${name}.html`, 'utf8');
-    assert.equal((html.match(/Unofficial fan edition;/g) ?? []).length, 1);
-    assert.match(html, /<footer>[\s\S]*Unofficial fan edition;/);
+    assert.equal(
+      (html.match(/Unofficial fan project\. Not affiliated with Twitch\./g) ?? []).length,
+      1,
+    );
+    assert.match(
+      html,
+      /<footer>[\s\S]*Unofficial fan project\. Not affiliated with Twitch\.[\s\S]*<\/footer>/,
+    );
   }
   const demo = await readFile('public/demo.html', 'utf8');
   assert.equal((demo.match(/id="demo-banner"/g) ?? []).length, 1);

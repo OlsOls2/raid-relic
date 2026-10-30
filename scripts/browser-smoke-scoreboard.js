@@ -4,7 +4,7 @@ import { createServer } from 'node:https';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';
 import { createLocalTLS } from '../test-support/local-tls.js';
-import { TWITCHCON } from '../src/scoreboard.js';
+import { EVENT_DAYS } from '../src/scoreboard.js';
 const origin = 'https://localhost:5191';
 let browser,
   server,
@@ -108,9 +108,7 @@ try {
   await page.locator('#keeper-rows').filter({ hasText: '24h Keeper' }).waitFor();
   assert.equal(
     await page
-      .locator(
-        '.score-badge[data-earned=true][data-badge="Carried during TwitchCon San Diego 2026"]',
-      )
+      .locator('.score-badge[data-earned=true][data-badge="Event-days badge · 13–15 Nov"]')
       .count(),
     0,
   );
@@ -222,15 +220,15 @@ try {
   assert.equal(await page.locator('#keeper-rows>li,#raider-rows>li').count(), 0);
   await page.unroute('**/api/scores');
   stage = 'official-event';
-  active = await prepared(TWITCHCON.startsAt);
+  active = await prepared(EVENT_DAYS.startsAt);
   await hop(active);
   await page.locator('#scores-refresh').click();
   await page
-    .locator('.score-badge[data-earned=true][data-badge="Carried during TwitchCon San Diego 2026"]')
+    .locator('.score-badge[data-earned=true][data-badge="Event-days badge · 13–15 Nov"]')
     .first()
     .waitFor();
   checks.push({
-    name: 'SIMULATOR fake-clock November official San Diego badge, not an October/live claim',
+    name: 'SIMULATOR fake-clock November event-days badge, not an October/live claim',
     passed: true,
   });
   stage = 'preview-read-only';

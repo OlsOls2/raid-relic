@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { scoreboard, reduceScores, SCORE_LIMITS, TWITCHCON } from '../src/scoreboard.js';
+import { scoreboard, reduceScores, SCORE_LIMITS, EVENT_DAYS } from '../src/scoreboard.js';
 import { createApp } from '../src/app.js';
 import { badgeDescription, EVENT_BADGE, holdDuration, validScores } from '../public/scoreboard.js';
 import { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';
@@ -321,17 +321,17 @@ test('known keeper coverage, zero/16 rings, cumulative time, deterministic ties 
   discontinuous.stops[1].from = HOME;
   assert.throws(() => scoreboard(discontinuous, {}, null, config, base + 10000));
 });
-test('TwitchCon badge official San Diego PST boundaries, never October', () => {
+test('Event-days badge retained UTC boundaries, never October', () => {
   for (const [time, awarded] of [
     [Date.parse('2026-10-25T20:00:00Z'), false],
-    [TWITCHCON.startsAt - 1, false],
-    [TWITCHCON.startsAt, true],
-    [TWITCHCON.endsAt - 1, true],
-    [TWITCHCON.endsAt, false],
+    [EVENT_DAYS.startsAt - 1, false],
+    [EVENT_DAYS.startsAt, true],
+    [EVENT_DAYS.endsAt - 1, true],
+    [EVENT_DAYS.endsAt, false],
   ]) {
     const v = scoreboard(history(1, time), { holderId: OTHER }, null, config, time);
     assert.equal(
-      v.channels.some((r) => r.badges.includes('Carried during TwitchCon San Diego 2026')),
+      v.channels.some((r) => r.badges.includes('Event-days badge · 13–15 Nov')),
       awarded,
     );
   }
@@ -516,9 +516,9 @@ test('specific-channel event badge uses proven half-open holds/current instant, 
   const badge = (h, holder, now, id) =>
     scoreboard(h, { holderId: holder }, null, config, now)
       .channels.find((r) => r.channelId === id)
-      .badges.includes('Carried during TwitchCon San Diego 2026');
-  const start = TWITCHCON.startsAt,
-    end = TWITCHCON.endsAt,
+      .badges.includes('Event-days badge · 13–15 Nov');
+  const start = EVENT_DAYS.startsAt,
+    end = EVENT_DAYS.endsAt,
     h = history(1, start - 1000);
   assert.equal(badge(h, OTHER, start - 1, OTHER), false);
   assert.equal(badge(h, OTHER, start, OTHER), true);

@@ -9,7 +9,7 @@ test('film accepts exact same-origin static files and only its own bounded PNG i
   assert.equal(filmResourceReason(request(origin + '/film.js'), policy), 'static');
   assert.equal(filmResourceReason(request(origin + '/edition-view.js'), policy), 'static');
   assert.equal(
-    filmResourceReason(request(origin + '/edition-crystal/twitchcon-2026.svg'), policy),
+    filmResourceReason(request(origin + '/edition-crystal/season-one-autumn-2026.svg'), policy),
     'static',
   );
   assert.equal(filmResourceReason(request(preview), policy), 'owned-preview');
@@ -42,7 +42,7 @@ test('film rejects APIs, unknown HTML, queries, writes, external and unowned obj
     '/unknown.html',
     '/favicon.ico',
     '/edition-crystal/unknown.svg',
-    '/edition-crystal/twitchcon-2026.svg?extra=1',
+    '/edition-crystal/season-one-autumn-2026.svg?extra=1',
     '/film.js?extra=1',
   ])
     assert.equal(filmResourceReason(request(origin + path), policy), 'unknown-static');

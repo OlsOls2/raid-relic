@@ -115,6 +115,45 @@ test('wrong session/broken JSON/UTF8 fail closed without reflecting source value
   );
   assert.throws(() => transcriptFrom(Buffer.from('')), /matching session_meta/);
 });
+test('capped whitespace is normalized only for rendering, preserving digest, source identity and disclosure', async (t) => {
+  const f = await setup(t);
+  const body = 'x'.repeat(32767) + ' ' + 'tail';
+  const raw = snapshot([row('event_msg', { type: 'agent_message', message: body })]);
+  const result = transcriptFrom(raw);
+  const digest = createHash('sha256').update(body).digest('hex');
+  assert.equal(result.exportedEntries, 1);
+  assert.equal(result.omissions.truncated, 1);
+  assert.equal(result.omissions.credentialLookingItems, 0);
+  assert.ok(
+    result.markdown.includes(
+      'x'.repeat(32767) +
+        '\n[bounded output: 4 characters omitted; sanitized item SHA256 ' +
+        digest +
+        ']',
+    ),
+  );
+  assert.doesNotMatch(result.markdown, /[ \t]+\r?$/m);
+  assert.match(result.markdown, /source line 2/);
+  await writeFile(f.input, raw);
+  await exportEvidence({ root: f.root, input: f.input });
+  const manifest = JSON.parse(await readFile(join(f.evidence, 'EXPORT_MANIFEST.json'), 'utf8'));
+  assert.equal(manifest.sessionID, SESSION_ID);
+  assert.equal(manifest.rawSnapshotSHA256, createHash('sha256').update(raw).digest('hex'));
+  assert.equal(manifest.rawBytes, raw.length);
+  assert.equal(manifest.exportedEntries, 1);
+});
+test('ordinary multiline body whitespace normalizes without removing indentation, blank lines or entries', () => {
+  const raw = snapshot([
+    row('event_msg', { type: 'user_message', message: '  alpha \t\nbeta\t \r\n \t\nomega \t' }),
+    row('event_msg', { type: 'agent_message', message: 'Done\t' }),
+  ]);
+  const result = transcriptFrom(raw);
+  assert.equal(result.exportedEntries, 2);
+  assert.equal(result.omissions.truncated, 0);
+  assert.ok(result.markdown.includes('````text\n  alpha\nbeta\r\n\nomega\n````'));
+  assert.ok(result.markdown.includes('````text\nDone\n````'));
+  assert.doesNotMatch(result.markdown, /[ \t]+\r?$/m);
+});
 test('explicit snapshot allowlist rejects escape/symlinks and exports reproducibly with hashes and source-run manifest', async (t) => {
   const f = await setup(t);
   const raw = snapshot([message('user', 'Proceed'), message('assistant', 'Done')]);

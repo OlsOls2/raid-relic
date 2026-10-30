@@ -24,11 +24,11 @@ export function presentEdition(archive, now = Date.now(), { label = true } = {})
       v.label.className = 'edition-label';
       (archive.closest?.('.demo-visual') ?? archive).after(v.label);
     }
-    v.label.textContent = 'Edition: ' + e.name + ' · ' + editionWindowLabel(e) + ' · cosmetic.';
+    v.label.textContent = e.name;
     v.label.style.cssText =
       'font:13px/1.5 system-ui;color:#e6bb70;text-align:center;margin:3px 0;max-width:100%;overflow-wrap:normal';
     v.label.hidden = archive.ownerDocument.body?.classList.contains('corner') ?? false;
-    archive.setAttribute('title', v.label.textContent);
+    archive.setAttribute('title', e.name + ' · ' + editionWindowLabel(e) + ' · cosmetic.');
   } else {
     v.label?.remove();
     v.label = null;

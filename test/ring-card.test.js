@@ -6,7 +6,7 @@ const now = Date.parse('2026-10-26T12:00Z'),
 test('ring cards use exact completed-stop index and completion-time cosmetic edition', () => {
   const m = ringCardModel(base, { now });
   assert.equal(m.ringIndex, 3);
-  assert.equal(m.edition.id, 'twitchcon-2026');
+  assert.equal(m.edition.id, 'season-one-autumn-2026');
   assert.match(m.disclaimer, /Unofficial/);
   assert.equal(ringCardModel({ ...base, claimedAt: null }, { now }).edition, null);
   assert.equal(
@@ -50,13 +50,13 @@ test('fresh Atlas API mode is distinct from fictional demo identity and always w
   const local = ringCardModel(base, { mode: 'simulator', now });
   assert.equal(local.caption, 'SIMULATOR—mock recorded stop; no real Twitch');
   assert.equal(local.simulated, true);
-  assert.equal(local.editionCaption, 'Edition at mock completion: TwitchCon 2026');
+  assert.equal(local.editionCaption, 'Edition at mock completion: Season One · Autumn 2026');
   assert.equal(local.keeper, '@raidrelichq');
   assert.equal(local.ringIndex, 3);
   const live = ringCardModel(base, { mode: 'live', now });
   assert.equal(live.caption, 'Recorded completion · Ring 3');
   assert.equal(live.simulated, false);
-  assert.equal(live.editionCaption, 'Edition at recorded completion: TwitchCon 2026');
+  assert.equal(live.editionCaption, 'Edition at recorded completion: Season One · Autumn 2026');
   for (const mode of ['unknown', 'SIMULATOR', null])
     assert.throws(() => ringCardModel(base, { mode, now }));
   assert.throws(() => ringCardModel({ ...base, ringIndex: 0 }, { mode: 'simulator', now }));

@@ -85,14 +85,14 @@ export async function keeperCardPNG(model, orientation, audience) {
         );
       if (model.disclaimer) {
         c.font = '16px system-ui';
-        c.fillText('Unofficial fan edition; not endorsed by Twitch/TwitchCon.', 32, 1240, 656);
+        c.fillText('Unofficial fan project. Not affiliated with Twitch.', 32, 1240, 656);
       }
     } else if (orientation === 'vertical') {
       c.fillText('A ring received. A community remembered.', 32, 200, 656);
       c.fillText(model.caption, 32, 850, 656);
       if (model.disclaimer) {
         c.font = '16px system-ui';
-        c.fillText('Unofficial fan edition; not endorsed by Twitch/TwitchCon.', 32, 910, 656);
+        c.fillText('Unofficial fan project. Not affiliated with Twitch.', 32, 910, 656);
       }
     }
     c.font = '18px system-ui';

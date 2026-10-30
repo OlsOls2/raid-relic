@@ -170,18 +170,15 @@ try {
     await n.decode();
     if (!n.naturalWidth || !n.naturalHeight) throw Error('Undecoded');
   });
-  assert.match(
-    await page.locator('.edition-label').innerText(),
-    /Edition: TwitchCon 2026.*23 Oct.*30 Nov.*cosmetic/,
-  );
+  assert.match(await page.locator('.edition-label').innerText(), /^Season One · Autumn 2026$/);
   assert.match(
     await page.locator('footer .edition-disclaimer').innerText(),
-    /Unofficial fan edition; not affiliated with or endorsed by Twitch\/TwitchCon/,
+    /Unofficial fan project\. Not affiliated with Twitch\./,
   );
   await captureHero();
   stage = 'atlas-badge-and-stops';
   const earned = page
-    .locator('.score-badge[data-badge="Carried during TwitchCon 2026 edition"][data-earned="true"]')
+    .locator('.score-badge[data-badge="Carried during Season One Autumn 2026"][data-earned="true"]')
     .first();
   await earned.waitFor();
   await earned.scrollIntoViewIfNeeded();
@@ -189,10 +186,8 @@ try {
   const fan = page.locator('footer .edition-disclaimer');
   await fan.scrollIntoViewIfNeeded();
   assert.ok(await fan.isVisible());
-  assert.match(await fan.innerText(), /Unofficial fan edition/);
-  const event = page
-    .locator('.score-badge[data-badge="Carried during TwitchCon San Diego 2026"]')
-    .first();
+  assert.match(await fan.innerText(), /Unofficial fan project/);
+  const event = page.locator('.score-badge[data-badge="Event-days badge · 13–15 Nov"]').first();
   assert.equal(await event.getAttribute('data-earned'), 'false');
   assert.match(await event.locator('summary').innerText(), /Event-days badge.*13–15 Nov/);
   await page.locator('#map-stops').scrollIntoViewIfNeeded();

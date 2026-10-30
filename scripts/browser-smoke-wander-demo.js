@@ -32,7 +32,7 @@ try {
     '/keeper-network.js',
     '/vendor/three.module.js',
     '/vendor/three.core.js',
-    '/edition-crystal/twitchcon-2026.svg',
+    '/edition-crystal/season-one-autumn-2026.svg',
   ]);
   page.on('request', (r) => {
     if (!allowed.has(new URL(r.url()).pathname)) forbidden++;

@@ -87,7 +87,7 @@ Existing hosting uses scale-to-zero Cloud Run and bounded Firestore data. No new
 
 Multiple **simultaneous** relics are future work requiring separate authority, isolation and quotas—not a current feature.
 
-Unofficial fan edition; not affiliated with or endorsed by Twitch/TwitchCon. Cosmetic edition dates do not imply conference attendance. [MIT licence](LICENSE) · [Three.js MIT and Cinzel OFL notices](THIRD_PARTY_NOTICES.md).
+Unofficial fan project. Not affiliated with Twitch. Cosmetic season dates do not imply event attendance. [MIT licence](LICENSE) · [Three.js MIT and Cinzel OFL notices](THIRD_PARTY_NOTICES.md).
 
 The receiving-value pilot source adds an opt-in Seeker queue, a prominent current-Keeper
 spotlight and recorded Keeper pages with two share-card orientations. These features

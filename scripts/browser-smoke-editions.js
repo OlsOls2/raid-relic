@@ -221,7 +221,7 @@ try {
   await action(page, 'raid');
   stage = 'actual-gpu-edition';
   await overlay
-    .locator('canvas.relic3d[data-edition="twitchcon-2026"]')
+    .locator('canvas.relic3d[data-edition="season-one-autumn-2026"]')
     .waitFor({ state: 'visible' });
   await overlay.waitForFunction(
     () => document.querySelector('canvas.relic3d').dataset.particlesVisible === 'true',
@@ -243,7 +243,7 @@ try {
     return r.json();
   });
   assert.equal(score.rings, 1);
-  assert.ok(score.channels.some((r) => r.badges.includes('Carried during TwitchCon 2026 edition')));
+  assert.ok(score.channels.some((r) => r.badges.includes('Carried during Season One Autumn 2026')));
   checks.push({
     name: 'SIMULATOR actual one-core eight-facet GPU/64 dust/transparent pixels; only actual signed fixture claim adds one ring/edition evidence',
     passed: true,
@@ -260,10 +260,13 @@ try {
   await page.setViewportSize({ width: 390, height: 800 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.locator('.crystal').waitFor({ state: 'visible' });
-  assert.equal(await page.locator('.archive').getAttribute('data-edition'), 'twitchcon-2026');
+  assert.equal(
+    await page.locator('.archive').getAttribute('data-edition'),
+    'season-one-autumn-2026',
+  );
   assert.equal(
     await page.locator('.crystal').getAttribute('src'),
-    '/edition-crystal/twitchcon-2026.svg',
+    '/edition-crystal/season-one-autumn-2026.svg',
   );
   await fallbackPaint(page, 'mobile');
   stage = 'mobile-permanent-release';
@@ -289,13 +292,13 @@ try {
   stage = 'atlas-demo-and-base-boundaries';
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto(origin + '/atlas/');
-  await page.locator('#atlas-relic[data-edition="twitchcon-2026"]').waitFor();
+  await page.locator('#atlas-relic[data-edition="season-one-autumn-2026"]').waitFor();
   await page.locator('#atlas-relic').scrollIntoViewIfNeeded();
   assert.equal(await page.locator('.edition-label').count(), 1);
   assert.equal(await page.locator('.atlas-relic-figure .edition-label').count(), 1);
   assert.match(
     await page.locator('footer .edition-disclaimer').textContent(),
-    /Unofficial fan edition; not affiliated with or endorsed by Twitch\/TwitchCon/,
+    /Unofficial fan project\. Not affiliated with Twitch\./,
   );
   assert.equal(
     await page.locator('.atlas-relic-figure .edition-label').evaluate((n) => {
@@ -309,18 +312,16 @@ try {
     true,
   );
   const earned = page
-    .locator('.score-badge[data-badge="Carried during TwitchCon 2026 edition"]')
+    .locator('.score-badge[data-badge="Carried during Season One Autumn 2026"]')
     .first();
   await earned.waitFor();
   assert.equal(await earned.getAttribute('data-earned'), 'true');
   assert.equal(await page.locator('.edition-disclaimer').count(), 1);
   assert.match(
     await page.locator('footer .edition-disclaimer').textContent(),
-    /Unofficial fan edition/,
+    /Unofficial fan project/,
   );
-  const official = page
-    .locator('.score-badge[data-badge="Carried during TwitchCon San Diego 2026"]')
-    .first();
+  const official = page.locator('.score-badge[data-badge="Event-days badge · 13–15 Nov"]').first();
   assert.equal(await official.getAttribute('data-earned'), 'false');
   assert.match(await official.locator('summary').textContent(), /Event-days badge.*13–15 Nov/);
   await capture('edition-atlas.png');
@@ -351,7 +352,10 @@ try {
   assert.match(icon.headers()['content-type'], /image\/svg\+xml/);
   await page.goto(origin + '/demo');
   await page.locator('#demo-banner').waitFor();
-  assert.equal(await page.locator('#demo-art').getAttribute('data-edition'), 'twitchcon-2026');
+  assert.equal(
+    await page.locator('#demo-art').getAttribute('data-edition'),
+    'season-one-autumn-2026',
+  );
   assert.equal(await page.locator('#demo-rings').textContent(), 'Rings: 0');
   const boundaries = await page.evaluate(async () => {
     const { selectEdition } = await import('/editions.js');
@@ -391,7 +395,7 @@ try {
   });
   const fallback = await noGL.newPage();
   await fallback.goto(origin + '/overlay/1591806023');
-  await fallback.locator('.archive[data-edition="twitchcon-2026"]').waitFor();
+  await fallback.locator('.archive[data-edition="season-one-autumn-2026"]').waitFor();
   await fallbackPaint(fallback, 'no-gl');
   await noGL.close();
   stage = 'rendered-base-before-after';
