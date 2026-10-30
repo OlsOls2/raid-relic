@@ -4,6 +4,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { visualReview, noDemoIO, growthPixels } from '../test-support/visual-review.js';
 import { capturePage } from '../test-support/capture-page.js';
 import { filmResourceReason, FILM_RESOURCE_REASONS } from '../test-support/film-resources.js';
+import { filmPaintedFraming } from '../test-support/film-framing.js';
 let review,
   stage = 'setup',
   passed = false,
@@ -57,7 +58,7 @@ try {
   await page.setViewportSize({ width: 1920, height: 1080 });
   stage = 'film-start';
   await page.goto(origin + '/demo/film');
-  assert.match(await page.locator('#film-banner').innerText(), /SIMULATOR.*no Twitch/);
+  assert.match(await page.locator('#film-verification').textContent(), /SIMULATOR.*no Twitch/);
   await page.clock.runFor(1200);
   await page.waitForFunction(
     () => Number(document.querySelector('canvas.relic3d')?.dataset.frames) > 0,
@@ -192,7 +193,41 @@ try {
     }),
   );
   assert.equal(await page.locator('#film-art .growth-fallback').getAttribute('data-total'), '1');
+  const reducedFraming = await filmPaintedFraming(page);
+  assert.ok(reducedFraming.paintedHeight >= reducedFraming.stageHeight * 0.5);
+  assert.equal(reducedFraming.overlap, 0);
+  assert.ok(reducedFraming.badgeHeight <= 44.1);
+  stage = 'film-reduced-pending-init';
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  let heldVendor;
+  await page.route('**/vendor/three.module.js', (route) => {
+    heldVendor = route;
+  });
+  const vendorRequested = page.waitForRequest(
+    (r) => r.url() === origin + '/vendor/three.module.js',
+  );
+  await page.reload();
+  await vendorRequested;
+  await page.waitForFunction(() => document.body.dataset.filmClock !== undefined);
+  await seek(60000);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.clock.runFor(500);
+  assert.equal(await page.locator('#film-art .growth-fallback').getAttribute('data-total'), '1');
+  const vendorResponse = page.waitForResponse(
+    (r) => r.url() === origin + '/vendor/three.module.js',
+  );
+  assert.ok(heldVendor);
+  await heldVendor.continue();
+  await (await vendorResponse).finished();
+  await page.waitForLoadState('networkidle');
+  assert.equal(await page.locator('#film-art canvas').count(), 0);
+  assert.equal(await page.locator('body').getAttribute('data-film-playing'), 'false');
+  assert.equal(await page.locator('#film-art .growth-fallback').getAttribute('data-total'), '1');
+  await seek(0);
+  assert.equal(await page.locator('#film-art .growth-fallback').getAttribute('data-total'), '0');
+  await page.unroute('**/vendor/three.module.js');
   await page.locator('#film-restart').click();
+  assert.equal(await page.locator('body').getAttribute('data-film-playing'), 'false');
   assert.match(await page.locator('#film-count').innerText(), /rings: 0/);
   assert.ok(Object.values(await page.evaluate(() => window.__demoIO)).every((n) => n === 0));
   const owned = await page.evaluate(() => ({

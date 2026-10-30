@@ -20,7 +20,13 @@ export async function localChromiumOptions(chromium) {
     return { executablePath, headless: true, chromiumSandbox: true };
   }
 }
-export async function visualReview({ seekers = false, durable = false } = {}) {
+export async function visualReview({
+  seekers = false,
+  durable = false,
+  backgroundThrottling = false,
+  headed = false,
+  fixtureOnly = false,
+} = {}) {
   const origin = 'https://localhost:5191',
     fixture = await pilotFixture(durable === true ? 'firestore' : 'memory', {
       origin,
@@ -46,8 +52,31 @@ export async function visualReview({ seekers = false, durable = false } = {}) {
       server.once('error', j);
       server.listen(5191, '127.0.0.1', r);
     });
+    if (fixtureOnly === true)
+      return {
+        origin,
+        fixture,
+        close: async () => {
+          sockets.close();
+          server.closeAllConnections();
+          await new Promise((resolve) => server.close(resolve));
+          await tls.cleanup();
+        },
+      };
     const { chromium } = await import('playwright-core');
-    browser = await chromium.launch(await localChromiumOptions(chromium));
+    browser = await chromium.launch({
+      ...(await localChromiumOptions(chromium)),
+      ...(headed === true ? { headless: false } : {}),
+      ...(backgroundThrottling === true
+        ? {
+            ignoreDefaultArgs: [
+              '--disable-background-timer-throttling',
+              '--disable-backgrounding-occluded-windows',
+              '--disable-renderer-backgrounding',
+            ],
+          }
+        : {}),
+    });
     context = await browser.newContext({
       ignoreHTTPSErrors: true,
       viewport: { width: 390, height: 844 },

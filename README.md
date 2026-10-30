@@ -12,7 +12,7 @@ As of 27 October 2026, the operator reports all four requested review increments
 
 1. Open the **45-second whole-loop sandbox** above. Watch the provisional offer wait for a distinct simulated accept before the one recorded ring appears. No account or installation is needed.
 2. At the last scene, optionally export the simulated card. Reduced motion keeps a readable SVG relic; focused controls retain their normal keys.
-3. For recording, use the unchanged [150-second fictional film](https://demo-film---raid-relic-vz4bhnskgq-uc.a.run.app/demo/film). The [35-second interactive demo](https://raid-relic-760724762396.us-central1.run.app/demo/) remains available for hands-on votes: choose **Autoplay 35-second tour** there; the [Atlas](https://raid-relic-760724762396.us-central1.run.app/atlas/) shows the separately retained public journey.
+3. For recording, use the [150-second fictional film](https://demo-film---raid-relic-vz4bhnskgq-uc.a.run.app/demo/film). The [35-second interactive demo](https://raid-relic-760724762396.us-central1.run.app/demo/) remains available for hands-on votes: choose **Autoplay 35-second tour** there; the [Atlas](https://raid-relic-760724762396.us-central1.run.app/atlas/) shows the separately retained public journey.
 
 [Judge guide and evidence boundaries](docs/JUDGES.md). The screenshots below are viewport views of the labelled `/demo/film` simulator, not live Twitch or physical OBS footage. The parent operator captured, viewed and promoted both native source233 PNGs; their source route and simulated sample labels remain explicit.
 
@@ -125,7 +125,7 @@ Freeze: **31 October 2026, 18:00 UK/UTC**.
 
 ### Film the fictional loop
 
-Source 208 adds a client-only **`/demo/film`** storyboard: 150 seconds from Send Off through arrival, two-chat binding, engraving, simulated Keeper spotlight, journey replay and a manually exported simulated card. Space pauses, Next skips, and Restart resets the local story. It is permanently labelled FILM / SIMULATOR, with no Twitch connection, audio or real transfers. [Film controls and bounded recording handoff](docs/DEMO_FILM.md). The operator published [the read-only film preview](https://demo-film---raid-relic-vz4bhnskgq-uc.a.run.app/demo/film) from `48f35cbb8f7664a9cd27b5acb9965d6ed2b25874` after its native/capture gate; that earlier cohort does not validate the later onboarding increment below.
+Source 208 adds a client-only **`/demo/film`** storyboard: 150 seconds from Send Off through arrival, two-chat binding, engraving, simulated Keeper spotlight, journey replay and a manually exported simulated card. Space pauses, Next skips, and Restart resets the local story. It is permanently labelled FILM / SIMULATOR, with no Twitch connection, audio or real transfers. [Film controls and bounded recording handoff](docs/DEMO_FILM.md). The local U2 update adds explicit autoplay kiosk mode, elapsed-time catch-up and static normal reduced-motion playback; parent QA and its new review preview are pending. The operator published [the read-only film preview](https://demo-film---raid-relic-vz4bhnskgq-uc.a.run.app/demo/film) from `48f35cbb8f7664a9cd27b5acb9965d6ed2b25874` after its native/capture gate; that earlier cohort does not validate the later onboarding increment below.
 
 ### New Keeper checklist
 

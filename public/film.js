@@ -2,7 +2,9 @@ import {
   FILM_MS,
   FILM_SCENES,
   freshFilm,
-  advanceFilmAtPace,
+  sampleFilmClock,
+  filmPlaybackOptions,
+  reconcileFilmMotion,
   filmDuration,
   seekFilm,
   filmStep,
@@ -18,22 +20,26 @@ const $ = (id) => document.getElementById(id),
   archive = $('film-art');
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
 const duration = filmDuration(location.pathname);
+const playback = filmPlaybackOptions(location.search, motion.matches);
+document.body.classList.toggle('film-kiosk', playback.kiosk);
 if (location.pathname === '/demo/judge') {
   document.body.classList.add('judge-mode');
   document.title = '45-second SIMULATED judge sandbox · Raid Relic';
-  $('film-banner').textContent = 'JUDGE / SIMULATOR — no Twitch connection or real transfers';
+  $('film-verification').textContent = 'JUDGE / SIMULATOR — no Twitch connection or real transfers';
   $('film-intro').textContent =
     '45-second fictional whole-loop preview · no account, audio or real actions. Pause, skip or replay; card export is optional.';
 }
 document.body.dataset.presentationDuration = String(duration);
 const rune =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 8 92 50 50 92 8 50Z M23 70 38 24 66 59 79 31" fill="none" stroke="#d8b46a" stroke-width="4"/></svg>';
-let state = freshFilm(),
+let state = freshFilm(playback.playing),
+  lastReduced = motion.matches,
   view = null,
   pending = null,
   epoch = 0,
-  raf = null,
-  last = null,
+  timer = null,
+  last = performance.now(),
+  captionAnimation = null,
   scene = -1,
   viewKey = null,
   card = null,
@@ -54,11 +60,12 @@ function release() {
   viewKey = null;
 }
 async function draw(frame) {
-  presentGrowth(archive, frame.rings);
   if (!alive || document.hidden || motion.matches || frame.index === 7) {
     release();
+    restoreGrowth();
     return;
   }
+  restoreGrowth();
   if (!view && !pending) {
     const controller = new AbortController(),
       own = epoch;
@@ -66,6 +73,7 @@ async function draw(frame) {
     try {
       const instance = await createRelic3D({
         archive,
+        framing: 'film',
         reducedMotion: motion,
         signal: controller.signal,
       });
@@ -78,9 +86,14 @@ async function draw(frame) {
     } catch {
       if (own === epoch) pending = null;
       return;
+    } finally {
+      // A cancelled initializer can finish after the static render. Its owned
+      // disposal clears shared growth art; restore only the latest live state.
+      restoreGrowth();
     }
   }
   if (!view) return;
+  frame = filmFrame(state.ms);
   // Only semantic changes rebuild scene geometry; per-frame clock drives existing
   // original cinematic styles without mutating game state.
   const key = `${frame.index}:${frame.rings}:${frame.engraved}:${state.playing}`;
@@ -95,6 +108,9 @@ async function draw(frame) {
       { animate: state.playing, growthFeedback: false },
     );
   }
+}
+function restoreGrowth() {
+  if (alive && !document.hidden) presentGrowth(archive, filmFrame(state.ms).rings);
 }
 async function prepareCard() {
   if (card || cardJob) return cardJob;
@@ -174,6 +190,15 @@ async function prepareCard() {
 function render() {
   const f = filmFrame(state.ms),
     elapsed = f.arrivalElapsed;
+  const sceneStart = FILM_SCENES[f.index].at;
+  const sceneEnd = FILM_SCENES[f.index + 1]?.at ?? FILM_MS;
+  const progress = Math.min(1, Math.max(0, (state.ms - sceneStart) / (sceneEnd - sceneStart)));
+  document.body.dataset.filmScene = String(f.index);
+  document.body.dataset.filmCompleted = String(f.completed);
+  document.body.style.setProperty(
+    '--film-push',
+    String(1 + (motion.matches ? 0 : progress * 0.08)),
+  );
   document.body.dataset.filmClock = String(state.ms);
   document.body.dataset.filmPlaying = String(state.playing);
   archive.dataset.phase =
@@ -213,6 +238,10 @@ function render() {
     setText('film-scene-number', `Scene ${scene + 1} / ${FILM_SCENES.length} · sample fixtures`);
     setText('film-heading', f.scene.name);
     setText('film-caption', f.scene.caption);
+    captionAnimation?.cancel();
+    captionAnimation = $('film-caption').animate([{ opacity: 0.3 }, { opacity: 1 }], {
+      duration: motion.matches ? 1500 : 350,
+    });
   }
   setText('film-count', `Recorded rings: ${f.rings} · SIMULATED`);
   setText(
@@ -245,26 +274,36 @@ function render() {
   if (f.index === 7) void prepareCard();
   void draw(f);
 }
-function schedule() {
-  if (raf === null && state.playing && !document.hidden && alive) raf = requestAnimationFrame(tick);
+function reconcileMotion() {
+  const observed = reconcileFilmMotion(state, lastReduced, motion.matches, playback.kiosk);
+  state = observed.state;
+  lastReduced = observed.reduced;
 }
-function tick(now) {
-  raf = null;
-  state = advanceFilmAtPace(
-    state,
-    last === null ? 0 : now - last,
+function tick() {
+  reconcileMotion();
+  const sampled = sampleFilmClock(
+    { state, at: last },
+    performance.now(),
     location.pathname,
     document.hidden,
+    playback.kiosk,
   );
-  last = now;
-  render();
-  schedule();
+  state = sampled.state;
+  last = sampled.at;
+  if (!document.hidden) render();
+  if (!state.playing && timer !== null) {
+    clearInterval(timer);
+    timer = null;
+  }
+}
+function schedule() {
+  if (timer === null && state.playing && alive) timer = setInterval(tick, 250);
 }
 function apply(action) {
-  state = filmStep(state, action);
-  last = null;
-  if (raf !== null) cancelAnimationFrame(raf);
-  raf = null;
+  tick();
+  state =
+    action === 'restart' ? freshFilm(!motion.matches || playback.kiosk) : filmStep(state, action);
+  last = performance.now();
   render();
   schedule();
 }
@@ -272,8 +311,9 @@ $('film-play').onclick = () => apply('toggle');
 $('film-next').onclick = () => apply('next');
 $('film-restart').onclick = () => apply('restart');
 $('film-seek').oninput = () => {
+  reconcileMotion();
   state = seekFilm(state, Number($('film-seek').value));
-  last = null;
+  last = performance.now();
   render();
   schedule();
 };
@@ -293,23 +333,29 @@ document.addEventListener('keydown', (e) => {
   }
 });
 motion.addEventListener('change', () => {
+  tick();
+  last = performance.now();
+  if (!state.playing && timer !== null) {
+    clearInterval(timer);
+    timer = null;
+  }
   release();
   render();
 });
 document.addEventListener('visibilitychange', () => {
-  if (raf !== null) cancelAnimationFrame(raf);
-  raf = null;
-  last = null;
+  // Kiosk retains its monotonic anchor even when timers/RAF are throttled.
+  // Normal mode discards hidden elapsed time and remains an explicit pause.
+  if (!playback.kiosk) last = performance.now();
+  tick();
   release();
-  if (!document.hidden) {
-    render();
-    schedule();
-  }
+  if (!document.hidden) render();
+  schedule();
 });
 addEventListener('pagehide', () => {
   alive = false;
-  if (raf !== null) cancelAnimationFrame(raf);
-  raf = null;
+  if (timer !== null) clearInterval(timer);
+  timer = null;
+  captionAnimation?.cancel();
   release();
   if (cardURL) URL.revokeObjectURL(cardURL);
   cardURL = null;
@@ -319,6 +365,8 @@ addEventListener('pagehide', () => {
 addEventListener('pageshow', () => {
   if (!alive) {
     alive = true;
+    if (!playback.kiosk) last = performance.now();
+    tick();
     render();
     schedule();
   }

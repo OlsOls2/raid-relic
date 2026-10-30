@@ -11,7 +11,12 @@
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to film</a>
-    <header id="film-banner">FILM / SIMULATOR — no Twitch connection or real transfers</header>
+    <header id="film-banner">
+      <span>SIMULATED</span
+      ><span id="film-verification" class="film-sr-only"
+        >FILM / SIMULATOR — no Twitch connection or real transfers</span
+      >
+    </header>
     <main id="main-content" tabindex="-1">
       <div class="intro">
         <p class="eyeline">One relic. Two communities. A story that stays.</p>
@@ -21,19 +26,47 @@
         </p>
       </div>
       <section id="film-stage" class="stage" aria-label="Simulated relic and community story">
+        <div class="stream-frame-label" aria-hidden="true">
+          sample_stream · fictional stream frame
+        </div>
+        <div class="stream-route" aria-hidden="true">
+          demo_keeper_a <span>→</span> demo_keeper_b
+        </div>
         <div class="relic-column">
           <div id="film-art" class="archive">
             <img class="crystal" src="/crystal.svg" alt="Original faceted moon-silver relic" />
             <div id="film-comet" hidden></div>
             <div id="film-impact" hidden></div>
+            <div class="film-claim-burst" aria-hidden="true">
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
           </div>
           <p id="film-holder">No holder yet · fictional fixture</p>
           <p id="film-count">Recorded rings: 0</p>
         </div>
+        <aside class="film-chat" aria-label="Fictional sample chat, not connected to Twitch">
+          <p>Sample chat</p>
+          <div class="chat-window" aria-hidden="true">
+            <ol>
+              <li>demo_spark: ready to pass it on?</li>
+              <li>demo_moon: !offer</li>
+              <li>demo_star: !accept</li>
+              <li>demo_leaf: a new ring!</li>
+              <li>demo_moon: !mark moon</li>
+              <li>demo_spark: keep the story going</li>
+              <li>demo_spark: ready to pass it on?</li>
+              <li>demo_moon: !offer</li>
+              <li>demo_star: !accept</li>
+              <li>demo_leaf: a new ring!</li>
+              <li>demo_moon: !mark moon</li>
+              <li>demo_spark: keep the story going</li>
+            </ol>
+          </div>
+        </aside>
         <div class="story">
           <p id="film-scene-number"></p>
           <h2 id="film-heading">Send Off</h2>
-          <p id="film-caption" role="status"></p>
+          <p id="film-caption" role="status" aria-live="polite"></p>
           <div id="film-meter" aria-label="Simulated two-chat claim">
             <p id="film-votes"></p>
             <progress
@@ -76,14 +109,19 @@
         <button id="film-export" disabled>Export simulated ring card</button>
       </section>
       <nav class="transport" aria-label="Film controls">
-        <button id="film-play">Pause film</button><button id="film-next">Next scene</button
-        ><button id="film-restart">Restart film</button><label for="film-seek">Story position</label
+        <button id="film-play" aria-keyshortcuts="Space">Pause film</button
+        ><button id="film-next">Next scene</button><button id="film-restart">Restart film</button
+        ><label for="film-seek">Story position</label
         ><input id="film-seek" type="range" min="0" max="150000" step="1000" value="0" /><output
           id="film-time"
           for="film-seek"
           >0:00 / 2:30</output
         >
       </nav>
+      <p class="film-verification-note">
+        All stream frames, chat, Keepers and the one completed hop are fictional. No connection to
+        Twitch or real transfers. The app-local claim is simulated; replay never adds history.
+      </p>
       <p class="keys">
         Space pauses/resumes and → advances when focus is on the page. Focused controls keep their
         native keys.

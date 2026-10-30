@@ -8,11 +8,11 @@
 
 | Metadata | Value |
 |---|---|
-| Cutoff | 2026-10-30T12:40:57.157Z |
-| Selected entries | 5193 |
-| CLI-log digests | 257 (run-000.jsonl–run-256.jsonl) |
-| Selected bytes | 15820034 |
-| Selected SHA256 | `b23571b61996f64e70dfd41819c1f3e2bae759530ca04365b1cae9deabf52f26` |
+| Cutoff | 2026-10-30T15:51:05.733Z |
+| Selected entries | 5375 |
+| CLI-log digests | 271 (run-000.jsonl–run-270.jsonl) |
+| Selected bytes | 16345312 |
+| Selected SHA256 | `4516bcbbbe270e838a2da7116c04a3ef9b6f519857c45283cb39751e2cc14747` |
 | Secondary whole-entry omissions | 5 |
 | Secondary rescan | zero-findings, bound to this exact selected SHA |
 

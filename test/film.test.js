@@ -10,6 +10,9 @@ import {
   filmStep,
   filmFrame,
   filmShortcut,
+  filmPlaybackOptions,
+  sampleFilmClock,
+  reconcileFilmMotion,
 } from '../public/film-state.js';
 import { createApp } from '../src/app.js';
 test('150-second film follows eight ordered scenes and binds only after the distinct simulated accept', () => {
@@ -22,6 +25,7 @@ test('150-second film follows eight ordered scenes and binds only after the dist
   }
   assert.equal(filmFrame(39999).offers, 0);
   assert.equal(filmFrame(40000).offers, 1);
+  assert.equal(filmFrame(40000).scene.caption, 'Both chats claim it.');
   assert.equal(filmFrame(54999).rings, 0);
   assert.equal(filmFrame(55000).accepts, 1);
   assert.equal(filmFrame(55000).rings, 1);
@@ -31,11 +35,11 @@ test('150-second film follows eight ordered scenes and binds only after the dist
   assert.equal(filmFrame(14999).arrivalElapsed, -1);
   assert.equal(filmFrame(15000).arrivalElapsed, 0);
 });
-test('film restart, seek/backseek, end and hidden clocks never catch up or accumulate extra rings', () => {
+test('film restart, seek/backseek and end preserve rings; visible elapsed catches up while normal hidden time pauses', () => {
   let s = freshFilm();
   s = advanceFilm(s, 100);
   assert.equal(s.ms, 100);
-  assert.equal(advanceFilm(s, 10000).ms, 350);
+  assert.equal(advanceFilm(s, 10000).ms, 10100);
   assert.equal(advanceFilm(s, 500, true), s);
   for (const dt of [NaN, Infinity, -1, 0]) assert.equal(advanceFilm(s, dt), s);
   s = filmStep(s, 'toggle');
@@ -124,4 +128,163 @@ test('judge entry scales only the exact local presentation path to45 seconds wit
   assert.equal(response.status, 200);
   assert.match(response.headers['content-security-policy'], /connect-src 'none'/);
   assert.equal((await app.dispatch({ method: 'POST', path: '/demo/judge' })).status, 403);
+});
+
+test('monotonic interval sampling catches throttling at both paces and holds the end without replay', () => {
+  for (const [path, duration] of [
+    ['/demo/film', 150000],
+    ['/demo/judge', 45000],
+  ]) {
+    let clock = { state: freshFilm(), at: 100.125 };
+    clock = sampleFilmClock(clock, 100.125 + duration, path, true, true);
+    assert.equal(clock.state.ms, FILM_MS);
+    assert.equal(clock.state.playing, false);
+    assert.equal(sampleFilmClock(clock, clock.at + 60000, path, true, true).state.ms, FILM_MS);
+    assert.equal(sampleFilmClock(clock, NaN, path), clock);
+    assert.equal(sampleFilmClock(clock, clock.at - 1, path), clock);
+  }
+  let clock = { state: freshFilm(), at: 0 };
+  clock = sampleFilmClock(clock, 60000, '/demo/film', true, false);
+  assert.equal(clock.state.ms, 0);
+  clock = sampleFilmClock(clock, 60250, '/demo/film');
+  assert.equal(clock.state.ms, 250);
+  clock = { at: clock.at, state: filmStep(clock.state, 'toggle') };
+  clock = sampleFilmClock(clock, 120000, '/demo/film', false, true);
+  assert.equal(clock.state.ms, 250);
+  clock = { at: clock.at, state: filmStep(clock.state, 'toggle') };
+  assert.equal(sampleFilmClock(clock, 120250, '/demo/film').state.ms, 500);
+  clock = { at: 0, state: freshFilm() };
+  for (let n = 1; n <= 1000; n++) clock = sampleFilmClock(clock, n * 0.125, '/demo/film');
+  assert.equal(clock.state.ms, 125); // Preserve fractional deltas, not rounding debt.
+});
+test('reduced-motion starts static except explicit autoplay kiosk, with no external query authority', () => {
+  assert.deepEqual(filmPlaybackOptions('', true), { kiosk: false, playing: false });
+  assert.equal(filmPlaybackOptions('?autoplay=1', true).playing, false);
+  assert.equal(filmPlaybackOptions('?kiosk=1', true).playing, false);
+  assert.deepEqual(filmPlaybackOptions('?autoplay=1&kiosk=1', true), {
+    kiosk: true,
+    playing: true,
+  });
+  assert.equal(filmPlaybackOptions('', false).playing, true);
+  assert.equal(filmPlaybackOptions('?kiosk=https://untrusted.example', true).kiosk, false);
+  assert.equal(freshFilm(false).playing, false);
+});
+test('film clock is interval-based; kiosk keeps accessible pause and reduced effects remain bounded', async () => {
+  const js = await readFile('public/film.js', 'utf8');
+  const css = await readFile('public/film.css', 'utf8');
+  const html = await readFile('public/film.html', 'utf8');
+  assert.match(js, /setInterval\(tick,\s*250\)/);
+  assert.doesNotMatch(js, /requestAnimationFrame/);
+  assert.match(js, /sampleFilmClock\([\s\S]*?performance\.now\(\)/);
+  assert.match(html, /id="film-play" aria-keyshortcuts="Space"/);
+  assert.match(html, /Fictional sample chat, not connected to Twitch/);
+  assert.equal((html.match(/<i><\/i>/g) ?? []).length, 12);
+  assert.match(css, /animation:\s*film-ring\s+600ms/);
+  assert.match(js, /motion\.matches\s*\?\s*1500\s*:\s*350/);
+  assert.match(css, /prefers-reduced-motion/);
+});
+
+test('film restores current growth after synchronous release and late cancelled initialization', async () => {
+  const { runInNewContext } = await import('node:vm');
+  const source = await readFile('public/film.js', 'utf8');
+  const lifecycle = source.slice(
+    source.indexOf('function release()'),
+    source.indexOf('async function prepareCard()'),
+  );
+  let finish;
+  const archive = {};
+  const context = {
+    archive,
+    alive: true,
+    document: { hidden: false },
+    motion: { matches: false },
+    state: { ms: 60000, playing: false },
+    view: {
+      dispose() {
+        delete archive.total;
+      },
+    },
+    viewKey: null,
+    pending: null,
+    epoch: 0,
+    AbortController,
+    filmFrame,
+    presentGrowth(target, total) {
+      target.total = total;
+    },
+    createRelic3D: () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+  };
+  runInNewContext(lifecycle + '; this.drawFilm = draw;', context);
+  context.motion.matches = true;
+  await context.drawFilm(filmFrame(60000));
+  assert.equal(archive.total, 1);
+  context.motion.matches = false;
+  const initializing = context.drawFilm(filmFrame(60000));
+  context.motion.matches = true;
+  await context.drawFilm(filmFrame(60000));
+  context.state = { ms: 0, playing: false };
+  await context.drawFilm(filmFrame(0));
+  finish({
+    dispose() {
+      delete archive.total;
+    },
+  });
+  await initializing;
+  assert.equal(
+    archive.total,
+    0,
+    'late disposal restores latest count rather than captured ring one',
+  );
+  assert.equal(context.view, null);
+  assert.equal(context.pending, null);
+  context.motion.matches = false;
+  const unloading = context.drawFilm(filmFrame(0));
+  context.alive = false;
+  await context.drawFilm(filmFrame(0));
+  finish({
+    dispose() {
+      delete archive.total;
+    },
+  });
+  await unloading;
+  assert.equal(archive.total, undefined, 'unloaded film cannot resurrect growth art');
+});
+
+test('film close framing is opt-in and contact-sheet transport stays within protocol bounds', async () => {
+  const renderer = await readFile('public/relic3d.js', 'utf8');
+  const film = await readFile('public/film.js', 'utf8');
+  const timing = await readFile('scripts/browser-smoke-film-timing.js', 'utf8');
+  assert.match(renderer, /framing = 'default'/);
+  assert.match(renderer, /framing === 'film' \? 20 : 36/);
+  assert.match(film, /framing: 'film'/);
+  assert.match(timing, /filmPaintedFraming/);
+  assert.match(timing, /painted\.paintedHeight >= painted\.stageHeight \* 0\.5/);
+  assert.match(timing, /assert\.equal\(painted\.overlap, 0\)/);
+  assert.match(timing, /bytes\.toString\('base64'\)/);
+  const frames = Array.from({ length: 4 }, () => Buffer.alloc(524288).toString('base64'));
+  assert.ok(Buffer.byteLength(JSON.stringify(frames)) < 3 * 1024 * 1024);
+  assert.equal(Buffer.from(frames[0], 'base64').length, 524288);
+  assert.doesNotMatch(timing, /map\(\(bytes\) => \[\.\.\.bytes\]\)/);
+});
+
+test('observed reduced transition pauses normal film once without blocking manual resume or kiosk', () => {
+  const playing = Object.freeze({ ms: 60000, playing: true });
+  const reduced = reconcileFilmMotion(playing, false, true);
+  assert.equal(reduced.state.playing, false);
+  assert.equal(reduced.state.ms, 60000);
+  assert.equal(reduced.reduced, true);
+  const resumed = filmStep(reduced.state, 'toggle');
+  assert.equal(reconcileFilmMotion(resumed, true, true).state, resumed);
+  assert.ok(sampleFilmClock({ state: resumed, at: 0 }, 250, '/demo/film').state.ms > 60000);
+  const paused = filmStep(resumed, 'toggle');
+  assert.equal(reconcileFilmMotion(paused, true, false).state, paused);
+  assert.equal(reconcileFilmMotion(resumed, false, true, true).state, resumed);
+  const normalAgain = reconcileFilmMotion(resumed, true, false);
+  assert.equal(
+    reconcileFilmMotion(normalAgain.state, normalAgain.reduced, true).state.playing,
+    false,
+  );
 });

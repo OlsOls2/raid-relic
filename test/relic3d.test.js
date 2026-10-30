@@ -65,368 +65,372 @@ test('reduced motion never imports WebGL; missing vendor fails to SVG without th
   missing.update(null);
   missing.dispose();
 });
-test('injected renderer pauses hidden, discards stale sprite loads, and context loss restores SVG', async () => {
-  const listeners = {},
-    classes = new Set(),
-    pending = new Map(),
-    images = [],
-    materials = [],
-    textures = [];
-  let colorWrites = 0;
-  let sequence = 0,
-    renders = 0,
-    disposed = 0,
-    forced = 0,
-    rendererDisposals = 0,
-    sizeCalls = 0,
-    projectionCalls = 0,
-    texturesCreated = 0,
-    texturesDisposed = 0;
-  let bounds = { width: 160, height: 160 };
-  let testCamera;
-  const canvas = {
-    style: { display: 'block' },
-    dataset: {},
-    width: 0,
-    hidden: true,
-    setAttribute() {},
-    addEventListener(n, f) {
-      listeners[n] = f;
-    },
-    removeEventListener(n, f) {
-      if (listeners[n] === f) delete listeners[n];
-    },
-    remove() {},
-  };
-  class Object3D {
-    constructor() {
-      this.rotation = {};
-      this.position = { set() {} };
-      this.scale = { set() {} };
-    }
-    add() {}
-    remove() {}
-  }
-  class Resource {
-    constructor() {}
-    setAttribute() {}
-    computeVertexNormals() {}
-    dispose() {
-      disposed++;
-    }
-  }
-  class Mesh extends Object3D {
-    constructor(g, m) {
-      super();
-      this.geometry = g;
-      this.material = m;
-    }
-  }
-  class Material extends Resource {
-    constructor(options) {
-      super();
-      Object.assign(this, options);
-      if (typeof options?.color === 'string')
-        this.color = {
-          r: 0.2,
-          g: 0.3,
-          b: 0.4,
-          setRGB(r, g, b) {
-            colorWrites++;
-            Object.assign(this, { r, g, b });
-          },
-        };
-      materials.push(this);
-    }
-  }
-  class Image {
-    constructor() {
-      images.push(this);
-    }
-  }
-  const T = {
-    WebGLRenderer: class {
-      constructor(options) {
-        assert.equal(options.antialias, false);
-        this.domElement = canvas;
+for (const framing of ['default', 'film'])
+  test(`${framing} renderer pauses hidden, discards stale sprite loads, and context loss restores SVG`, async () => {
+    const listeners = {},
+      classes = new Set(),
+      pending = new Map(),
+      images = [],
+      materials = [],
+      textures = [];
+    let colorWrites = 0;
+    let sequence = 0,
+      renders = 0,
+      disposed = 0,
+      forced = 0,
+      rendererDisposals = 0,
+      sizeCalls = 0,
+      projectionCalls = 0,
+      texturesCreated = 0,
+      texturesDisposed = 0;
+    let bounds = { width: 160, height: 160 };
+    let testCamera;
+    const canvas = {
+      style: { display: 'block' },
+      dataset: {},
+      width: 0,
+      hidden: true,
+      setAttribute() {},
+      addEventListener(n, f) {
+        listeners[n] = f;
+      },
+      removeEventListener(n, f) {
+        if (listeners[n] === f) delete listeners[n];
+      },
+      remove() {},
+    };
+    class Object3D {
+      constructor() {
+        this.rotation = {};
+        this.position = { set() {} };
+        this.scale = { set() {} };
       }
-      setPixelRatio(n) {
-        assert.equal(n, 1);
-      }
-      setClearColor(c, a) {
-        assert.equal(a, 0);
-      }
-      setSize(w, h) {
-        sizeCalls++;
-        canvas.width = w;
-        canvas.height = h;
-      }
-      render() {
-        renders++;
-      }
+      add() {}
+      remove() {}
+    }
+    class Resource {
+      constructor() {}
+      setAttribute() {}
+      computeVertexNormals() {}
       dispose() {
         disposed++;
-        rendererDisposals++;
       }
-      forceContextLoss() {
-        forced++;
-        assert.equal(rendererDisposals, 1);
-        assert.equal(listeners.webglcontextlost, undefined);
-        assert.equal(listeners.webglcontextrestored, undefined);
-      }
-    },
-    Scene: Object3D,
-    Group: Object3D,
-    PerspectiveCamera: class extends Object3D {
-      constructor() {
-        super();
-        testCamera = this;
-      }
-      updateProjectionMatrix() {
-        projectionCalls++;
-      }
-    },
-    BufferGeometry: Resource,
-    Float32BufferAttribute: Resource,
-    ShaderMaterial: Material,
-    Mesh,
-    TorusGeometry: Resource,
-    MeshBasicMaterial: Material,
-    Texture: Resource,
-    CanvasTexture: class extends Resource {
-      constructor() {
-        super();
-        texturesCreated++;
-        textures.push(this);
-      }
-      dispose() {
-        texturesDisposed++;
-        super.dispose();
-      }
-    },
-    SpriteMaterial: Material,
-    Sprite: class extends Mesh {
-      constructor(m) {
-        super(undefined, m);
-      }
-    },
-  };
-  const win = {
-    Image,
-    requestAnimationFrame(f) {
-      const id = ++sequence;
-      pending.set(id, f);
-      return id;
-    },
-    cancelAnimationFrame(id) {
-      pending.delete(id);
-    },
-  };
-  const doc = {
-    createElement() {
-      return {
-        getContext() {
-          return {
-            arc() {},
-            beginPath() {},
-            fill() {},
-            stroke() {},
-            clearRect() {},
-            fillText() {},
-            drawImage() {},
-          };
-        },
-      };
-    },
-    hidden: false,
-    addEventListener(n, f) {
-      listeners[n] = f;
-    },
-    removeEventListener() {},
-  };
-  const reducedMotion = {
-    matches: false,
-    addEventListener(n, f) {
-      listeners.motion = f;
-    },
-    removeEventListener() {},
-  };
-  const archive = {
-    dataset: { phase: 'idle' },
-    getBoundingClientRect: () => bounds,
-    append() {},
-    classList: { add: (n) => classes.add(n), remove: (n) => classes.delete(n) },
-  };
-  const view = await createRelic3D({
-    archive,
-    reducedMotion,
-    corner: true,
-    document: doc,
-    window: win,
-    load: async () => T,
-  });
-  assert.equal(canvas.hidden, true);
-  assert.equal(canvas.style.display, 'none'); // vendor inline block must not flash before first successful frame
-  const tick = (time) => {
-    const item = pending.entries().next().value;
-    if (item) {
-      pending.delete(item[0]);
-      item[1](time);
     }
-  };
-  view.update({ lineageRings: 16, marks: [{ runeSvg: '<svg/>', faded: true }] });
-  tick(0);
-  assert.equal(renders, 1);
-  assert.equal(canvas.dataset.growthTotal, '16');
-  assert.equal(texturesCreated, 0);
-  assert.equal(canvas.style.display, 'block');
-  assert.equal(materials.filter((m) => m.vertexColors).length, 1);
-  assert.equal(materials.find((m) => m.vertexColors).forceSinglePass, true);
-  assert.equal(canvas.dataset.growthTextures, '0');
-  assert.equal(canvas.dataset.growthRepresentation, 'composited-svg-sprite');
-  assert.equal(colorWrites, 0); // Initial tier color survives ordinary idle rendering.
-  tick(10);
-  assert.equal(renders, 1);
-  tick(34);
-  assert.equal(renders, 2);
-  assert.equal(colorWrites, 0); // No identical per-band material writes each frame.
-  assert.equal(texturesCreated, 0);
-  const beforeReuse = disposed,
-    imageCount = images.length;
-  view.update({
-    lineageRings: 16,
-    marks: [{ runeSvg: '<svg/>', faded: true }],
-    claimMeter: { offers: 1 },
-    serverNow: 500,
-  });
-  assert.equal(disposed, beforeReuse);
-  assert.equal(images.length, imageCount);
-  assert.equal(pending.size, 1);
-  tick(40);
-  assert.equal(renders, 2); // unchanged update must not reset the30fps budget
-  assert.equal(canvas.dataset.snapshotPresent, 'true');
-  assert.equal(sizeCalls, 1);
-  assert.equal(projectionCalls, 1);
-  bounds = { width: 358, height: 135 };
-  archive.dataset.fusionPending = 'true';
-  archive.style = { getPropertyValue: (key) => (key === '--fusion-glow' ? '1' : '0.5') };
-  tick(68);
-  assert.equal(colorWrites, 2); // Only the newest pair receives the fusion flare.
+    class Mesh extends Object3D {
+      constructor(g, m) {
+        super();
+        this.geometry = g;
+        this.material = m;
+      }
+    }
+    class Material extends Resource {
+      constructor(options) {
+        super();
+        Object.assign(this, options);
+        if (typeof options?.color === 'string')
+          this.color = {
+            r: 0.2,
+            g: 0.3,
+            b: 0.4,
+            setRGB(r, g, b) {
+              colorWrites++;
+              Object.assign(this, { r, g, b });
+            },
+          };
+        materials.push(this);
+      }
+    }
+    class Image {
+      constructor() {
+        images.push(this);
+      }
+    }
+    const T = {
+      WebGLRenderer: class {
+        constructor(options) {
+          assert.equal(options.antialias, false);
+          this.domElement = canvas;
+        }
+        setPixelRatio(n) {
+          assert.equal(n, 1);
+        }
+        setClearColor(c, a) {
+          assert.equal(a, 0);
+        }
+        setSize(w, h) {
+          sizeCalls++;
+          canvas.width = w;
+          canvas.height = h;
+        }
+        render() {
+          renders++;
+        }
+        dispose() {
+          disposed++;
+          rendererDisposals++;
+        }
+        forceContextLoss() {
+          forced++;
+          assert.equal(rendererDisposals, 1);
+          assert.equal(listeners.webglcontextlost, undefined);
+          assert.equal(listeners.webglcontextrestored, undefined);
+        }
+      },
+      Scene: Object3D,
+      Group: Object3D,
+      PerspectiveCamera: class extends Object3D {
+        constructor(fov) {
+          super();
+          this.fov = fov;
+          testCamera = this;
+        }
+        updateProjectionMatrix() {
+          projectionCalls++;
+        }
+      },
+      BufferGeometry: Resource,
+      Float32BufferAttribute: Resource,
+      ShaderMaterial: Material,
+      Mesh,
+      TorusGeometry: Resource,
+      MeshBasicMaterial: Material,
+      Texture: Resource,
+      CanvasTexture: class extends Resource {
+        constructor() {
+          super();
+          texturesCreated++;
+          textures.push(this);
+        }
+        dispose() {
+          texturesDisposed++;
+          super.dispose();
+        }
+      },
+      SpriteMaterial: Material,
+      Sprite: class extends Mesh {
+        constructor(m) {
+          super(undefined, m);
+        }
+      },
+    };
+    const win = {
+      Image,
+      requestAnimationFrame(f) {
+        const id = ++sequence;
+        pending.set(id, f);
+        return id;
+      },
+      cancelAnimationFrame(id) {
+        pending.delete(id);
+      },
+    };
+    const doc = {
+      createElement() {
+        return {
+          getContext() {
+            return {
+              arc() {},
+              beginPath() {},
+              fill() {},
+              stroke() {},
+              clearRect() {},
+              fillText() {},
+              drawImage() {},
+            };
+          },
+        };
+      },
+      hidden: false,
+      addEventListener(n, f) {
+        listeners[n] = f;
+      },
+      removeEventListener() {},
+    };
+    const reducedMotion = {
+      matches: false,
+      addEventListener(n, f) {
+        listeners.motion = f;
+      },
+      removeEventListener() {},
+    };
+    const archive = {
+      dataset: { phase: 'idle' },
+      getBoundingClientRect: () => bounds,
+      append() {},
+      classList: { add: (n) => classes.add(n), remove: (n) => classes.delete(n) },
+    };
+    const view = await createRelic3D({
+      archive,
+      reducedMotion,
+      corner: true,
+      framing,
+      document: doc,
+      window: win,
+      load: async () => T,
+    });
+    assert.equal(canvas.hidden, true);
+    assert.equal(testCamera.fov, framing === 'film' ? 20 : 36);
+    assert.equal(canvas.style.display, 'none'); // vendor inline block must not flash before first successful frame
+    const tick = (time) => {
+      const item = pending.entries().next().value;
+      if (item) {
+        pending.delete(item[0]);
+        item[1](time);
+      }
+    };
+    view.update({ lineageRings: 16, marks: [{ runeSvg: '<svg/>', faded: true }] });
+    tick(0);
+    assert.equal(renders, 1);
+    assert.equal(canvas.dataset.growthTotal, '16');
+    assert.equal(texturesCreated, 0);
+    assert.equal(canvas.style.display, 'block');
+    assert.equal(materials.filter((m) => m.vertexColors).length, 1);
+    assert.equal(materials.find((m) => m.vertexColors).forceSinglePass, true);
+    assert.equal(canvas.dataset.growthTextures, '0');
+    assert.equal(canvas.dataset.growthRepresentation, 'composited-svg-sprite');
+    assert.equal(colorWrites, 0); // Initial tier color survives ordinary idle rendering.
+    tick(10);
+    assert.equal(renders, 1);
+    tick(34);
+    assert.equal(renders, 2);
+    assert.equal(colorWrites, 0); // No identical per-band material writes each frame.
+    assert.equal(texturesCreated, 0);
+    const beforeReuse = disposed,
+      imageCount = images.length;
+    view.update({
+      lineageRings: 16,
+      marks: [{ runeSvg: '<svg/>', faded: true }],
+      claimMeter: { offers: 1 },
+      serverNow: 500,
+    });
+    assert.equal(disposed, beforeReuse);
+    assert.equal(images.length, imageCount);
+    assert.equal(pending.size, 1);
+    tick(40);
+    assert.equal(renders, 2); // unchanged update must not reset the30fps budget
+    assert.equal(canvas.dataset.snapshotPresent, 'true');
+    assert.equal(sizeCalls, 1);
+    assert.equal(projectionCalls, 1);
+    bounds = { width: 358, height: 135 };
+    archive.dataset.fusionPending = 'true';
+    archive.style = { getPropertyValue: (key) => (key === '--fusion-glow' ? '1' : '0.5') };
+    tick(68);
+    assert.equal(colorWrites, 2); // Only the newest pair receives the fusion flare.
 
-  assert.equal(canvas.width, 358);
-  assert.equal(canvas.height, 135);
-  assert.equal(testCamera.aspect, 358 / 135);
-  assert.equal(projectionCalls, 2);
-  archive.dataset.fusionPending = 'false';
-  tick(102);
-  assert.equal(colorWrites, 4); // Both return to their exact cached tier color.
-  for (const m of materials.filter((m) => typeof m.color?.setRGB === 'function'))
-    assert.deepEqual([m.color.r, m.color.g, m.color.b], [0.2, 0.3, 0.4]);
-  assert.equal(sizeCalls, 2);
-  bounds = { width: 0, height: 0 };
-  const prior = renders;
-  tick(136);
-  assert.equal(renders, prior);
-  assert.equal(canvas.hidden, true);
-  bounds = { width: 160, height: 160 };
-  tick(170);
-  assert.equal(canvas.width, 160);
-  assert.equal(canvas.height, 160);
-  assert.equal(testCamera.aspect, 1);
+    assert.equal(canvas.width, 358);
+    assert.equal(canvas.height, 135);
+    assert.equal(testCamera.aspect, 358 / 135);
+    assert.equal(projectionCalls, 2);
+    archive.dataset.fusionPending = 'false';
+    tick(102);
+    assert.equal(colorWrites, 4); // Both return to their exact cached tier color.
+    for (const m of materials.filter((m) => typeof m.color?.setRGB === 'function'))
+      assert.deepEqual([m.color.r, m.color.g, m.color.b], [0.2, 0.3, 0.4]);
+    assert.equal(sizeCalls, 2);
+    bounds = { width: 0, height: 0 };
+    const prior = renders;
+    tick(136);
+    assert.equal(renders, prior);
+    assert.equal(canvas.hidden, true);
+    bounds = { width: 160, height: 160 };
+    tick(170);
+    assert.equal(canvas.width, 160);
+    assert.equal(canvas.height, 160);
+    assert.equal(testCamera.aspect, 1);
 
-  tick(204);
-  assert.equal(canvas.hidden, false);
-  assert.equal(classes.has('webgl-relic'), true);
-  assert.equal(pending.size, 1);
-  images[0].onerror();
-  assert.equal(canvas.dataset.spriteFailures, '1');
-  view.update({ lineageRings: 0, marks: [] });
-  assert.equal(canvas.dataset.spriteFailures, '0');
-  const before = disposed;
-  images[0].onerror();
-  assert.equal(canvas.dataset.spriteFailures, '0');
-  images[0].onload();
-  assert.equal(disposed, before); // stale load creates no resources
-  doc.hidden = true;
-  listeners.visibilitychange();
-  assert.equal(pending.size, 0);
-  assert.equal(classes.has('webgl-relic'), false);
-  doc.hidden = false;
-  listeners.visibilitychange();
-  tick(272);
-  assert.equal(classes.has('webgl-relic'), true);
-  view.update({ lineageRings: 3, marks: [] });
-  view.update(null);
-  listeners.visibilitychange();
-  assert.equal(pending.size, 0);
-  assert.equal(canvas.hidden, true);
-  assert.equal(canvas.style.display, 'none');
-  assert.equal(canvas.dataset.bands, '0');
-  assert.equal(canvas.dataset.sprites, '0');
-  assert.equal(forced, 0);
-  const pausedRenders = renders;
-  tick(306);
-  assert.equal(renders, pausedRenders);
-  view.update({ lineageRings: 1, marks: [] }, { animate: false });
-  const staticRenders = renders;
-  assert.equal(canvas.hidden, false);
-  assert.equal(canvas.dataset.bands, '2');
-  assert.equal(pending.size, 0);
-  tick(320);
-  assert.equal(renders, staticRenders);
-  const styleTicks = Number(canvas.dataset.growthTicks ?? 0);
-  for (const total of [9, 17, 42, 120]) {
-    view.update({ lineageRings: total, marks: [] }, { animate: false, growthFeedback: false });
-    assert.equal(Number(canvas.dataset.growthTicks ?? 0), styleTicks);
-    assert.equal(canvas.dataset.growthTotal, String(total));
+    tick(204);
+    assert.equal(canvas.hidden, false);
+    assert.equal(classes.has('webgl-relic'), true);
+    assert.equal(pending.size, 1);
+    images[0].onerror();
+    assert.equal(canvas.dataset.spriteFailures, '1');
+    view.update({ lineageRings: 0, marks: [] });
+    assert.equal(canvas.dataset.spriteFailures, '0');
+    const before = disposed;
+    images[0].onerror();
+    assert.equal(canvas.dataset.spriteFailures, '0');
+    images[0].onload();
+    assert.equal(disposed, before); // stale load creates no resources
+    doc.hidden = true;
+    listeners.visibilitychange();
     assert.equal(pending.size, 0);
-  }
-  view.update({ lineageRings: 9, marks: [] }, { animate: false, growthFeedback: false });
-  view.update({ lineageRings: 10, marks: [] }, { animate: false });
-  assert.equal(Number(canvas.dataset.growthTicks), styleTicks + 1);
-  view.update({ lineageRings: 10, marks: [] }, { animate: false });
-  assert.equal(Number(canvas.dataset.growthTicks), styleTicks + 1);
-  view.update(null);
-  assert.equal(canvas.hidden, true);
-  assert.equal(canvas.dataset.bands, '0');
-  view.update({ lineageRings: 0, marks: [] });
-  tick(340);
-  listeners.webglcontextlost({ preventDefault() {} });
-  assert.equal(pending.size, 0);
-  assert.equal(canvas.hidden, true);
-  assert.equal(canvas.style.display, 'none');
-  assert.equal(classes.has('webgl-relic'), false);
-  view.wake();
-  assert.equal(canvas.style.display, 'none');
-  assert.equal(forced, 0);
-  const staleRestore = listeners.webglcontextrestored;
-  listeners.webglcontextrestored();
-  tick(374);
-  assert.equal(canvas.dataset.contextStatus, 'active');
-  assert.equal(canvas.hidden, false);
-  assert.equal(forced, 0);
-  reducedMotion.matches = true;
-  listeners.motion();
-  assert.equal(forced, 1); // Reduced motion permanently releases the owned context.
-  reducedMotion.matches = false;
-  view.wake();
-  tick(408);
-  assert.equal(pending.size, 0); // The owner creates a fresh scene on normal motion.
-  view.dispose();
-  view.dispose();
-  assert.ok(disposed > 0);
-  assert.equal(forced, 1);
-  assert.equal(rendererDisposals, 1);
-  assert.equal(texturesDisposed, texturesCreated);
-  assert.equal(canvas.hidden, true);
-  assert.equal(canvas.style.display, 'none');
-  staleRestore();
-  view.update({ lineageRings: 1, marks: [] });
-  view.wake();
-  assert.equal(pending.size, 0);
-  listeners.visibilitychange();
-  assert.equal(pending.size, 0);
-});
+    assert.equal(classes.has('webgl-relic'), false);
+    doc.hidden = false;
+    listeners.visibilitychange();
+    tick(272);
+    assert.equal(classes.has('webgl-relic'), true);
+    view.update({ lineageRings: 3, marks: [] });
+    view.update(null);
+    listeners.visibilitychange();
+    assert.equal(pending.size, 0);
+    assert.equal(canvas.hidden, true);
+    assert.equal(canvas.style.display, 'none');
+    assert.equal(canvas.dataset.bands, '0');
+    assert.equal(canvas.dataset.sprites, '0');
+    assert.equal(forced, 0);
+    const pausedRenders = renders;
+    tick(306);
+    assert.equal(renders, pausedRenders);
+    view.update({ lineageRings: 1, marks: [] }, { animate: false });
+    const staticRenders = renders;
+    assert.equal(canvas.hidden, false);
+    assert.equal(canvas.dataset.bands, '2');
+    assert.equal(pending.size, 0);
+    tick(320);
+    assert.equal(renders, staticRenders);
+    const styleTicks = Number(canvas.dataset.growthTicks ?? 0);
+    for (const total of [9, 17, 42, 120]) {
+      view.update({ lineageRings: total, marks: [] }, { animate: false, growthFeedback: false });
+      assert.equal(Number(canvas.dataset.growthTicks ?? 0), styleTicks);
+      assert.equal(canvas.dataset.growthTotal, String(total));
+      assert.equal(pending.size, 0);
+    }
+    view.update({ lineageRings: 9, marks: [] }, { animate: false, growthFeedback: false });
+    view.update({ lineageRings: 10, marks: [] }, { animate: false });
+    assert.equal(Number(canvas.dataset.growthTicks), styleTicks + 1);
+    view.update({ lineageRings: 10, marks: [] }, { animate: false });
+    assert.equal(Number(canvas.dataset.growthTicks), styleTicks + 1);
+    view.update(null);
+    assert.equal(canvas.hidden, true);
+    assert.equal(canvas.dataset.bands, '0');
+    view.update({ lineageRings: 0, marks: [] });
+    tick(340);
+    listeners.webglcontextlost({ preventDefault() {} });
+    assert.equal(pending.size, 0);
+    assert.equal(canvas.hidden, true);
+    assert.equal(canvas.style.display, 'none');
+    assert.equal(classes.has('webgl-relic'), false);
+    view.wake();
+    assert.equal(canvas.style.display, 'none');
+    assert.equal(forced, 0);
+    const staleRestore = listeners.webglcontextrestored;
+    listeners.webglcontextrestored();
+    tick(374);
+    assert.equal(canvas.dataset.contextStatus, 'active');
+    assert.equal(canvas.hidden, false);
+    assert.equal(forced, 0);
+    reducedMotion.matches = true;
+    listeners.motion();
+    assert.equal(forced, 1); // Reduced motion permanently releases the owned context.
+    reducedMotion.matches = false;
+    view.wake();
+    tick(408);
+    assert.equal(pending.size, 0); // The owner creates a fresh scene on normal motion.
+    view.dispose();
+    view.dispose();
+    assert.ok(disposed > 0);
+    assert.equal(forced, 1);
+    assert.equal(rendererDisposals, 1);
+    assert.equal(texturesDisposed, texturesCreated);
+    assert.equal(canvas.hidden, true);
+    assert.equal(canvas.style.display, 'none');
+    staleRestore();
+    view.update({ lineageRings: 1, marks: [] });
+    view.wake();
+    assert.equal(pending.size, 0);
+    listeners.visibilitychange();
+    assert.equal(pending.size, 0);
+  });
 test('vendored Three.js module is local, MIT-labelled and exposes the renderer contract', async () => {
   const { readFile } = await import('node:fs/promises');
   const T = await import('../public/vendor/three.module.js');

@@ -2,59 +2,76 @@
 export const FILM_MS = 150000;
 export const JUDGE_MS = 45000;
 export const filmDuration = (path) => (path === '/demo/judge' ? JUDGE_MS : FILM_MS);
-export function advanceFilmAtPace(state, delta, path, hidden = false) {
-  if (path !== '/demo/judge') return advanceFilm(state, delta, hidden);
-  if (!state.playing || hidden || !Number.isFinite(delta) || delta <= 0) return state;
-  return seekFilm(state, state.ms + (Math.min(250, delta) * FILM_MS) / JUDGE_MS);
+export function filmPlaybackOptions(search = '', reduced = false) {
+  const query = new URLSearchParams(search);
+  const kiosk = query.get('kiosk') === '1';
+  return Object.freeze({ kiosk, playing: !reduced || (kiosk && query.get('autoplay') === '1') });
+}
+// Observe the preference itself, even when a change notification is delayed.
+// Only the transition pauses: subsequent explicit Play remains available.
+export function reconcileFilmMotion(state, previousReduced, reduced, kiosk = false) {
+  return Object.freeze({
+    reduced,
+    state:
+      reduced && !previousReduced && !kiosk ? Object.freeze({ ...state, playing: false }) : state,
+  });
+}
+export function advanceFilmAtPace(state, delta, path, hidden = false, kiosk = false) {
+  if (!state.playing || (hidden && !kiosk) || !Number.isFinite(delta) || delta <= 0) return state;
+  const ms = Math.min(FILM_MS, state.ms + (delta * FILM_MS) / filmDuration(path));
+  return Object.freeze({ ms, playing: ms < FILM_MS });
+}
+// Constant-work catch-up: no per-missed-frame loop, no Date.now authority.
+export function sampleFilmClock(clock, now, path, hidden = false, kiosk = false) {
+  if (!Number.isFinite(now) || now < clock.at) return clock;
+  return Object.freeze({
+    at: now,
+    state: advanceFilmAtPace(clock.state, now - clock.at, path, hidden, kiosk),
+  });
 }
 export const FILM_SCENES = Object.freeze([
   Object.freeze({
     at: 0,
     name: 'Send Off',
-    caption: 'Two fictional Keepers choose to pass one relic. API acceptance is not an arrival.',
+    caption: 'One relic. Two chats.',
   }),
   Object.freeze({
     at: 15000,
     name: 'Arrival',
-    caption: 'A simulated signed receipt begins the original arrival. No Twitch event is sent.',
+    caption: 'The relic arrives.',
   }),
   Object.freeze({
     at: 40000,
     name: 'Two-chat claim',
-    caption:
-      'An early offer waits for a distinct host accept. Only their completed simulated binding adds a ring.',
+    caption: 'Both chats claim it.',
   }),
   Object.freeze({
     at: 60000,
     name: 'Community engraving',
-    caption:
-      'The approved sample word moon becomes an original community rune. Private held words never appear.',
+    caption: 'Leave a rune.',
   }),
   Object.freeze({
     at: 80000,
     name: 'Keeper spotlight',
-    caption:
-      'SIMULATED LIVE · @demo_keeper_b holds the relic. This is not a Twitch live-status observation.',
+    caption: 'A new Keeper.',
   }),
   Object.freeze({
     at: 100000,
     name: 'Recorded journey',
-    caption:
-      'One retained fictional hop, from @demo_keeper_a to @demo_keeper_b. Presence is not proof of raid membership.',
+    caption: 'A story that stays.',
   }),
   Object.freeze({
     at: 120000,
     name: 'Journey replay',
-    caption: 'Replay the same recorded arrival. Replay adds no ring, vote or new history.',
+    caption: 'Replay the journey.',
   }),
   Object.freeze({
     at: 135000,
     name: 'Take the story onward',
-    caption:
-      'Preview a permanently simulated ring card. Download only if you choose the export button.',
+    caption: 'Carry the story onward.',
   }),
 ]);
-export const freshFilm = () => Object.freeze({ ms: 0, playing: true });
+export const freshFilm = (playing = true) => Object.freeze({ ms: 0, playing });
 export function seekFilm(state, ms) {
   if (!Number.isFinite(ms)) return state;
   return Object.freeze({
@@ -64,8 +81,8 @@ export function seekFilm(state, ms) {
 }
 export function advanceFilm(state, delta, hidden = false) {
   if (!state.playing || hidden || !Number.isFinite(delta) || delta <= 0) return state;
-  // A suspended tab never fast-forwards the story on return.
-  return seekFilm(state, state.ms + Math.min(250, delta));
+  // Normal hidden pages pause; visible throttled work catches up in one step.
+  return advanceFilmAtPace(state, delta, '/demo/film', hidden);
 }
 export function filmStep(state, action) {
   if (action === 'restart') return freshFilm();

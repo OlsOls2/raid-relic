@@ -68,7 +68,10 @@ try {
   await page.setViewportSize({ width: 1280, height: 720 });
   stage = 'judge-start';
   await page.goto(origin + '/demo/judge');
-  assert.match(await page.locator('#film-banner').innerText(), /JUDGE.*SIMULATOR.*no Twitch/);
+  assert.match(
+    await page.locator('#film-verification').textContent(),
+    /JUDGE.*SIMULATOR.*no Twitch/,
+  );
   assert.equal(await page.locator('body').getAttribute('data-presentation-duration'), '45000');
   assert.equal(await page.locator('#film-heading').innerText(), 'Send Off');
   const visited = new Set(['Send Off']);
@@ -77,7 +80,7 @@ try {
     await page.clock.runFor(target - spent);
     spent = target;
     visited.add(await page.locator('#film-heading').innerText());
-    assert.match(await page.locator('#film-banner').innerText(), /SIMULATOR.*no Twitch/);
+    assert.match(await page.locator('#film-verification').textContent(), /SIMULATOR.*no Twitch/);
     if (target === 6000) {
       assert.equal(await growthPixels(page, () => page.clock.runFor(100)), true);
     }

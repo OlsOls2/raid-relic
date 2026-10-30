@@ -91,6 +91,7 @@ export async function createRelic3D({
   archive,
   reducedMotion,
   corner = false,
+  framing = 'default',
   previousGrowth = null,
   onReducedMotion = () => {},
   design = DEFAULT_DESIGN,
@@ -114,6 +115,7 @@ export async function createRelic3D({
     smallWidget = false,
     staticMode = false,
     lastGrowth = growthSummary(previousGrowth)?.total ?? null;
+  const cameraFov = framing === 'film' ? 20 : 36;
   const resources = new Set(),
     sprites = [],
     bands = [];
@@ -388,7 +390,7 @@ export async function createRelic3D({
         const pose = runePose(sprite.orbitIndex, snapshot.marks?.length ?? 0, time, unfurl);
         sprite.visible =
           !['streak', 'impact'].includes(phase) && (phase !== 'unfurl' || pose.flight > 0);
-        const span = 2 * (6 - 0.5) * Math.tan(Math.PI / 10); // camera36deg, sprite plane z=.5
+        const span = 2 * (6 - 0.5) * Math.tan((cameraFov * Math.PI) / 360);
         sprite.position.set(
           ((pose.x - 50) / 100) * span * camera.aspect,
           ((50 - pose.y) / 100) * span,
@@ -546,7 +548,8 @@ export async function createRelic3D({
     canvas.dataset.shaderErrors = '0';
     archive.append(canvas);
     scene = new T.Scene();
-    camera = new T.PerspectiveCamera(36, 1, 0.1, 20);
+    // Film-only close framing; all existing callers retain the 36-degree camera.
+    camera = new T.PerspectiveCamera(cameraFov, 1, 0.1, 20);
     camera.position.z = 6;
     group = new T.Group();
     scene.add(group);
