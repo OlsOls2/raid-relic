@@ -1,0 +1,3 @@
+# Generated transcript parts preserve entry-boundary separators for exact byte concatenation.
+# Permit only their blank-at-EOF separator; application and other whitespace checks stay normal.
+/.codex-evidence/EXPORTED_TRANSCRIPT.part-*.md whitespace=-blank-at-eof

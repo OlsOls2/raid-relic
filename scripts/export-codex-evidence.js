@@ -1,5 +1,5 @@
 // Offline submission exporter. Never discover Codex/auth directories or active rollouts.
-import { readFile, readdir, lstat, realpath, writeFile, rename } from 'node:fs/promises';
+import { readdir, lstat, realpath } from 'node:fs/promises';
 import { resolve, dirname, basename, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
@@ -144,6 +144,7 @@ export function transcriptFrom(raw) {
       credentialReasons: {},
     };
   const entries = [];
+  let renderedBytes = 0;
   let meta = 0,
     firstTimestamp = null,
     lastTimestamp = null;
@@ -229,16 +230,24 @@ export function transcriptFrom(raw) {
     // Presentation only, after source-length accounting and sanitized digest:
     // a bounded slice can end mid-line on whitespace immediately before its marker.
     body = body.replace(/[ \t]+(?=\r?$)/gm, '');
-    entries.push(
-      `### ${entries.length + 1}. ${stamp ?? 'timestamp unavailable'} — ${label} (source line ${n + 1})\n\n\`\`\`\`text\n${body.replaceAll('````', '[four-backtick delimiter escaped]')}\n\`\`\`\`\n`,
-    );
+    const entry = `### ${entries.length + 1}. ${stamp ?? 'timestamp unavailable'} — ${label} (source line ${n + 1})\n\n\`\`\`\`text\n${body.replaceAll('````', '[four-backtick delimiter escaped]')}\n\`\`\`\`\n`;
+    renderedBytes += Buffer.byteLength(entry);
+    if (renderedBytes > 32 * 1024 * 1024) throw Error('Selected aggregate size rejected');
+    entries.push(entry);
   }
   if (meta !== 1) throw Error('Exactly one matching session_meta required');
   const header = `# Sanitized Codex transcript\n\nSession: ${SESSION_ID}\n\nSnapshot cutoff: ${lastTimestamp ?? 'unavailable'} (last timestamped record; not a claim that future/active conversation is included).\n\nThis is a readable selected native-JSONL export, NOT a complete raw transcript. User/assistant messages and tool calls/results are retained; duplicate native event records are labelled. Private system/developer/bootstrap instructions, reasoning/analysis, opaque encrypted fields, media/base64 and other internal metadata are omitted. Each item is capped at ${MAX_TEXT} characters with an explicit omission count and sanitized-item digest. No raw-backup links or private credentials are published. Credential-looking literals, headers or sensitive fields cause whole-item content omission, with source line and reason retained; counts are in the manifest. Strong key patterns remain fatal across all selected visible fields, even in otherwise omitted items. Existing synthetic fixture literals are explicitly classified, not proof of real authentication.\n\n`;
-  const markdown =
-    header +
-    'Rendered body lines have trailing spaces/tabs removed; source digests and truncation counts refer to the pre-rendered content.\n\n' +
-    entries.join('\n');
+  const presentation =
+    'Rendered body lines have trailing spaces/tabs removed; source digests and truncation counts refer to the pre-rendered content.\n\n';
+  if (
+    Buffer.byteLength(header) +
+      Buffer.byteLength(presentation) +
+      renderedBytes +
+      Math.max(0, entries.length - 1) >
+    32 * 1024 * 1024
+  )
+    throw Error('Selected aggregate size rejected');
+  const markdown = header + presentation + entries.join('\n');
   scan(markdown);
   return {
     markdown,
@@ -251,7 +260,7 @@ export function transcriptFrom(raw) {
 }
 async function regular(file, max = MAX_BYTES) {
   const info = await lstat(file);
-  if (!info.isFile() || info.isSymbolicLink() || info.size > max)
+  if (!info.isFile() || info.isSymbolicLink() || info.nlink !== 1 || info.size > max)
     throw Error('Source file rejected');
   return info;
 }
@@ -264,6 +273,14 @@ export async function exportEvidence({ root = process.cwd(), input } = {}) {
     const stat = await lstat(dir);
     if (!stat.isDirectory() || stat.isSymbolicLink()) throw Error('Source directory rejected');
   }
+  const { boundedFile, evidenceSHA, packageSelected, publishSelected } =
+    await import('./verify-evidence.js');
+  let previous = null;
+  try {
+    previous = evidenceSHA(await boundedFile(join(evidence, 'EXPORT_MANIFEST.json'), 1024 * 1024));
+  } catch (e) {
+    if (e.code !== 'ENOENT') throw e;
+  }
   const file = resolve(base, input),
     leaf = basename(file);
   if (
@@ -272,7 +289,7 @@ export async function exportEvidence({ root = process.cwd(), input } = {}) {
   )
     throw Error('Explicit owned snapshot path/session filename required');
   const before = await regular(file);
-  const raw = await readFile(file);
+  const raw = await boundedFile(file, MAX_BYTES);
   const after = await regular(file);
   if (before.size !== after.size || before.mtimeMs !== after.mtimeMs || raw.length !== before.size)
     throw Error('Snapshot changed during read');
@@ -283,7 +300,7 @@ export async function exportEvidence({ root = process.cwd(), input } = {}) {
     .sort()) {
     const path = join(evidence, name);
     await regular(path);
-    const bytes = await readFile(path);
+    const bytes = await boundedFile(path, MAX_BYTES);
     sourceRunLogs.push({ leaf: name, bytes: bytes.length, sha256: sha(bytes) });
   }
   const manifest = {
@@ -305,34 +322,7 @@ export async function exportEvidence({ root = process.cwd(), input } = {}) {
       'Selected sanitized native JSONL; private/internal/media omitted and per-item output bounded. Raw snapshot remains local ignored.',
   };
   scan(JSON.stringify(manifest));
-  // Refuse symlink destinations; only these two approved outputs can be written.
-  for (const name of ['EXPORTED_TRANSCRIPT.md', 'EXPORT_MANIFEST.json']) {
-    try {
-      if (!(await lstat(join(evidence, name))).isFile()) throw Error('Output rejected');
-    } catch (e) {
-      if (e.code !== 'ENOENT') throw e;
-    }
-    try {
-      await lstat(join(evidence, `${name}.tmp`));
-      throw Error('Existing temporary output rejected');
-    } catch (e) {
-      if (e.code !== 'ENOENT') throw e;
-    }
-  }
-  await writeFile(join(evidence, 'EXPORTED_TRANSCRIPT.md.tmp'), parsed.markdown, {
-    flag: 'wx',
-    mode: 0o600,
-  });
-  await writeFile(
-    join(evidence, 'EXPORT_MANIFEST.json.tmp'),
-    JSON.stringify(manifest, null, 2) + '\n',
-    { flag: 'wx', mode: 0o600 },
-  );
-  await rename(
-    join(evidence, 'EXPORTED_TRANSCRIPT.md.tmp'),
-    join(evidence, 'EXPORTED_TRANSCRIPT.md'),
-  );
-  await rename(join(evidence, 'EXPORT_MANIFEST.json.tmp'), join(evidence, 'EXPORT_MANIFEST.json'));
+  await publishSelected(base, packageSelected(Buffer.from(parsed.markdown), manifest), previous);
   return {
     exportedEntries: parsed.exportedEntries,
     cutoff: parsed.cutoff,

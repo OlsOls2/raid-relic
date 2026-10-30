@@ -1,23 +1,91 @@
 // Operator-only offline secondary omission. Explicit selected artifacts and report;
 // no raw/active session discovery, no finding values emitted or copied.
-import { readFile, writeFile, rename, lstat, unlink } from 'node:fs/promises';
-import { resolve, join, basename } from 'node:path';
+import { lstat } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
   evidenceEntries,
   evidenceSHA,
   readSelected,
   verifyEvidenceBytes,
+  packageSelected,
+  publishSelected,
+  validateParts,
+  PART_LIMIT,
+  TOTAL_LIMIT,
+  boundedFile,
+  selectedFiles,
 } from './verify-evidence.js';
 const ruleName = (value) => typeof value === 'string' && /^[A-Za-z0-9_-]{1,80}$/.test(value);
+// A v2 report is a private envelope, not a published scanner report. Every
+// component (including zero findings) must be bound to the exact current bytes.
+export function mappedReport(bytes, manifest, report) {
+  if (manifest.formatVersion !== 2) {
+    if (!Array.isArray(report)) throw Error('Legacy report rejected');
+    return report;
+  }
+  validateParts(bytes, manifest);
+  if (
+    !report ||
+    Object.keys(report).sort().join(',') !== 'components,exportSHA256,formatVersion' ||
+    report.formatVersion !== 2 ||
+    report.exportSHA256 !== evidenceSHA(bytes) ||
+    !Array.isArray(report.components) ||
+    report.components.length !== manifest.parts.length
+  )
+    throw Error('Report generation rejected');
+  let offset = 0,
+    lineOffset = 0;
+  const findings = [];
+  for (const [i, p] of manifest.parts.entries()) {
+    const row = report.components[i];
+    if (
+      !row ||
+      Object.keys(row).sort().join(',') !== 'bytes,findings,path,sha256' ||
+      row.path !== p.path ||
+      row.sha256 !== p.sha256 ||
+      row.bytes !== p.bytes ||
+      !Array.isArray(row.findings) ||
+      row.findings.length > 10000 ||
+      findings.length + row.findings.length > 10000
+    )
+      throw Error('Report component rejected');
+    const text = new TextDecoder('utf8', { fatal: true }).decode(
+      bytes.subarray(offset, offset + p.bytes),
+    );
+    const lineCount = text.split('\n').length;
+    for (const f of row.findings) {
+      if (
+        !f ||
+        ![p.path, `.codex-evidence/${p.path}`].includes(f.File) ||
+        !Number.isSafeInteger(f.StartLine) ||
+        f.StartLine < 1 ||
+        !Number.isSafeInteger(f.EndLine ?? f.StartLine) ||
+        (f.EndLine ?? f.StartLine) < f.StartLine ||
+        (f.EndLine ?? f.StartLine) > lineCount - (i + 1 < manifest.parts.length ? 1 : 0)
+      )
+        throw Error('Report component location rejected');
+      findings.push({
+        ...f,
+        File: 'EXPORTED_TRANSCRIPT.md',
+        StartLine: f.StartLine + lineOffset,
+        EndLine: (f.EndLine ?? f.StartLine) + lineOffset,
+      });
+    }
+    offset += p.bytes;
+    lineOffset += lineCount - 1;
+  }
+  return findings;
+}
 export function omitSecondary(bytes, manifest, report, reportSHA256) {
   if (
     !Buffer.isBuffer(bytes) ||
-    bytes.length > 16 * 1024 * 1024 ||
+    bytes.length > (manifest.formatVersion === 2 ? TOTAL_LIMIT : PART_LIMIT) ||
     manifest.exportBytes !== bytes.length ||
     manifest.exportSHA256 !== evidenceSHA(bytes)
   )
     throw Error('Selected input mismatch');
+  report = mappedReport(bytes, manifest, report);
   if (!Array.isArray(report) || report.length > 10000 || !/^[a-f0-9]{64}$/.test(reportSHA256))
     throw Error('Report rejected');
   if (manifest.secondaryScan)
@@ -25,12 +93,14 @@ export function omitSecondary(bytes, manifest, report, reportSHA256) {
   const text = new TextDecoder('utf8', { fatal: true }).decode(bytes),
     { lines, entries } = evidenceEntries(text),
     affected = new Map(),
-    rules = {};
+    rules = Object.create(null);
   for (const finding of report) {
     if (
       !ruleName(finding.RuleID) ||
       typeof finding.File !== 'string' ||
-      basename(finding.File) !== 'EXPORTED_TRANSCRIPT.md' ||
+      !['EXPORTED_TRANSCRIPT.md', '.codex-evidence/EXPORTED_TRANSCRIPT.md'].includes(
+        finding.File,
+      ) ||
       !Number.isSafeInteger(finding.StartLine) ||
       finding.StartLine < 1
     )
@@ -73,7 +143,7 @@ export function omitSecondary(bytes, manifest, report, reportSHA256) {
     }
   const output = Buffer.from(lines.join('\n')),
     next = structuredClone(manifest);
-  if (output.length > 16 * 1024 * 1024) throw Error('Selected output too large');
+  if (output.length > TOTAL_LIMIT) throw Error('Selected output too large');
   next.exportBytes = output.length;
   next.exportSHA256 = evidenceSHA(output);
   next.sourceRunLogCount = next.sourceRunLogs.length;
@@ -86,9 +156,10 @@ export function omitSecondary(bytes, manifest, report, reportSHA256) {
   };
   next.scope +=
     ' Secondary scanner findings cause whole selected-entry omission, including public identifiers; zero-finding rescan required.';
-  return { bytes: output, manifest: next };
+  return packageSelected(output, next);
 }
 export function attestSecondary(bytes, manifest, report, reportSHA256) {
+  report = mappedReport(bytes, manifest, report);
   if (
     !Array.isArray(report) ||
     report.length !== 0 ||
@@ -101,6 +172,9 @@ export function attestSecondary(bytes, manifest, report, reportSHA256) {
     status: 'zero-findings',
     reportSHA256,
     scannedExportSHA256: evidenceSHA(bytes),
+    ...(manifest.formatVersion === 2
+      ? { scannedPartsSHA256: evidenceSHA(JSON.stringify(manifest.parts)) }
+      : {}),
   };
   verifyEvidenceBytes(bytes, next);
   return next;
@@ -110,9 +184,9 @@ export async function sanitizeEvidence({ root = process.cwd(), reportPath, verif
     throw Error('Explicit private report required');
   const path = resolve(reportPath),
     s = await lstat(path);
-  if (!s.isFile() || s.isSymbolicLink() || s.size > 16 * 1024 * 1024)
+  if (!s.isFile() || s.isSymbolicLink() || s.nlink !== 1 || s.size > 16 * 1024 * 1024)
     throw Error('Report file rejected');
-  const raw = await readFile(path),
+  const raw = await boundedFile(path, 16 * 1024 * 1024),
     report = JSON.parse(raw),
     selected = await readSelected(root),
     digest = evidenceSHA(raw);
@@ -122,25 +196,15 @@ export async function sanitizeEvidence({ root = process.cwd(), reportPath, verif
         manifest: attestSecondary(selected.bytes, selected.manifest, report, digest),
       }
     : omitSecondary(selected.bytes, selected.manifest, report, digest);
-  const outputs = verify
-    ? ['EXPORT_MANIFEST.json']
-    : ['EXPORTED_TRANSCRIPT.md', 'EXPORT_MANIFEST.json'];
-  const temporary = [];
-  try {
-    for (const name of outputs) {
-      const dest = join(root, '.codex-evidence', name),
-        tmp = dest + '.secondary.tmp';
-      await writeFile(
-        tmp,
-        name.endsWith('.md') ? result.bytes : JSON.stringify(result.manifest, null, 2) + '\n',
-        { flag: 'wx', mode: 0o600 },
-      );
-      temporary.push([tmp, dest]);
-    }
-    for (const [tmp, dest] of temporary) await rename(tmp, dest);
-  } finally {
-    for (const [tmp] of temporary) await unlink(tmp).catch(() => {});
-  }
+  await publishSelected(
+    root,
+    {
+      bytes: result.bytes,
+      manifest: result.manifest,
+      files: selectedFiles(result.bytes, result.manifest),
+    },
+    selected.manifestSHA256,
+  );
   return {
     status: result.manifest.secondaryScan.status,
     omittedEntries: result.manifest.secondaryScan.omittedEntries,

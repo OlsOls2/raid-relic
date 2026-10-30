@@ -137,6 +137,16 @@ test('generated session summary uses verified counts rather than stale run047 pr
   assert.match(text, /Selected entries \| 2/);
   assert.match(text, /not raw-complete/);
   assert.ok(text.includes(summary.cutoff));
+  const chunkedText = evidenceSessionMarkdown(summary, {
+    ...manifest,
+    formatVersion: 2,
+    parts: [{}],
+  });
+  assert.match(chunkedText, /sole APP source author/);
+  assert.match(chunkedText, /CODEX_SESSIONS/);
+  assert.match(chunkedText, /transcripts are not included/);
+  assert.ok(!text.includes('CODEX_SESSIONS')); // Legacy generated prose stays byte-compatible.
+
   assert.throws(() => evidenceSessionMarkdown(summary, { ...manifest, cutoff: 'stale' }));
   assert.throws(() =>
     evidenceSessionMarkdown(summary, { ...manifest, secondaryScan: { status: 'rescan-required' } }),
