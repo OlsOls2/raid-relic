@@ -1,5 +1,46 @@
 import { presentGrowth } from './growth.js';
 import { presentEdition } from './edition-view.js';
+// Atlas-only composition of the existing numeric projection. Overlay emblems
+// retain their own presentation; no new count, timer or renderer resource.
+export function presentAtlasGrowth(archive, rings) {
+  const model = presentGrowth(archive, rings);
+  archive.setAttribute?.(
+    'aria-label',
+    model
+      ? model.total > 0
+        ? `Original relic · Ring ${model.total}`
+        : 'Original relic · first journey begins'
+      : 'Original relic · journey count unavailable',
+  );
+  const svg = archive.querySelector?.('.growth-fallback');
+  if (!svg) return model;
+  svg.classList.add('atlas-ring-pill');
+  svg.toggleAttribute('hidden', !model || model.total === 0);
+  if (!model) return model;
+  svg.setAttribute('viewBox', '0 0 140 44');
+  svg.setAttribute('aria-label', `Ring ${model.total}`);
+  let plate = svg.querySelector('rect');
+  if (!plate) {
+    plate = archive.ownerDocument.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    for (const [key, value] of Object.entries({
+      x: 1,
+      y: 1,
+      width: 138,
+      height: 42,
+      rx: 21,
+      fill: '#101d30',
+      stroke: '#dba95c',
+    }))
+      plate.setAttribute(key, String(value));
+    svg.prepend(plate);
+  }
+  const text = svg.querySelector('text');
+  text.textContent = `Ring ${model.total}`;
+  text.setAttribute('x', '70');
+  text.setAttribute('y', '29');
+  text.setAttribute('font-size', '18');
+  return model;
+}
 // Aggregate-only presentation. No provider calls, history expansion or polling.
 export function atlasRings(value) {
   return Number.isInteger(value) && value >= 0 && value <= 16 ? value : null;
@@ -19,6 +60,7 @@ export function createAtlasHero({
     idlePaused = false;
   const doc = globalThis.document,
     win = globalThis.window;
+  presentEdition(archive);
   const suspend = () => {
     idlePaused = true;
     clearTimeout(idle);
@@ -81,12 +123,12 @@ export function createAtlasHero({
     lifecycle();
     archive.classList.remove('webgl-relic');
     archive.dataset.rings = '0';
-    presentGrowth(archive, undefined);
+    presentAtlasGrowth(archive, undefined);
   }
   async function update(value) {
     presentEdition(archive);
     const rings = atlasRings(value);
-    presentGrowth(archive, rings ?? undefined);
+    presentAtlasGrowth(archive, rings ?? undefined);
     if (rings === null) {
       clear();
       return;
@@ -96,12 +138,13 @@ export function createAtlasHero({
       archive.dataset.rings = String(rings);
       if (!idlePaused) {
         renderer.update({ status: 'archive', lineageRings: rings, marks: [] });
+        presentAtlasGrowth(archive, rings);
         lastPainted = rings;
       }
       return;
     }
     clear();
-    presentGrowth(archive, rings);
+    presentAtlasGrowth(archive, rings);
     if (rings === null || stopped) return;
     lastValue = rings;
     archive.dataset.rings = String(rings);
@@ -131,6 +174,7 @@ export function createAtlasHero({
         return;
       }
       renderer.update({ status: 'archive', lineageRings: rings, marks: [] });
+      presentAtlasGrowth(archive, rings);
       lastPainted = rings;
     } catch {
       /* The original SVG remains independent of optional WebGL. */

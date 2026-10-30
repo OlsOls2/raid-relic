@@ -180,4 +180,66 @@ test('Atlas composited growth styles target the actual hero root in normal and r
   );
   assert.match(css, /:is\(\.archive,\s*\.atlas-relic\)\s+\.growth-tick/);
   assert.match(css, /prefers-reduced-motion:\s*reduce/);
+  assert.match(css, /#atlas-relic\s*\{[^}]*aspect-ratio:\s*1[^}]*margin-bottom:\s*60px/s);
+  assert.match(
+    css,
+    /#atlas-relic\s+\.atlas-ring-pill\s*\{[^}]*top:\s*calc\(100%\s*\+\s*16px\)[^}]*height:\s*44px/s,
+  );
+  assert.match(css, /transition:\s*opacity\s+300ms\s+ease/);
+});
+
+test('Atlas ring pill keeps the authoritative total, hides zero and clears invalid data', async () => {
+  const { presentAtlasGrowth } = await import('../public/atlas-hero.js');
+  const make = (tag) => ({
+    tag,
+    children: [],
+    dataset: {},
+    attributes: {},
+    textContent: '',
+    classList: { add() {} },
+    setAttribute(key, value) {
+      this.attributes[key] = value;
+    },
+    toggleAttribute(key, enabled) {
+      if (enabled) this.attributes[key] = '';
+      else delete this.attributes[key];
+    },
+    append(...items) {
+      this.children.push(...items);
+    },
+    prepend(item) {
+      this.children.unshift(item);
+    },
+    querySelector(name) {
+      return this.children.find((item) => item.tag === name);
+    },
+    remove() {
+      a.svg = null;
+    },
+  });
+  const a = {
+    ownerDocument: { createElementNS: (_, tag) => make(tag) },
+    append(svg) {
+      this.svg = svg;
+    },
+    querySelector() {
+      return this.svg;
+    },
+  };
+  presentAtlasGrowth(a, 3);
+  const svg = a.svg;
+  assert.equal(svg.dataset.total, '3');
+  assert.equal(svg.attributes['aria-label'], 'Ring 3');
+  assert.equal(svg.querySelector('text').textContent, 'Ring 3');
+  assert.equal(svg.querySelector('rect').attributes.height, '42');
+  assert.equal(Object.hasOwn(svg.attributes, 'hidden'), false);
+  presentAtlasGrowth(a, 0);
+  assert.equal(a.svg, svg);
+  assert.equal(svg.dataset.total, '0');
+  assert.equal(Object.hasOwn(svg.attributes, 'hidden'), true);
+  presentAtlasGrowth(a, 16);
+  assert.equal(Object.hasOwn(svg.attributes, 'hidden'), false);
+  assert.equal(svg.querySelector('text').textContent, 'Ring 16');
+  presentAtlasGrowth(a, undefined);
+  assert.equal(a.svg, null);
 });

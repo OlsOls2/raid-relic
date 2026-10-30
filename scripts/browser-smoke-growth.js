@@ -39,7 +39,8 @@ async function badgePixels(page, selector, count) {
     const b = svg.getBoundingClientRect(),
       root = svg.parentElement,
       parent = root.getBoundingClientRect(),
-      style = getComputedStyle(svg);
+      style = getComputedStyle(svg),
+      atlas = root.id === 'atlas-relic';
     if (
       svg.dataset.total !== String(expected) ||
       style.display === 'none' ||
@@ -52,7 +53,7 @@ async function badgePixels(page, selector, count) {
       b.left < parent.left - 1 ||
       b.right > parent.right + 1 ||
       b.top < parent.top - 1 ||
-      b.bottom > parent.bottom + 1 ||
+      b.bottom > parent.bottom + (atlas ? 61 : 1) ||
       b.left < -1 ||
       b.top < -1 ||
       b.right > innerWidth + 1 ||
@@ -61,7 +62,15 @@ async function badgePixels(page, selector, count) {
       b.width > parent.width
     )
       return false;
-    if (root.classList.contains('webgl-relic')) {
+    if (atlas) {
+      if (
+        Math.abs(b.height - 44) > 1 ||
+        Math.abs(b.right - parent.right) > 1 ||
+        b.top < parent.bottom + 15 ||
+        svg.textContent.trim() !== `Ring ${expected}`
+      )
+        return false;
+    } else if (root.classList.contains('webgl-relic')) {
       const centerY = (b.top + b.height / 2 - parent.top) / parent.height;
       const centerX = (b.left + b.width / 2 - parent.left) / parent.width;
       if (Math.abs(centerY - 0.654) > 0.015 || Math.abs(centerX - 0.5) > 0.015) return false;

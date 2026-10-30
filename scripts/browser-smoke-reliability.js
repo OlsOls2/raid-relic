@@ -69,6 +69,16 @@ try {
   assert.ok(connections - attempts <= 3);
   await context.setOffline(false);
   await page.waitForFunction(() => document.body.dataset.connection === 'connected');
+  // Connected means a validated snapshot arrived; the claim meter and cinema
+  // are painted by overlay.js on its next animation frame, not by onopen.
+  stage = 'offline-reconnect-rendered';
+  await page.waitForFunction(
+    () =>
+      document.body.dataset.connection === 'connected' &&
+      document.querySelector('#claim-meter')?.hidden === false &&
+      /Offer 1\/2.*Accept 1\/2/.test(document.querySelector('#claim-label')?.textContent ?? '') &&
+      Number(document.querySelector('.archive')?.dataset.cinematicElapsed) >= 23000,
+  );
   assert.match(await page.locator('#claim-label').innerText(), /Offer 1\/2.*Accept 1\/2/);
   assert.equal((await f.runtime.state.getKeeperRegistry()).pendingHop.startedAt, hop.startedAt);
   assert.equal(
