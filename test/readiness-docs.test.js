@@ -63,7 +63,9 @@ test('judge front door uses canonical links, clear pitch and linked technical ev
     'not a zero-invoice guarantee',
   ])
     assert.ok(s.toLowerCase().includes(term), term);
-  assert.match(guide, /LOCAL UNPUBLISHED/);
+  assert.match(guide, /panels14a4 is the latest deployed review release/);
+  assert.match(guide, /newer gate\/connect\/parallel contributions are LOCAL UNCOMMITTED/);
+  assert.doesNotMatch(s, /\b(?:1151|934)\b|\d+\/\d+ native/);
   assert.match(guide, /ten-second client-only expiry|client-only expiry/);
   assert.ok(!/\| P[1-9] \|/.test(s));
   const built = await readFile('BUILT_WITH_CODEX.md', 'utf8'),
@@ -126,7 +128,14 @@ test('provenance and private draft separate historical/published/local proof and
     '934/934',
     '46 browser flows / 141 checks',
     '41087864748',
-    'LOCAL UNPUBLISHED',
+    'LOCAL UNCOMMITTED',
+    '14a4f138858de911741510fc5b14c051594f2604',
+    '31 October 2026, 00:20:59.568 UTC',
+    '41145753035',
+    '1,151/1,151',
+    'FORMAT-LOCKED 46/46 browser workflows /147 checks',
+    '3,600,206 ms',
+    '3,605,492 ms',
     'run270',
     '295/296',
     'BLOCKED',
@@ -135,10 +144,28 @@ test('provenance and private draft separate historical/published/local proof and
     '16 MiB each / 32 MiB total',
     'missing-approval blocker is cleared',
     'not be summed',
-    '20:56 UTC',
+    '20:56UTC',
     'd2ae612',
   ])
     assert.ok(provenance.includes(value), value);
+  assert.match(provenance, /panels-1030.*at \*\*0% traffic\*\*/);
+  assert.match(provenance, /Earlier published feature checkpoints · historical/);
+  assert.match(provenance, /UNFORMATTED immutable docs298 snapshot \/ app296 bytes/);
+  assert.match(provenance, /result is \*\*unknown\*\* here/);
+  assert.match(provenance, /No worker patches are copied\/merged by this documentation turn/);
+  assert.match(provenance, /No access key was provisioned or read/);
+  assert.match(provenance, /unlisted tag URLs were unauthenticated\/public200/);
+  assert.match(provenance, /repo privacy.*read-only flags do not make the site access-private/);
+  assert.match(provenance, /remote\/default `main` \*\*3991bb84b9a3d60d1681e8d18e68b5e9cb44f511\*\* is an ancestor of14a4/);
+  assert.match(provenance, /No forced rewrite, main merge or default-branch switch was performed/);
+  assert.match(provenance, /promotion\/default change is not authorized/);
+  const handoff = await readFile('docs/PANEL_OPERATOR_HANDOFF.md', 'utf8');
+  assert.match(handoff, /compaction is \*\*NOT STARTED\*\*/);
+  assert.match(handoff, /private COMPLETE backup first/);
+  assert.match(handoff, /version\/CAS preconditions/);
+  assert.match(handoff, /Restoring an old backup must never resurrect forgotten content/);
+  assert.match(provenance, /real 180-second app window/);
+  assert.match(provenance, /without refunding quotas; saved downloads cannot be recalled/);
   for (const name of ['raidrelichq', 'olsols2', 'olsols3'])
     assert.ok(provenance.includes(name) && draft.includes(name));
   assert.match(provenance, /not community adoption, real-user growth or a public launch/);
@@ -228,7 +255,7 @@ test('current judge docs use neutral original art and preserve obsolete captures
   }
 });
 
-test('authorized QA session registry separates report-only contribution, original export and pending integration', async () => {
+test('authorized session registry separates merged report-only history, five actual authors and pending application integration', async () => {
   const registry = await readFile('docs/CODEX_SESSIONS.md', 'utf8');
   const report = await readFile('docs/RUNTIME_RELEASE_QA.md', 'utf8');
   assert.ok(Buffer.byteLength(registry) <= 32768 && Buffer.byteLength(report) <= 65536);
@@ -238,7 +265,11 @@ test('authorized QA session registry separates report-only contribution, origina
   assert.deepEqual(ids, [
     '01a1705c-a87d-7143-80f6-021e47b78ced',
     '01a18f00-8033-7d81-befa-9b82d727a3a6',
+    '01a19023-5596-7dd2-825a-5c0e25286d42',
+    '01a19023-b32e-75f2-9c0b-94bc30233f1e',
+    '01a19046-f9c9-7112-a4d3-ae2f073e90c6',
   ]);
+  for (const id of ids) assert.equal(registry.split(id).length - 1, 1, id);
   for (const value of [
     '1565854078880190495',
     '2026-10-30T22:25:04Z',
@@ -248,12 +279,30 @@ test('authorized QA session registry separates report-only contribution, origina
     '46/46',
     '147 checks',
     '317 source hashes',
-    'run270',
-    'original301',
-    'pending',
+    'through source303',
+    'LOCAL UNCOMMITTED',
+    'integration pending',
+    'full-history merged into published 14a4',
+    'Original-session selected evidence covers only the original lead',
+    'Worker CLI/session transcripts remain private, separate and unpublished',
   ])
     assert.ok(registry.includes(value), value);
-  assert.match(registry, /worker transcript is \*\*not included\*\*/);
+  assert.match(registry, /not any of the four separately registered workers/);
+  assert.match(registry, /original application\/test\/art author.*through source298/);
+  assert.match(registry, /not claimed as sole-lead authorship/);
+  const workerRows = registry.split('\n').filter((line) => /^\| `01a190/.test(line));
+  assert.equal(workerRows.length, 3);
+  for (const [index, branch, role] of [
+    [0, 'feature/raid-relic-audit-presentation-1031', 'Presentation fonts/tokens'],
+    [1, 'feature/raid-relic-audit-control-1031', 'Control wizard/readiness/observation copy'],
+    [2, 'feature/raid-relic-replies-1031', 'Shared reply copy, six-slot hop notice reservations'],
+  ]) {
+    assert.ok(workerRows[index].includes(ids[index + 2]));
+    assert.ok(workerRows[index].includes(branch));
+    assert.ok(workerRows[index].includes(role));
+    assert.match(workerRows[index], /LOCAL UNCOMMITTED contribution; worker stopped; composite whole-tree QA result unknown/);
+  }
+  assert.match(registry, /No new worker commit, merge, deployment or passing cohort is inferred/);
   assert.match(registry, /only `docs\/RUNTIME_RELEASE_QA\.md`/);
   assert.match(report, /canonical-formatted source parity or exact final-commit parity/);
   assert.ok(report.includes('No worker session ID is asserted') === false);

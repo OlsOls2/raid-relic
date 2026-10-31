@@ -1,6 +1,6 @@
 # Project guide · retained README detail
 
-Updated 30 October 2026. This guide preserves the longer README, including dated historical reports and limits. The single current release/proof ledger is [PROVENANCE](PROVENANCE.md): published film-clock source and LOCAL UNPUBLISHED Groups 3–5 are distinct. Old counts below belong only to their named cohorts. No production promotion is inferred.
+Updated 31 October 2026. This guide preserves the longer README, including dated historical reports and limits. The single current release/proof ledger is [PROVENANCE](PROVENANCE.md): panels14a4 is the latest deployed review release; newer gate/connect/parallel contributions are LOCAL UNCOMMITTED. Film-clock and earlier local cohorts remain historical. Old counts below belong only to their named cohorts. No production promotion is inferred.
 
 A raid usually lasts ten seconds. Raid Relic turns it into something two communities build together, then pass on.
 
@@ -66,7 +66,7 @@ Add an OBS **Browser Source** using the public overlay for your configured chann
 https://raid-relic-760724762396.us-central1.run.app/overlay/1591805230
 ```
 
-Historical published browser behavior used hidden-stop and ten-minute human-idle suspension. LOCAL UNPUBLISHED Group 3 separates OBS (`obsstudio` user agent or `obs=1`) read retention from ordinary browser/control idle behavior; it does not authorize game actions or certify physical OBS. Its parent-run one-hour result covers the frozen source274 default-card workload and synthetic read projection, not the final current tree. Reconnection reads fresh state quietly rather than replaying an old arrival. Close unused sources. Active WebSockets can incur hosting usage. [Current scope and limits](PROVENANCE.md).
+Earlier browser behavior used hidden-stop and ten-minute human-idle suspension. Published panels14a4 Group3 separates OBS (`obsstudio` user agent or `obs=1`) read retention from ordinary browser/control idle behavior; it does not authorize game actions or certify physical OBS. The final14a4 native hour passed3,600,206ms/13GC/1WS/0inputs/errors, with synthetic read projection; historical source274 is a separate earlier hour, neither physical OBS nor a new candidate soak. Reconnection reads fresh state quietly rather than replaying an old arrival. Close unused sources. Active WebSockets can incur hosting usage. [Current scope and limits](PROVENANCE.md).
 
 ## Run locally
 
@@ -79,7 +79,7 @@ npm run judges
 
 Open http://127.0.0.1:5191/demo/ and stop with Ctrl-C. The separate `/judges` fixture is local-only, visibly simulated and never a production mode. Keep credentials outside the repository; [.env.example](../.env.example) contains configuration examples.
 
-[![CI](https://github.com/OlsOls2/raid-relic/actions/workflows/ci.yml/badge.svg?branch=feature%2Fraid-relic-p9-stretch)](https://github.com/OlsOls2/raid-relic/actions/workflows/ci.yml?query=branch%3Afeature%2Fraid-relic-p9-stretch) runs Node 22 tests, formatting and the isolated headless runtime journey without Twitch credentials or deployment permissions. [Quality record](QUALITY.md) is the single authority for dated test results; it distinguishes observed results from pending checks. [Architecture and threat model](../ARCHITECTURE.md) · [Built with Codex](../BUILT_WITH_CODEX.md) · [Privacy](PRIVACY.md).
+[![CI](https://github.com/OlsOls2/raid-relic/actions/workflows/ci.yml/badge.svg?branch=feature%2Fraid-relic-p9-stretch)](https://github.com/OlsOls2/raid-relic/actions/workflows/ci.yml?query=branch%3Afeature%2Fraid-relic-p9-stretch) runs Node 22 tests, formatting and the isolated headless runtime journey without Twitch credentials or deployment permissions. [Provenance](PROVENANCE.md) records the latest parent-verified release; the generated [quality record](QUALITY.md) is independently dated and it distinguishes observed results from pending checks. [Architecture and threat model](../ARCHITECTURE.md) · [Built with Codex](../BUILT_WITH_CODEX.md) · [Privacy](PRIVACY.md).
 
 ## Limits, cost and what's next
 
@@ -131,7 +131,7 @@ Source 208 adds a client-only **`/demo/film`** storyboard: 150 seconds from Send
 
 ### New Keeper checklist
 
-Source 212 adds **`/start`** and a private own-channel checklist for connecting Twitch, opting in, copying the canonical OBS URL and explicitly becoming a Seeker. Historical public readiness started unchecked and private ticks expired after ten seconds. LOCAL UNPUBLISHED Group 5A replaces that client-only expiry with factual checked-age and four tasks; copying/manual acknowledgement still never claims OBS is server-verified. Its authenticated status GET is read-only, visible polling is bounded at 5/30 seconds, hidden polling stops, and only an explicit Setup flow may reconcile. Backend fresh authorization/eligibility checks remain. [Control wizard](CONTROL_WIZARD.md). This remains a configured pilot, not open enrollment. [Two-minute setup guide and review boundaries](GETTING_STARTED.md). The older checklist belonged to its historical preview cohort. The new four-step wizard, front door, overlay and moderator/filter work remain LOCAL UNPUBLISHED; no current whole-tree suite or preview is claimed. Source authoring does not promote production.
+Source 212 adds **`/start`** and a private own-channel checklist for connecting Twitch, opting in, copying the canonical OBS URL and explicitly becoming a Seeker. Historical public readiness started unchecked and private ticks expired after ten seconds. Published panels14a4 Group5A replaces that client-only expiry with factual checked-age and four tasks; copying/manual acknowledgement still never claims OBS is server-verified. Its authenticated status GET is read-only, visible polling is bounded at 5/30 seconds, hidden polling stops, and only an explicit Setup flow may reconcile. Backend fresh authorization/eligibility checks remain. [Control wizard](CONTROL_WIZARD.md). This remains a configured pilot, not open enrollment. [Two-minute setup guide and review boundaries](GETTING_STARTED.md). The older checklist belonged to its historical preview cohort. The four-step wizard, front door, overlay and moderator/filter work subsequently shipped in panels14a4 with the final1151/46/147 cohort. The newer gate/connect/parallel candidate remains local and unmerged. Source authoring does not promote production.
 
 ### Reliability review layers
 
@@ -141,4 +141,4 @@ The [headless runtime journey CI gate](CI_JOURNEY.md) exercises local mock OAuth
 
 ## Current local working-tree additions · unpublished
 
-Groups 3–5 add the bounded OBS card/verified takeover and isolated local preview, a dedicated front door, current-only formatting/cards, the four-step own-channel control wizard, whole-word input filtering, and signed moderator pending/last/structured-mention review. They are **LOCAL UNPUBLISHED**, not features of the published film-clock runtime. See [front door](FRONTDOOR.md), [control wizard](CONTROL_WIZARD.md), [offline filter](MARK_FILTER.md), [moderator commands](MODERATOR_COMMANDS.md), and [PROVENANCE](PROVENANCE.md) for proof boundaries and remaining work.
+Groups 3–5 add the bounded OBS card/verified takeover and isolated local preview, a dedicated front door, current-only formatting/cards, the four-step own-channel control wizard, whole-word input filtering, and signed moderator pending/last/structured-mention review. They shipped in the published panels14a4 zero-preview, but are not features of the earlier film-clock runtime or implied production promotion. New gate/connect/parallel changes remain LOCAL UNCOMMITTED. See [front door](FRONTDOOR.md), [control wizard](CONTROL_WIZARD.md), [offline filter](MARK_FILTER.md), [moderator commands](MODERATOR_COMMANDS.md), and [PROVENANCE](PROVENANCE.md) for proof boundaries and remaining work.

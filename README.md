@@ -24,7 +24,7 @@ Use **Node.js 22+**: `npm ci && npm test`, then `npm run judges` for the labelle
 
 [Project guide: setup, permissions, demos, cost and dated history](docs/PROJECT_GUIDE.md) · [Architecture](ARCHITECTURE.md) · [Privacy](docs/PRIVACY.md)
 
-[Provenance: published vs LOCAL UNPUBLISHED source and scoped proof](docs/PROVENANCE.md) · [Generated quality record](docs/QUALITY.md) · [Built with Codex](BUILT_WITH_CODEX.md)
+[Provenance: deployed panels release, local candidate and scoped proof](docs/PROVENANCE.md) · [Generated quality record](docs/QUALITY.md) · [Built with Codex](BUILT_WITH_CODEX.md)
 
 Scale-to-zero and free-tier allowances are not a zero-invoice guarantee. Paid AI is off; clipping is design-only and not runtime-wired. Production is not promoted by this documentation.
 

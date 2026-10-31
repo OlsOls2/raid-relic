@@ -3,13 +3,11 @@ import { setupChannel, copyOBS } from './onboarding.js';
 const $ = (id) => document.getElementById(id),
   select = $('start-channel');
 $('start-confirm').checked = false;
-// Public configured-name matching only, not account lookup or open enrollment.
+// Connect always uses this runtime's generic route; typed names never choose identity.
+// Optional public configured-name matching only supplies existing manual utility links.
 select.oninput = () => {
   const links = setupChannel(select.value, keeperNames);
-  for (const [id, url] of [
-    ['start-connect', links?.connect],
-    ['start-control', links?.control],
-  ]) {
+  for (const [id, url] of [['start-control', links?.control]]) {
     const a = $(id);
     a.removeAttribute('href');
     a.setAttribute('aria-disabled', String(!url));

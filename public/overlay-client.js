@@ -11,6 +11,14 @@ function validHandoff(h) {
         Number.isFinite(h.completedAt) &&
         h.completedAt >= h.startedAt &&
         h.completedAt < h.endsAt)) &&
+    (!Object.hasOwn(h, 'carriedApprovedCount') ||
+      (Number.isSafeInteger(h.carriedApprovedCount) &&
+        h.carriedApprovedCount >= 0 &&
+        h.carriedApprovedCount <= 160 &&
+        h.completed === true &&
+        Number.isFinite(h.completedAt) &&
+        h.completedAt >= h.startedAt &&
+        h.completedAt < h.endsAt)) &&
     ['source', 'host'].includes(h.role) &&
     Number.isFinite(h.startedAt) &&
     Number.isFinite(h.endsAt) &&

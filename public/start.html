@@ -34,28 +34,16 @@
         </div>
         <img src="/crystal.svg" alt="Original moon-silver Raid Relic" />
       </div>
-      <label for="start-channel">Your Twitch channel name</label
-      ><input
-        id="start-channel"
-        type="text"
-        maxlength="25"
-        autocomplete="off"
-        autocapitalize="none"
-        spellcheck="false"
-        aria-describedby="start-status"
-        placeholder="Your channel name"
-      />
-      <p id="start-status" role="status">
-        Enter your channel to see your own connection link. This does not sign you in or opt you in.
-      </p>
       <ol class="start-steps">
         <li>
-          <h2>Connect your matching Twitch account</h2>
+          <h2>Connect Twitch, then check pilot admission</h2>
           <p>
-            Use a private browser signed in as the matching Keeper. The app creates its own fresh
-            OAuth state; never copy a redirected Twitch consent URL.
+            Connect first: the app checks the account verified by Twitch, not a typed channel name.
+            Only an already admitted Keeper can save a connection. The app creates fresh OAuth
+            state; never copy a redirected Twitch consent URL.
           </p>
-          <a id="start-connect" aria-disabled="true">Connect Twitch</a>
+          <a id="start-connect" href="/oauth/keeper/start" aria-describedby="start-review">Connect Twitch</a>
+          <p id="start-review">Read-only review: connection occurs only when the owner activates an approved runtime. This guide does not promise live OAuth access on a review preview.</p>
           <p>
             Unchecked here. This guide never reads private sessions, grants or another channel's
             controls.
@@ -72,6 +60,20 @@
         </li>
         <li>
           <h2>Add your OBS Browser Source</h2>
+          <label for="start-channel">Optional: configured channel name for an OBS URL</label
+          ><input
+            id="start-channel"
+            type="text"
+            maxlength="25"
+            autocomplete="off"
+            autocapitalize="none"
+            spellcheck="false"
+            aria-describedby="start-status"
+            placeholder="Optional configured channel name"
+          />
+          <p id="start-status" role="status">
+            Connect Twitch above to check your verified account. This optional field only previews a configured OBS URL; it does not sign you in or opt you in.
+          </p>
           <label for="start-obs">Canonical overlay URL — no account secrets</label
           ><input id="start-obs" readonly /><button id="start-copy" disabled>Copy OBS URL</button>
           <p id="start-copy-status" role="status">
@@ -102,8 +104,8 @@
       </ol>
       <p>
         <a href="/demo/judge">Watch the 45-second no-login demo first</a>. Not configured? Contact
-        the pilot owner through your existing private contact; they must add your verified channel
-        before you can consent. No email, Twitch password or stream key is collected here.
+        the pilot owner through your existing private contact; they must admit your verified channel
+        before this app can save a Keeper connection. Twitch consent does not enroll a channel. No email, Twitch password or stream key is collected here.
       </p>
     </main>
     <footer>Unofficial fan project. Not affiliated with Twitch.</footer>

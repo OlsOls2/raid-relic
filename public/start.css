@@ -96,3 +96,14 @@ h1 {
     flex-wrap: wrap;
   }
 }
+
+/* The first action is independent of the optional channel-name utility. */
+#start-connect {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 18px;
+  background: var(--amber);
+  color: var(--deep);
+  font-weight: 600;
+}
