@@ -1,7 +1,7 @@
 :root {
   color-scheme: dark;
-  background: #101d30;
-  color: #dce4ed;
+  background: var(--rr-deep);
+  color: var(--rr-moon);
   font:
     16px/1.6 system-ui,
     sans-serif;
@@ -19,7 +19,7 @@ main {
 }
 h1 {
   font:
-    clamp(36px, 6vw, 64px)/1.1 Georgia,
+    clamp(36px, 6vw, 64px)/1.1 Cinzel, Georgia,
     serif;
   font-weight: 400;
   margin: 20px 0;
@@ -27,7 +27,7 @@ h1 {
 a,
 .eyebrow,
 #status {
-  color: #e6bb70;
+  color: var(--rr-amber);
 }
 .eyebrow {
   letter-spacing: 0.1em;
@@ -42,9 +42,9 @@ a,
 button {
   font: inherit;
   padding: 8px 14px;
-  color: #dce4ed;
-  border: 1px solid #9486b7;
-  background: #26394f;
+  color: var(--rr-moon);
+  border: 1px solid var(--rr-violet);
+  background: var(--rr-slate);
   cursor: pointer;
 }
 button:disabled {
@@ -53,7 +53,7 @@ button:disabled {
 }
 button:focus-visible,
 a:focus-visible {
-  outline: 2px solid #e6bb70;
+  outline: 2px solid var(--rr-amber);
   outline-offset: 3px;
 }
 figure {
@@ -64,7 +64,7 @@ figure {
   display: block;
   width: 100%;
   height: auto;
-  border: 1px solid #9486b7;
+  border: 1px solid var(--rr-violet);
 }
 #card[hidden] {
   display: none;
@@ -74,16 +74,16 @@ figure {
 }
 #route li {
   padding: 8px 0;
-  border-bottom: 1px solid #9486b733;
+  border-bottom: 1px solid color-mix(in srgb, var(--rr-violet) 20%, transparent);
   overflow-wrap: anywhere;
 }
 .note {
   max-width: 85ch;
-  color: #b5a9d4;
+  color: var(--rr-muted);
 }
 #simulator {
-  color: #101d30;
-  background: #e6bb70;
+  color: var(--rr-deep);
+  background: var(--rr-amber);
   font-weight: 800;
   padding: 8px;
 }

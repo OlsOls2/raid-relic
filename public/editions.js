@@ -20,7 +20,7 @@ export const EDITION_CONFIG = freeze([
       shape: 'crystal',
       facets: 8,
       aspect: 1.05,
-      palette: ['#101d30', '#dce4ed', '#9486b7', '#e6bb70'],
+      palette: ['#101d30', '#e3e8ef', '#b7a2df', '#dba95c'],
     },
     particles: { kind: 'orbit-dust', count: 64 },
   },

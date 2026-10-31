@@ -1,10 +1,10 @@
 :root {
   color-scheme: dark;
-  --navy: #0d1e2e;
-  --silver: #d8e6ef;
-  --gold: #d8b46a;
-  --quiet: #acbdcc;
-  --purple: #b5a3dd;
+  --navy: var(--rr-deep);
+  --silver: var(--rr-moon);
+  --gold: var(--rr-amber);
+  --quiet: var(--rr-muted);
+  --purple: var(--rr-violet);
 }
 * {
   box-sizing: border-box;
@@ -90,7 +90,7 @@ canvas.relic3d {
   inset: 0;
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 0 12px #9486b755);
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--rr-violet) 33.333333%, transparent));
 }
 .growth-fallback {
   position: absolute;
@@ -187,7 +187,7 @@ progress {
   gap: 12px;
   align-items: center;
   flex-wrap: wrap;
-  border-top: 1px solid #9486b766;
+  border-top: 1px solid color-mix(in srgb, var(--rr-violet) 40%, transparent);
   padding-top: 22px;
   margin-top: 20px;
 }
@@ -198,7 +198,7 @@ input {
 }
 button {
   font: inherit;
-  background: #182b43;
+  background: var(--rr-slate);
   color: var(--silver);
   border: 1px solid var(--gold);
   padding: 10px 18px;
@@ -307,9 +307,9 @@ footer {
   position: relative;
   display: block;
   height: 650px;
-  border: 1px solid #9486b780;
+  border: 1px solid color-mix(in srgb, var(--rr-violet) 50.196078%, transparent);
   border-radius: 12px;
-  background: radial-gradient(ellipse at 35% 40%, #26354b 0%, #0d1e2e 65%);
+  background: radial-gradient(ellipse at 35% 40%, var(--rr-slate) 0%, var(--rr-deep) 65%);
   isolation: isolate;
 }
 .stream-frame-label {
@@ -335,7 +335,7 @@ body:not([data-film-scene='0']) .stream-route {
   display: none;
 }
 [data-film-scene='1'] #film-stage {
-  background: radial-gradient(ellipse at 45% 30%, #504361 0%, #0d1e2e 65%);
+  background: radial-gradient(ellipse at 45% 30%, var(--rr-violet) 0%, var(--rr-deep) 65%);
 }
 .relic-column {
   position: absolute;
@@ -417,7 +417,7 @@ body:not([data-film-scene='0']) .stream-route {
   width: 220px;
   padding: 8px;
   font-size: 14px;
-  background: #0d1e2eed;
+  background: color-mix(in srgb, var(--rr-deep) 92.941176%, transparent);
 }
 #film-meter p {
   margin: 4px 0;
@@ -430,7 +430,7 @@ body:not([data-film-scene='0']) .stream-route {
   bottom: 90px;
   width: 220px;
   padding: 8px;
-  background: #0d1e2eed;
+  background: color-mix(in srgb, var(--rr-deep) 92.941176%, transparent);
   font-size: 14px;
 }
 #film-engraving {
@@ -450,7 +450,7 @@ body:not([data-film-scene='0']) .stream-route {
   top: 24px;
   width: 220px;
   height: 240px;
-  border-left: 1px solid #9486b766;
+  border-left: 1px solid color-mix(in srgb, var(--rr-violet) 40%, transparent);
   padding-left: 16px;
   font-size: 14px;
   color: var(--quiet);

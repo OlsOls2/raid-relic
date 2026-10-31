@@ -331,8 +331,11 @@ if (root) {
         };
         void paintPreviews();
       }
-      status.textContent =
-        'Current retained record. Presence and audience are not proof of new or retained viewers.';
+      // Keeper's complete verification/retention context lives in its one
+      // disclosure. Keep the live status concise without repeating that warning.
+      status.textContent = login
+        ? 'Current retained Keeper record.'
+        : 'Current retained record. Presence and audience are not proof of new or retained viewers.';
     } catch {
       if (own === generation) {
         active.abort();
