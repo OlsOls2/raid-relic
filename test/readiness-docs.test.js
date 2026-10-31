@@ -2,10 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, stat } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-test('judge front door uses canonical links, clear pitch and linked technical evidence', async () => {
+test('judge front door uses current gated GET-only walk and separates published review from planned production-policy preview', async () => {
   const s = await readFile('README.md', 'utf8');
   const guide = await readFile('docs/PROJECT_GUIDE.md', 'utf8');
-  assert.ok(s.trimEnd().split('\n').length < 40);
+  const quick = await readFile('docs/JUDGES_QUICKSTART.md', 'utf8');
+  const demo = await readFile('docs/DEMO_SCRIPT.md', 'utf8');
+  const compact = (value) => value.replace(/\s+/g, ' ');
+  assert.ok(s.trimEnd().split('\n').length <= 60);
   for (const term of [
     'Raids that leave a story.',
     'Node.js 22+',
@@ -18,58 +21,91 @@ test('judge front door uses canonical links, clear pitch and linked technical ev
     'Unofficial fan project. Not affiliated with Twitch.',
   ])
     assert.ok(s.includes(term), term);
-  assert.ok(
-    s.includes(
-      'https://review-1031---raid-relic-vz4bhnskgq-uc.a.run.app/demo/film?autoplay=1&kiosk=1',
-    ),
-  );
+  const origin = 'https://retained-marks-1031---raid-relic-vz4bhnskgq-uc.a.run.app';
+  for (const route of [
+    '',
+    '/atlas/',
+    '/keeper/olsols3',
+    '/overlay/1593561134',
+    '/demo/judge',
+    '/demo/film?autoplay=1&kiosk=1',
+    '/demo/',
+  ])
+    assert.ok(s.includes(origin + route), route);
+  assert.match(s, /access[- ]gated[^\n]*read-only preview/i);
+  assert.match(s, /access code[^\n]*owner[^\n]*private DM/);
+  assert.match(s, /no Twitch login/i);
+  assert.match(s, /real Twitch OAuth\/control mutations are blocked/);
+  assert.match(s, /Ring 12[^\n]*approved light|approved light[^\n]*Ring 12/);
+  assert.match(s, /offline|stream closure/);
+  assert.match(s, /under five minutes/i);
+  assert.match(quick, /3:30[^\n]*under five minutes/);
+  for (const route of ['/atlas/', '/keeper/olsols3', '/overlay/1593561134'])
+    assert.ok(quick.includes(origin + route));
+  assert.match(quick, /no new chat or approval is needed/);
+  assert.match(quick, /do not recreate data/);
+  assert.match(s, /45-second judge cut/);
+  assert.match(s, /150-second film/);
+  assert.match(s, /35-second interactive demo/);
+  assert.match(s, /labelled fiction/);
   assert.match(
     s,
     /!\[Neutral original[^\]]*not a screenshot or live proof\]\(public\/relic\.svg\)/,
   );
-  assert.ok(
-    s.includes(
-      'Original procedural/vector art, not a live view, screenshot or verification result.',
-    ),
-  );
-  const linked = s + '\n' + guide;
-  for (const term of [
-    'A raid usually lasts ten seconds. Raid Relic turns it into something two communities build together, then pass on.',
-    'Judge in 60 seconds',
-    'https://raid-relic-760724762396.us-central1.run.app/demo/',
-    'https://raid-relic-760724762396.us-central1.run.app/atlas/',
-    'Autoplay 35-second tour',
-    '```mermaid',
-    'Node.js 22+',
-    'npm ci && npm test',
-    'multiple **simultaneous** relics',
-    'clips:edit',
-    'not runtime-wired',
-  ])
-    assert.ok(
-      term.startsWith('multiple ')
-        ? linked.replace(/\s+/g, ' ').toLowerCase().includes(term.toLowerCase())
-        : linked.replace(/\s+/g, ' ').includes(term),
-      term,
-    );
   assert.match(
-    linked.replace(/\s+/g, ' '),
-    /multiple \*\*simultaneous\*\* relics[^\n]*future work[^\n]*not a current feature/i,
+    s,
+    /Original procedural\/vector art, not a live view, screenshot or verification result/,
   );
-  assert.ok(!s.includes('p9-review---'));
+  assert.doesNotMatch(s, /!\[[^\]]*\]\([^)]*\.png\)/i);
   for (const term of [
     'not open public signup',
     'saved downloads cannot be recalled',
     'not a zero-invoice guarantee',
   ])
     assert.ok(s.toLowerCase().includes(term), term);
-  assert.match(guide, /private review-1031\/runtimead48 is the latest deployed review release/);
-  assert.match(guide, /real OAuth\/control actions remain denied by its read-only policy/);
-  assert.match(s, /access code delivered only to the owner by private DM/);
-  assert.match(s, /real Twitch OAuth\/control mutations are blocked/);
+  assert.match(s, /Only approved text is public/);
+  assert.match(s, /without refunding quota/);
+  assert.match(s, /API acceptance is not arrival/);
+  assert.match(s, /180-second[^\n]*verified receipt[^\n]*distinct eligible nonbot/);
+  assert.match(s, /Paid AI is off[^\n]*clipping is design-only and unwired/);
   assert.doesNotMatch(s, /\b(?:1261|1151|934)\b|\d+\/\d+ native/);
-  assert.match(guide, /ten-second client-only expiry|client-only expiry/);
   assert.ok(!/\| P[1-9] \|/.test(s));
+  // Technical guide retains dated legacy details; they are not the front door.
+  for (const term of ['Autoplay 35-second tour', '```mermaid', 'clips:edit', 'not runtime-wired'])
+    assert.ok(guide.includes(term), term);
+  assert.match(
+    compact(guide).toLowerCase(),
+    /multiple \*\*simultaneous\*\* relics.*future work.*not a current feature/,
+  );
+  assert.match(guide, /client-only expiry/);
+  for (const doc of [s, quick, demo]) {
+    assert.match(doc, /judge-freeze-1031/);
+    assert.match(doc, /planned[^\n]*(?:not yet published|NOT YET CREATED\/PUBLISHED)/);
+    assert.match(doc, /P5_PREVIEW_READ_ONLY=false/);
+    assert.match(doc, /GET-only/);
+    assert.match(
+      doc,
+      /not[^\n]*(?:promised blocked|promise OAuth\/control mutations are blocked)/i,
+    );
+    assert.match(doc, /private access|accessprivate|access-gated/);
+  }
+  assert.match(quick, /180d995dccd2d6550cee78f001a9b7d28d6842e1/);
+  assert.match(quick, /12:46:33 UTC, 31 October 2026/);
+  assert.match(quick, /1,267 native tests, zero skips; 46 browser flows \/ 153 checks PASS/);
+  assert.match(quick, /41202297504/);
+  assert.match(quick, /092a89d2e67c12c7f1d3f71667d6a25751140e3d/);
+  assert.match(quick, /native1268zeroSkip and nine whole-plate native checks/);
+  assert.match(quick, /e80b322[^\n]*native1270zeroSkip/);
+  assert.match(quick, /maxima508\/404\/364\/364ms[^\n]*baseline428\/380\/356\/364ms/);
+  assert.match(quick, /not new final-candidate release proof/);
+  assert.match(quick, /no speedup, forced server-cold, p95 or SLA claim/);
+  assert.match(demo, /2:45 shot list/);
+  assert.match(demo, /Keep the edit below three minutes/);
+  assert.match(demo, /recording plan, not completed footage/);
+  assert.match(demo, /Include only genuine consenting footage/);
+  assert.match(demo, /Genuine live integration footage unavailable/);
+  assert.match(demo, /Never mix simulated votes into live proof/);
+  assert.match(demo, /no external video upload, submission or production promotion/);
   const built = await readFile('BUILT_WITH_CODEX.md', 'utf8'),
     scopes = await readFile('docs/JUDGE_SCOPES.md', 'utf8');
   assert.ok(built.includes('01a1705c-a87d-7143-80f6-021e47b78ced'));
@@ -318,6 +354,19 @@ test('provenance and private draft separate historical/published/local proof and
   assert.match(provenance, /not community adoption, real-user growth or a public launch/);
   assert.match(provenance, /not physical OBS/);
   assert.match(draft, /^# PRIVATE DRAFT[^\n]*not submitted/);
+  assert.deepEqual(
+    [...draft.matchAll(/^## (.+)$/gm)].slice(0, 8).map((m) => m[1]),
+    [
+      'Inspiration',
+      'What it does',
+      'How built',
+      'How used Codex',
+      'Challenges',
+      'Accomplishments',
+      'What learned',
+      "What's next",
+    ],
+  );
   assert.equal((draft.match(/^### Episode [1-4] ·/gm) ?? []).length, 4);
   assert.equal((draft.match(/\*\*Prompt\/problem paraphrase:\*\*/g) ?? []).length, 4);
   for (const value of [
@@ -329,6 +378,11 @@ test('provenance and private draft separate historical/published/local proof and
     '8ded729',
   ])
     assert.ok(draft.includes(value), value);
+  assert.match(draft, /original-only[^\n]*through337/);
+  assert.match(draft, /through342 refresh[^\n]*pending, not yet promoted/);
+  assert.match(draft, /not new final-candidate QA/);
+  assert.match(draft, /Worker transcripts are not covered or published/);
+
   for (const [path, body] of Object.entries(text)) {
     assert.doesNotMatch(
       body,
@@ -402,7 +456,7 @@ test('current judge docs use neutral original art and preserve obsolete captures
   }
 });
 
-test('authorized session registry separates original-only evidence from five actual authors and merged application history', async () => {
+test('authorized session registry separates original-only evidence from six actual sessions and scoped merged/documentation roles', async () => {
   const registry = await readFile('docs/CODEX_SESSIONS.md', 'utf8');
   const report = await readFile('docs/RUNTIME_RELEASE_QA.md', 'utf8');
   assert.ok(Buffer.byteLength(registry) <= 32768 && Buffer.byteLength(report) <= 65536);
@@ -415,6 +469,7 @@ test('authorized session registry separates original-only evidence from five act
     '01a19023-5596-7dd2-825a-5c0e25286d42',
     '01a19023-b32e-75f2-9c0b-94bc30233f1e',
     '01a19046-f9c9-7112-a4d3-ae2f073e90c6',
+    '01a1924f-dc94-7033-84fb-5041b52f26b1',
   ]);
   for (const id of ids) assert.equal(registry.split(id).length - 1, 1, id);
   for (const value of [
@@ -469,6 +524,37 @@ test('authorized session registry separates original-only evidence from five act
       /FULL-HISTORY MERGED; worker commit `[^`]+`; included in R0\/runtimead48/,
     );
   }
+  const docsWorker = registry
+    .split('## Authorized independent judge-freeze documentation worker')[1]
+    .split('## Source343 integration update')[0];
+  for (const term of [
+    '01a1924f-dc94-7033-84fb-5041b52f26b1',
+    'openclaw/raid-relic-judge-freeze-docs-1031',
+    '/home/ubuntu/.openclaw/worktrees/e9c84e569f7f5dd8/raid-relic-judge-freeze-docs-1031',
+    '2026-10-31T14:14:29Z',
+    '2026-10-31T14:17:05Z',
+    'README.md',
+    'docs/DEVPOST_DRAFT.md',
+    'docs/JUDGES_QUICKSTART.md',
+    'docs/DEMO_SCRIPT.md',
+    'source STOPPED',
+    'tests UNRUN by worker',
+    'parent QA/commit/history integration pending',
+  ])
+    assert.ok(docsWorker.includes(term), term);
+  assert.match(docsWorker, /exit code \*\*0\*\*/);
+  assert.match(docsWorker, /this appended registry section/);
+  assert.match(
+    docsWorker,
+    /worker transcript remains private and excluded from the original-only selected export/,
+  );
+  const integration = registry.split('## Source343 integration update')[1];
+  assert.match(integration, /coverage is through337/);
+  assert.match(integration, /through342 export is UPCOMING and has not yet been promoted/);
+  assert.match(integration, /NOT YET CREATED\/PUBLISHED/);
+  assert.match(integration, /P5_PREVIEW_READ_ONLY=false/);
+  assert.match(integration, /no claim is made that OAuth\/control POSTs will be blocked/);
+  assert.match(integration, /not added together or relabelled as final-candidate QA/);
   assert.match(registry, /Actual commits\/merges above come from the parent receipt/);
   assert.match(registry, /Later323\/324probes and docs325 are not yet selected/);
   assert.match(registry, /only `docs\/RUNTIME_RELEASE_QA\.md`/);
@@ -483,9 +569,15 @@ test('authorized session registry separates original-only evidence from five act
   ]) {
     const body = await readFile(path, 'utf8');
     assert.ok(body.includes('CODEX_SESSIONS.md'), path);
-    assert.ok(
-      body.includes('01a18f00-8033-7d81-befa-9b82d727a3a6') || path === 'docs/CODEX_EVIDENCE.md',
-      path,
-    );
+    if (path === 'docs/DEVPOST_DRAFT.md') {
+      assert.match(body, /earlier QA worker authored only a report/);
+      assert.match(body, /Three separately registered application workers/);
+      assert.match(body, /judge-freeze worker authored only five authorized documentation files/);
+      assert.match(body, /01a1705c-a87d-7143-80f6-021e47b78ced/);
+    } else
+      assert.ok(
+        body.includes('01a18f00-8033-7d81-befa-9b82d727a3a6') || path === 'docs/CODEX_EVIDENCE.md',
+        path,
+      );
   }
 });

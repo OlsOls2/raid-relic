@@ -33,8 +33,29 @@ All three streams use base `14a4f138858de911741510fc5b14c051594f2604`. Parent su
 
 The original lead retains integration review and future merge ownership; parent controls Git and runtime QA. Actual commits/merges above come from the parent receipt, not inference from a completed authoring process. Main core53f064d5daae1a612c7c284b3095e7e1a4ffebee plus the three worker histories were integrated; original lead subsequently repaired the carried-counter overwrite and film mobile framing. Parent owns formatting, QA/Git/deployment; these are not parent-authored product fixes.
 
-## Evidence and proof boundaries
+## Evidence and proof boundaries · historical R0 cutoff
 
 The parent-generated fixed original-session export through322 accompanied R0:6395entries/323CLI digests,2parts/20,119,022selected bytes,6whole-entry omissions preserved with old headers and a zero bound rescan. Later323/324probes and docs325 are not yet selected; parent refreshes only after the writer stops. The through source303 export belongs to historical14a4. No generated selected content was read for this registry. Original-session selected evidence covers only the original lead, not any of the four separately registered workers. Worker CLI/session transcripts remain private, separate and unpublished; no transcript coverage is invented.
 
 The earlier UNFORMATTED docs298/app296 46/147 cohort is distinct from final FORMAT-LOCKED 46/147 at published 14a4. Do not sum overlapping counts or infer physical Twitch/OBS proof. Final canonical R0 QA passed1261/1261native0skip and46browserflows152checks, exactCI41180909135. Existing app/source bytes remain deployedad48; subsequent docs-only commit proof is separate, not a second image or future CI claim. [Provenance](PROVENANCE.md) · [Evidence procedure](CODEX_EVIDENCE.md).
+
+
+## Authorized independent judge-freeze documentation worker · 31 October 2026
+
+- Authorization: direct owner instruction **2026-10-31 14:07 UTC**, superseding original-only/no-new-session rules solely for this bounded independent documentation worker; no delegation or fork. The original primary session remains sole integration lead.
+- Actual distinct session: **01a1924f-dc94-7033-84fb-5041b52f26b1**, parent-verified actual worker identity; no private session history or transcript body was read by this integration lead. The owned CLI process completed with exit code **0** at **2026-10-31T14:17:05Z** (process start **2026-10-31T14:14:29Z**).
+- Branch, owner supplied: `openclaw/raid-relic-judge-freeze-docs-1031`.
+- Worktree: `/home/ubuntu/.openclaw/worktrees/e9c84e569f7f5dd8/raid-relic-judge-freeze-docs-1031`.
+- Base, owner supplied: `180d995dccd2d6550cee78f001a9b7d28d6842e1`.
+- Authored scope: `README.md`, `docs/DEVPOST_DRAFT.md`, `docs/JUDGES_QUICKSTART.md`, `docs/DEMO_SCRIPT.md`, and this appended registry section. Previous registry text preserved verbatim. Updated retained-preview route walk, eight-section private Devpost draft, sanitized prompt → code → test episodes, session attribution and conditional 2:45 recording plan.
+- Proof attribution: parent supplied retained-marks release at 12:46:33 UTC, native 1267/zero skips, 46 browser flows/153 checks PASS, exact-source CI41202297504 both green, and CLOSEDSESSION Ring12 retained-light observations. Worker performed no runtime verification, network lookup or new physical Twitch/OBS validation. Earlier registry release/export statements above remain historical; current generated `CODEX_SESSION.md` separately records the original-only fixed snapshot through337 and was not edited or regenerated.
+- State: **source STOPPED; tests UNRUN by worker; original-lead integration review completed in source343, copied into main working docs; parent QA/commit/history integration pending**. Tests, formatter and source execution UNRUN; parent owns QA/format/integration/Git/CI. No Git mutations, cloud/provider/Twitch/OAuth/control actions, credentials/auth reads, raw or selected transcript reads, private-stage reads, external writes, video/music/submission, delegation or compaction. Parent subsequently completed G3.05 source340/341 and G4.04 source342 checks (dated integration update below); physical OBS/manual AT/native OS sharing remain pending.
+- Evidence boundary: this worker transcript remains private and excluded from the original-only selected export. Parent collects process exit status and handles integration; this worker stops after this bounded pass.
+
+## Source343 integration update · parent-reported checks, not a new release
+
+G3.05 commit `092a89d2e67c12c7f1d3f71667d6a25751140e3d` is pushed: parent full native1268/1268zeroSkip and nine whole-plate native checks passed. G4.04 commit `e80b322` is pushed: parent native1270zeroSkip, default offline reliability and the actual repository harness's twelve production navigations passed; route LCP maxima were508/404/364/364ms versus recorded baseline428/380/356/364ms. No runtime speedup is claimed. These overlapping source cohorts are not added together or relabelled as final-candidate QA.
+
+Current original-only generated coverage is through337, per parent; a through342 export is UPCOMING and has not yet been promoted. The through322 numbers and the sentence “Later323/324probes and docs325 are not yet selected” above describe the historical R0 cutoff only, not today's coverage. All separate worker transcripts, including this documentation worker, remain private and excluded from the original-only export.
+
+The existing retained-marks preview remains a published access-gated read-only review. Final grouped `judge-freeze-1031` is planned and NOT YET CREATED/PUBLISHED. Its intended production-environment policy has P5_PREVIEW_READ_ONLY=false: private access is not a read-only mutation guard, and no claim is made that OAuth/control POSTs will be blocked there. The judge walk deliberately uses only GET content routes, with no OAuth/control/Twitch actions. Final policy, access expiry, runtime/CI/image and zero-traffic proof require the parent's actual receipt. No production shift, public post or compaction is authorized by these docs.
