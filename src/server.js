@@ -32,7 +32,9 @@ export function privatePreviewConfig(env, now = Date.now()) {
   const expiry = env.P5_PREVIEW_ACCESS_EXPIRES_AT;
   const expiresAt = typeof expiry === 'string' ? Date.parse(expiry) : NaN;
   if (
-    env.P5_PREVIEW_READ_ONLY !== 'true' ||
+    // Admission is independent of application action permissions. Both modes
+    // must be explicit; the runtime still enforces its own read-only/auth gates.
+    !['true', 'false'].includes(env.P5_PREVIEW_READ_ONLY) ||
     typeof digest !== 'string' ||
     !/^[a-f0-9]{64}$/i.test(digest) ||
     typeof expiry !== 'string' ||

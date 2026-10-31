@@ -68,7 +68,7 @@ async function invoke(
 function gate(options = {}) {
   return createPrivatePreview(ENV, { now: () => NOW, ...options });
 }
-test('disabled gate is an exact identity wrapper; private configuration is explicit, read-only and fail-closed', () => {
+test('disabled gate is an exact identity wrapper; private configuration requires explicit action policy independently of admission', () => {
   const handler = () => {},
     server = {};
   for (const env of [{}, { P5_PREVIEW_PRIVATE_ENABLED: 'false' }]) {
@@ -77,25 +77,115 @@ test('disabled gate is an exact identity wrapper; private configuration is expli
     assert.equal(g.wrapHandler(handler), handler);
     assert.equal(g.upgradeServer(server), server);
   }
-  assert.equal(privatePreviewConfig(ENV, NOW).enabled, true);
-  for (const change of [
-    { P5_PREVIEW_PRIVATE_ENABLED: '' },
-    { P5_PREVIEW_PRIVATE_ENABLED: 'TRUE' },
-    { P5_PREVIEW_READ_ONLY: 'false' },
-    { P5_PREVIEW_READ_ONLY: undefined },
-    { P5_PREVIEW_ACCESS_SHA256: '' },
-    { P5_PREVIEW_ACCESS_SHA256: 'a'.repeat(63) },
-    { P5_PREVIEW_ACCESS_SHA256: 'g'.repeat(64) },
-    { P5_PREVIEW_ACCESS_EXPIRES_AT: undefined },
-    { P5_PREVIEW_ACCESS_EXPIRES_AT: '2026-10-31T05:00:00+00:00' },
-    { P5_PREVIEW_ACCESS_EXPIRES_AT: new Date(NOW).toISOString() },
-    { P5_PREVIEW_ACCESS_EXPIRES_AT: new Date(NOW + 86400001).toISOString() },
-    { P5_PREVIEW_ACCESS_EXPIRES_AT: '2026-02-30T05:00:00Z' },
-  ])
-    assert.throws(
-      () => privatePreviewConfig({ ...ENV, ...change }, NOW),
-      /^Error: Invalid private preview configuration$/,
+  for (const readOnly of ['true', 'false']) {
+    assert.equal(
+      privatePreviewConfig({ ...ENV, P5_PREVIEW_READ_ONLY: readOnly }, NOW).enabled,
+      true,
     );
+    for (const change of [
+      { P5_PREVIEW_PRIVATE_ENABLED: '' },
+      { P5_PREVIEW_PRIVATE_ENABLED: 'TRUE' },
+      { P5_PREVIEW_READ_ONLY: undefined },
+      { P5_PREVIEW_READ_ONLY: '' },
+      { P5_PREVIEW_READ_ONLY: 'TRUE' },
+      { P5_PREVIEW_READ_ONLY: 'False' },
+      { P5_PREVIEW_READ_ONLY: false },
+      { P5_PREVIEW_READ_ONLY: true },
+      { P5_PREVIEW_READ_ONLY: null },
+      { P5_PREVIEW_READ_ONLY: '0' },
+      { P5_PREVIEW_ACCESS_SHA256: '' },
+      { P5_PREVIEW_ACCESS_SHA256: 'a'.repeat(63) },
+      { P5_PREVIEW_ACCESS_SHA256: 'g'.repeat(64) },
+      { P5_PREVIEW_ACCESS_EXPIRES_AT: undefined },
+      { P5_PREVIEW_ACCESS_EXPIRES_AT: '2026-10-31T05:00:00+00:00' },
+      { P5_PREVIEW_ACCESS_EXPIRES_AT: new Date(NOW).toISOString() },
+      { P5_PREVIEW_ACCESS_EXPIRES_AT: new Date(NOW + 86400001).toISOString() },
+      { P5_PREVIEW_ACCESS_EXPIRES_AT: '2026-02-30T05:00:00Z' },
+    ])
+      assert.throws(
+        () => privatePreviewConfig({ ...ENV, P5_PREVIEW_READ_ONLY: readOnly, ...change }, NOW),
+        /^Error: Invalid private preview configuration$/,
+      );
+  }
+});
+
+test('production-policy private admission gates HTTP and WS before dispatch; authorized delegation does not grant action permission', async () => {
+  const g = createPrivatePreview({ ...ENV, P5_PREVIEW_READ_ONLY: 'false' }, { now: () => NOW });
+  for (const path of [
+    '/health',
+    '/atlas.css',
+    '/api/journey',
+    '/eventsub',
+    '/oauth/keeper/start',
+    '/control/201',
+  ]) {
+    for (const method of ['GET', 'POST']) {
+      const result = await invoke(g, path, { method });
+      assert.equal(result.calls, 0);
+      assert.equal(result.res.status, 401);
+    }
+  }
+  const admitted = await invoke(g, '/health', { headers: { 'x-preview-access': KEY } });
+  assert.equal(admitted.calls, 1);
+  assert.equal(admitted.res.status, 200);
+  assert.ok(!JSON.stringify(admitted.req.headers).includes(KEY));
+  const app = (req, res) => {
+    assert.equal(req.headers['x-preview-access'], undefined);
+    assert.ok(!JSON.stringify(req.rawHeaders).includes(KEY));
+    const authorized =
+      req.headers.origin === 'https://preview.example' &&
+      req.headers['x-fixture-csrf'] === 'synthetic-csrf';
+    res.writeHead(authorized ? 202 : 403, { 'content-type': 'text/plain' });
+    res.end(
+      authorized ? 'Synthetic authorized action; no provider' : 'Application permission denied',
+    );
+  };
+  const denied = await invoke(
+    g,
+    '/control/201',
+    { method: 'POST', headers: { 'x-preview-access': KEY } },
+    app,
+  );
+  assert.equal(denied.calls, 1);
+  assert.equal(denied.res.status, 403, 'Preview admission alone grants no application authority');
+  const delegated = await invoke(
+    g,
+    '/control/201',
+    {
+      method: 'POST',
+      headers: {
+        'x-preview-access': KEY,
+        origin: 'https://preview.example',
+        'x-fixture-csrf': 'synthetic-csrf',
+      },
+    },
+    app,
+  );
+  assert.equal(delegated.calls, 1);
+  assert.equal(delegated.res.status, 202);
+  const server = new EventEmitter();
+  let upgrades = 0;
+  const facade = g.upgradeServer(server);
+  const listener = (req) => {
+    upgrades++;
+    assert.ok(!JSON.stringify(req.headers).includes(KEY));
+  };
+  facade.on('upgrade', listener);
+  const anonymous = socket();
+  server.emit('upgrade', request('/ws/201'), anonymous, Buffer.alloc(0));
+  assert.match(anonymous.output, /HTTP\/1\.1 401/);
+  assert.equal(upgrades, 0);
+  const authenticated = socket();
+  server.emit(
+    'upgrade',
+    request('/ws/201', { headers: { 'x-preview-access': KEY } }),
+    authenticated,
+    Buffer.alloc(0),
+  );
+  assert.equal(upgrades, 1);
+  authenticated.destroy();
+  facade.off('upgrade', listener);
+  assert.equal(server.listenerCount('upgrade'), 0);
 });
 test('root gate contains no app/pilot assets and unauthenticated aliases, assets, APIs, health, callbacks and mutations never dispatch', async () => {
   const g = gate(),
@@ -430,46 +520,55 @@ for (const kind of ['memory', 'firestore'])
     assert.equal(f.calls.length, 0);
     assert.deepEqual(await f.runtime.state.getKeeperRegistry(), before);
   });
-test('actual overlay adapter performs zero read-budget, projection or subscribe work before admission', () => {
-  const server = new EventEmitter();
-  let reads = 0,
-    subscriptions = 0,
-    budgets = 0;
-  const feed = {
-    channel: '201',
-    snapshot: async () => {
-      reads++;
-      return {};
-    },
-    subscribe: () => {
-      subscriptions++;
-      return () => {};
-    },
-  };
-  const sockets = attachOverlaySockets(gate().upgradeServer(server), feed, {
-    origins: ['https://preview.example'],
-    allowRead: () => {
-      budgets++;
-      return true;
-    },
-  });
-  try {
-    for (const path of ['/ws/201', '/ws/201?key=' + KEY]) {
-      const s = socket();
-      server.emit(
-        'upgrade',
-        request(path, { headers: { origin: 'https://preview.example' } }),
-        s,
-        Buffer.alloc(0),
-      );
-      assert.match(s.output, /401/);
+test('actual overlay adapter performs zero read-budget, projection or subscribe work before admission in both explicit action-policy modes', () => {
+  for (const readOnly of ['true', 'false']) {
+    const server = new EventEmitter();
+    let reads = 0,
+      subscriptions = 0,
+      budgets = 0;
+    const feed = {
+      channel: '201',
+      snapshot: async () => {
+        reads++;
+        return {};
+      },
+      subscribe: () => {
+        subscriptions++;
+        return () => {};
+      },
+    };
+    const sockets = attachOverlaySockets(
+      createPrivatePreview(
+        { ...ENV, P5_PREVIEW_READ_ONLY: readOnly },
+        { now: () => NOW },
+      ).upgradeServer(server),
+      feed,
+      {
+        origins: ['https://preview.example'],
+        allowRead: () => {
+          budgets++;
+          return true;
+        },
+      },
+    );
+    try {
+      for (const path of ['/ws/201', '/ws/201?key=' + KEY]) {
+        const s = socket();
+        server.emit(
+          'upgrade',
+          request(path, { headers: { origin: 'https://preview.example' } }),
+          s,
+          Buffer.alloc(0),
+        );
+        assert.match(s.output, /401/);
+      }
+      assert.equal(reads, 0);
+      assert.equal(subscriptions, 0);
+      assert.equal(budgets, 0);
+      assert.equal(sockets.clients.size, 0);
+    } finally {
+      sockets.close();
     }
-    assert.equal(reads, 0);
-    assert.equal(subscriptions, 0);
-    assert.equal(budgets, 0);
-    assert.equal(sockets.clients.size, 0);
-  } finally {
-    sockets.close();
   }
 });
 test('bounded form timeout and four concurrent reads reject without dispatching or growing an address index', async () => {
