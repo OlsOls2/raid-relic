@@ -1,0 +1,368 @@
+{
+  "at": "2026-10-31T14:13:39.675Z",
+  "origin": "https://sendoff-fix-on-1031---raid-relic-vz4bhnskgq-uc.a.run.app",
+  "browser": "native Chromium 156.0.8078.47",
+  "viewport": [
+    1365,
+    768
+  ],
+  "dpr": 1,
+  "samples": 3,
+  "observationMs": 8000,
+  "httpCacheDisabled": true,
+  "freshContextPerNavigation": true,
+  "cpuThrottle": false,
+  "networkThrottle": false,
+  "serverColdStartForced": false,
+  "noInputOrProviderWrites": true,
+  "rows": [
+    {
+      "route": "/",
+      "sample": 0,
+      "status": 200,
+      "error": null,
+      "paints": [
+        {
+          "name": "first-paint",
+          "time": 428
+        },
+        {
+          "name": "first-contentful-paint",
+          "time": 428
+        }
+      ],
+      "lcp": {
+        "time": 428,
+        "size": 60630,
+        "tag": "H1",
+        "id": "title"
+      },
+      "navigation": {
+        "ttfb": 158.5,
+        "dom": 669.3000000715256,
+        "load": 782.1000000238419,
+        "transfer": 9097
+      },
+      "visibility": "visible"
+    },
+    {
+      "route": "/",
+      "sample": 1,
+      "status": 200,
+      "error": null,
+      "paints": [
+        {
+          "name": "first-paint",
+          "time": 360
+        },
+        {
+          "name": "first-contentful-paint",
+          "time": 360
+        }
+      ],
+      "lcp": {
+        "time": 360,
+        "size": 60630,
+        "tag": "H1",
+        "id": "title"
+      },
+      "navigation": {
+        "ttfb": 130,
+        "dom": 627.8999999761581,
+        "load": 758.2999999523163,
+        "transfer": 9097
+      },
+      "visibility": "visible"
+    },
+    {
+      "route": "/",
+      "sample": 2,
+      "status": 200,
+      "error": null,
+      "paints": [
+        {
+          "name": "first-paint",
+          "time": 352
+        },
+        {
+          "name": "first-contentful-paint",
+          "time": 352
+        }
+      ],
+      "lcp": {
+        "time": 352,
+        "size": 60630,
+        "tag": "H1",
+        "id": "title"
+      },
+      "navigation": {
+        "ttfb": 130.5,
+        "dom": 625.8000000715256,
+        "load": 740.6000000238419,
+        "transfer": 9097
+      },
+      "visibility": "visible"
+    },
+    {
+      "route": "/atlas/",
+      "sample": 0,
+      "status": 200,
+      "error": null,
+      "paints": [
+        {
+          "name": "first-paint",
+          "time": 348
+        },
+        {
+          "name": "first-contentful-paint",
+          "time": 348
+        }
+      ],
+      "lcp": {
+        "time": 348,
+        "size": 82200,
+        "tag": "H1",
+        "id": "title"
+      },
+      "navigation": {
+        "ttfb": 123.5,
+        "dom": 599.2000000476837,
+        "load": 695.2000000476837,
+        "transfer": 8550
+      },
+      "visibility": "visible"
+    },
+    {
+      "route": "/atlas/",
+      "sample": 1,
+      "status": 200,
+      "error": null,
+      "paints": [
+        {
+          "name": "first-paint",
+          "time": 352
+        },
+        {
+          "name": "first-contentful-paint",
+          "time": 352
+        }
+      ],
+      "lcp": {
+        "time": 352,
+        "size": 82200,
+        "tag": "H1",
+        "id": "title"
+      },
+      "navigation": {
+        "ttfb": 120.29999995231628,
+        "dom": 625.8999999761581,
+        "load": 750.7999999523163,
+        "transfer": 8550
+      },
+      "visibility": "visible"
+    },
+    {
+      "route": "/atlas/",
+      "sample": 2,
+      "status": 200,
+      "error": null,
+      "paints": [
+        {
+          "name": "first-paint",
+          "time": 380
+        },
+        {
+          "name": "first-contentful-paint",
+          "time": 380
+        }
+      ],
+      "lcp": {
+        "time": 380,
+        "size": 82200,
+        "tag": "H1",
+        "id": "title"
+      },
+      "navigation": {
+        "ttfb": 144.5,
+        "dom": 648.8999999761581,
+        "load": 760.1999999284744,
+        "transfer": 8550
+      },
+      "visibility": "visible"
+    },
+    {
+      "route": "/keeper/olsols3",
+      "sample": 0,
+      "status": 200,
+      "error": null,
+      "paints": [
+        {
+          "name": "first-paint",
+          "time": 356
+        },
+        {
+          "name": "first-contentful-paint",
+          "time": 356
+        }
+      ],
+      "lcp": {
+        "time": 356,
+        "size": 50400,
+        "tag": "H1",
+        "id": "keeper-title"
+      },
+      "navigation": {
+        "ttfb": 145.20000004768372,
+        "dom": 767,
+        "load": 767.2000000476837,
+        "transfer": 3084
+      },
+      "visibility": "visible"
+    },
+    {
+      "route": "/keeper/olsols3",
+      "sample": 1,
+      "status": 200,
+      "error": null,
+      "paints": [
+        {
+          "name": "first-paint",
+          "time": 332
+        },
+        {
+          "name": "first-contentful-paint",
+          "time": 332
+        }
+      ],
+      "lcp": {
+        "time": 332,
+        "size": 50400,
+        "tag": "H1",
+        "id": "keeper-title"
+      },
+      "navigation": {
+        "ttfb": 133.10000002384186,
+        "dom": 733.8000000715256,
+        "load": 734,
+        "transfer": 3084
+      },
+      "visibility": "visible"
+    },
+    {
+      "route": "/keeper/olsols3",
+      "sample": 2,
+      "status": 200,
+      "error": null,
+      "paints": [
+        {
+          "name": "first-paint",
+          "time": 340
+        },
+        {
+          "name": "first-contentful-paint",
+          "time": 340
+        }
+      ],
+      "lcp": {
+        "time": 340,
+        "size": 50400,
+        "tag": "H1",
+        "id": "keeper-title"
+      },
+      "navigation": {
+        "ttfb": 137.09999990463257,
+        "dom": 698.8999999761581,
+        "load": 699.0999999046326,
+        "transfer": 3084
+      },
+      "visibility": "visible"
+    },
+    {
+      "route": "/overlay/1593561134",
+      "sample": 0,
+      "status": 200,
+      "error": null,
+      "paints": [
+        {
+          "name": "first-paint",
+          "time": 356
+        },
+        {
+          "name": "first-contentful-paint",
+          "time": 356
+        }
+      ],
+      "lcp": {
+        "time": 356,
+        "size": 71586,
+        "tag": "IMG",
+        "id": ""
+      },
+      "navigation": {
+        "ttfb": 120.89999997615814,
+        "dom": 615,
+        "load": 745.8999999761581,
+        "transfer": 3062
+      },
+      "visibility": "visible"
+    },
+    {
+      "route": "/overlay/1593561134",
+      "sample": 1,
+      "status": 200,
+      "error": null,
+      "paints": [
+        {
+          "name": "first-paint",
+          "time": 360
+        },
+        {
+          "name": "first-contentful-paint",
+          "time": 360
+        }
+      ],
+      "lcp": {
+        "time": 360,
+        "size": 71586,
+        "tag": "IMG",
+        "id": ""
+      },
+      "navigation": {
+        "ttfb": 129.5,
+        "dom": 613.5999999046326,
+        "load": 742.6999999284744,
+        "transfer": 3062
+      },
+      "visibility": "visible"
+    },
+    {
+      "route": "/overlay/1593561134",
+      "sample": 2,
+      "status": 200,
+      "error": null,
+      "paints": [
+        {
+          "name": "first-paint",
+          "time": 364
+        },
+        {
+          "name": "first-contentful-paint",
+          "time": 364
+        }
+      ],
+      "lcp": {
+        "time": 364,
+        "size": 71586,
+        "tag": "IMG",
+        "id": ""
+      },
+      "navigation": {
+        "ttfb": 134.59999990463257,
+        "dom": 652.8999999761581,
+        "load": 658.7999999523163,
+        "transfer": 3062
+      },
+      "visibility": "visible"
+    }
+  ]
+}

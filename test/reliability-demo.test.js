@@ -3,6 +3,94 @@ import { createHmac } from 'node:crypto';
 import assert from 'node:assert/strict';
 import { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';
 import { createRuntime } from '../src/runtime.js';
+import { readFile } from 'node:fs/promises';
+import {
+  coldOptions,
+  coldReadAllowed,
+  coldAccess,
+  coldSummary,
+  coldBaseline,
+  validateColdRow,
+} from '../scripts/browser-smoke-reliability.js';
+
+test('cold-navigation input, credential and read boundaries are closed without importing a running browser', () => {
+  const origin = 'https://candidate---raid-relic-vz4bhnskgq-uc.a.run.app';
+  assert.deepEqual(coldOptions(['--cold-navigation', '--origin=' + origin]), {
+    origin,
+    samples: 3,
+    privateAccess: false,
+  });
+  for (const args of [
+    [],
+    ['--cold-navigation'],
+    ['--cold-navigation', '--origin=http://example.run.app'],
+    ['--cold-navigation', '--origin=' + origin + '/'],
+    ['--cold-navigation', '--origin=' + origin, '--samples=4'],
+    ['--cold-navigation', '--origin=' + origin, '--samples=0'],
+    ['--cold-navigation', '--origin=' + origin, '--samples=1', '--samples=2'],
+    ['--cold-navigation', '--origin=' + origin, '--unknown'],
+    ['--cold-navigation=true', '--origin=' + origin],
+  ])
+    assert.throws(() => coldOptions(args));
+  assert.throws(() => coldOptions(['--cold-navigation', '--origin=https://other.a.run.app']));
+  assert.equal(coldReadAllowed(origin, origin + '/atlas/', 'GET'), true);
+  assert.equal(coldReadAllowed(origin, origin + '/atlas.js', 'HEAD'), true);
+  for (const path of [
+    '/oauth/keeper/start',
+    '/control/123/status',
+    '/auth/callback',
+    '/eventsub',
+    '/internal/wander/tick',
+    '/_preview/access',
+    '/%6fauth/keeper/start',
+  ])
+    assert.equal(coldReadAllowed(origin, origin + path, 'GET'), false);
+  for (const method of ['POST', 'PUT', 'DELETE'])
+    assert.equal(coldReadAllowed(origin, origin + '/', method), false);
+  assert.equal(coldReadAllowed(origin, 'https://provider.invalid/', 'GET'), false);
+  const dummy = Buffer.alloc(32, 7).toString('base64url');
+  assert.equal(coldAccess(Buffer.from(dummy + '\n')), dummy);
+  for (const bytes of [
+    Buffer.from(dummy + '\nextra'),
+    Buffer.from(dummy + '\r\n'),
+    Buffer.from('a'.repeat(43)),
+    Buffer.from(dummy + '='),
+    Buffer.alloc(43, 200),
+  ])
+    assert.throws(() => coldAccess(bytes));
+});
+test('cold-navigation baseline and metrics reject missing, duplicate or forged samples; summaries use median/max only', async () => {
+  const baseline = JSON.parse(await readFile('docs/COLD_NAV_BASELINE_1031.json', 'utf8'));
+  const summary = coldBaseline(baseline);
+  assert.deepEqual(
+    summary.map((r) => [r.medianMs, r.maxMs]),
+    [
+      [360, 428],
+      [352, 380],
+      [340, 356],
+      [360, 364],
+    ],
+  );
+  assert.ok(summary.every((r) => r.withinBudget));
+  for (const patch of [
+    { status: 401 },
+    { visibility: 'hidden' },
+    { error: 'TimeoutError' },
+    { lcp: null },
+    { lcp: { ...baseline.rows[0].lcp, time: 0 } },
+    { lcp: { ...baseline.rows[0].lcp, time: NaN } },
+    { paints: [] },
+    { navigation: { ...baseline.rows[0].navigation, ttfb: 0 } },
+  ])
+    assert.throws(() => validateColdRow({ ...baseline.rows[0], ...patch }));
+  assert.throws(() => coldSummary(baseline.rows.slice(1), 3));
+  assert.throws(() => coldSummary([baseline.rows[1], ...baseline.rows.slice(1)], 3));
+  assert.throws(() => coldBaseline({ ...baseline, serverColdStartForced: true }));
+  assert.throws(() => coldBaseline({ ...baseline, samples: 4 }));
+  const slow = structuredClone(baseline.rows);
+  slow[0].lcp.time = 2501;
+  assert.equal(coldSummary(slow, 3)[0].withinBudget, false);
+});
 const raidPosts = (f) =>
   f.calls.filter((c) => new URL(c.url).pathname.endsWith('/raids') && c.method === 'POST');
 const refreshPosts = (f) =>
