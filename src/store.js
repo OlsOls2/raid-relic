@@ -1,6 +1,6 @@
 import { publicKeeperProfiles } from './scoreboard.js';
 import { wanderMutation, wanderActivity } from './wander-state.js';
-import { receivingView, currentApprovedView } from './receiving.js';
+import { receivingView, currentApprovedView, retainedHoldLineage } from './receiving.js';
 import { streakView } from './streaks.js';
 import { enqueueP7, p7Mutation, cancelP7 } from './p7.js';
 import { journeyMap } from './journey-map.js';
@@ -176,6 +176,24 @@ export function createFirestoreStore(
   reviewPolicy = trustedReviewPolicy(reviewPolicy);
   p7Enabled = Boolean(p7Enabled && config);
   const ref = (collection, key) => db.collection(collection).doc(hash(key));
+  const readHolds = async (tx) => {
+    const registry = (await tx.get(ref('keeperRegistry', 'single'))).data();
+    const lineage = (await tx.get(ref('lineage', 'single'))).data();
+    const channels = {},
+      docs = {};
+    for (const id of config?.channels ?? []) {
+      channels[id] = (await tx.get(ref('streamChannels', id))).data();
+      docs[id] = (await tx.get(ref('markChannels', id))).data();
+    }
+    return {
+      registry,
+      lineage,
+      channels,
+      docs,
+      retained: retainedHoldLineage(registry, channels, docs, lineage, config),
+    };
+  };
+
   return {
     lifecycleEnabled: Boolean(config),
     async accept({
@@ -1071,31 +1089,24 @@ export function createFirestoreStore(
       });
     },
     async getRecap() {
-      return recapProjection((await ref('lineage', 'single').get()).data());
+      return db.runTransaction(async (tx) => recapProjection((await readHolds(tx)).retained));
     },
     async searchPublicMarks(options) {
-      return atlasSearch((await ref('lineage', 'single').get()).data(), options);
+      return db.runTransaction(async (tx) => atlasSearch((await readHolds(tx)).retained, options));
     },
     async getJourneyMap(now) {
       return journeyMap((await ref('lineage', 'single').get()).data(), config, now);
     },
     async getAtlasPage(options) {
-      if (options?.stopId) return atlasPage((await ref('lineage', 'single').get()).data(), options);
       return db.runTransaction(async (tx) => {
-        const registry = (await tx.get(ref('keeperRegistry', 'single'))).data();
-        const lineage = (await tx.get(ref('lineage', 'single'))).data();
-        const channels = {},
-          docs = {};
-        // Only the configured immutable holder is read; no public identity lookup.
-        if (config?.channels.includes(registry?.holderId)) {
-          const host = registry.holderId;
-          channels[host] = (await tx.get(ref('streamChannels', host))).data();
-          docs[host] = (await tx.get(ref('markChannels', host))).data();
-        }
-        return {
-          ...atlasPage(lineage, options),
-          current: currentApprovedView(registry, channels, docs, lineage, config),
-        };
+        const v = await readHolds(tx),
+          page = atlasPage(v.retained, options);
+        return page && !options?.stopId
+          ? {
+              ...page,
+              current: currentApprovedView(v.registry, v.channels, v.docs, v.lineage, config),
+            }
+          : page;
       });
     },
     async getPublicPresentation(host, now) {
@@ -1129,24 +1140,17 @@ export function createFirestoreStore(
     },
     async getOverlayState(host, now = Date.now()) {
       return db.runTransaction(async (tx) => {
-        const doc = (await tx.get(ref('markChannels', host))).data();
-        const registry = (await tx.get(ref('keeperRegistry', 'single'))).data();
-        const lineage = (await tx.get(ref('lineage', 'single'))).data();
-        const channels = {},
-          docs = { [host]: doc };
-        if (
-          registry?.pendingHop?.to === host &&
-          !registry.pendingHop.finalized &&
-          !registry.pendingHop.cancelled &&
-          now < registry.pendingHop.endsAt
-        ) {
-          for (const id of [registry.pendingHop.from, host]) {
-            channels[id] = (await tx.get(ref('streamChannels', id))).data();
-            if (id !== host) docs[id] = (await tx.get(ref('markChannels', id))).data();
-          }
-        }
+        const v = await readHolds(tx);
+        const { registry, lineage, channels, docs } = v;
+        const doc = docs[host] ?? (await tx.get(ref('markChannels', host))).data();
         return withIncomingPreview(
-          withCarriedMarks(publicOverlayState(doc, host), lineage, registry, host),
+          withCarriedMarks(
+            publicOverlayState(doc, host),
+            v.retained,
+            registry,
+            host,
+            doc?.context?.streamId,
+          ),
           registry,
           host,
           channels,

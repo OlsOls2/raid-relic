@@ -1,6 +1,7 @@
 import { seekerState } from './seeker-state.js';
 import { boundedCall } from './bounded.js';
-import { runeSvg, publicMarks } from './marks.js';
+import { runeSvg } from './marks.js';
+import { hash } from './crypto.js';
 
 export const RECEIVING_KEEPERS = Object.freeze({
   1591805230: 'raidrelichq',
@@ -28,47 +29,133 @@ export function keeperNetwork(value = RECEIVING_KEEPERS) {
 }
 const time = (v) => Number.isSafeInteger(v) && v >= 0;
 const count = (v) => Number.isSafeInteger(v) && v >= 0 && v <= 1000000;
-// Current-session content is separate from immutable completed arrival archives.
+export const publicRuneId = (host, stream, id) =>
+  'r' + hash(JSON.stringify(['retained-rune-v1', host, stream, id]));
+// Read-only attribution: strict interior of a single, continuous authoritative
+// hold interval. Equal-boundary/initial/ambiguous legacy timestamps are omitted.
+// No stored archive, stream context, quota or approval is changed.
+export function retainedHoldLineage(registry, channels, docs, lineage, config) {
+  const stops = lineage?.stops ?? [];
+  if (stops.length > 16 || (config?.channels.length ?? 0) > 4) throw Error('Hold capacity');
+  const ordered = stops.every(
+    (s, i) => time(s.claimedAt) && (i === 0 || s.claimedAt > stops[i - 1].claimedAt),
+  );
+  const projected = stops.map((stop, index) => {
+    const next = stops[index + 1],
+      host = stop.to;
+    const channel = channels[host],
+      doc = docs[host];
+    const continuous = next
+      ? next.from === host && next.claimedAt > stop.claimedAt
+      : registry?.holderId === host;
+    if (
+      !ordered ||
+      !config?.channels.includes(host) ||
+      !continuous ||
+      !time(stop.claimedAt) ||
+      !channel?.optedIn ||
+      channel.banned ||
+      channel.paused ||
+      !doc?.context?.optedIn ||
+      doc.context.keeperId !== host ||
+      doc.paused ||
+      doc.blocked.includes(host) ||
+      doc.context.blockedUserIds.includes(host) ||
+      channel.blockedUserIds?.includes(host)
+    )
+      return stop;
+    if (doc.sessions.length > 16 || stop.marks.length > 160) throw Error('Hold capacity');
+    const additions = [];
+    for (const session of doc.sessions) {
+      if (session.marks.length > 160) throw Error('Hold capacity');
+      for (const mark of session.marks) {
+        if (
+          mark.status !== 'approved' ||
+          !time(mark.createdAt) ||
+          mark.createdAt <= stop.claimedAt ||
+          (next && mark.createdAt >= next.claimedAt) ||
+          doc.blocked.includes(mark.userId) ||
+          doc.context.blockedUserIds.includes(mark.userId) ||
+          channel.blockedUserIds?.includes(mark.userId)
+        )
+          continue;
+        // IDs are channel-local; compare full private origin, never just m1.
+        const duplicate = stop.marks.some(
+          (m) =>
+            (m.originHost ?? stop.from) === host &&
+            (m.originStream ?? stop.streamId) === session.streamId &&
+            m.id === mark.id &&
+            m.userId === mark.userId,
+        );
+        if (!duplicate)
+          additions.push({
+            id: mark.id,
+            text: mark.text,
+            userId: mark.userId,
+            originHost: host,
+            originStream: session.streamId,
+            holdAddition: true,
+          });
+      }
+    }
+    if (stop.marks.length + additions.length > 160) throw Error('Hold capacity');
+    return { ...stop, marks: [...stop.marks, ...additions] };
+  });
+  const value = { ...lineage, stops: projected };
+  if (Buffer.byteLength(JSON.stringify(value)) > 524288) throw Error('Hold capacity');
+  // Public identity must not reuse channel-local m1 across different origins.
+  // Always namespace the read projection, so deletion of a colliding neighbour
+  // or a later carry cannot change a surviving glyph's identity. Stored IDs and
+  // private-origin comparisons above remain untouched. No viewer ID is hashed.
+  return {
+    ...value,
+    stops: projected.map((stop) => ({
+      ...stop,
+      marks: stop.marks.map((mark) => ({
+        ...mark,
+        publicId: publicRuneId(
+          mark.originHost ?? stop.from,
+          mark.originStream ?? stop.streamId,
+          mark.id,
+        ),
+      })),
+    })),
+  };
+}
 export function currentApprovedView(registry, channels, docs, lineage, config) {
-  const host = registry?.holderId;
-  if (!config?.channels.includes(host)) return null;
+  const projected = retainedHoldLineage(registry, channels, docs, lineage, config);
+  const last = projected.stops.at(-1),
+    host = registry?.holderId;
+  if (!last || last.to !== host || !config?.channels.includes(host)) return null;
   const channel = channels[host],
     doc = docs[host];
-  const session = doc?.sessions?.find((s) => s.streamId === channel?.streamId);
   if (
-    !channel?.online ||
-    !channel.optedIn ||
-    channel.paused ||
+    !channel?.optedIn ||
     channel.banned ||
-    channel.blockedUserIds?.includes(host) ||
-    !doc ||
-    doc.paused ||
-    doc.blocked?.includes(host) ||
-    doc.context?.blockedUserIds?.includes(host) ||
-    !doc.context?.holdsRelic ||
-    !doc.context.optedIn ||
+    channel.paused ||
+    !doc?.context?.optedIn ||
     doc.context.keeperId !== host ||
-    doc.context.streamId !== channel.streamId ||
-    !session ||
-    session.closed ||
-    session.marks.length > 160 ||
-    (lineage?.stops?.length ?? 0) > 16
+    doc.paused ||
+    doc.blocked.includes(host) ||
+    doc.context.blockedUserIds.includes(host) ||
+    channel.blockedUserIds?.includes(host)
   )
     return null;
-  const visible = new Set(publicMarks(doc, host).marks.map((m) => m.id));
-  const marks = session.marks
-    .filter((m) => visible.has(m.id) && !channel.blockedUserIds?.includes(m.userId))
-    .map(({ id, text }) => ({ id, text, runeSvg: runeSvg(text) }));
   const login = Object.entries(config.logins).find(([, id]) => id === host)?.[0];
   if (!login) return null;
-  return { login, ringCount: lineage?.stops?.length ?? 0, approvedCount: marks.length, marks };
+  const marks = last.marks.map(({ publicId, text }) => ({
+    id: publicId,
+    text,
+    runeSvg: runeSvg(text),
+  }));
+  return { login, ringCount: projected.stops.length, approvedCount: marks.length, marks };
 }
 // Called from the existing store read transaction. No viewer associations escape.
 export function receivingView(registry, channels, marks, lineage, config, now) {
   const current = currentApprovedView(registry, channels, marks, lineage, config);
   const names = Object.fromEntries(Object.entries(config?.logins ?? {}).map(([n, id]) => [id, n]));
   const ids = config?.channels ?? [];
-  const stops = lineage?.stops ?? [];
+  const stops = retainedHoldLineage(registry, channels, marks, lineage, config).stops;
   if (ids.length > 4 || stops.length > 16) throw Error('Receiving capacity');
   const safe = (id) =>
     channels[id]?.optedIn === true &&

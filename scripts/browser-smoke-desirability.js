@@ -176,30 +176,63 @@ try {
   await f.chat(HOME, '8201', '!offer');
   await f.chat(OTHER, '8202', '!accept');
   assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
+  f.advance(1);
   await f.chat(OTHER, '8301', '!mark light');
   await f.chat(OTHER, '8302', '!mark spoiler');
   const liveAtlas = JSON.parse((await f.request('/api/atlas')).body.toString());
-  assert.equal(liveAtlas.current.approvedCount, 1);
+  assert.equal(liveAtlas.current.approvedCount, 2);
   assert.deepEqual(
     liveAtlas.current.marks.map((m) => m.text),
-    ['light'],
+    ['moon', 'light'],
   );
-  assert.equal(liveAtlas.stops[0].approvedCount, 1);
-  stage = 'current-holder-overlay-glyph';
+  assert.equal(liveAtlas.stops[0].approvedCount, 2);
+  const heldStream = { ...f.streams.get(OTHER) };
+  await f.signed('stream.offline', { broadcaster_user_id: OTHER }, OTHER);
+  f.streams.delete(OTHER);
+  const offlineAtlas = JSON.parse((await f.request('/api/atlas')).body.toString());
+  assert.equal(offlineAtlas.stops[0].approvedCount, 2);
+  assert.equal(offlineAtlas.current.approvedCount, 2);
+  const offlineRecap = JSON.parse((await f.request('/api/recap')).body.toString());
+  assert.equal(
+    offlineRecap.route.find((s) => s.stopId === offlineAtlas.stops[0].stopId).retainedEntries,
+    offlineAtlas.stops[0].approvedCount,
+  );
+  assert.equal(offlineRecap.retainedMarkEntries, 2);
+  const offlineDetail = JSON.parse(
+    (await f.request('/api/atlas/stops/' + offlineAtlas.stops[0].stopId)).body.toString(),
+  );
+  const offlineOverlay = JSON.parse((await f.request('/api/overlay/' + OTHER)).body.toString());
+  assert.equal(
+    new Set(offlineDetail.marks.map((m) => m.id)).size,
+    2,
+    'Different channels both stored m1; public identities must differ',
+  );
+  assert.deepEqual(
+    offlineOverlay.marks.map((m) => m.id),
+    offlineDetail.marks.map((m) => m.id),
+  );
+  assert.deepEqual(
+    offlineAtlas.current.marks.map((m) => m.id),
+    offlineDetail.marks.map((m) => m.id),
+  );
+  stage = 'offline-holder-overlay-glyph';
   // Real reduced-motion SVG output makes the approved glyph itself observable;
   // normal WebGL/resource coverage remains in the existing overlay workflows.
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(origin + '/overlay/' + OTHER);
   await page.waitForFunction(
-    (svg) =>
-      [...document.querySelectorAll('#runes img')].filter(
-        (img) =>
-          decodeURIComponent(img.src.split(',')[1] ?? '') === svg &&
-          img.complete &&
-          img.naturalWidth > 0 &&
-          img.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }),
-      ).length === 1,
-    runeSvg('light'),
+    (svgs) =>
+      svgs.every(
+        (svg) =>
+          [...document.querySelectorAll('#runes img')].filter(
+            (img) =>
+              decodeURIComponent(img.src.split(',')[1] ?? '') === svg &&
+              img.complete &&
+              img.naturalWidth > 0 &&
+              img.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }),
+          ).length === 1,
+      ),
+    [runeSvg('moon'), runeSvg('light')],
   );
   assert.equal(
     await page.locator('#runes img').count(),
@@ -210,10 +243,10 @@ try {
   stage = 'atlas-holder';
   await page.goto(origin + '/atlas/');
   await page.emulateMedia({ reducedMotion: 'no-preference' });
-  await page.locator('#atlas-current-live img[alt="Live approved rune: light"]').waitFor();
+  await page.locator('#atlas-current-live img[alt="Retained approved rune: light"]').waitFor();
   assert.match(
     await page.locator('#atlas-current-live').innerText(),
-    /Current hold · Ring 1.*@olsols2/s,
+    /Retained hold · Ring 1.*@olsols2/s,
   );
   assert.doesNotMatch(await page.locator('#atlas-current-live').innerText(), /spoiler|8301|8302/);
   assert.equal(errors, 0);
@@ -266,10 +299,12 @@ try {
     /Twitch-reported raid audience: 1/,
   );
   assert.doesNotMatch(await page.locator('#receiving-content').innerText(), /spoiler|8101/);
-  assert.equal(await page.locator('.keeper-glyphs img').count(), 1);
-  await page.locator('#keeper-current-live img[alt="Live approved rune: light"]').waitFor();
-  assert.equal(await page.locator('#keeper-current-live img').count(), 1);
-  assert.match(await page.locator('#keeper-current-live').innerText(), /1 live approved marks/);
+  assert.equal(await page.locator('.keeper-glyphs img').count(), 2);
+  await page.locator('.keeper-glyphs img[alt="Approved rune: light"]').waitFor();
+  assert.match(await page.locator('#keeper-current-live').innerText(), /2 retained approved marks/);
+  const offlineKeeper = JSON.parse((await f.request('/api/keeper/olsols2')).body.toString());
+  assert.equal(offlineKeeper.profile.glyphTotal, 2);
+  assert.equal(offlineKeeper.profile.glyphs.filter((m) => m.text === 'light').length, 1);
   await page.locator('.keeper-card-preview').first().waitFor({ state: 'visible' });
   const thumbnail = await page
     .locator('.keeper-card-preview')
@@ -333,12 +368,13 @@ try {
     passed: true,
   });
   stage = 'stale-live-unknown';
-  f.streams.get(OTHER).viewer_count = 'invalid';
+  f.streams.set(OTHER, { ...heldStream, viewer_count: 'invalid' });
   f.advance(60001);
   await page.locator('#receiving-refresh').click();
   await page.locator('.holder-spotlight').filter({ hasText: 'Live status unknown' }).waitFor();
   stage = 'erase-and-unavailable';
   await f.chat(HOME, '8101', '!relic forgetme');
+  await f.chat(OTHER, '8301', '!relic forgetme');
   await page.locator('#receiving-refresh').click();
   stage = 'erasure-glyphs';
   await page.waitForFunction(
@@ -356,9 +392,42 @@ try {
   assert.equal(downloads, 0);
 
   stage = 'keeper-repeat-disclosure';
-  // Restore the malformed mock observation used above, then let its freshness expire.
+  // Earlier glyph checks deliberately closed OTHER's stream. A provider row
+  // alone cannot reopen it: start a new immutable signed mock stream before
+  // attempting any further hand-off; never reuse the closed heldStream ID.
   for (const stream of f.streams.values()) stream.viewer_count = 1;
   f.advance(61000);
+  const repeatStreamId = '9900991';
+  assert.notEqual(repeatStreamId, heldStream.id);
+  const repeatStartedAt = new Date(f.now()).toISOString();
+  f.streams.set(OTHER, {
+    ...heldStream,
+    user_id: OTHER,
+    id: repeatStreamId,
+    started_at: repeatStartedAt,
+    type: 'live',
+    viewer_count: 1,
+  });
+  const repeatOnline = await f.signed(
+    'stream.online',
+    {
+      broadcaster_user_id: OTHER,
+      id: repeatStreamId,
+      type: 'live',
+      started_at: repeatStartedAt,
+    },
+    OTHER,
+  );
+  assert.equal(repeatOnline.status, 204);
+  const repeatSetup = await f.control(OTHER, 'bootstrap');
+  assert.equal(repeatSetup.status, 200);
+  assert.equal(JSON.parse(repeatSetup.body).status, 'reconciled');
+  assert.equal(JSON.parse(repeatSetup.body).ready, true);
+  const repeatChannel = await f.runtime.state.getStreamStatus(OTHER);
+  assert.equal(repeatChannel.online, true);
+  assert.equal(repeatChannel.streamId, repeatStreamId);
+  assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, OTHER);
+  assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
   // Genuine signed mock hops create four received rings; no fabricated profile DTO.
   for (let i = 0; i < 6; i++) {
     const from = (await f.runtime.state.getKeeperRegistry()).holderId;

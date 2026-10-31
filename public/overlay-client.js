@@ -80,13 +80,14 @@ export function validSnapshot(value) {
     Array.isArray(value.marks) &&
     value.marks.length <= 160 &&
     value.approvedCount === value.marks.length &&
+    new Set(value.marks.map((mark) => mark?.id)).size === value.marks.length &&
     value.marks.every(
       (mark) =>
         Object.keys(mark).every((k) => ['id', 'runeSvg', 'faded', 'flightText'].includes(k)) &&
         typeof mark.id === 'string' &&
         (mark.flightText === undefined || validFlightText(mark.flightText)) &&
         (mark.faded === undefined || typeof mark.faded === 'boolean') &&
-        /^m[1-9]\d{0,8}$/.test(mark.id) &&
+        /^(?:m[1-9]\d{0,8}|r[a-f0-9]{64})$/.test(mark.id) &&
         typeof mark.runeSvg === 'string' &&
         mark.runeSvg.length < 1024,
     )

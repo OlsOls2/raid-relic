@@ -85,10 +85,10 @@ async function load() {
       )
         throw Error('Invalid live marks');
       liveSection.append(
-        node('h2', `Current hold · Ring ${live.ringCount} · @${live.login}`),
+        node('h2', `Retained hold · Ring ${live.ringCount} · @${live.login}`),
         node(
           'p',
-          `${live.approvedCount} live approved marks. Added during this hold; not the archived arrival snapshot.`,
+          `${live.approvedCount} retained approved marks. Includes approved marks made during this hold; arrival snapshots are not rewritten.`,
         ),
       );
       const list = node('ul');
@@ -104,7 +104,7 @@ async function load() {
         const image = node('img');
         image.src = `data:image/svg+xml,${encodeURIComponent(mark.runeSvg)}`;
         image.width = image.height = 48;
-        image.alt = 'Live approved rune: ' + mark.text;
+        image.alt = 'Retained approved rune: ' + mark.text;
         const item = node('li');
         item.append(image, node('span', mark.text));
         list.append(item);

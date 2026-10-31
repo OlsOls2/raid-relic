@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-31T12:38:44.465Z",
+  "lead": "01a1705c-a87d-7143-80f6-021e47b78ced",
+  "applicationRuns": [
+    334,
+    335,
+    336,
+    337
+  ],
+  "fixtureRuns": [
+    338,
+    339
+  ],
+  "ownerPolicyCorrection": "Approved marks stay publicly attached to the hold/ring where made after stream closure; collecting new marks still requires authorized live holder.",
+  "qa": {
+    "nativeTests": 1267,
+    "skipped": 0,
+    "browserFlows": 46,
+    "browserChecks": 153,
+    "execution": "OS-isolated Node22/Chromium, mock providers"
+  },
+  "regressions": [
+    "Offline approved glyphs visible on Atlas/Keeper/overlay, pending hidden.",
+    "Strict trusted hold interval attribution; ambiguous boundaries omitted; no historical data migration.",
+    "Opaque origin IDs prevent cross-host m1 collisions; stability and no duplicate glyphs.",
+    "Recap/Atlas/card counts consistent; strict card cross-read/erasure checks retained.",
+    "Valid initial-active plus retained overlay union; historical carried fading does not fade new local glyphs.",
+    "Both-store forget/block/veto/opt-out and lifecycle/replay tests; offline collection blocked.",
+    "Bounded configured Firestore reads with no public projection writes."
+  ],
+  "liveAcceptance": "Parent must verify actual existing offline light in new0 Atlas Ring12 detail, Keeper glyphs and overlay before declaring delivery; local fixture pass alone is insufficient.",
+  "productionTrafficChanged": false,
+  "productionDataMigrated": false,
+  "streamReopened": false,
+  "approvalOrQuotaChanged": false,
+  "privatePreview": "Existing expiring owner-only access credential reused; never in repository or URL.",
+  "operator": "Owner handles production-env staging/promotion; hard reload cached modules afterward.",
+  "evidence": {
+    "originalOnlyThroughRun": 337,
+    "laterFixtureRunsOutsideCutoff": true,
+    "wholeEntryOmissions": 8,
+    "secondaryFindings": 0,
+    "chunkCap": 16777216,
+    "totalCap": 33554432
+  }
+}

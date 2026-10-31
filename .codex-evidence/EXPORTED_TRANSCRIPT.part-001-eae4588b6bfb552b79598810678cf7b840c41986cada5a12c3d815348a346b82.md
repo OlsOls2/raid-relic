@@ -2,7 +2,7 @@
 
 Session: 01a1705c-a87d-7143-80f6-021e47b78ced
 
-Snapshot cutoff: 2026-10-31T11:30:39.876Z (last timestamped record; not a claim that future/active conversation is included).
+Snapshot cutoff: 2026-10-31T12:22:34.710Z (last timestamped record; not a claim that future/active conversation is included).
 
 This is a readable selected native-JSONL export, NOT a complete raw transcript. User/assistant messages and tool calls/results are retained; duplicate native event records are labelled. Private system/developer/bootstrap instructions, reasoning/analysis, opaque encrypted fields, media/base64 and other internal metadata are omitted. Each item is capped at 32768 characters with an explicit omission count and sanitized-item digest. No raw-backup links or private credentials are published. Credential-looking literals, headers or sensitive fields cause whole-item content omission, with source line and reason retained; counts are in the manifest. Strong key patterns remain fatal across all selected visible fields, even in otherwise omitted items. Existing synthetic fixture literals are explicitly classified, not proof of real authentication.
 

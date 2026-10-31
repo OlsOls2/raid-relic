@@ -10,6 +10,23 @@ import { createJourneyFixture } from '../test-support/journey-fixture.js';
 import { createJudges } from '../test-support/judges.js';
 import { fakeFirestore } from '../test-support/fake-firestore.js';
 import { createApp } from '../src/app.js';
+import { hash } from '../src/crypto.js';
+function assertRetainedReadBudget(db, f, writesBefore) {
+  assert.deepEqual(
+    [...db.reads].sort(),
+    [
+      `lineage/${hash('single')}`,
+      `keeperRegistry/${hash('single')}`,
+      ...[f.source, f.target].flatMap((id) => [
+        `streamChannels/${hash(id)}`,
+        `markChannels/${hash(id)}`,
+      ]),
+    ].sort(),
+  );
+  assert.equal(db.reads.length, 6);
+  assert.equal(new Set(db.reads).size, 6, 'Each configured document is read exactly once');
+  assert.equal(db.writes.length, writesBefore, 'Public recap cannot write');
+}
 const archive = (count = 16) => ({
   stops: Array.from({ length: count }, (_, i) => ({
     stopId: (i + 1).toString(16).padStart(64, '0'),
@@ -31,9 +48,10 @@ for (const kind of ['memory', 'firestore']) {
     t.after(() => f.close());
     await f.chat(f.source, '9999', { type: 'mark', text: 'pending' });
     if (db) db.reads.length = 0;
+    const writesBefore = db?.writes.length;
     const result = await f.app.dispatch({ method: 'GET', path: '/api/recap' });
     assert.equal(result.status, 200);
-    if (db) assert.equal(db.reads.length, 1);
+    if (db) assertRetainedReadBudget(db, f, writesBefore);
     const data = JSON.parse(result.body);
     assert.equal(data.mode, 'simulator');
     assert.equal(data.rings, 1);
@@ -263,8 +281,9 @@ for (const kind of ['memory', 'firestore'])
       await f.chat(target, target, { type: 'accept' }, time);
     }
     if (db) db.reads.length = 0;
+    const writesBefore = db?.writes.length;
     const data = await f.state.getRecap();
-    if (db) assert.equal(db.reads.length, 1);
+    if (db) assertRetainedReadBudget(db, f, writesBefore);
     assert.equal(data.rings, 16);
     assert.equal(data.route.length, 16);
     assert.equal(data.retainedMarkEntries, 72);

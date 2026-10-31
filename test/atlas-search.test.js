@@ -6,6 +6,7 @@ import { createJourneyFixture } from '../test-support/journey-fixture.js';
 import { fakeFirestore } from '../test-support/fake-firestore.js';
 import { createApp } from '../src/app.js';
 import { atlasSearch } from '../src/public-view.js';
+import { hash } from '../src/crypto.js';
 const query = (app, value) =>
   app.dispatch({
     method: 'POST',
@@ -19,11 +20,23 @@ for (const kind of ['memory', 'firestore']) {
     const f = await createJourneyFixture({ firestoreClient: db });
     t.after(() => f.close());
     if (db) db.reads.length = 0;
+    const writesBefore = db?.writes.length;
     const response = await query(f.app, { query: 'ｍＯＯＮ' });
     assert.equal(response.status, 200);
     if (db) {
-      assert.equal(db.reads.length, 1);
-      assert.ok(db.reads[0].startsWith('lineage/'));
+      assert.deepEqual(
+        [...db.reads].sort(),
+        [
+          `lineage/${hash('single')}`,
+          `keeperRegistry/${hash('single')}`,
+          ...[f.source, f.target].flatMap((id) => [
+            `streamChannels/${hash(id)}`,
+            `markChannels/${hash(id)}`,
+          ]),
+        ].sort(),
+      );
+      assert.equal(new Set(db.reads).size, 6);
+      assert.equal(db.writes.length, writesBefore);
     }
     const result = JSON.parse(response.body);
     assert.equal(result.total, 1);

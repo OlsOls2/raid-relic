@@ -8,7 +8,7 @@ import { ackDocument, ackStep, completionAck } from '../src/claim-ack.js';
 import { reserveShare } from '../src/my-marks.js';
 import { updatePresence, revokePresenceActor, presenceKey } from '../src/presence.js';
 import { reduceLifecycle, emptyRegistry } from '../src/lifecycle.js';
-import { reduceMark, setMarkContext, markReviewPolicy } from '../src/marks.js';
+import { reduceMark, setMarkContext, markReviewPolicy, runeSvg } from '../src/marks.js';
 import { hash } from '../src/crypto.js';
 import { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';
 
@@ -503,7 +503,22 @@ for (const kind of ['memory', 'firestore']) {
       approved.sessions.flatMap((s) => s.marks).find((m) => m.id === moon.id).status,
       'approved',
     );
-    assert.ok((await f.runtime.overlayFeeds[HOME].snapshot()).marks.some((m) => m.id === moon.id));
+    // Storage IDs are channel-local; public union IDs are stable opaque origins.
+    // Prove the actual approved glyph remains present, not equality to a private ID.
+    const approvedSnapshot = await f.runtime.overlayFeeds[HOME].snapshot();
+    const publicMoons = approvedSnapshot.marks.filter((m) => m.runeSvg === runeSvg('moon'));
+    assert.equal(publicMoons.length, 1);
+    assert.match(publicMoons[0].id, /^r[a-f0-9]{64}$/);
+    assert.equal(
+      new Set(approvedSnapshot.marks.map((m) => m.id)).size,
+      approvedSnapshot.marks.length,
+    );
+    const repeatedSnapshot = await f.runtime.overlayFeeds[HOME].snapshot();
+    assert.equal(repeatedSnapshot.marks.filter((m) => m.runeSvg === runeSvg('moon')).length, 1);
+    assert.equal(
+      repeatedSnapshot.marks.find((m) => m.runeSvg === runeSvg('moon')).id,
+      publicMoons[0].id,
+    );
     assert.equal(JSON.parse((await f.control(HOME, `send:${OTHER}`)).body).status, 'accepted');
     await f.raid();
     await f.chat(HOME, '102', '!offer', { messageId: 'honest-offer' });

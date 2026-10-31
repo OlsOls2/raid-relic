@@ -8,22 +8,40 @@ the public Ring 12 arrival archive and Keeper archived glyph count were zero.
 This confirms an archive-only view gap, not a missing stored mark. The source
 author did not read production data or independently verify the live overlay.
 
-Mark acknowledgements are transaction-derived: approved means public on the live
-relic; pending means private until approval. Current-hold marks are not retroactive
-edits to completed-stop archives. Keeper glyphs currently describe the latest
-received ring's archived source marks; Atlas stop marks are also historical.
-The candidate adds a distinct read-only current-hold projection to Atlas overview
-and the current Keeper page. It requires the actual configured holder, matching
-active open session, online/opted-in/unpaused/unbanned channel and approved,
-unblocked marks. It exposes no author IDs or pending text and caps marks at 160.
-Both stores derive it from consistent reads; GET performs no writes or provider
-actions. Stop detail/arrival counts remain immutable. Current-hold marks enter
-the next completed archive only through the existing verified hand-off path.
-This candidate does not approve, migrate, reconstruct or rewrite marks or Ring 12.
-Forget/block and inactive context remove the live projection on the next read.
-Local both-store regression definitions cover privacy, holder changes and replay;
-the browser probe checks actual Atlas/Keeper images and the existing WSS overlay
-render, with archived and current glyphs counted separately.
+## Approved retention policy — local source334 candidate
+
+The owner explicitly clarified at 12:02 UTC that approved marks belong to the
+ring/hold where made and remain public after a stream ends. The parent reports
+`light` still approved in a closed olsols3 session with Ring 12 held there.
+The previous online-only view does not meet that policy.
+
+Atlas list/detail/search, Keeper glyphs and the holder overlay now share a pure
+read-time union of existing arrival marks and approved marks made during that
+hold. Stored arrival snapshots are **not modified**. Each additional mark needs
+its configured channel's retained approved record and a trusted creation time
+strictly inside one continuous authoritative hold: after that stop's claim and
+before the next claim (or the actual current holder's open-ended final hold).
+Equal-boundary, missing timestamp, discontinuous/unsorted and initial-hold legacy
+attribution is conservatively omitted rather than guessed. Stream closure or a
+new stream does not change this association. No stream is reopened and offline
+mark collection remains denied by the existing live-holder/quota rules.
+
+Reads recheck approval, opt-in, pause/ban and block/privacy state; erased/vetoed
+records cannot be regenerated. Origin/channel/stream/user references remain
+private; only existing opaque mark IDs, approved text and original glyphs escape.
+An already represented mark is not appended twice. Bounds stay four configured
+Keepers, sixteen stops/sessions, 160 marks per projected ring and 512 KiB private
+projection; over-capacity fails closed, without truncation or data deletion.
+Keeper's existing bounded twenty-glyph preview retains its honest total count.
+
+No migration, approval, quota reset, collection, provider action or data write is
+needed for the parent-reported unambiguous Ring 12 `light`. Tests are definitions,
+not source-author execution: both stores cover offline retention, old/new stream,
+search/detail, move/replay, forget/block and private-pending exclusion. The browser
+probe renders the actual offline holder glyph in Atlas, Keeper and reduced-motion
+SVG overlay. Normal WebGL/resource coverage remains in existing workflows.
+**Completion still requires parent QA and the actual new zero-preview APIs showing
+stored Ring 12 `light`; a local fixture pass alone is insufficient.**
 
 The bounded `/overlay?channel=...` alias accepts only an exact configured login or
 ID with an existing feed and redirects relatively to the numeric overlay route.

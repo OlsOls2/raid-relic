@@ -1,15 +1,26 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';
-import { createReceiving, keeperNetwork, currentApprovedView } from '../src/receiving.js';
+import {
+  createReceiving,
+  keeperNetwork,
+  currentApprovedView,
+  retainedHoldLineage,
+} from '../src/receiving.js';
 import { keeperCardFilename } from '../public/keeper-card.js';
 import { parseMarkCommand, runeSvg } from '../src/marks.js';
+import { atlasPage, withCarriedMarks } from '../src/public-view.js';
+import { localOverlayArrival, validSnapshot } from '../public/overlay-client.js';
 
 const posts = (f) =>
   f.calls.filter((c) => c.url.endsWith('/chat/messages')).map((c) => JSON.parse(c.body));
-test('current hold projection is bounded, distinct and fails closed for revoked or inactive contexts', () => {
+test('retained hold projection survives closure but fails closed for revoked or ambiguous attribution', () => {
   const registry = { holderId: HOME },
-    lineage = { stops: [{}] };
+    lineage = {
+      stops: [
+        { from: OTHER, to: HOME, claimedAt: 100, marks: [], streamId: 'source', ringIndex: 1 },
+      ],
+    };
   const config = { channels: [HOME, OTHER], logins: { raidrelichq: HOME, olsols2: OTHER } };
   const channel = {
     online: true,
@@ -37,6 +48,7 @@ test('current hold projection is bounded, distinct and fails closed for revoked 
           text: 'light',
           userId: String(9000 + i),
           status: 'approved',
+          createdAt: 101,
         })),
       },
     ],
@@ -45,30 +57,33 @@ test('current hold projection is bounded, distinct and fails closed for revoked 
     currentApprovedView(r, { [HOME]: c }, { [HOME]: d }, lineage, config);
   assert.equal(project().approvedCount, 160);
   assert.equal(new Set(project().marks.map((m) => m.id)).size, 160);
-  assert.doesNotMatch(JSON.stringify(project()), /userId|9000|stream-one/);
+  assert.doesNotMatch(JSON.stringify(project()), /userId|"9000"|stream-one/);
   for (const patch of [
-    { online: false },
     { optedIn: false },
     { paused: true },
     { banned: true },
-    { streamId: 'another' },
     { blockedUserIds: [HOME] },
   ])
     assert.equal(project({ ...channel, ...patch }), null);
   for (const patch of [
     { paused: true },
     { blocked: [HOME] },
-    { context: { ...doc.context, holdsRelic: false } },
     { context: { ...doc.context, optedIn: false } },
     { context: { ...doc.context, keeperId: OTHER } },
   ])
     assert.equal(project(channel, { ...doc, ...patch }), null);
   const closed = structuredClone(doc);
   closed.sessions[0].closed = true;
-  assert.equal(project(channel, closed), null);
+  assert.equal(
+    project(
+      { ...channel, online: false, streamId: null },
+      { ...closed, context: { ...closed.context, holdsRelic: false } },
+    ).approvedCount,
+    160,
+  );
   const over = structuredClone(doc);
   over.sessions[0].marks.push({ ...over.sessions[0].marks[0], id: 'm161' });
-  assert.equal(project(channel, over), null);
+  assert.throws(() => project(channel, over), /capacity/);
   const privateDoc = structuredClone(doc);
   privateDoc.sessions[0].marks[0].status = 'pending';
   privateDoc.sessions[0].marks[1].status = 'rejected';
@@ -76,6 +91,113 @@ test('current hold projection is bounded, distinct and fails closed for revoked 
   privateDoc.context.blockedUserIds.push('9003');
   assert.equal(project({ ...channel, blockedUserIds: ['9004'] }, privateDoc).approvedCount, 155);
   assert.equal(project(channel, doc, { holderId: OTHER }), null);
+  const uncertain = structuredClone(doc);
+  for (const m of uncertain.sessions[0].marks) m.createdAt = 100;
+  assert.equal(
+    project(channel, uncertain).approvedCount,
+    0,
+    'Equal-boundary legacy creation is ambiguous',
+  );
+  delete uncertain.sessions[0].marks[0].createdAt;
+  assert.equal(project(channel, uncertain).approvedCount, 0);
+  assert.deepEqual(
+    currentApprovedView(registry, { [HOME]: channel }, { [HOME]: doc }, { stops: [] }, config),
+    null,
+  );
+  const copied = structuredClone(lineage);
+  copied.stops[0].marks.push({
+    ...doc.sessions[0].marks[0],
+    originHost: HOME,
+    originStream: 'stream-one',
+  });
+  assert.equal(
+    retainedHoldLineage(registry, { [HOME]: channel }, { [HOME]: doc }, copied, config).stops[0]
+      .marks.length,
+    160,
+    'Already represented glyph is not duplicated',
+  );
+  const collisionDoc = structuredClone(doc);
+  collisionDoc.sessions[0].marks = [collisionDoc.sessions[0].marks[0]];
+  const collisionLineage = structuredClone(lineage);
+  collisionLineage.stops[0].stopId = 'a'.repeat(64);
+  collisionLineage.stops[0].marks = [{ id: 'm1', text: 'moon', userId: '8000' }];
+  const projectCollision = (d) =>
+    retainedHoldLineage(registry, { [HOME]: channel }, { [HOME]: d }, collisionLineage, config);
+  const collision = projectCollision(collisionDoc);
+  assert.deepEqual(
+    collision.stops[0].marks.map((m) => m.id),
+    ['m1', 'm1'],
+    'Stored/private IDs are not rewritten',
+  );
+  const detail = atlasPage(collision, { stopId: 'a'.repeat(64) });
+  assert.equal(new Set(detail.marks.map((m) => m.id)).size, 2);
+  assert.ok(detail.marks.every((m) => /^r[a-f0-9]{64}$/.test(m.id)));
+  const carried = withCarriedMarks({ status: 'waiting', marks: [] }, collision, registry, HOME);
+  assert.deepEqual(
+    carried.marks.map((m) => m.id),
+    detail.marks.map((m) => m.id),
+  );
+  const current = currentApprovedView(
+    registry,
+    { [HOME]: channel },
+    { [HOME]: collisionDoc },
+    collisionLineage,
+    config,
+  );
+  assert.deepEqual(
+    current.marks.map((m) => m.id),
+    detail.marks.map((m) => m.id),
+  );
+  const snapshot = { ...localOverlayArrival('host', 1000), marks: carried.marks, approvedCount: 2 };
+  assert.equal(validSnapshot(snapshot), true);
+  assert.equal(validSnapshot({ ...snapshot, marks: [carried.marks[0], carried.marks[0]] }), false);
+  for (const id of [
+    'r' + '0'.repeat(63),
+    'r' + 'A'.repeat(64),
+    'm0',
+    'm1000000000',
+    'source/private/m1',
+  ])
+    assert.equal(
+      validSnapshot({ ...snapshot, marks: [{ id, runeSvg: runeSvg('light') }], approvedCount: 1 }),
+      false,
+    );
+  assert.equal(
+    validSnapshot({
+      ...snapshot,
+      marks: [{ id: 'm1', runeSvg: runeSvg('light') }],
+      approvedCount: 1,
+    }),
+    true,
+  );
+  const surviving = detail.marks.find((m) => m.text === 'moon').id;
+  collisionDoc.sessions[0].marks = [];
+  assert.equal(
+    atlasPage(projectCollision(collisionDoc), { stopId: 'a'.repeat(64) }).marks[0].id,
+    surviving,
+  );
+  const next = {
+    ...collisionLineage.stops[0],
+    from: HOME,
+    to: OTHER,
+    streamId: 'stream-one',
+    marks: [{ id: 'm1', text: 'light', userId: '9000' }],
+  };
+  const again = retainedHoldLineage(
+    { holderId: OTHER },
+    { [OTHER]: { ...channel, optedIn: false } },
+    {},
+    { stops: [next] },
+    config,
+  );
+  assert.equal(
+    atlasPage(again, { stopId: next.stopId }).marks[0].id,
+    detail.marks.find((m) => m.text === 'light').id,
+  );
+  assert.doesNotMatch(
+    JSON.stringify({ detail, current, carried }),
+    /userId|originHost|originStream|stream-one|"8000"|"9000"/,
+  );
 });
 async function setup(kind, enabled = true) {
   const f = await pilotFixture(kind, {
@@ -121,6 +243,148 @@ test('bounded operator Keeper mapping and commands do not admit arbitrary caller
     assert.throws(() => keeperCardFilename(...v));
 });
 for (const kind of ['memory', 'firestore']) {
+  test(`${kind}: approved hold marks survive offline without writes and remain attributable after reconnect/move/erasure`, async () => {
+    const f = await setup(kind, false);
+    await f.control(HOME, 'send:' + OTHER);
+    f.advance();
+    await f.raid(HOME, OTHER, 1);
+    await f.chat(HOME, '8801', '!offer');
+    await f.chat(OTHER, '8802', '!accept');
+    f.advance(1);
+    await f.chat(OTHER, '8803', '!mark light');
+    await f.chat(OTHER, '8804', '!mark spoiler');
+    const stored = await f.runtime.state.getPublicJourney();
+    await f.signed('stream.offline', { broadcaster_user_id: OTHER }, OTHER);
+    const writes = f.db?.writes.length;
+    const page = JSON.parse((await f.request('/api/atlas')).body.toString());
+    assert.equal(page.rings, 1);
+    assert.equal(page.stops[0].approvedCount, 1);
+    const recap = JSON.parse((await f.request('/api/recap')).body.toString());
+    assert.equal(
+      recap.route.find((s) => s.stopId === page.stops[0].stopId).retainedEntries,
+      page.stops[0].approvedCount,
+    );
+    assert.equal(recap.retainedMarkEntries, 1);
+    assert.equal(recap.shownRunes, 1);
+    const detail = JSON.parse(
+      (await f.request('/api/atlas/stops/' + page.stops[0].stopId)).body.toString(),
+    );
+    assert.deepEqual(
+      detail.marks.map((m) => m.text),
+      ['light'],
+    );
+    const profile = JSON.parse((await f.request('/api/keeper/olsols2')).body.toString()).profile;
+    assert.equal(profile.glyphTotal, 1);
+    assert.deepEqual(
+      profile.glyphs.map((m) => m.text),
+      ['light'],
+    );
+    const overlay = JSON.parse((await f.request('/api/overlay/' + OTHER)).body.toString());
+    assert.equal(overlay.marks.length, 1);
+    assert.equal(overlay.marks[0].runeSvg, runeSvg('light'));
+    assert.equal(overlay.status, 'waiting', 'Retained display never fabricates an online session');
+    assert.equal(
+      (await f.runtime.state.searchPublicMarks({ query: 'light', offset: 0, limit: 20 })).total,
+      1,
+    );
+    assert.doesNotMatch(
+      JSON.stringify({ page, detail, profile, overlay }),
+      /spoiler|"8803"|"8804"|userId|originHost|originStream/,
+    );
+    assert.deepEqual(
+      await f.runtime.state.getPublicJourney(),
+      stored,
+      'Read projection does not mutate arrival archive',
+    );
+    if (f.db) assert.equal(f.db.writes.length, writes);
+    await f.chat(OTHER, '8805', '!mark dawn');
+    assert.match(posts(f).at(-1).message, /Marks are open only while/);
+    assert.equal(
+      JSON.parse((await f.request('/api/atlas')).body.toString()).stops[0].approvedCount,
+      1,
+    );
+    f.advance(1001);
+    await f.signed(
+      'stream.online',
+      {
+        broadcaster_user_id: OTHER,
+        id: '990091',
+        type: 'live',
+        started_at: new Date(f.now()).toISOString(),
+      },
+      OTHER,
+    );
+    assert.equal(
+      JSON.parse((await f.request('/api/atlas')).body.toString()).stops[0].approvedCount,
+      1,
+    );
+    await f.chat(OTHER, '8806', '!mark dawn');
+    await f.control(OTHER, 'send:' + HOME);
+    f.advance();
+    await f.raid(OTHER, HOME, 1);
+    await f.chat(OTHER, '8811', '!offer');
+    await f.chat(HOME, '8812', '!accept', { messageId: 'retained-return' });
+    const moved = JSON.parse((await f.request('/api/atlas')).body.toString());
+    assert.equal(moved.rings, 2);
+    const first = JSON.parse(
+      (await f.request('/api/atlas/stops/' + moved.stops[0].stopId)).body.toString(),
+    );
+    assert.equal(first.marks.filter((m) => m.text === 'light').length, 1);
+    const second = JSON.parse(
+      (await f.request('/api/atlas/stops/' + moved.stops[1].stopId)).body.toString(),
+    );
+    assert.deepEqual(
+      second.marks.map((m) => m.text),
+      ['dawn'],
+    );
+    await f.chat(HOME, '8812', '!accept', { messageId: 'retained-return' });
+    assert.deepEqual(JSON.parse((await f.request('/api/atlas')).body.toString()), moved);
+    const movedRecap = JSON.parse((await f.request('/api/recap')).body.toString());
+    assert.deepEqual(
+      movedRecap.route.map((s) => s.retainedEntries),
+      moved.stops.map((s) => s.approvedCount),
+    );
+    await f.chat(OTHER, '8803', '!relic forgetme');
+    const afterForget = JSON.parse(
+      (await f.request('/api/atlas/stops/' + moved.stops[0].stopId)).body.toString(),
+    );
+    assert.equal(afterForget.total, 1);
+    assert.deepEqual(
+      afterForget.marks.map((m) => m.text),
+      ['dawn'],
+    );
+    assert.equal(
+      (await f.runtime.state.searchPublicMarks({ query: 'light', offset: 0, limit: 20 })).total,
+      0,
+    );
+    const afterForgetKeeper = JSON.parse(
+      (await f.request('/api/keeper/olsols2')).body.toString(),
+    ).profile;
+    assert.deepEqual(
+      afterForgetKeeper.glyphs.map((m) => m.text),
+      ['dawn'],
+    );
+    const afterForgetOverlay = JSON.parse(
+      (await f.request('/api/overlay/' + HOME)).body.toString(),
+    );
+    assert.ok(afterForgetOverlay.marks.every((m) => m.runeSvg !== runeSvg('light')));
+    assert.equal(afterForgetOverlay.marks.filter((m) => m.runeSvg === runeSvg('dawn')).length, 1);
+    f.advance(10001);
+    await f.chat(OTHER, OTHER, '!relic block 8806');
+    const erasedRecap = JSON.parse((await f.request('/api/recap')).body.toString());
+    assert.equal(erasedRecap.retainedMarkEntries, 0);
+    assert.ok(erasedRecap.route.every((s) => s.retainedEntries === 0));
+    assert.equal(
+      JSON.parse((await f.request('/api/atlas/stops/' + moved.stops[0].stopId)).body.toString())
+        .total,
+      0,
+    );
+    assert.equal(
+      JSON.parse((await f.request('/api/atlas/stops/' + moved.stops[1].stopId)).body.toString())
+        .total,
+      0,
+    );
+  });
   test(`${kind}: broadcaster-only Seeker consent, CSRF/room isolation, status and duplicate safety`, async () => {
     const f = await setup(kind);
     await f.signed(
@@ -190,6 +454,7 @@ for (const kind of ['memory', 'firestore']) {
     assert.ok(!JSON.stringify(v).includes('7101'));
     // Current-hold approval is public on the live overlay, not a rewrite of the
     // immutable completed ring's source-mark archive.
+    f.advance(1);
     await f.chat(OTHER, '7401', '!mark light');
     assert.equal(posts(f).at(-1).message, 'Your mark is public on the relic.');
     const current = JSON.parse((await f.request(`/api/overlay/${OTHER}`)).body.toString());
@@ -207,22 +472,26 @@ for (const kind of ['memory', 'firestore']) {
     assert.ok(!JSON.stringify(held).includes('spoiler'));
     const archive = JSON.parse((await f.request('/api/atlas')).body.toString());
     assert.equal(archive.rings, 1);
-    assert.equal(archive.stops[0].approvedCount, 1);
+    assert.equal(archive.stops[0].approvedCount, 2);
     assert.equal(archive.current.login, 'olsols2');
     assert.equal(archive.current.ringCount, 1);
-    assert.equal(archive.current.approvedCount, 1);
+    assert.equal(archive.current.approvedCount, 2);
     assert.deepEqual(
       archive.current.marks.map((m) => m.text),
-      ['light'],
+      ['moon', 'light'],
     );
     const profile = JSON.parse((await f.request('/api/keeper/olsols2')).body.toString()).profile;
     assert.deepEqual(profile.current, archive.current);
-    assert.equal(profile.glyphTotal, 1, 'Arrival archive remains moon only');
+    assert.equal(
+      profile.glyphTotal,
+      2,
+      'Retained ring combines arrival moon and hold light without rewriting storage',
+    );
     assert.equal(
       JSON.parse((await f.request('/api/keeper/raidrelichq')).body.toString()).profile.current,
       undefined,
     );
-    assert.doesNotMatch(JSON.stringify(archive.current), /spoiler|7401|7402|userId|streamId/);
+    assert.doesNotMatch(JSON.stringify(archive.current), /spoiler|"7401"|"7402"|userId|streamId/);
     await f.chat(OTHER, '7403', '!mark first light');
     assert.match(posts(f).at(-1).message, /one allowed word or emoji.*!mark light/);
     assert.deepEqual(
@@ -273,7 +542,7 @@ for (const kind of ['memory', 'firestore']) {
     const moved = JSON.parse((await f.request('/api/atlas')).body.toString());
     assert.equal(moved.rings, 2);
     assert.equal(moved.current.login, 'raidrelichq');
-    assert.ok(!moved.current.marks.some((m) => m.text === 'dawn'));
+    assert.equal(moved.current.marks.filter((m) => m.text === 'dawn').length, 1);
     assert.equal(moved.stops.at(-1).approvedCount, 1);
     assert.equal(
       JSON.parse((await f.request('/api/keeper/olsols2')).body.toString()).profile.current,
@@ -287,7 +556,10 @@ for (const kind of ['memory', 'firestore']) {
       0,
     );
     await f.signed('stream.offline', { broadcaster_user_id: HOME }, HOME);
-    assert.equal(JSON.parse((await f.request('/api/atlas')).body.toString()).current, null);
+    assert.equal(
+      JSON.parse((await f.request('/api/atlas')).body.toString()).current.approvedCount,
+      0,
+    );
   });
 }
 

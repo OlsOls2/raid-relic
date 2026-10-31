@@ -411,7 +411,9 @@ function render(snapshot) {
   if (!simulated)
     document.querySelector('#waiting-note').textContent = snapshot.movedToLogin
       ? `The relic has moved on to @${snapshot.movedToLogin}`
-      : 'The relic stirs… a confirmed raid will light the way here.';
+      : snapshot.holderLogin === ownLogin && snapshot.marks.length
+        ? 'Retained approved runes · stream activity does not grant a new claim.'
+        : 'The relic stirs… a confirmed raid will light the way here.';
   count.textContent = simulated
     ? `${snapshot.approvedCount} approved marks · charge ${snapshot.approvedCount}/160`
     : `${snapshot.approvedCount} approved runes`;

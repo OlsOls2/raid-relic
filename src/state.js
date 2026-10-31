@@ -1,6 +1,6 @@
 import { publicKeeperProfiles } from './scoreboard.js';
 import { wanderMutation, wanderActivity } from './wander-state.js';
-import { receivingView, currentApprovedView } from './receiving.js';
+import { receivingView, currentApprovedView, retainedHoldLineage } from './receiving.js';
 import { streakView } from './streaks.js';
 import { enqueueP7, p7Mutation, cancelP7 } from './p7.js';
 import { journeyMap } from './journey-map.js';
@@ -830,16 +830,42 @@ export function createMemoryState({
       );
     },
     getRecap() {
-      return recapProjection(lineage);
+      return recapProjection(
+        retainedHoldLineage(
+          registry,
+          Object.fromEntries(channels),
+          Object.fromEntries(markDocs),
+          lineage,
+          config,
+        ),
+      );
     },
     searchPublicMarks(options) {
-      return atlasSearch(lineage, options);
+      return atlasSearch(
+        retainedHoldLineage(
+          registry,
+          Object.fromEntries(channels),
+          Object.fromEntries(markDocs),
+          lineage,
+          config,
+        ),
+        options,
+      );
     },
     getJourneyMap(now) {
       return journeyMap(lineage, config, now);
     },
     getAtlasPage(options) {
-      const page = atlasPage(lineage, options);
+      const page = atlasPage(
+        retainedHoldLineage(
+          registry,
+          Object.fromEntries(channels),
+          Object.fromEntries(markDocs),
+          lineage,
+          config,
+        ),
+        options,
+      );
       return page && !options?.stopId
         ? {
             ...page,
@@ -879,7 +905,19 @@ export function createMemoryState({
     },
     getOverlayState(host, now = Date.now()) {
       return withIncomingPreview(
-        withCarriedMarks(publicOverlayState(markDocs.get(host), host), lineage, registry, host),
+        withCarriedMarks(
+          publicOverlayState(markDocs.get(host), host),
+          retainedHoldLineage(
+            registry,
+            Object.fromEntries(channels),
+            Object.fromEntries(markDocs),
+            lineage,
+            config,
+          ),
+          registry,
+          host,
+          markDocs.get(host)?.context?.streamId,
+        ),
         registry,
         host,
         Object.fromEntries(channels),

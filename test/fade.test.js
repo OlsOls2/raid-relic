@@ -6,6 +6,7 @@ import { withCarriedMarks } from '../src/public-view.js';
 import { createOverlayHub } from '../src/overlay-feed.js';
 import { createCueTracker } from '../public/overlay-audio.js';
 import { validSnapshot } from '../public/overlay-client.js';
+import { runeSvg } from '../src/marks.js';
 
 async function setup(kind) {
   const f = await pilotFixture(kind);
@@ -54,6 +55,14 @@ for (const kind of ['memory', 'firestore']) {
     await f.chat(OTHER, OTHER, '!relic approve m1');
     const marks = (await view()).marks;
     assert.equal(marks.length, 2);
+    assert.equal(
+      new Set(marks.map((m) => m.id)).size,
+      2,
+      'Channel-local m1 collisions remain distinct',
+    );
+    assert.equal(marks[0].runeSvg, runeSvg('moon'));
+    assert.equal(marks[0].faded, true);
+    assert.equal(marks[1].runeSvg, runeSvg('star'));
     assert.equal(marks[1].faded, undefined);
     const journey = await state.getPublicJourney();
     assert.equal(journey.stops[0].marks.length, 1);

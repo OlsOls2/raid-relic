@@ -79,6 +79,23 @@ for (const kind of ['memory', 'firestore']) {
       await f.chat(f.source, '7004', { type: 'accept' });
       assert.equal(latest.approvedCount, 4);
       assert.equal(latest.lineageRings, 2);
+      assert.equal(new Set(latest.marks.map((m) => m.id)).size, 4);
+      const returned = JSON.parse(
+        (await f.app.dispatch({ method: 'GET', path: '/api/atlas' })).body,
+      );
+      const returnDetail = JSON.parse(
+        (
+          await f.app.dispatch({
+            method: 'GET',
+            path: `/api/atlas/stops/${returned.stops[1].stopId}`,
+          })
+        ).body,
+      );
+      assert.equal(
+        returnDetail.total,
+        0,
+        'Initial-home active marks stay visible without guessed Ring 2 attribution',
+      );
       const actor = {
         broadcasterId: f.source,
         chatterId: action === 'forgetme' ? '9000' : f.source,

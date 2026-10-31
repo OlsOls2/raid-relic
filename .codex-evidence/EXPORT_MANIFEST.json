@@ -1,23 +1,23 @@
 {
   "formatVersion": 2,
   "sessionID": "01a1705c-a87d-7143-80f6-021e47b78ced",
-  "inputLeaf": "rollout-release331-01a1705c-a87d-7143-80f6-021e47b78ced.jsonl",
-  "rawSnapshotSHA256": "a02df3d6ccf7b47818b83ca77822f5ad7047ad61a066d79d69670a6829a93fd6",
-  "rawBytes": 128567433,
+  "inputLeaf": "rollout-release337-01a1705c-a87d-7143-80f6-021e47b78ced.jsonl",
+  "rawSnapshotSHA256": "b2ab4d7bb181142bf7643e67ab052b3c39c6edfe5434eae0e31df52addc55f02",
+  "rawBytes": 129567699,
   "eventCounts": {
     "session_meta": 1,
-    "event_msg": 11535,
-    "response_item": 9946,
-    "world_state": 188,
-    "turn_context": 333,
-    "token_usage_record": 2972,
+    "event_msg": 11714,
+    "response_item": 10098,
+    "world_state": 192,
+    "turn_context": 339,
+    "token_usage_record": 3022,
     "compacted": 24
   },
-  "exportedEntries": 6595,
+  "exportedEntries": 6702,
   "omissions": {
     "private": 121,
     "media": 9,
-    "unselected": 18403,
+    "unselected": 18687,
     "truncated": 20,
     "credentialLookingItems": 76,
     "credentialReasons": {
@@ -26,10 +26,10 @@
     }
   },
   "firstTimestamp": "2026-10-25T00:01:23.357Z",
-  "cutoff": "2026-10-31T11:30:39.876Z",
-  "exportSHA256": "17c24531be309c0f28f54d860e20a0e0fe4db1f6df2a28ec5a3e5aeee66077f3",
-  "exportBytes": 20752512,
-  "sourceRunLogCount": 332,
+  "cutoff": "2026-10-31T12:22:34.710Z",
+  "exportSHA256": "eae4588b6bfb552b79598810678cf7b840c41986cada5a12c3d815348a346b82",
+  "exportBytes": 21002289,
+  "sourceRunLogCount": 338,
   "sourceRunLogs": [
     {
       "leaf": "run-000.jsonl",
@@ -1690,27 +1690,57 @@
       "leaf": "run-331.jsonl",
       "bytes": 11477,
       "sha256": "a1e4cc27d26c260709ad99575cd3350ea5147588c1e36758ab78be58208b294c"
+    },
+    {
+      "leaf": "run-332.jsonl",
+      "bytes": 34644,
+      "sha256": "03bd89e98bab87aece9a03487f71a9f7b8c3044c40e9e7f0f6cd466398b49e0d"
+    },
+    {
+      "leaf": "run-333.jsonl",
+      "bytes": 4945,
+      "sha256": "b5d12cef45ad27e7fbbd0a75be5bc11cfb56f1d397eb5d677bc032e12a5b2f72"
+    },
+    {
+      "leaf": "run-334.jsonl",
+      "bytes": 120806,
+      "sha256": "ebbab9fe8f8086ff52ff8ca4f9ee83c1b5edba713abdc2ff20dde60e78040738"
+    },
+    {
+      "leaf": "run-335.jsonl",
+      "bytes": 39605,
+      "sha256": "431125925839f0248c4f80fc4c962661e1bbf8b263eb1e9089b6cebbdecefce1"
+    },
+    {
+      "leaf": "run-336.jsonl",
+      "bytes": 16732,
+      "sha256": "79162fbfcd1644601e0f4d11fc624c516772a04f4f87e57e67000dd7633f5cde"
+    },
+    {
+      "leaf": "run-337.jsonl",
+      "bytes": 48004,
+      "sha256": "0126d2bbc0dee4be12f54be0c04307694673aa877ed6396f524d2b319c3a8b36"
     }
   ],
   "scope": "Selected sanitized native JSONL; private/internal/media omitted and per-item output bounded. Raw snapshot remains local ignored. Secondary scanner findings cause whole selected-entry omission, including public identifiers; zero-finding rescan required.",
   "parts": [
     {
       "order": 1,
-      "path": "EXPORTED_TRANSCRIPT.part-001-17c24531be309c0f28f54d860e20a0e0fe4db1f6df2a28ec5a3e5aeee66077f3.md",
+      "path": "EXPORTED_TRANSCRIPT.part-001-eae4588b6bfb552b79598810678cf7b840c41986cada5a12c3d815348a346b82.md",
       "bytes": 16770524,
-      "sha256": "023c4f01e958ab0de527101bbbdaa02fe35f4f39b3e33257539425fae8b7f6f6",
+      "sha256": "27490ee8fb0b0d33adfa4268069d55f8f69751fd4511a39b6a4ac8465b006918",
       "entries": 5513
     },
     {
       "order": 2,
-      "path": "EXPORTED_TRANSCRIPT.part-002-17c24531be309c0f28f54d860e20a0e0fe4db1f6df2a28ec5a3e5aeee66077f3.md",
-      "bytes": 3981988,
-      "sha256": "95ea8608c446dcdd3d0721fb923980ffea54c8d7f2a0f7e1a31124ab17c4ffec",
-      "entries": 1082
+      "path": "EXPORTED_TRANSCRIPT.part-002-eae4588b6bfb552b79598810678cf7b840c41986cada5a12c3d815348a346b82.md",
+      "bytes": 4231765,
+      "sha256": "9a333d5c32273ff76327c6f0a6b055a68cd417112757074db33db73c7feb0f37",
+      "entries": 1189
     }
   ],
   "indexBytes": 862,
-  "indexSHA256": "df9ca9ab756416d3e2f7b2a3f52df03fb1bee76cf46f0a2376f062cace79626e",
+  "indexSHA256": "11c589f157ed41a0a61563933076636e14583fe9823ec89fa6fe42155e43a27f",
   "secondaryScan": {
     "status": "zero-findings",
     "findings": 8,
@@ -1719,9 +1749,9 @@
       "twitch-api-token": 4,
       "generic-api-key": 4
     },
-    "omissionReportSHA256": "63314b89c15315b4b7fd8cb71c8b4e75a1224a059c5d9161996f047da0aa87d2",
-    "reportSHA256": "f98c11f82ba36b17f1d10035fd8c0cd4ef770b6f30c9696a977ab90ff95ff365",
-    "scannedExportSHA256": "17c24531be309c0f28f54d860e20a0e0fe4db1f6df2a28ec5a3e5aeee66077f3",
-    "scannedPartsSHA256": "62e1dd285c25dad68a7c9ca256874dca41bec913a37e78d4641adf3817bd4438"
+    "omissionReportSHA256": "33377749610ac6b7479ef6d8fbb8fae8551cd744373c9b4843b57167d3927a32",
+    "reportSHA256": "5eebd75a13d2b6bd1613d3c39fd7146ce05ec6cbdd47fd753ff0e97784b19317",
+    "scannedExportSHA256": "eae4588b6bfb552b79598810678cf7b840c41986cada5a12c3d815348a346b82",
+    "scannedPartsSHA256": "8aae21f481637e45b43b1f958cc5a83127b56c77f1f0b0d0a13eb091097d64b6"
   }
 }

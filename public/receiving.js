@@ -153,7 +153,12 @@ if (root) {
           ),
         );
         if (p.glyphs.length)
-          content.append(node('p', 'Approved community glyphs on the latest received ring:'));
+          content.append(
+            node(
+              'p',
+              'Retained approved glyphs on the latest received ring (arrival plus marks made during that hold):',
+            ),
+          );
         const glyphs = node('div');
         glyphs.className = 'keeper-glyphs';
         for (const g of p.glyphs) {
@@ -188,29 +193,12 @@ if (root) {
           const section = node('section');
           section.id = 'keeper-current-live';
           section.append(
-            node('h3', `Current hold · Ring ${live.ringCount}`),
+            node('h3', `Retained hold · Ring ${live.ringCount}`),
             node(
               'p',
-              `${live.approvedCount} live approved marks. Separate from archived arrival glyphs.`,
+              `${live.approvedCount} retained approved marks, shown above. Collection still requires a live authorized Keeper.`,
             ),
           );
-          for (const mark of live.marks) {
-            if (
-              typeof mark.text !== 'string' ||
-              mark.text.length > 128 ||
-              typeof mark.runeSvg !== 'string' ||
-              mark.runeSvg.length > 4096 ||
-              !mark.runeSvg.startsWith('<svg xmlns="http://www.w3.org/2000/svg"')
-            )
-              throw Error('Invalid live glyph');
-            const figure = node('figure'),
-              image = node('img');
-            image.src = 'data:image/svg+xml,' + encodeURIComponent(mark.runeSvg);
-            image.width = image.height = 48;
-            image.alt = 'Live approved rune: ' + mark.text;
-            figure.append(image, node('figcaption', mark.text));
-            section.append(figure);
-          }
           content.append(section);
         }
         const more = node('details'),

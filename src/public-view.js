@@ -1,4 +1,4 @@
-import { RECEIVING_KEEPERS } from './receiving.js';
+import { RECEIVING_KEEPERS, publicRuneId } from './receiving.js';
 import { stopStreak } from './streaks.js';
 import { chronicleView } from './chronicle.js';
 import { eligible } from './send-state.js';
@@ -31,9 +31,11 @@ export function atlasPage(lineage, { stopId, offset = 0, limit = 8 } = {}) {
       offset,
       total: stop.marks.length,
       nextOffset: offset + limit < stop.marks.length ? offset + limit : null,
-      marks: stop.marks
-        .slice(offset, offset + limit)
-        .map((mark) => ({ id: mark.id, text: mark.text, runeSvg: runeSvg(mark.text) })),
+      marks: stop.marks.slice(offset, offset + limit).map((mark) => ({
+        id: mark.publicId ?? mark.id,
+        text: mark.text,
+        runeSvg: runeSvg(mark.text),
+      })),
     };
   }
   return {
@@ -84,19 +86,30 @@ export function handoffView(registry, channel, now, lineage, names = RECEIVING_K
   };
 }
 
-export function withCarriedMarks(view, lineage, registry, host) {
-  if (registry?.holderId !== host || !['ready', 'paused'].includes(view.status)) return view;
+export function withCarriedMarks(view, lineage, registry, host, activeStream) {
+  if (registry?.holderId !== host || !['ready', 'paused', 'waiting'].includes(view.status))
+    return view;
   const last = lineage?.stops?.at(-1);
   const carried =
     last?.to === host
-      ? last.marks.map(({ id, text }) => ({
-          id,
+      ? last.marks.map(({ id, publicId, text, holdAddition }) => ({
+          id: publicId ?? id,
           runeSvg: runeSvg(text),
           flightText: text,
-          ...(registry.carriedClosures === 3 ? { faded: true } : {}),
+          ...(registry.carriedClosures === 3 && !holdAddition ? { faded: true } : {}),
         }))
       : [];
-  return { ...view, marks: [...carried, ...view.marks].slice(-160) };
+  // Active approved marks may predate any attributable hold (notably initial
+  // home marks on return). Preserve their existing public visibility without
+  // assigning them to a guessed archive stop. Full-origin opaque IDs dedup the
+  // union with retained additions; neither stream authority nor data changes.
+  const union = new Map(carried.map((m) => [m.id, m]));
+  for (const mark of view.marks) {
+    const id = activeStream ? publicRuneId(host, activeStream, mark.id) : mark.id;
+    if (!union.has(id)) union.set(id, { ...mark, id });
+  }
+  if (union.size > 160) throw Error('Public mark capacity');
+  return { ...view, marks: [...union.values()] };
 }
 
 export function withIncomingPreview(view, registry, host, channels, docs, now) {
