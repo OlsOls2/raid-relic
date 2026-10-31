@@ -20,17 +20,37 @@ const edition = EDITION_CONFIG[0],
   end = Date.parse(edition.endsAt),
   config = { channels: [HOME, OTHER], logins: { raidrelichq: HOME, olsols2: OTHER } };
 test('edition config frozen, exact inclusive start/exclusive end, one original deterministic design', () => {
+  assert.ok(Object.isFrozen(EDITION_CONFIG));
+  assert.ok(Object.isFrozen(edition));
+  assert.ok(Object.isFrozen(edition.design));
   assert.ok(Object.isFrozen(edition.design.palette));
+  assert.ok(Object.isFrozen(edition.particles));
+  assert.deepEqual(edition.design.palette, ['#101d30', '#e3e8ef', '#b7a2df', '#dba95c']);
   assert.equal(validEditions(EDITION_CONFIG), true);
   for (const t of [start - 1, end, end + 1, NaN, Infinity, undefined])
     assert.equal(selectEdition(t), null);
   for (const t of [start, start + 1000, end - 1]) assert.equal(selectEdition(t), edition);
   assert.equal(validRelicDesign(edition.design), true);
+  assert.equal(edition.design.shape, 'crystal');
+  assert.equal(edition.design.facets, 8);
   assert.equal(crystalMesh(edition.design).triangles, 48);
   assert.equal(DEFAULT_DESIGN.facets, 6);
   assert.ok(crystalMesh(edition.design).triangles * 2 + 16 * 2 * 8 * 24 * 2 + 160 * 2 < 20000);
   assert.equal(edition.particles.count, 64);
-  assert.match(editionSVG(edition), /#e6bb70/);
+  const svg = editionSVG(edition);
+  assert.equal(svg, editionSVG(edition));
+  assert.equal(svg, editionSVG(JSON.parse(JSON.stringify(edition))));
+  assert.equal((svg.match(/<path\b/g) ?? []).length, 8);
+  // Deep is the configured base; the original SVG paints eight facets using
+  // the other three palette entries, with amber outlines and no extra colors.
+  assert.deepEqual(
+    [...svg.matchAll(/\bfill="([^"]+)"/g)].map((match) => match[1]),
+    ['#e3e8ef', '#b7a2df', '#dba95c', '#e3e8ef', '#b7a2df', '#dba95c', '#e3e8ef', '#b7a2df'],
+  );
+  assert.deepEqual(
+    [...svg.matchAll(/\bstroke="([^"]+)"/g)].map((match) => match[1]),
+    Array(8).fill('#dba95c'),
+  );
   assert.equal(editionSVG(null), null);
 });
 test('malformed, overlapping, duplicate and unknown edition config fails closed to base', () => {

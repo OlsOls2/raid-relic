@@ -1,11 +1,11 @@
 :root {
   color-scheme: dark;
-  --slate: #26354b;
-  --deep: #101d30;
-  --moon: #e3e8ef;
-  --amber: #dba95c;
-  --violet: #b7a2df;
-  --muted: #bbc6d7;
+  --slate: var(--rr-slate);
+  --deep: var(--rr-deep);
+  --moon: var(--rr-moon);
+  --amber: var(--rr-amber);
+  --violet: var(--rr-violet);
+  --muted: var(--rr-muted);
   font-family: 'Segoe UI', system-ui, sans-serif;
   color: var(--moon);
   background: var(--deep);

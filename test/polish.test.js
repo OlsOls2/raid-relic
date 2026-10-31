@@ -44,12 +44,61 @@ test('polish keeps source and corner assets accessible and excludes local browse
   assert.match(demo, /not evidence of completed live validation/);
 });
 test('archive palette provides AA normal-text contrast without external typography/assets', async () => {
+  const fonts = await readFile('public/fonts.css', 'utf8');
   const css = await readFile('public/atlas.css', 'utf8');
-  const color = (token) => {
-    const match = css.match(new RegExp(`--${token}\\s*:\\s*(#[a-f0-9]{6})`, 'i'));
-    assert.ok(match, `Missing palette token ${token}`);
-    return match[1];
+  // Narrow local palette model: shared canonical declarations followed by Atlas
+  // aliases, with later root declarations winning. No CSS imports/evaluation,
+  // computed layout, fallbacks or arbitrary color expressions are interpreted.
+  const tokens = new Map();
+  const hex = /^#[a-f0-9]{6}$/i;
+  const variable = /^var\(\s*(--[a-z][a-z0-9-]{0,63})\s*\)$/i;
+  for (const source of [fonts, css]) {
+    assert.ok(source.length <= 131072, 'Bounded local stylesheet');
+    const roots = [...source.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/:root\s*\{([^{}]*)\}/g)];
+    assert.ok(roots.length > 0 && roots.length <= 8, 'Bounded explicit root declarations');
+    for (const root of roots)
+      for (const declaration of root[1].matchAll(/(--[a-z][a-z0-9-]{0,63})\s*:\s*([^;{}]+);/gi)) {
+        const value = declaration[2].trim();
+        assert.ok(hex.test(value) || variable.test(value), 'Unsupported palette declaration');
+        tokens.set(declaration[1], value);
+        assert.ok(tokens.size <= 32, 'Bounded local custom properties');
+      }
+  }
+  const resolve = (name, declarations = tokens, seen = new Set(), depth = 0) => {
+    assert.ok(depth < 8, 'Palette variable depth exceeded');
+    assert.ok(!seen.has(name), 'Palette variable cycle');
+    assert.ok(declarations.has(name), `Unresolved palette variable ${name}`);
+    const value = declarations.get(name);
+    if (hex.test(value)) return value.toLowerCase();
+    const match = variable.exec(value);
+    assert.ok(match, 'Unsupported palette expression');
+    return resolve(match[1], declarations, new Set([...seen, name]), depth + 1);
   };
+  const color = (token) => resolve('--' + token);
+  const required = {
+    deep: '#101d30', slate: '#26354b', moon: '#e3e8ef',
+    muted: '#bbc6d7', amber: '#dba95c', violet: '#b7a2df',
+  };
+  assert.deepEqual(
+    Object.fromEntries(Object.keys(required).map((token) => [token, color(token)])),
+    required,
+  );
+  // Rejection behavior belongs to this same named test, so a targeted parent
+  // rerun also checks the resolver rather than assuming its failure bounds.
+  assert.throws(() => resolve('--missing'), /Unresolved palette variable/);
+  assert.throws(
+    () => resolve('--a', new Map([['--a', 'var(--b)'], ['--b', 'var(--a)']])),
+    /Palette variable cycle/,
+  );
+  assert.throws(
+    () => resolve('--a', new Map([['--a', 'var(--missing)']])),
+    /Unresolved palette variable/,
+  );
+  const deepChain = new Map(Array.from({ length: 9 }, (_, index) => [
+    '--step-' + index, index === 8 ? '#101d30' : `var(--step-${index + 1})`,
+  ]));
+  assert.throws(() => resolve('--step-0', deepChain), /Palette variable depth exceeded/);
+  assert.throws(() => resolve('--a', new Map([['--a', 'rgb(0,0,0)']])), /Unsupported palette expression/);
   const luminance = (hex) =>
     hex
       .slice(1)
@@ -61,5 +110,17 @@ test('archive palette provides AA normal-text contrast without external typograp
     const values = [luminance(color(foreground)), luminance(color('deep'))].sort((a, b) => b - a);
     assert.ok((values[0] + 0.05) / (values[1] + 0.05) >= 4.5, foreground);
   }
-  assert.ok(!/@import|https?:\/\/|@font-face/.test(css));
+  assert.ok(!/@import|https?:\/\/|@font-face/i.test(css));
+  // The existing pinned local Cinzel face is legitimate; external font/assets
+  // and imports remain forbidden in both files, not silently exempted.
+  assert.doesNotMatch(fonts, /@import|https?:\/\//i);
+  const faces = [...fonts.matchAll(/@font-face\s*\{([^{}]*)\}/gi)];
+  assert.equal(faces.length, 1);
+  assert.match(faces[0][1], /font-family\s*:\s*Cinzel\s*;/);
+  assert.match(faces[0][1], /src\s*:\s*url\(\s*(['"])\/fonts\/Cinzel\.ttf\1\s*\)\s*format\(\s*(['"])truetype\2\s*\)\s*;/);
+  assert.deepEqual(
+    [...fonts.matchAll(/url\(\s*(['"]?)([^'"\s)]+)\1\s*\)/gi)].map((match) => match[2]),
+    ['/fonts/Cinzel.ttf'],
+  );
+  assert.match(fonts, /Cinzel, Google Fonts pinned 3dd78844021e948ceb633d1dcee3f7885561b5d9; SIL OFL 1\.1\./);
 });

@@ -1,3 +1,12 @@
+/* Shared presentation colors; art geometry and game authority remain independent. */
+:root {
+  --rr-deep: #101d30;
+  --rr-slate: #26354b;
+  --rr-moon: #e3e8ef;
+  --rr-muted: #bbc6d7;
+  --rr-amber: #dba95c;
+  --rr-violet: #b7a2df;
+}
 /* Cinzel, Google Fonts pinned 3dd78844021e948ceb633d1dcee3f7885561b5d9; SIL OFL 1.1. */
 @font-face {
   font-family: Cinzel;

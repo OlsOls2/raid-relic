@@ -26,6 +26,26 @@ const updateText = (selector, value) => {
   const node = document.querySelector(selector);
   if (node.textContent !== value) node.textContent = value;
 };
+// Optional public completed-stop projection only. Current stream marks are not
+// evidence of what was carried; absence/invalidity never means zero carried.
+export function carriedRuneLabel(handoff) {
+  if (
+    handoff?.clockPolicy !== 'landing-v2' ||
+    handoff.completed !== true ||
+    !Number.isFinite(handoff.startedAt) ||
+    !Number.isFinite(handoff.endsAt) ||
+    !Number.isFinite(handoff.completedAt) ||
+    handoff.completedAt < handoff.startedAt ||
+    handoff.completedAt >= handoff.endsAt ||
+    !Number.isInteger(handoff.carriedApprovedCount) ||
+    handoff.carriedApprovedCount < 0 ||
+    handoff.carriedApprovedCount > 160
+  )
+    return null;
+  return handoff.carriedApprovedCount === 0
+    ? 'No approved runes carried'
+    : `${handoff.carriedApprovedCount} approved runes carried`;
+}
 const channel = /^\/overlay\/(\d{1,32})$/.exec(location.pathname)?.[1];
 const echoNote = document.createElement('span');
 echoNote.className = 'echo-note';
@@ -374,6 +394,14 @@ function render(snapshot) {
     ? `${snapshot.approvedCount} approved marks · charge ${snapshot.approvedCount}/160`
     : `${snapshot.approvedCount} approved runes`;
   if (options.layout === 'card') count.textContent = `${snapshot.approvedCount} approved runes`;
+  const carried = carriedRuneLabel(snapshot.handoff);
+  if (carried !== null) {
+    count.textContent = carried;
+    const compact = document.querySelector('#compact-count');
+    compact.textContent = carried;
+    compact.removeAttribute('title');
+    compact.removeAttribute('aria-label');
+  }
   document.querySelector('#charge').style.width = `${(snapshot.approvedCount / 160) * 100}%`;
   document.querySelector('.charge-track').hidden = !simulated;
   snapshot.marks.forEach((mark, index) => {

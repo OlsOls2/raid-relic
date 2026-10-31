@@ -1,7 +1,7 @@
 :root {
   color-scheme: dark;
-  background: #101d30;
-  color: #dce4ed;
+  background: var(--rr-deep);
+  color: var(--rr-moon);
   font:
     16px/1.6 system-ui,
     sans-serif;
@@ -19,7 +19,7 @@ main {
 }
 h1 {
   font:
-    clamp(36px, 6vw, 62px)/1.12 Georgia,
+    clamp(36px, 6vw, 62px)/1.12 Cinzel, Georgia,
     serif;
   font-weight: 400;
   margin: 20px 0;
@@ -27,7 +27,7 @@ h1 {
 .eyebrow,
 a,
 #status {
-  color: #e6bb70;
+  color: var(--rr-amber);
 }
 .eyebrow {
   letter-spacing: 0.12em;
@@ -45,16 +45,16 @@ textarea {
   width: min(100%, 650px);
   max-width: 100%;
   font: inherit;
-  color: #dce4ed;
-  background: #17283d;
-  border: 1px solid #9486b7;
+  color: var(--rr-moon);
+  background: var(--rr-slate);
+  border: 1px solid var(--rr-violet);
   padding: 10px;
 }
 button {
   font: inherit;
-  color: #dce4ed;
-  background: #26394f;
-  border: 1px solid #9486b7;
+  color: var(--rr-moon);
+  background: var(--rr-slate);
+  border: 1px solid var(--rr-violet);
   padding: 8px 12px;
   margin: 10px 6px 0 0;
   cursor: pointer;
@@ -67,7 +67,7 @@ button:focus-visible,
 a:focus-visible,
 textarea:focus-visible,
 pre:focus-visible {
-  outline: 2px solid #e6bb70;
+  outline: 2px solid var(--rr-amber);
   outline-offset: 3px;
 }
 .design {
@@ -89,18 +89,18 @@ pre {
   min-width: 0;
   margin: 0;
   padding: 14px;
-  border-left: 2px solid #9486b7;
+  border-left: 2px solid var(--rr-violet);
 }
 .actions {
   display: flex;
   flex-wrap: wrap;
 }
 .note {
-  color: #b5a9d4;
+  color: var(--rr-muted);
 }
 #simulator {
-  color: #101d30;
-  background: #e6bb70;
+  color: var(--rr-deep);
+  background: var(--rr-amber);
   padding: 8px;
   font-weight: 800;
 }

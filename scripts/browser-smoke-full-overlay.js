@@ -15,6 +15,7 @@ let browser,
   stage = 'startup';
 const checks = [];
 const diagnostic = { assertionLine: 0, errorCategoryCode: 0 };
+const layoutMeasurements = [], captureMetadata = [];
 const overlayCaptures = new Map();
 const captureNames = new Set([
   'overlay-card-fhd.png',
@@ -65,6 +66,8 @@ async function captureOverlay(page, name) {
   await mkdir('artifacts', { recursive: true });
   await writeFile('artifacts/' + name, png);
   overlayCaptures.set(name, png.length);
+  captureMetadata.push({ name, viewport, clip, bytes: png.length, backdrop: 'synthetic-stripes',
+    compressedGameplayProven: false });
 }
 
 try {
@@ -228,6 +231,10 @@ try {
         plateOverlap: area(plate, central),
         heading: parseFloat(getComputedStyle(document.querySelector('h1')).fontSize),
         body: parseFloat(getComputedStyle(document.querySelector('#status')).fontSize),
+        artSlotWidth: document.querySelector('.archive').getBoundingClientRect().width,
+        artSlotHeight: document.querySelector('.archive').getBoundingClientRect().height,
+        svgElementWidth: document.querySelector('.crystal').getBoundingClientRect().width,
+        svgElementHeight: document.querySelector('.crystal').getBoundingClientRect().height,
         rasterWidth: document.querySelector('canvas.relic3d').width,
         rasterHeight: document.querySelector('canvas.relic3d').height,
       };
@@ -280,6 +287,8 @@ try {
     }
   };
   const fhd = await geometry();
+  layoutMeasurements.push({ viewportWidth: 1920, viewportHeight: 1080, ...fhd,
+    paintedSubject140Proven: false, fullPlateAvoidsCentral60: fhd.plateOverlap === 0 });
   if (
     fhd.width !== 560 ||
     fhd.height !== 180 ||
@@ -298,6 +307,8 @@ try {
   await card.setViewportSize({ width: 960, height: 540 });
   await settleCard([960, 540, 24, 426, 280, 90], 1);
   const half = await geometry();
+  layoutMeasurements.push({ viewportWidth: 960, viewportHeight: 540, ...half,
+    paintedSubject140Proven: false, fullPlateAvoidsCentral60: half.plateOverlap === 0 });
   if (
     half.width !== 280 ||
     half.height !== 90 ||
@@ -439,6 +450,8 @@ try {
         diagnostic,
         checks,
         captures: [...overlayCaptures.keys()],
+        captureMetadata,
+        layoutMeasurements,
       },
       null,
       2,
