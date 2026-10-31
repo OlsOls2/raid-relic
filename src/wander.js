@@ -3,6 +3,7 @@ import { boundedCall } from './bounded.js';
 import { wanderKey, wanderMembers } from './wander-state.js';
 import { verifyWanderRequest } from './wander-auth.js';
 import { RECEIVING_KEEPERS } from './receiving.js';
+import { wanderNotice } from '../public/ritual-copy.js';
 export function createWander({
   policy,
   key,
@@ -114,10 +115,7 @@ export function createWander({
       }
       const claimed = await state.wanderStep({ type: 'claim-message', key: row.key }, now());
       if (claimed.status !== 'message') continue;
-      const message =
-        row.kind === 'warning'
-          ? 'The relic has been idle. It may wander to an opted-in Keeper after the warning period. Add an approved mark or start a valid Send Off to keep playing.'
-          : `The relic wandered here to @${keepers[row.host]}; no raid or audience transfer occurred. Leave !mark word to add a community rune.`;
+      const message = wanderNotice(row.kind, keepers[row.host]);
       let accepted = false;
       try {
         const sent = await bots[row.host].sendChat(message, { retryUnauthorized: false });

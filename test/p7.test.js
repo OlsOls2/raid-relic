@@ -70,6 +70,177 @@ async function complete(f, from = HOME, to = OTHER) {
   await f.chat(to, '812', '!accept');
 }
 const actions = (p) => p.calls.filter((c) => new URL(c.url).pathname.startsWith('/helix/chat/'));
+const chatDeliveries = (f, p) => [...f.calls, ...p.calls].filter((c) =>
+  c.method === 'POST' && ['/helix/chat/messages', '/helix/chat/announcements'].includes(new URL(c.url).pathname),
+);
+
+for (const kind of ['memory', 'firestore'])
+  for (const failure of ['none', 'unknown', 'finish'])
+    test(`${kind}: P7ON ${failure} shares six chat POSTs with 300 real signed distinct voters and replay`, async () => {
+      const p = fakeP7({ fail: failure === 'unknown' }),
+        f = await prepared(kind, p);
+      const transport = p.transport;
+      // createP7 captured the injected transport during fixture creation. A
+      // worker with the same gates checks actual committed state at the POST.
+      const installWorker = () => {
+        const worker = createP7({
+        flags, state: f.runtime.state, oauth: f.runtime.oauth,
+        clientId: 'public-client', clientSecret: 'synthetic-client-secret', botId: BOT,
+        keeperIds: [HOME, OTHER], logins: { [HOME]: 'raidrelichq', [OTHER]: 'olsols2' }, now: f.now,
+        transport: async (url, options) => {
+          if (new URL(url).pathname === '/helix/chat/announcements') {
+            const registry = await f.runtime.state.getKeeperRegistry();
+            assert.equal(registry.pendingHop.noticePolicy, 'six-chat-v2');
+            assert.equal(registry.pendingHop.noticeMask & 4, 4);
+            const jobs = await f.runtime.state.getPrivateP7(new URL(url).searchParams.get('broadcaster_id'));
+            assert.equal(jobs.rows.find((r) => r.kind === 'announcement').status, 'dispatching');
+          }
+          return transport(url, options);
+        },
+        });
+        f.runtime.p7.process = worker.process;
+      };
+      for (const id of [HOME, OTHER]) f.streams.get(id).viewer_count = 100;
+      await f.control(HOME, `send:${OTHER}`);
+      await Promise.all(Array.from({ length: 150 }, (_, i) => f.chat(HOME, String(10000 + i), '!offer')));
+      let root = await f.runtime.state.getKeeperRegistry();
+      assert.equal(root.pendingHop.offers.length, 10);
+      assert.equal(root.pendingHop.accepts.length, 0);
+      assert.equal(root.holderId, HOME);
+      assert.equal(chatDeliveries(f, p).length, 2);
+      f.advance(30000);
+      const landing = f.now();
+      await f.raid(HOME, OTHER, 100);
+      root = await f.runtime.state.getKeeperRegistry();
+      assert.equal(root.pendingHop.threshold, 10);
+      assert.equal(root.pendingHop.endsAt, landing + 180000);
+      assert.equal(root.pendingHop.claimStartedAt, landing);
+      assert.equal(root.pendingHop.noticeMask, 11);
+      if (kind === 'firestore') await f.restart();
+      installWorker();
+      await Promise.all(Array.from({ length: 9 }, (_, i) => f.chat(OTHER, String(20000 + i), '!accept')));
+      root = await f.runtime.state.getKeeperRegistry();
+      assert.equal(root.pendingHop.offers.length, 10);
+      assert.equal(root.pendingHop.accepts.length, 9);
+      assert.equal(root.holderId, HOME);
+      const step = f.runtime.state.p7Step;
+      if (failure === 'finish') f.runtime.state.p7Step = (host, op, now) => {
+        if (op.type === 'finish') throw Error('synthetic P7 finish failure');
+        return step(host, op, now);
+      };
+      if (kind === 'firestore') f.db.retry = true;
+      await Promise.all(Array.from({ length: 8 }, () =>
+        f.chat(OTHER, '20009', '!accept', { messageId: 'mixed-final' }),
+      ));
+      await Promise.all(Array.from({ length: 140 }, (_, i) => f.chat(OTHER, String(20010 + i), '!accept')));
+      f.runtime.state.p7Step = step;
+      root = await f.runtime.state.getKeeperRegistry();
+      assert.equal(root.holderId, OTHER);
+      assert.equal(root.pendingHop.finalized, true);
+      assert.equal(root.pendingHop.noticeMask, 63);
+      assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
+      assert.equal(chatDeliveries(f, p).length, 6);
+      assert.equal(chatDeliveries(f, p).filter((c) => new URL(c.url).pathname === '/helix/chat/announcements').length, 1);
+      const doc = await f.runtime.state.getPrivateP7(OTHER);
+      const announcement = doc.rows.find((r) => r.kind === 'announcement');
+      assert.equal(announcement.status, failure === 'none' ? 'sent' : failure === 'unknown' ? 'unknown' : 'dispatching');
+      for (const row of doc.rows)
+        await Promise.all(Array.from({ length: 8 }, () => f.runtime.p7.process(OTHER, row.key)));
+      await f.chat(OTHER, '20009', '!accept', { messageId: 'mixed-final' });
+      f.advance(700000);
+      await Promise.all(Array.from({ length: 300 }, (_, i) => f.chat(OTHER, String(30000 + i), '!accept')));
+      assert.equal(chatDeliveries(f, p).length, 6, 'unknown/dispatched/expired receipts never refund a slot');
+      assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
+      for (const host of [HOME, OTHER]) {
+        const acks = await f.runtime.state.getPrivateClaimAcks(host);
+        assert.ok(acks.rows.length <= 128);
+        assert.ok(Buffer.byteLength(JSON.stringify(acks)) <= 65536);
+      }
+      assert.ok(Buffer.byteLength(JSON.stringify(root)) <= 4096);
+      assert.ok(doc.rows.length <= 64);
+      const beforeNext = chatDeliveries(f, p).length;
+      f.advance();
+      await f.control(OTHER, `send:${HOME}`);
+      f.advance();
+      await f.raid(OTHER, HOME, 1);
+      await f.chat(OTHER, '41001', '!offer');
+      await f.chat(HOME, '41002', '!accept');
+      assert.equal((await f.runtime.state.getPublicJourney()).rings, 2);
+      assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, HOME);
+      assert.ok(chatDeliveries(f, p).length > beforeNext);
+      assert.ok(chatDeliveries(f, p).length - beforeNext <= 6);
+      assert.equal(chatDeliveries(f, p).filter((c) => new URL(c.url).pathname === '/helix/chat/announcements').length, 2);
+    });
+
+for (const kind of ['memory', 'firestore'])
+  test(`${kind}: legacy/unproven optional announcement is quiet before provider prerequisites or POST`, async () => {
+    const p = fakeP7(), f = await prepared(kind, p);
+    f.runtime.p7.process = async () => {};
+    await complete(f);
+    const jobs = await f.runtime.state.getPrivateP7(OTHER);
+    const announcement = jobs.rows.find((r) => r.kind === 'announcement');
+    const root = await f.runtime.state.getKeeperRegistry(), channels = {}, marks = {};
+    const journey = await f.runtime.state.getPublicJourney();
+    // Obtain the actual committed queued proof; no claimed result is fabricated.
+    for (const id of [HOME, OTHER]) {
+      channels[id] = await f.runtime.state.getStreamStatus(id);
+      marks[id] = await f.runtime.state.getPrivateMarks(id, { broadcasterId: id, chatterId: id });
+    }
+    const lineage = { stops: [{ ...journey.stops[0], eventId: announcement.proof.eventId }] };
+    for (const patch of [{ noticePolicy: undefined }, { noticePolicy: 'old' }, { noticeMask: undefined }, { noticeMask: 63 }]) {
+      const legacy = structuredClone(root);
+      Object.assign(legacy.pendingHop, patch);
+      const mutation = p7Mutation(jobs, { type: 'inspect', key: announcement.key }, flags, legacy, lineage, channels, marks, f.now());
+      assert.equal(mutation.result, null);
+      assert.equal(mutation.doc.rows.find((r) => r.key === announcement.key).status, 'cancelled');
+      let providerCalls = 0;
+      let legacyJobs = jobs;
+      const worker = createP7({
+        flags, state: { p7Step: (host, op, now) => {
+          const next = p7Mutation(legacyJobs, op, flags, legacy, lineage, channels, marks, now);
+          legacyJobs = next.doc;
+          return next.result;
+        } },
+        oauth: new Proxy({}, { get() { throw Error('No legacy capability lookup'); } }),
+        clientId: 'public-client', clientSecret: 'synthetic-client-secret', botId: BOT,
+        keeperIds: [HOME, OTHER], now: f.now,
+        transport: async () => { providerCalls++; throw Error('No legacy provider request'); },
+      });
+      assert.deepEqual(await worker.process(OTHER, announcement.key), { status: 'skipped' });
+      assert.equal(providerCalls, 0);
+    }
+    assert.equal(actions(p).length, 0);
+    assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, OTHER);
+  });
+
+test('Firestore announcement reservation and dispatch roll back together; SDK retry produces one actual announcement POST', async () => {
+  const p = fakeP7(), f = await prepared('firestore', p);
+  const process = f.runtime.p7.process;
+  f.runtime.p7.process = async () => {};
+  await complete(f);
+  const doc = await f.runtime.state.getPrivateP7(OTHER);
+  const announcement = doc.rows.find((r) => r.kind === 'announcement');
+  const before = structuredClone([...f.db.docs]);
+  f.db.failCommit = true;
+  await assert.rejects(f.runtime.state.p7Step(OTHER, { type: 'claim', key: announcement.key, flags }, f.now()));
+  assert.deepEqual([...f.db.docs], before);
+  assert.equal(actions(p).length, 0);
+  f.db.failCommit = false;
+  f.runtime.p7.process = process;
+  const step = f.runtime.state.p7Step;
+  f.runtime.state.p7Step = (host, op, now) => {
+    if (op.type === 'claim') f.db.retry = true;
+    return step(host, op, now);
+  };
+  await process(OTHER, announcement.key);
+  f.runtime.state.p7Step = step;
+  await Promise.all(Array.from({ length: 12 }, () => process(OTHER, announcement.key)));
+  assert.equal(actions(p).filter((c) => new URL(c.url).pathname === '/helix/chat/announcements').length, 1);
+  assert.equal((await f.runtime.state.getKeeperRegistry()).pendingHop.noticeMask & 4, 4);
+  assert.ok(chatDeliveries(f, p).length <= 6);
+  assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
+});
+
 test('all optional gates default off and invalid config fails closed; off proxies untouched', async () => {
   const trap = new Proxy(
     {},
@@ -401,14 +572,11 @@ for (const kind of ['memory', 'firestore']) {
     const posts = f.calls
       .filter((c) => c.url.endsWith('/chat/messages'))
       .map((c) => JSON.parse(c.body));
-    assert.equal(posts.length, 5);
+    assert.equal(posts.length, 4);
     assert.equal(posts.filter((c) => c.message.startsWith('Claim complete')).length, 2);
-    assert.equal(
-      posts.at(-1).message,
-      'No Send Off is active yet. The Keeper starts one in private control; after the raid arrives, sending chat uses !offer and receiving chat uses !accept.',
-    );
+    assert.ok(posts.every((c) => c.message !== 'No Send Off is active yet. The Keeper starts one in private control; after the raid arrives, sending chat uses !offer and receiving chat uses !accept.'));
     await f.chat(OTHER, '812', '!accept', { messageId: 'new-after-finalize-fault' });
-    assert.equal(f.calls.filter((c) => c.url.endsWith('/chat/messages')).length, 5);
+    assert.equal(f.calls.filter((c) => c.url.endsWith('/chat/messages')).length, 4);
     assert.equal(actions(p).length, 0);
     const p2 = fakeP7(),
       g = await prepared(kind, p2),

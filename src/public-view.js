@@ -3,6 +3,7 @@ import { stopStreak } from './streaks.js';
 import { chronicleView } from './chronicle.js';
 import { eligible } from './send-state.js';
 import { runeSvg } from './marks.js';
+import { carriedApprovedCount } from './claim-ack.js';
 
 const stopSummary = (stop) => ({
   stopId: stop.stopId,
@@ -62,7 +63,9 @@ export function handoffView(registry, channel, now, lineage, names = RECEIVING_K
       (s) => s.eventId === hop.eventId && s.from === hop.from && s.to === hop.to,
     );
   const sourceLogin = names[hop.from];
+  const carried = carriedApprovedCount(hop, lineage);
   return {
+    ...(carried !== undefined ? { carriedApprovedCount: carried } : {}),
     ...(sourceLogin ? { sourceLogin } : {}),
     ...(stop && Number.isFinite(stop.claimedAt) ? { completedAt: stop.claimedAt } : {}),
     role: hop.to === channel ? 'host' : 'source',
