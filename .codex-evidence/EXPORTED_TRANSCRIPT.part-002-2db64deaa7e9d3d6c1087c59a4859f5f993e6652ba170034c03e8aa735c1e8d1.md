@@ -18669,3 +18669,1080 @@
   }
 ]
 ````
+
+### 6703. 2026-10-31T12:25:30.132Z — user (source line 25395)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "Original338 FIXTUREONLYactualbrowser337progress. Good: OFFLINEapprovedglyphoverlay/Atlas/KeeperANDlandscape+verticalPNGdownloadsPASSED(now2downloads,2checks),336recapstrictfixworks. LaterFAILstagekeeper-repeat-disclosure line405 afterfakeproviderstale-live-unknown+forgetcases; log source-offline whenf.controlOTHERsendHOME, so7-hopfixtureexpectsring2butstate remainsOFFLINE fromnew334offlineGlyphcase. Restoringf.streams providerentry (oldclosedheldStreamid) isNOTtrustedstream.online and MUSTNOTreopenclosedstream. BeforelaterrepeatSendOff, constructNEWimmutablemockstreamid/newstartedAt(f.advance validmonotonic), validnumericviewer_count/type/live, emitproperSIGNEDstream.online andexplicitSetup/reconcileifneeded, sameasexistingtesthelpersemantics. NeverreuseclosedstreamID/relaxlifecycle/forceonlineflagdirectly. Preserveearlierofflineglyph/privacy/2PNGexports/stale-providerunknown/cross-readprivacychecks then7actualfixturehops+N3→4→3 assertions. Testshouldnowmodelhonestnewstreambeforemutatingraid; appcorrectlyblocksoffline. ONLYscripts/browser-smoke-desirability.js (existingtesthelperifstrictlyneededbutpreferonefile), no product/marks/backend/probesother/Git/format/testexecution/rawCody/private/secret/providersbyyou. Parentnative337stillrunning(no resultassumption), allruntimeproduct337MUSTstaybyte-identical. ExplainfixturetransitionSTOP."
+  }
+]
+````
+
+### 6704. 2026-10-31T12:25:34.055Z — assistant (source line 25398)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll restore the fixture’s lifecycle through a fresh signed stream event before the repeat hand-offs, preserving the earlier offline and stale-observation checks.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6705. 2026-10-31T12:25:35.288Z — tool call (source line 25399)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_907f3a4c8f4f491e9aea7d802f4febef",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '350,440p' scripts/browser-smoke-desirability.js\\nsed -n '300,350p' scripts/browser-smoke-desirability.js\\nrg -n 'stream.online|f.streams|repeat|raid\\\\(' scripts/browser-smoke-desirability.js\",\"max_output_tokens\":2700})).output)\n"
+}
+````
+
+### 6706. 2026-10-31T12:25:35.432Z — tool result (source line 25402)
+
+````text
+{
+  "call_id": "call_907f3a4c8f4f491e9aea7d802f4febef",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "\n  for (const [orientation, w, h] of [\n    ['landscape', 1200, 675],\n    ['vertical', 720, 1280],\n  ]) {\n    stage = orientation === 'landscape' ? 'card-landscape' : 'card-vertical';\n    if (orientation === 'vertical') {\n      await page.getByRole('button', { name: 'Share · Ring 1', exact: true }).click();\n      await page.getByLabel('Share format · Ring 1', { exact: true }).selectOption('vertical');\n    }\n    const downloaded = page.waitForEvent('download');\n    await page\n      .getByRole('button', { name: `Download ${orientation} card · Ring 1`, exact: true })\n      .click();\n    await png(await downloaded, `raid-relic-keeper-olsols2-ring-1-${orientation}.png`, w, h, page);\n  }\n  checks.push({\n    name: 'Registry spotlight, seven-safe public fields and actual decoded 16:9/9:16 PNG exports',\n    passed: true,\n  });\n  stage = 'stale-live-unknown';\n  f.streams.set(OTHER, { ...heldStream, viewer_count: 'invalid' });\n  f.advance(60001);\n  await page.locator('#receiving-refresh').click();\n  await page.locator('.holder-spotlight').filter({ hasText: 'Live status unknown' }).waitFor();\n  stage = 'erase-and-unavailable';\n  await f.chat(HOME, '8101', '!relic forgetme');\n  await f.chat(OTHER, '8301', '!relic forgetme');\n  await page.locator('#receiving-refresh').click();\n  stage = 'erasure-glyphs';\n  await page.waitForFunction(\n    () => document.querySelector('.keeper-glyphs')?.childElementCount === 0,\n  );\n  await page.route('**/api/atlas/stops/*', (r) => r.fulfill({ status: 404, body: 'Unavailable' }));\n  let downloads = 0;\n  page.on('download', () => downloads++);\n  // Refresh resets the menu; choose the same vertical format through the new Share UI.\n  await page.getByRole('button', { name: 'Share · Ring 1', exact: true }).click();\n  await page.getByLabel('Share format · Ring 1', { exact: true }).selectOption('vertical');\n  await page.getByRole('button', { name: 'Download vertical card · Ring 1', exact: true }).click();\n  stage = 'removed-stop-card';\n  await page.locator('#receiving-status').filter({ hasText: 'Card unavailable' }).waitFor();\n  assert.equal(downloads, 0);\n\n  stage = 'keeper-repeat-disclosure';\n  // Restore the malformed mock observation used above, then let its freshness expire.\n  for (const stream of f.streams.values()) stream.viewer_count = 1;\n  f.advance(61000);\n  // Genuine signed mock hops create four received rings; no fabricated profile DTO.\n  for (let i = 0; i < 6; i++) {\n    const from = (await f.runtime.state.getKeeperRegistry()).holderId;\n    const to = from === HOME ? OTHER : HOME;\n    f.advance(31000);\n    const sent = await f.control(from, 'send:' + to);\n    assert.equal(sent.status, 200);\n    assert.equal(JSON.parse(sent.body).status, 'accepted');\n    f.advance();\n    await f.raid(from, to, 1);\n    await f.chat(from, '8102', '!offer', { messageId: 'frontdoor-repeat-offer-' + i });\n    await f.chat(to, '8103', '!accept', { messageId: 'frontdoor-repeat-accept-' + i });\n    assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, to);\n  }\n  assert.equal((await f.runtime.state.getPublicJourney()).rings, 7);\n  await page.goto(origin + '/keeper/olsols2');\n  await page\n    .locator('.keeper-more > summary')\n    .filter({ hasText: '+1 more received rings' })\n    .waitFor();\n  assert.equal(await page.locator('.keeper-arrival').count(), 4);\n  assert.equal(await page.locator('.keeper-arrival:visible').count(), 3);\n  assert.equal(await page.locator('.keeper-more').evaluate((n) => n.open), false);\n  assert.ok(\n    await page\n      .locator('.keeper-arrival')\n      .evaluateAll((nodes) => nodes.every((n) => n.querySelectorAll('button').length <= 2)),\n  );\n  await page.locator('.keeper-more > summary').click();\n  await page.waitForFunction(\n    () => document.querySelectorAll('.keeper-card-preview:not([hidden])').length === 4,\n  );\n  assert.equal(await page.locator('.keeper-arrival:visible').count(), 4);\n  assert.ok(\n    await page.locator('.keeper-card-preview').evaluateAll(async (nodes) => {\n      await Promise.all(nodes.map((n) => n.decode()));\n      return nodes.every((n) => n.naturalWidth === 320 && n.naturalHeight === 180);\n    }),\n  );\n  checks.push({\n    name: 'Genuine retained four-ring profile starts with three entries, expands +1, real320x180 cards and at most two buttons per ring',\n    passed: true,\n  });\n  );\n  assert.doesNotMatch(await page.locator('#receiving-content').innerText(), /spoiler|8101/);\n  assert.equal(await page.locator('.keeper-glyphs img').count(), 2);\n  await page.locator('.keeper-glyphs img[alt=\"Approved rune: light\"]').waitFor();\n  assert.match(await page.locator('#keeper-current-live').innerText(), /2 retained approved marks/);\n  const offlineKeeper = JSON.parse((await f.request('/api/keeper/olsols2')).body.toString());\n  assert.equal(offlineKeeper.profile.glyphTotal, 2);\n  assert.equal(offlineKeeper.profile.glyphs.filter((m) => m.text === 'light').length, 1);\n  await page.locator('.keeper-card-preview').first().waitFor({ state: 'visible' });\n  const thumbnail = await page\n    .locator('.keeper-card-preview')\n    .first()\n    .evaluate(async (img) => {\n      await img.decode();\n      const canvas = document.createElement('canvas');\n      canvas.width = 320;\n      canvas.height = 180;\n      try {\n        const c = canvas.getContext('2d');\n        c.drawImage(img, 0, 0, 320, 180);\n        const pixels = c.getImageData(0, 0, 320, 180).data;\n        let lit = 0;\n        for (let i = 0; i < pixels.length; i += 4)\n          if (pixels[i + 3] && Math.max(pixels[i], pixels[i + 1], pixels[i + 2]) > 80) lit++;\n        const rect = img.getBoundingClientRect();\n        return {\n          width: img.naturalWidth,\n          height: img.naturalHeight,\n          renderedWidth: rect.width,\n          renderedHeight: rect.height,\n          lit,\n        };\n      } finally {\n        canvas.width = canvas.height = 0;\n      }\n    });\n  assert.equal(thumbnail.width, 320);\n  assert.equal(thumbnail.height, 180);\n  assert.ok(thumbnail.lit > 100);\n  assert.equal(await page.locator('.keeper-arrival').first().locator('button').count(), 2);\n  assert.doesNotMatch(\n    await page.locator('#receiving-content').innerText(),\n    /\\d{4}-\\d{2}-\\d{2}T\\d{2}:/,\n  );\n  for (const width of [1280, 390]) {\n    await page.setViewportSize({ width, height: 844 });\n    const bounds = await page.locator('.keeper-card-preview').first().boundingBox();\n    assert.ok(bounds.width <= 320 && Math.abs(bounds.width / bounds.height - 16 / 9) < 0.01);\n    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));\n  }\n\n71:  for (const id of [HOME, OTHER]) f.streams.get(id).viewer_count = 1;\n175:  await f.raid(HOME, OTHER, 1);\n189:  const heldStream = { ...f.streams.get(OTHER) };\n191:  f.streams.delete(OTHER);\n371:  f.streams.set(OTHER, { ...heldStream, viewer_count: 'invalid' });\n394:  stage = 'keeper-repeat-disclosure';\n396:  for (const stream of f.streams.values()) stream.viewer_count = 1;\n407:    await f.raid(from, to, 1);\n408:    await f.chat(from, '8102', '!offer', { messageId: 'frontdoor-repeat-offer-' + i });\n409:    await f.chat(to, '8103', '!accept', { messageId: 'frontdoor-repeat-accept-' + i });\n"
+    }
+  ]
+}
+````
+
+### 6707. 2026-10-31T12:25:57.274Z — tool call (source line 25406)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_a080a2de398a490eb1c8a16be48cf3e2",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/scripts/browser-smoke-desirability.js\\n@@\\n   stage = 'keeper-repeat-disclosure';\\n-  // Restore the malformed mock observation used above, then let its freshness expire.\\n+  // Earlier glyph checks deliberately closed OTHER's stream. A provider row\\n+  // alone cannot reopen it: start a new immutable signed mock stream before\\n+  // attempting any further hand-off; never reuse the closed heldStream ID.\\n   for (const stream of f.streams.values()) stream.viewer_count = 1;\\n   f.advance(61000);\\n+  const repeatStreamId = '9900991';\\n+  assert.notEqual(repeatStreamId, heldStream.id);\\n+  const repeatStartedAt = new Date(f.now()).toISOString();\\n+  f.streams.set(OTHER, {\\n+    ...heldStream,\\n+    user_id: OTHER,\\n+    id: repeatStreamId,\\n+    started_at: repeatStartedAt,\\n+    type: 'live',\\n+    viewer_count: 1,\\n+  });\\n+  const repeatOnline = await f.signed('stream.online', {\\n+    broadcaster_user_id: OTHER,\\n+    id: repeatStreamId,\\n+    type: 'live',\\n+    started_at: repeatStartedAt,\\n+  }, OTHER);\\n+  assert.equal(repeatOnline.status, 204);\\n+  const repeatSetup = await f.control(OTHER, 'bootstrap');\\n+  assert.equal(repeatSetup.status, 200);\\n+  assert.equal(JSON.parse(repeatSetup.body).status, 'reconciled');\\n+  assert.equal(JSON.parse(repeatSetup.body).ready, true);\\n+  const repeatChannel = await f.runtime.state.getStreamStatus(OTHER);\\n+  assert.equal(repeatChannel.online, true);\\n+  assert.equal(repeatChannel.streamId, repeatStreamId);\\n+  assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, OTHER);\\n+  assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);\\n   // Genuine signed mock hops create four received rings; no fabricated profile DTO.\\n*** End Patch\"));\n"
+}
+````
+
+### 6708. 2026-10-31T12:25:57.367Z — tool result (source line 25409)
+
+````text
+{
+  "call_id": "call_a080a2de398a490eb1c8a16be48cf3e2",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 6709. 2026-10-31T12:26:02.949Z — assistant (source line 25412)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Changed only `scripts/browser-smoke-desirability.js`.\n\nBefore repeat hand-offs, the fixture now creates a fresh stream ID/start time, emits signed `stream.online`, explicitly reconciles, and verifies readiness and lifecycle state. Earlier offline/privacy/download checks and all seven-hop disclosure assertions remain intact.\n\nNo execution performed. Product bytes unchanged. Stopped.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6710. 2026-10-31T12:26:26.034Z — user (source line 25420)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "Original339 LASTFOURACTUALFULLNATIVE337FAILS—likelyFIXTUREONLY, diagnosewithoutwaiver. Actual1267tests1263PASS4FAIL0skip, previous7fixed. (1,2)Firestoretest/recap.test.js:28and237 assertionsdb.reads.length1(lines36/267) ACTUAL6 after336sharedretainedreadHolds. As337searchstrictbudgetfix, updateEXACTboundeduniqueconfiguredreads(lineage+registry+2channels+2markdocs=6 for2fixturechannels), eachkeyonce,zeroWRITES, all16hop route/approved counts/invariants unchanged. Do notloosenunboundedlimit/droptest. (3,4)bothstorestest/security-hardening.test.js476 line506 oldcomparison overlay.snapshot.marks.some(m.id===moon.id)false; moon=originalactivepublicmarkrawchannel-localID while335/337overlayusesOPAQUEoriginID. ConfirmglyphpresenceusingexactapprovedmoonruneSvg plusvalidstablepublicID uniqueness, notrawlegacyIDequality. KeepALLfullrevocationerasureasserts/Atlas/overlay/snapshotprivacy/spam/idempotency; ifactualmoonruneMISSINGfixproductratherthanweaken. 337restoredactiveunion/fade; oldprivacyatlas/fade/receivingnewregressionsnowPASSED. Parentfocused337browserpassedofflineglyphsall3+2PNGdownloadsbeforelater7hopfixtureoffline;338honestfreshsignedNEWstreamfixturecorrected nowCOLLECTED/sourceSTOPPED. Productsrc/public337MUSTremainunchangedunlessrealglyphmissingreason; no blanketregenerateexpected/dynamicexpected/privateleaks. ONLYexistingtwoTESTfilesideally. Noexecution/Git/cloud/format/rawCody/selected/secret/privateAPI/newmodules. Parentfreshfull+focused+46thenactualnew0Lightgate. CompleteboundedSTOP."
+  }
+]
+````
+
+### 6711. 2026-10-31T12:26:31.651Z — assistant (source line 25423)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll inspect the failing assertions and update only the read-budget and glyph-identity expectations, preserving all revocation and privacy checks.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6712. 2026-10-31T12:26:33.395Z — tool call (source line 25424)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_5550e5229c0a43e7a86912eadb1cc49b",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '1,62p' test/recap.test.js\\nsed -n '235,277p' test/recap.test.js\\nsed -n '465,555p' test/security-hardening.test.js\\nhead -35 test/security-hardening.test.js\\nrg -n 'f.source|f.target|streamChannels|markChannels|reads.length|writes' test/recap.test.js\",\"max_output_tokens\":4000})).output)\n"
+}
+````
+
+### 6713. 2026-10-31T12:26:33.544Z — tool result (source line 25427)
+
+````text
+{
+  "call_id": "call_5550e5229c0a43e7a86912eadb1cc49b",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "import { spawnSync } from 'node:child_process';\nimport { createHash } from 'node:crypto';\nimport { runeSvg, runeGeometry, normalizeMark } from '../src/marks.js';\nimport test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { readFile } from 'node:fs/promises';\nimport { Readable } from 'node:stream';\nimport { recapProjection, recapSVG } from '../src/recap.js';\nimport { createJourneyFixture } from '../test-support/journey-fixture.js';\nimport { createJudges } from '../test-support/judges.js';\nimport { fakeFirestore } from '../test-support/fake-firestore.js';\nimport { createApp } from '../src/app.js';\nconst archive = (count = 16) => ({\n  stops: Array.from({ length: count }, (_, i) => ({\n    stopId: (i + 1).toString(16).padStart(64, '0'),\n    from: '1591805230',\n    to: '1591806023',\n    ringIndex: i + 1,\n    claimedAt: 1,\n    marks: Array.from({ length: 160 }, (_, n) => ({\n      id: `m${n + 1}`,\n      userId: 'PRIVATE_USER_CANARY',\n      text: 'moon',\n    })),\n  })),\n});\nfor (const kind of ['memory', 'firestore']) {\n  test(`${kind}: recap empty and completed counts come from one bounded archive, approved retained entries only`, async (t) => {\n    const db = kind === 'firestore' ? fakeFirestore() : undefined;\n    const f = await createJourneyFixture({ firestoreClient: db });\n    t.after(() => f.close());\n    await f.chat(f.source, '9999', { type: 'mark', text: 'pending' });\n    if (db) db.reads.length = 0;\n    const result = await f.app.dispatch({ method: 'GET', path: '/api/recap' });\n    assert.equal(result.status, 200);\n    if (db) assert.equal(db.reads.length, 1);\n    const data = JSON.parse(result.body);\n    assert.equal(data.mode, 'simulator');\n    assert.equal(data.rings, 1);\n    assert.equal(data.completedStops, 1);\n    assert.equal(data.retainedMarkEntries, 4);\n    assert.equal(data.shownRunes, 4);\n    assert.deepEqual(\n      Object.keys(data.route[0]).sort(),\n      ['stopId', 'from', 'to', 'claimedAt', 'ringIndex', 'retainedEntries'].sort(),\n    );\n    for (const forbidden of [\n      'userId',\n      'PRIVATE_USER',\n      'pending',\n      'csrf',\n      'refresh_token',\n      'eventId',\n      'streamId',\n    ])\n      assert.ok(!JSON.stringify(data).includes(forbidden));\n    assert.ok(data.svg.includes('SIMULATOR'));\n    assert.ok(!data.svg.includes('moon'));\n    const empty = await createJourneyFixture({\n      seed: false,\n      firestoreClient: kind === 'firestore' ? fakeFirestore() : undefined,\n    });\n});\nfor (const kind of ['memory', 'firestore'])\n  test(`${kind}: sixteen actual completed kernel hops retain all route and entry counts`, async (t) => {\n    const db = kind === 'firestore' ? fakeFirestore() : undefined;\n    const f = await createJourneyFixture({ seed: false, firestoreClient: db });\n    t.after(() => f.close());\n    const base = Date.now() - 1000;\n    for (const [host, streamId] of [\n      [f.source, '9001'],\n      [f.target, '9002'],\n    ]) {\n      await f.event(\n        { lifecycle: { host, type: 'online', streamId, startedAt: base, sentAt: base } },\n        base,\n      );\n      await f.chat(host, host, { type: 'keep' }, base);\n    }\n    for (let i = 0; i < 16; i++) {\n      const source = i % 2 ? f.target : f.source,\n        target = i % 2 ? f.source : f.target,\n        time = base + i + 1;\n      await f.chat(source, String(9100 + i), { type: 'mark', text: 'moon' }, time);\n      await f.chat(source, source, { type: 'approve', markId: `m${Math.floor(i / 2) + 1}` }, time);\n      await f.event(\n        { raid: { from_broadcaster_user_id: source, to_broadcaster_user_id: target, viewers: 1 } },\n        time,\n      );\n      await f.chat(source, source, { type: 'offer' }, time);\n      await f.chat(target, target, { type: 'accept' }, time);\n    }\n    if (db) db.reads.length = 0;\n    const data = await f.state.getRecap();\n    if (db) assert.equal(db.reads.length, 1);\n    assert.equal(data.rings, 16);\n    assert.equal(data.route.length, 16);\n    assert.equal(data.retainedMarkEntries, 72);\n    assert.equal(data.shownRunes, 24);\n    assert.equal(\n      data.route.reduce((sum, stop) => sum + stop.retainedEntries, 0),\n      72,\n    );\n  });\n\n  );\n  assert.equal(doc.sessions[0].marks[0].status, 'approved');\n  f.db.docs.set(`keeperRegistry/${hash('single')}`, structuredClone(registry));\n  f.db.docs.set(`markChannels/${hash('201')}`, structuredClone(doc));\n  await assert.doesNotReject(async () => f.accept('201', '102', 'forgetme'));\n  const retained = await f.state.getPrivateMarks('201', chat('201', '201', 'read-after'));\n  assert.equal(retained.sessions[0].marks.length, 0);\n  assert.equal(retained.sessions[0].viewers[0].spent, 1);\n});\n\nfor (const kind of ['memory', 'firestore']) {\n  test(`security regression ${kind}: signed mock completion survives spam; full revocations cannot retain archived content`, async () => {\n    // Existing provider transport is entirely mocked; configured identities here\n    // are fixture constants, never real login, chat or raid operations.\n    const f = await pilotFixture(kind, {\n      chronicleEnv: { MARK_AUTO_APPROVE_ENABLED: 'true' },\n    });\n    for (const id of [BOT, HOME, OTHER]) await f.login(id);\n    for (const id of [HOME, OTHER]) {\n      f.streams.get(id).viewer_count = 1;\n      await f.control(id, 'bootstrap');\n      f.advance();\n      await f.control(id, 'keep');\n      f.advance();\n    }\n    for (let i = 0; i < 128; i++) await f.chat(HOME, '101', '!offer');\n    await f.chat(HOME, '102', '!mark moon');\n    const marked = await f.runtime.state.getPrivateMarks(HOME, chat(HOME, HOME, 'inspect-mark'));\n    const moon = marked.sessions\n      .flatMap((s) => s.marks)\n      .find((m) => m.userId === '102' && m.text === 'moon');\n    assert.ok(moon);\n    await f.chat(HOME, HOME, `!relic approve ${moon.id}`);\n    const approved = await f.runtime.state.getPrivateMarks(\n      HOME,\n      chat(HOME, HOME, 'inspect-approved'),\n    );\n    assert.equal(\n      approved.sessions.flatMap((s) => s.marks).find((m) => m.id === moon.id).status,\n      'approved',\n    );\n    assert.ok((await f.runtime.overlayFeeds[HOME].snapshot()).marks.some((m) => m.id === moon.id));\n    assert.equal(JSON.parse((await f.control(HOME, `send:${OTHER}`)).body).status, 'accepted');\n    await f.raid();\n    await f.chat(HOME, '102', '!offer', { messageId: 'honest-offer' });\n    await f.chat(OTHER, '103', '!accept', { messageId: 'honest-accept' });\n    assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);\n    const archived = await f.runtime.state.getPublicJourney();\n    assert.ok(\n      archived.stops.some(\n        (s) => s.from === HOME && s.marks.some((m) => m.id === moon.id && m.text === 'moon'),\n      ),\n    );\n    for (const host of [HOME, OTHER]) {\n      const acks = await f.runtime.state.getPrivateClaimAcks(host);\n      assert.equal(acks.rows.filter((r) => r.completionReceipt && !r.arrivalReceipt).length, 1);\n      assert.ok(acks.rows.length <= 128);\n    }\n    await f.chat(OTHER, '103', '!accept', { messageId: 'honest-accept' });\n    assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);\n    assert.equal(f.calls.filter((c) => c.url.includes('/raids?') && c.method === 'POST').length, 1);\n    for (let i = 0; i < 256; i++) {\n      await f.runtime.state.accept({\n        id: `erase-ledger-${i}`,\n        now: f.now(),\n        sentAt: f.now(),\n        expiresAt: f.now() + 600000,\n        chat: chat(HOME, String(5000 + i), `erase-ledger-${i}`, 'forgetme'),\n      });\n    }\n    await f.runtime.state.controlMarks(\n      HOME,\n      chat(HOME, '102', 'forget-owner'),\n      { type: 'forgetme' },\n      f.now(),\n    );\n    if (f.db) {\n      const sourcePresence = f.db.docs.get(`presence/${hash(HOME)}`);\n      assert.equal(sourcePresence.streamId, f.streams.get(HOME).id);\n      assert.equal(\n        sourcePresence.actors.some((a) => a.id === '102'),\n        false,\n      );\n    }\n    const journey = await f.runtime.state.getPublicJourney();\n    assert.ok(journey.stops.every((s) => s.marks.every((m) => m.text !== 'moon')));\n    const retained = await f.runtime.state.getPrivateMarks(HOME, chat(HOME, HOME, 'inspect'));\n    assert.ok(retained.sessions.every((s) => s.marks.every((m) => m.userId !== '102')));\n    assert.equal(\n      retained.sessions\n        .find((s) => s.viewers.some((v) => v.userId === '102'))\nimport test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { createMemoryState } from '../src/state.js';\nimport { createFirestoreStore } from '../src/store.js';\nimport { fakeFirestore } from '../test-support/fake-firestore.js';\nimport { reduceScores } from '../src/scoreboard.js';\nimport { ackDocument, ackStep, completionAck } from '../src/claim-ack.js';\nimport { reserveShare } from '../src/my-marks.js';\nimport { updatePresence, revokePresenceActor, presenceKey } from '../src/presence.js';\nimport { reduceLifecycle, emptyRegistry } from '../src/lifecycle.js';\nimport { reduceMark, setMarkContext, markReviewPolicy } from '../src/marks.js';\nimport { hash } from '../src/crypto.js';\nimport { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\n\n// Post-fix regressions retain the bounded baseline scenarios and assert isolation.\n// No HTTP/provider transport is needed: these are the actual transaction/reducer\n// interfaces after signature parsing. They do NOT establish signed end-to-end delivery.\nconst NOW = 1800000000000;\nconst ROOMS = ['201', '202'];\nconst chat = (host, actor, messageId, type) => ({\n  broadcasterId: host,\n  chatterId: actor,\n  chatterLogin: actor === '101' ? 'sample_a' : 'sample_b',\n  messageId,\n  isBot: false,\n  copied: false,\n  ...(type ? { markAction: { type } } : {}),\n});\nconst dummyShare = (actor, login) => ({\n  host: '201',\n  actor,\n  login,\n  nonce: `dummy-${actor}`,\n  token: `dummy-${actor}`,\n  expiresAt: NOW + 600000,\n32:    await f.chat(f.source, '9999', { type: 'mark', text: 'pending' });\n33:    if (db) db.reads.length = 0;\n36:    if (db) assert.equal(db.reads.length, 1);\n77:        f.source,\n78:        { broadcasterId: f.source, chatterId: action === 'forgetme' ? '9000' : f.source },\n86:      await f.chat(f.source, f.source, {\n243:      [f.source, '9001'],\n244:      [f.target, '9002'],\n253:      const source = i % 2 ? f.target : f.source,\n254:        target = i % 2 ? f.source : f.target,\n265:    if (db) db.reads.length = 0;\n267:    if (db) assert.equal(db.reads.length, 1);\n"
+    }
+  ]
+}
+````
+
+### 6714. 2026-10-31T12:26:45.768Z — tool call (source line 25431)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_f357a5fcd11840e4b193e707a435810b",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '550,590p' test/security-hardening.test.js\\nrg -n 'validSnapshot|runeSvg' test/security-hardening.test.js\\nrg -n 'createHash' test/recap.test.js\",\"max_output_tokens\":1000})).output)\n"
+}
+````
+
+### 6715. 2026-10-31T12:26:45.911Z — tool result (source line 25434)
+
+````text
+{
+  "call_id": "call_f357a5fcd11840e4b193e707a435810b",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "    assert.ok(journey.stops.every((s) => s.marks.every((m) => m.text !== 'moon')));\n    const retained = await f.runtime.state.getPrivateMarks(HOME, chat(HOME, HOME, 'inspect'));\n    assert.ok(retained.sessions.every((s) => s.marks.every((m) => m.userId !== '102')));\n    assert.equal(\n      retained.sessions\n        .find((s) => s.viewers.some((v) => v.userId === '102'))\n        .viewers.find((v) => v.userId === '102').spent,\n      1,\n    );\n  });\n}\n\ntest('security regression fair allocations and expiry remain bounded across actors and rooms', () => {\n  let scores;\n  for (const host of ROOMS)\n    for (const actor of ['101', '102', '103', '104'])\n      for (let i = 0; i < 16; i++)\n        scores = reduceScores(scores, {\n          channels,\n          marks,\n          now: NOW,\n          chat: chat(host, actor, `${host}-${actor}-${i}`, 'scores-status'),\n        }).doc;\n  assert.equal(scores.receipts.length, 64);\n  assert.ok(scores.receipts.length <= 128);\n  for (const host of ROOMS)\n    assert.equal(scores.receipts.filter((r) => r.room === hash(`command-room:${host}`)).length, 32);\n  const recovered = reduceScores(scores, {\n    channels,\n    marks,\n    now: NOW + 600001,\n    chat: chat('201', '101', 'after-expiry', 'scores-status'),\n  });\n  assert.equal(recovered.reason, 'queued');\n  assert.equal(recovered.doc.receipts.length, 1);\n  let acks;\n  for (let i = 0; i < 128; i++)\n    acks = ackDocument(\n      acks,\n      chat('201', String(6000 + i), `many-${i}`, 'offer'),\n      null,\n2:import { createHash } from 'node:crypto';\n293:    assert.equal(createHash('sha256').update(canonical).digest('hex'), digest);\n"
+    }
+  ]
+}
+````
+
+### 6716. 2026-10-31T12:27:01.994Z — tool call (source line 25438)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_969f52aafb2545e982d6219aeec1268e",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/test/recap.test.js\\n@@\\n import { createApp } from '../src/app.js';\\n+import { hash } from '../src/crypto.js';\\n+function assertRetainedReadBudget(db, f, writesBefore) {\\n+  assert.deepEqual([...db.reads].sort(), [\\n+    `lineage/${hash('single')}`, `keeperRegistry/${hash('single')}`,\\n+    ...[f.source, f.target].flatMap((id) => [`streamChannels/${hash(id)}`, `markChannels/${hash(id)}`]),\\n+  ].sort());\\n+  assert.equal(db.reads.length, 6);\\n+  assert.equal(new Set(db.reads).size, 6, 'Each configured document is read exactly once');\\n+  assert.equal(db.writes.length, writesBefore, 'Public recap cannot write');\\n+}\\n@@\\n     if (db) db.reads.length = 0;\\n+    const writesBefore = db?.writes.length;\\n     const result = await f.app.dispatch({ method: 'GET', path: '/api/recap' });\\n@@\\n-    if (db) assert.equal(db.reads.length, 1);\\n+    if (db) assertRetainedReadBudget(db, f, writesBefore);\\n@@\\n     if (db) db.reads.length = 0;\\n+    const writesBefore = db?.writes.length;\\n     const data = await f.state.getRecap();\\n-    if (db) assert.equal(db.reads.length, 1);\\n+    if (db) assertRetainedReadBudget(db, f, writesBefore);\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/test/security-hardening.test.js\\n@@\\n-import { reduceMark, setMarkContext, markReviewPolicy } from '../src/marks.js';\\n+import { reduceMark, setMarkContext, markReviewPolicy, runeSvg } from '../src/marks.js';\\n@@\\n-    assert.ok((await f.runtime.overlayFeeds[HOME].snapshot()).marks.some((m) => m.id === moon.id));\\n+    // Storage IDs are channel-local; public union IDs are stable opaque origins.\\n+    // Prove the actual approved glyph remains present, not equality to a private ID.\\n+    const approvedSnapshot = await f.runtime.overlayFeeds[HOME].snapshot();\\n+    const publicMoons = approvedSnapshot.marks.filter((m) => m.runeSvg === runeSvg('moon'));\\n+    assert.equal(publicMoons.length, 1);\\n+    assert.match(publicMoons[0].id, /^r[a-f0-9]{64}$/);\\n+    assert.equal(new Set(approvedSnapshot.marks.map((m) => m.id)).size, approvedSnapshot.marks.length);\\n+    const repeatedSnapshot = await f.runtime.overlayFeeds[HOME].snapshot();\\n+    assert.equal(repeatedSnapshot.marks.filter((m) => m.runeSvg === runeSvg('moon')).length, 1);\\n+    assert.equal(repeatedSnapshot.marks.find((m) => m.runeSvg === runeSvg('moon')).id, publicMoons[0].id);\\n*** End Patch\"));\n"
+}
+````
+
+### 6717. 2026-10-31T12:27:02.144Z — tool result (source line 25441)
+
+````text
+{
+  "call_id": "call_969f52aafb2545e982d6219aeec1268e",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 6718. 2026-10-31T12:27:07.711Z — assistant (source line 25444)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Changed only `test/recap.test.js` and `test/security-hardening.test.js`.\n\nRecap now asserts the exact six unique configured reads and zero writes. Security checks now require the exact moon glyph, a valid stable opaque ID, and unique public IDs; all revocation assertions remain intact.\n\nNo product changes or execution. Stopped.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6719. 2026-10-31T14:09:06.658Z — user (source line 25454)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "Original340 NEW14:07ownerGrokexplicitfinalfreezepriorities. Currentclean180d995dccd2d6550cee78f001a9b7d28d6842e1. DO NOTprod/cloud/live/provider/Git/execution/rawCody/privateSecret. Userwillstage/promoteretainedmarks, keepallfixes. FIRSTG3.05 ONLY: changefull-overlaywholePLATEgeometrysoALLouterplate(notmerelyart/text) hasZEROoverlapcentral60%atFHD1920x1080and960x540. Old560+48intrudes12logicalpx/2688FHD/672960; shrink/repositionwholeplate outside centralrect[20%,80%] axes, no interpretation/noaskowner. Preservecriticalart/text0, transparency/noedition/zeropills, minfontsize/readability/hitcontrols, shader/resource/160firstpartyguards. Updateexistingfull-overlaynativebrowser assertion ACTUALWHOLEplateoverlap0 atbothsizes+all relevantframestates/reducedmode; measureouterpaintedborder/shadowcorrectlynotcheatrect/transparentbounds/critical-only. MinimalCSS/geometryaffectedexistingtests/probes, no newfilesJS/deps/designredesign/perfchangesyet. docsPANEL_STATUS updateG3.05ONLYtoimplemented awaitingParentQA, preservedatedbaseline/currenttablehonest proof. Parentrunsnative/browser/formatthencommitpushG3.05. Later340sourceSTOP→parentauthorizesG4.04baselineharness/perffix→judgeDocsgroup. ONEfinal0previewwithPRODENVuserexplicitbutno trafficshift; parenthandles cloudlast currentbaselinefreshcheck. No G6.07compaction. Freeze18:00UK; afteronlybugsdocs. SourceonlyfinishboundedSTOPwithgeometrymath/files/testdefinitions/unrun. SameONLYlead01a1705c, no replacement/delegationneeded."
+  }
+]
+````
+
+### 6720. 2026-10-31T14:09:11.631Z — assistant (source line 25457)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll inspect the card geometry and existing measurements, then adjust the whole plate to clear the central 60% at both viewport sizes. I’ll keep this increment limited to geometry, its acceptance checks, and the G3.05 status note.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6721. 2026-10-31T14:09:14.594Z — tool call (source line 25458)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_1690c6f7270c4d1b875a86da430e17ce",
+  "input": "text((await tools.exec_command({cmd:\"rg -n '560|180|48|overlay.*(width|height|safe)|shadow|layout-card|backdrop' public/overlay.css public/overlay.js | tail -65\\nrg -n '672|2688|560|280|plateOverlap|criticalOverlap|central|overlap' scripts/browser-smoke-full-overlay.js test/overlay-group3.test.js\\nrg -n 'G3.05|12px|12 px' docs/PANEL_STATUS.md\\nrg --files scripts | rg 'overlay'\",\"max_output_tokens\":4200})).output)\n"
+}
+````
+
+### 6722. 2026-10-31T14:09:14.733Z — tool result (source line 25461)
+
+````text
+{
+  "call_id": "call_1690c6f7270c4d1b875a86da430e17ce",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "public/overlay.css:726:    0 0 42px #9486b7;\npublic/overlay.css:732:  background: radial-gradient(ellipse at center, #fff9e9 5%, #e6bb70 48%, #9486b7 100%);\npublic/overlay.css:743:  box-shadow:\npublic/overlay.css:745:    inset 0 0 18px #9486b7;\npublic/overlay.css:762:  filter: drop-shadow(0 0 7px #e6bb70);\npublic/overlay.css:765:  fill: #9486b733;\npublic/overlay.css:784:  text-shadow: 0 1px 6px #101d30;\npublic/overlay.css:790:  filter: drop-shadow(0 0 calc(4px + var(--fusion-glow, 0) * 20px) #ffe6ac);\npublic/overlay.css:798:  box-shadow: 0 0 calc(var(--fusion-glow, 0) * 22px) #e6bb70;\npublic/overlay.css:809:  box-shadow: 0 0 6px #e6bb70;\npublic/overlay.css:886:    #fff3cd66 48%,\npublic/overlay.css:908:    #e6bb7044 48%,\npublic/overlay.css:1062:body.layout-card {\npublic/overlay.css:1066:body.layout-card .relic-overlay {\npublic/overlay.css:1068:  width: 560px;\npublic/overlay.css:1069:  height: 180px;\npublic/overlay.css:1071:  background: rgba(16, 29, 48, 0.86);\npublic/overlay.css:1074:  backdrop-filter: blur(8px);\npublic/overlay.css:1079:body.layout-card .archive {\npublic/overlay.css:1088:body.layout-card .crystal {\npublic/overlay.css:1091:body.layout-card h1 {\npublic/overlay.css:1094:  left: 180px;\npublic/overlay.css:1102:body.layout-card #status {\npublic/overlay.css:1105:  left: 180px;\npublic/overlay.css:1115:body.layout-card #count {\npublic/overlay.css:1118:  left: 180px;\npublic/overlay.css:1125:body.layout-card #lineage {\npublic/overlay.css:1134:body.layout-card\npublic/overlay.css:1147:body.layout-card .simulator {\npublic/overlay.css:1158:body.layout-card #sound-toggle {\npublic/overlay.css:1168:body.layout-card .archive .growth-fallback {\npublic/overlay.css:1177:body.layout-card.pos-bl .relic-overlay,\npublic/overlay.css:1178:body.layout-card.pos-tl .relic-overlay {\npublic/overlay.css:1179:  left: var(--overlay-safe);\npublic/overlay.css:1182:body.layout-card.pos-br .relic-overlay,\npublic/overlay.css:1183:body.layout-card.pos-tr .relic-overlay {\npublic/overlay.css:1184:  right: var(--overlay-safe);\npublic/overlay.css:1187:body.layout-card.pos-bl .relic-overlay,\npublic/overlay.css:1188:body.layout-card.pos-br .relic-overlay {\npublic/overlay.css:1189:  bottom: var(--overlay-safe);\npublic/overlay.css:1191:body.layout-card.pos-tl .relic-overlay,\npublic/overlay.css:1192:body.layout-card.pos-tr .relic-overlay {\npublic/overlay.css:1193:  top: var(--overlay-safe);\npublic/overlay.css:1196:body.layout-card.pos-tr .relic-overlay {\npublic/overlay.css:1224:body.layout-card.arrival-takeover .relic-overlay {\npublic/overlay.css:1230:  bottom: var(--overlay-safe);\npublic/overlay.css:1236:  background: rgba(16, 29, 48, 0.86);\npublic/overlay.css:1239:  backdrop-filter: blur(8px);\npublic/overlay.css:1242:body.layout-card.arrival-takeover .archive {\npublic/overlay.css:1251:body.layout-card.arrival-takeover\npublic/overlay.css:1273:  left: 180px;\npublic/overlay.css:1283:  left: 180px;\npublic/overlay.css:1298:  left: 180px;\npublic/overlay.css:1305:  left: 180px;\npublic/overlay.css:1319:body.coach-visible.layout-card #count {\npublic/overlay.css:1322:body.layout-card.ring-forged .archive {\npublic/overlay.css:1327:    filter: drop-shadow(0 0 12px #dba95c);\npublic/overlay.css:1331:  body.layout-card.ring-forged .archive {\npublic/overlay.css:1335:body.layout-card #status {\npublic/overlay.css:1364:body.layout-card.arrival-takeover .relic-overlay {\npublic/overlay.css:1368:  bottom: var(--overlay-safe);\npublic/overlay.css:1372:body.layout-card.arrival-takeover #simulator {\npublic/overlay.css:1382:body.layout-card .crystal {\npublic/overlay.css:1387:body.layout-card.ring-forged .archive::after {\npublic/overlay.css:1407:  body.layout-card.ring-forged .archive::after {\ntest/overlay-group3.test.js:251:    '@sample_a holds the relic. Held since: 1970-01-01 00:00:00 UTC. Watch: https://twitch.tv/sample_a · https://raid-relic-760724762396.us-central1.run.app/keeper/sample_a',\nscripts/browser-smoke-full-overlay.js:99:    viewport: { width: 1280, height: 800 },\nscripts/browser-smoke-full-overlay.js:162:      checks.push({ name: label, passed: true, viewport: '1280x800', proof });\nscripts/browser-smoke-full-overlay.js:220:      const central = {\nscripts/browser-smoke-full-overlay.js:237:        criticalOverlap: critical.reduce((n, r) => n + area(r, central), 0),\nscripts/browser-smoke-full-overlay.js:238:        plateOverlap: area(plate, central),\nscripts/browser-smoke-full-overlay.js:302:    fullPlateAvoidsCentral60: fhd.plateOverlap === 0,\nscripts/browser-smoke-full-overlay.js:305:    fhd.width !== 560 ||\nscripts/browser-smoke-full-overlay.js:309:    fhd.criticalOverlap !== 0 ||\nscripts/browser-smoke-full-overlay.js:310:    fhd.plateOverlap !== 224 * 12 ||\nscripts/browser-smoke-full-overlay.js:320:  await settleCard([960, 540, 24, 426, 280, 90], 1);\nscripts/browser-smoke-full-overlay.js:327:    fullPlateAvoidsCentral60: half.plateOverlap === 0,\nscripts/browser-smoke-full-overlay.js:330:    half.width !== 280 ||\nscripts/browser-smoke-full-overlay.js:334:    half.criticalOverlap !== 0 ||\nscripts/browser-smoke-full-overlay.js:335:    half.plateOverlap !== 56 * 12\nscripts/browser-smoke-full-overlay.js:340:    name: 'Logical560x180 at48safe; original FHD and half-scale viewport, honest 12px plate-only central intrusion',\nscripts/browser-smoke-full-overlay.js:345:  await settleCard([1920, 1080, 48, 852, 560, 180], 2);\nscripts/browser-smoke-full-overlay.js:393:      iframe.width = '1280';\n42:| G3.05 | PARTLY DONE | Critical art/text outside central60% has actual overlap0; outer plate truthfully intrudes **12 logical px / 2,688 FHD square px** (960:672). Full-overlay browser asserts those exact values. Literal entire-card zero central overlap is **not satisfied** by560+48 geometry. Need owner acceptance of critical-only interpretation or scoped design decision; never report whole-plate overlap0. Transparent outside plate/no edition/zero pills retained. Current bounded implementation/regression coverage is included in R0; no broader physical/manual claim. |\n97:Remaining owner-only decisions: literal12px plate/central60 conflict; painted Atlas≥440 interpretation and three-cold-image outline acceptance; universal typography/date/gameplay7:1 interpretation; every-scene/every4s physical motion claim; visual10min/8scoach; OSWebShare/manualAT; approval/backup-gated compaction. New private preview does not permit real OAuth/control mutations, moderation delivery or production promotion. Current capture proof is4viewed PNGs/230301bytes: desktop1920×540 crops at original viewport, Keeper list post-disclosure not header, mobile390×844; not physical/adoption evidence. Native film150037/60007hidden/8scenes/0inputs/downloads and hour3600273/host3605600/13GC/105151frames/1WS/0inputs/errors/forbidden are R0, not older receipts. Only one4s active pixel sample was observed. No current external gameplay/physicalOBS claim.\n186:| G3.05 | PARTLY DONE | Critical art/text outside central60% has actual overlap0; outer plate truthfully intrudes **12 logical px / 2,688 FHD square px** (960:672). Full-overlay browser asserts those exact values. Literal entire-card zero central overlap is **not satisfied** by560+48 geometry. Need owner acceptance of critical-only interpretation or scoped design decision; never report whole-plate overlap0. Transparent outside plate/no edition/zero pills retained. |\n251:3. **Relic/overlay acceptance gaps (G1.04/.08/.10; G3.04/.05/.13), approximately1–3h targeted measurement/review:** actual painted hero size and three-load capture agreement, computed fonts across owned pages, actual critical contrast≥7 at original FHD/960. Explicit owner decision on12px plate-only centre intrusion before any geometry change. Retain full/corner aliases, caps and default-card byte-bound hour scope.\n294:- **Central60% contradiction remains manual owner decision:** exact560×180 card at48px FHD margin places12px of backplate inside the central60% rectangle. Critical art/text can remain outside; do not report zero plate overlap or silently change dimensions/margins to make a test green.\nscripts/soak-overlay.js\nscripts/browser-smoke-full-overlay.js\nscripts/simulate-overlay.js\n"
+    }
+  ]
+}
+````
+
+### 6723. 2026-10-31T14:09:19.132Z — tool call (source line 25463)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_7af13b1fb31d4d1cbe268c00f5f14380",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '1060,1083p' public/overlay.css\\nsed -n '1218,1245p' public/overlay.css\\nsed -n '1355,1375p' public/overlay.css\\nrg -n '560|900|300|overlay-safe|fitOverlay' public/overlay.js\\nsed -n '168,242p' public/overlay.js\\nsed -n '175,355p' scripts/browser-smoke-full-overlay.js\",\"max_output_tokens\":4700})).output)\n"
+}
+````
+
+### 6724. 2026-10-31T14:09:19.237Z — tool result (source line 25466)
+
+````text
+{
+  "call_id": "call_7af13b1fb31d4d1cbe268c00f5f14380",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "\n/* Group 3: OBS logical-FHD card. Full retains the historical composition. */\nbody.layout-card {\n  display: block;\n  color: #e3e8ef;\n}\nbody.layout-card .relic-overlay {\n  position: fixed;\n  width: 560px;\n  height: 180px;\n  padding: 20px;\n  background: rgba(16, 29, 48, 0.86);\n  border: 1px solid #dba95c55;\n  border-radius: 16px;\n  backdrop-filter: blur(8px);\n  filter: none;\n  transform: scale(var(--overlay-scale, 1));\n  text-align: left;\n}\nbody.layout-card .archive {\n  position: absolute;\n  left: 20px;\n  top: 20px;\n  width: 140px;\n  align-self: end;\n}\n#arrival-panel[hidden],\n#command-coach[hidden] {\n  display: none;\n}\nbody.layout-card.arrival-takeover .relic-overlay {\n  position: fixed;\n  width: 900px;\n  height: 300px;\n  left: 50%;\n  right: auto;\n  bottom: var(--overlay-safe);\n  top: auto;\n  padding: 20px;\n  transform: translateX(-50%) scale(var(--overlay-scale, 1));\n  scale: 1;\n  transform-origin: center bottom;\n  background: rgba(16, 29, 48, 0.86);\n  border: 1px solid #dba95c55;\n  border-radius: 16px;\n  backdrop-filter: blur(8px);\n  filter: none;\n}\nbody.layout-card.arrival-takeover .archive {\n  position: absolute;\n  top: 80px;\n  left: 20px;\n}\nbody.layout-corner.pos-tl .relic-overlay,\nbody.layout-corner.pos-tr .relic-overlay {\n  top: var(--corner-safe);\n  transform-origin: left top;\n}\nbody.layout-corner.pos-tr .relic-overlay {\n  transform-origin: right top;\n}\nbody.layout-card.arrival-takeover .relic-overlay {\n  left: 50%;\n  right: auto;\n  top: auto;\n  bottom: var(--overlay-safe);\n  transform-origin: center bottom;\n}\n\nbody.layout-card.arrival-takeover #simulator {\n  top: 4px;\n  right: 16px;\n  bottom: auto;\n89:const fitOverlay = () => {\n94:  document.body.style.setProperty('--overlay-safe', `${48 * fit}px`);\n104:fitOverlay();\n105:addEventListener('resize', fitOverlay);\n442:  if (options.layout === 'full') fitOverlay();\n495:  removeEventListener('resize', fitOverlay);\nfunction clearCinema() {\n  for (const node of [...Object.values(effects), ...words, ...ambient, sourceCaption]) {\n    node.hidden = true;\n    if (node.classList.contains('p3-word')) node.textContent = '';\n    if (node.classList.contains('p31-decorative')) node.setAttribute('hidden', '');\n  }\n  sourceCaption.textContent = '';\n  archiveNode.dataset.ambientCount = '0';\n  archiveNode.dataset.charge = 'false';\n  archiveNode.style.setProperty('--charge-level', '0');\n  archiveNode.style.setProperty('--charge-alpha', '0');\n  archiveNode.dataset.fusionPending = 'false';\n  archiveNode.style.setProperty('--p3-shake', '0px');\n}\n\nconst soundButton = document.querySelector('#sound-toggle');\nsoundButton.hidden = new URLSearchParams(location.search).get('sound') !== '1';\nsoundButton.onclick = async (event) => {\n  if (!event.isTrusted) return;\n  if (soundButton.getAttribute('aria-pressed') === 'true') {\n    await audio.mute();\n    soundButton.setAttribute('aria-pressed', 'false');\n    soundButton.textContent = 'Sound';\n    soundButton.setAttribute('aria-label', 'Enable optional overlay sounds');\n  } else {\n    const enabled = await audio.arm();\n    soundButton.setAttribute('aria-pressed', String(enabled));\n    soundButton.textContent = enabled ? 'Mute' : 'Sound';\n    soundButton.setAttribute(\n      'aria-label',\n      enabled\n        ? 'Mute overlay sounds'\n        : 'Enable optional overlay sounds; browser permission required',\n    );\n  }\n};\naddEventListener('pagehide', () => {\n  audio.teardown();\n  cueFor(null);\n  soundButton.setAttribute('aria-pressed', 'false');\n  soundButton.textContent = 'Sound';\n  soundButton.setAttribute('aria-label', 'Enable optional overlay sounds');\n});\nlet current = null;\nlet activityAt = performance.now(),\n  activityKey = null;\nlet disconnectOverlay = null;\nlet receivedAt = 0;\nlet receiptServerTime = 0;\nconst motion = matchMedia('(prefers-reduced-motion: reduce)');\nlet relic3d,\n  relic3dClosed = false;\nlet relic3dAbort = new AbortController(),\n  relic3dEpoch = 0;\nfunction loadRelicView() {\n  const own = ++relic3dEpoch;\n  relic3dAbort.abort();\n  relic3dAbort = new AbortController();\n  createRelic3D({\n    signal: relic3dAbort.signal,\n    archive: document.querySelector('.archive'),\n    reducedMotion: motion,\n    corner: options.layout !== 'full',\n  }).then((view) => {\n    if (relic3dClosed || own !== relic3dEpoch) {\n      view?.dispose();\n      return;\n    }\n    relic3d = view;\n    view?.update(current);\n  });\n}\nloadRelicView();\nfunction syncRelicMotion() {\n  relic3d?.dispose();\n  }\n  await f.chat(HOME, HOME, '!mark moon');\n  await f.chat(HOME, HOME, '!relic approve m1');\n  await f.control(HOME, `send:${OTHER}`);\n  f.advance();\n  await f.raid(HOME, OTHER, 2);\n  // Seek beyond the actual receipt-based20s animation with fixture clock; no CSS/class override.\n  f.advance(20001);\n  await overlay(OTHER, 'SIMULATOR verified receipt after20s');\n  await f.chat(HOME, HOME, '!offer');\n  await f.chat(OTHER, OTHER, '!accept');\n  if ((await f.runtime.state.getPublicJourney()).rings !== 1) throw Error('transfer failed');\n  await overlay(HOME, 'SIMULATOR home after transfer');\n  await overlay(OTHER, 'SIMULATOR holder after transfer');\n  stage = 'atlas';\n  const page = await context.newPage();\n  await page.goto(`${origin}/atlas/`);\n  await page.waitForFunction(() => document.body.textContent.includes('1 completed growth ring'));\n  if (await page.evaluate(() => document.documentElement.scrollWidth > innerWidth))\n    throw Error('Atlas overflow');\n  checks.push({ name: 'SIMULATOR Atlas actual completed stop', passed: true });\n  await page.close();\n  stage = 'logical-fhd-card';\n  const modern = await browser.newContext({\n    ignoreHTTPSErrors: true,\n    viewport: { width: 1920, height: 1080 },\n  });\n  await modern.route('**/*', (route) =>\n    new URL(route.request().url()).origin === origin ? route.continue() : route.abort(),\n  );\n  await modern.routeWebSocket('**/*', (route) =>\n    new URL(route.url()).origin === origin.replace('https:', 'wss:')\n      ? route.connectToServer()\n      : route.close(),\n  );\n  const card = await modern.newPage();\n  await card.goto(`${origin}/overlay/${OTHER}`);\n  await card.waitForFunction(\n    () =>\n      document.body.dataset.connection === 'connected' &&\n      Number(document.querySelector('canvas.relic3d')?.dataset.frames) > 0,\n  );\n  const geometry = async () =>\n    card.evaluate(() => {\n      const plate = document.querySelector('.relic-overlay').getBoundingClientRect();\n      const central = {\n        left: innerWidth * 0.2,\n        right: innerWidth * 0.8,\n        top: innerHeight * 0.2,\n        bottom: innerHeight * 0.8,\n      };\n      const area = (a, b) =>\n        Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) *\n        Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));\n      const critical = ['.archive', 'h1', '#status', '#count'].map((q) =>\n        document.querySelector(q).getBoundingClientRect(),\n      );\n      return {\n        x: plate.x,\n        y: plate.y,\n        width: plate.width,\n        height: plate.height,\n        criticalOverlap: critical.reduce((n, r) => n + area(r, central), 0),\n        plateOverlap: area(plate, central),\n        heading: parseFloat(getComputedStyle(document.querySelector('h1')).fontSize),\n        body: parseFloat(getComputedStyle(document.querySelector('#status')).fontSize),\n        artSlotWidth: document.querySelector('.archive').getBoundingClientRect().width,\n        artSlotHeight: document.querySelector('.archive').getBoundingClientRect().height,\n        svgElementWidth: document.querySelector('.crystal').getBoundingClientRect().width,\n        svgElementHeight: document.querySelector('.crystal').getBoundingClientRect().height,\n        rasterWidth: document.querySelector('canvas.relic3d').width,\n        rasterHeight: document.querySelector('canvas.relic3d').height,\n      };\n    });\n  const settleCard = async (expected, phaseCode) => {\n    try {\n      await card.waitForFunction(\n        ([vw, vh, x, y, width, height]) => {\n          const rect = document.querySelector('.relic-overlay')?.getBoundingClientRect();\n          return (\n            innerWidth === vw &&\n            innerHeight === vh &&\n            rect &&\n            rect.x === x &&\n            rect.y === y &&\n            rect.width === width &&\n            rect.height === height\n          );\n        },\n        expected,\n        { timeout: 5000 },\n      );\n    } catch (error) {\n      diagnostic.resizePhaseCode = phaseCode;\n      try {\n        const actual = await card.evaluate(() => {\n          const rect = document.querySelector('.relic-overlay')?.getBoundingClientRect();\n          return {\n            resizeViewportWidth: innerWidth,\n            resizeViewportHeight: innerHeight,\n            resizeX: rect?.x,\n            resizeY: rect?.y,\n            resizeWidth: rect?.width,\n            resizeHeight: rect?.height,\n          };\n        });\n        for (const key of [\n          'resizeViewportWidth',\n          'resizeViewportHeight',\n          'resizeX',\n          'resizeY',\n          'resizeWidth',\n          'resizeHeight',\n        ])\n          diagnostic[key] = Number.isFinite(actual[key]) ? actual[key] : -1;\n      } catch {\n        diagnostic.resizeDiagnosticUnavailable = 1;\n      }\n      throw error;\n    }\n  };\n  const fhd = await geometry();\n  layoutMeasurements.push({\n    viewportWidth: 1920,\n    viewportHeight: 1080,\n    ...fhd,\n    paintedSubject140Proven: false,\n    fullPlateAvoidsCentral60: fhd.plateOverlap === 0,\n  });\n  if (\n    fhd.width !== 560 ||\n    fhd.height !== 180 ||\n    fhd.x !== 48 ||\n    fhd.y !== 852 ||\n    fhd.criticalOverlap !== 0 ||\n    fhd.plateOverlap !== 224 * 12 ||\n    fhd.heading !== 36 ||\n    fhd.body !== 28 ||\n    fhd.rasterWidth > 480 ||\n    fhd.rasterHeight > 480\n  )\n    throw Error('logical card geometry');\n  await captureOverlay(card, 'overlay-card-fhd.png');\n  stage = 'compressed-card-resize';\n  await card.setViewportSize({ width: 960, height: 540 });\n  await settleCard([960, 540, 24, 426, 280, 90], 1);\n  const half = await geometry();\n  layoutMeasurements.push({\n    viewportWidth: 960,\n    viewportHeight: 540,\n    ...half,\n    paintedSubject140Proven: false,\n    fullPlateAvoidsCentral60: half.plateOverlap === 0,\n  });\n  if (\n    half.width !== 280 ||\n    half.height !== 90 ||\n    half.x !== 24 ||\n    half.y !== 426 ||\n    half.criticalOverlap !== 0 ||\n    half.plateOverlap !== 56 * 12\n  )\n    throw Error('compressed card geometry');\n  await captureOverlay(card, 'overlay-card-960.png');\n  checks.push({\n    name: 'Logical560x180 at48safe; original FHD and half-scale viewport, honest 12px plate-only central intrusion',\n    passed: true,\n  });\n  stage = 'restored-fhd-resize';\n  await card.setViewportSize({ width: 1920, height: 1080 });\n  await settleCard([1920, 1080, 48, 852, 560, 180], 2);\n  stage = 'verified-takeover';\n  await f.control(OTHER, `send:${HOME}`);\n  f.advance();\n  await f.raid(OTHER, HOME, 2);\n  await card.waitForFunction(() => document.body.classList.contains('arrival-takeover'));\n  if ((await card.locator('#arrival-action').innerText()) !== 'Sending chat: !offer')\n    throw Error('source role');\n  const takeover = await card.locator('.relic-overlay').boundingBox();\n  if (takeover.width !== 900 || takeover.height !== 300) throw Error('takeover geometry');\n  const before = Number(await card.locator('#arrival-countdown').innerText());\n"
+    }
+  ]
+}
+````
+
+### 6725. 2026-10-31T14:09:27.366Z — tool call (source line 25470)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_792529d2c81e48c590a23016220b410a",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '89,104p' public/overlay.js\\nsed -n '1080,1175p' public/overlay.css\\nsed -n '1242,1322p' public/overlay.css\\nsed -n '350,390p' scripts/browser-smoke-full-overlay.js\\nhead -35 public/overlay.css\\nrg -n '560|900|300|180' test/overlay-group3.test.js\",\"max_output_tokens\":2600})).output)\n"
+}
+````
+
+### 6726. 2026-10-31T14:09:27.490Z — tool result (source line 25473)
+
+````text
+{
+  "call_id": "call_792529d2c81e48c590a23016220b410a",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "const fitOverlay = () => {\n  const fit = Math.min(innerWidth / 1920, innerHeight / 1080);\n  document.body.style.setProperty('--overlay-scale', String(options.scale * fit));\n  // Full mode uses its original responsive CSS, without FHD fitting or safe-area shrink.\n  document.body.style.setProperty('--overlay-requested-scale', String(options.scale));\n  document.body.style.setProperty('--overlay-safe', `${48 * fit}px`);\n  document.body.style.setProperty(\n    '--corner-safe',\n    `${Math.min(innerWidth, innerHeight) <= 256 ? 0 : 48 * fit}px`,\n  );\n  document.body.style.setProperty(\n    '--corner-scale',\n    String(Math.min(options.scale, innerWidth / 160, innerHeight / 160)),\n  );\n};\nfitOverlay();\n  position: absolute;\n  left: 20px;\n  top: 20px;\n  width: 140px;\n  height: 140px;\n  margin: 0;\n  overflow: hidden;\n}\nbody.layout-card .crystal {\n  width: 76%;\n}\nbody.layout-card h1 {\n  position: absolute;\n  top: 12px;\n  left: 180px;\n  margin: 0;\n  font:\n    400 36px/1.2 Cinzel,\n    Georgia,\n    serif;\n  letter-spacing: 0;\n}\nbody.layout-card #status {\n  position: absolute;\n  top: 60px;\n  left: 180px;\n  width: 358px;\n  max-width: none;\n  margin: 0;\n  padding: 0;\n  border: 0;\n  color: #e3e8ef;\n  font: 28px/1.16 system-ui;\n  background: #101d30;\n}\nbody.layout-card #count {\n  position: absolute;\n  top: 132px;\n  left: 180px;\n  margin: 0;\n  padding: 0;\n  color: #e3e8ef;\n  background: #101d30;\n  font: 24px/1.2 system-ui;\n}\nbody.layout-card #lineage {\n  position: absolute;\n  top: 16px;\n  right: 16px;\n  margin: 0;\n  font: 24px/1.2 system-ui;\n  color: #e3e8ef;\n  background: #101d30;\n}\nbody.layout-card\n  :is(\n    .charge-track,\n    #handoff,\n    #waiting-note,\n    #claim-meter,\n    .ring-pips,\n    .compact-state,\n    .p31-source,\n    .echo-note\n  ) {\n  display: none;\n}\nbody.layout-card .simulator {\n  position: absolute;\n  left: 20px;\n  bottom: 2px;\n  margin: 0;\n  padding: 0;\n  background: #101d30;\n  border: 0;\n  color: #e3e8ef;\n  font-size: 12px;\n}\nbody.layout-card #sound-toggle {\n  position: absolute;\n  right: 4px;\n  bottom: 4px;\n  z-index: 9;\n}\nbody :is(.edition-label, .edition-badge),\n.growth-fallback[data-total='0'] {\n  display: none !important;\n}\nbody.layout-card .archive .growth-fallback {\n  width: 32px;\n  height: 24px;\n  top: auto;\n  left: auto;\n  right: 0;\n  bottom: 0;\n  transform: none;\nbody.layout-card.arrival-takeover .archive {\n  position: absolute;\n  top: 80px;\n  left: 20px;\n  width: 140px;\n  height: 140px;\n  margin: 0;\n  overflow: hidden;\n}\nbody.layout-card.arrival-takeover\n  :is(\n    h1,\n    #status,\n    #count,\n    #lineage,\n    #handoff,\n    #claim-meter,\n    #waiting-note,\n    .compact-state,\n    .charge-track,\n    .ring-pips,\n    .p31-source\n  ) {\n  display: none;\n}\n#arrival-panel {\n  color: #e3e8ef;\n}\n#arrival-title {\n  position: absolute;\n  top: 20px;\n  left: 180px;\n  margin: 0;\n  font:\n    44px/1.2 Cinzel,\n    Georgia,\n    serif;\n}\n#arrival-countdown {\n  position: absolute;\n  top: 80px;\n  left: 180px;\n  font: 72px/1.1 system-ui;\n  font-variant-numeric: tabular-nums;\n}\n#arrival-action {\n  position: absolute;\n  top: 102px;\n  left: 360px;\n  margin: 0;\n  max-width: none;\n  font: 32px/1.2 system-ui;\n}\n#arrival-counts {\n  position: absolute;\n  top: 176px;\n  left: 180px;\n  margin: 0;\n  font: 28px/1.2 system-ui;\n}\n#arrival-progress {\n  position: absolute;\n  height: 28px;\n  left: 180px;\n  bottom: 22px;\n  width: 680px;\n  accent-color: #dba95c;\n}\n#command-coach {\n  position: absolute;\n  bottom: 2px;\n  right: 20px;\n  margin: 0;\n  font: 24px/1.2 system-ui;\n  color: #e3e8ef;\n  background: #101d30;\n}\nbody.coach-visible.layout-card #count {\n  visibility: hidden;\n}\nbody.layout-card.ring-forged .archive {\n  await card.waitForFunction(() => document.body.classList.contains('arrival-takeover'));\n  if ((await card.locator('#arrival-action').innerText()) !== 'Sending chat: !offer')\n    throw Error('source role');\n  const takeover = await card.locator('.relic-overlay').boundingBox();\n  if (takeover.width !== 900 || takeover.height !== 300) throw Error('takeover geometry');\n  const before = Number(await card.locator('#arrival-countdown').innerText());\n  if (before > 180 || before < 175) throw Error('landing deadline');\n  await captureOverlay(card, 'overlay-arrival-source.png');\n  const receiver = await modern.newPage();\n  await receiver.goto(`${origin}/overlay/${HOME}`);\n  await receiver.waitForFunction(() => document.body.classList.contains('arrival-takeover'));\n  if ((await receiver.locator('#arrival-action').innerText()) !== 'Receiving chat: !accept')\n    throw Error('receiver role');\n  await captureOverlay(receiver, 'overlay-arrival-host.png');\n  await f.chat(OTHER, OTHER, '!offer');\n  await f.chat(HOME, HOME, '!accept');\n  await card.waitForFunction(() => !document.body.classList.contains('arrival-takeover'));\n  if ((await f.runtime.state.getPublicJourney()).rings !== 2) throw Error('actual ring');\n  await receiver.close();\n  await card.close();\n  checks.push({\n    name: 'Actual signed verified landing drives both roles and real180s deadline; genuine completion returns card',\n    passed: true,\n  });\n  stage = 'isolated-local-preview';\n  const parent = await modern.newPage();\n  let previewSockets = 0,\n    previewWrites = 0;\n  parent.on('websocket', () => previewSockets++);\n  parent.on('request', (r) => {\n    if (\n      r.method() !== 'GET' ||\n      /\\/(api|control|auth|oauth|eventsub|internal)(?:\\/|$)/.test(new URL(r.url()).pathname)\n    )\n      previewWrites++;\n  });\n  const beforeRegistry = await f.runtime.state.getKeeperRegistry(),\n    beforeJourney = await f.runtime.state.getPublicJourney(),\n    beforeCalls = f.calls.length;\n  await parent.goto(origin + '/overlay');\n  await parent.evaluate(\n:root {\n  color-scheme: dark;\n  font-family: 'Segoe UI', system-ui, sans-serif;\n  color: #dce4ed;\n  background: transparent;\n}\n* {\n  box-sizing: border-box;\n}\nbody {\n  margin: 0;\n  background: transparent;\n}\n.relic-overlay {\n  width: min(100%, 480px);\n  padding: 18px 16px 26px;\n  text-align: center;\n  filter: drop-shadow(0 2px 5px #101d30);\n}\nh1 {\n  font-family: Georgia, 'Times New Roman', serif;\n  font-size: 28px;\n  font-weight: 400;\n  letter-spacing: 0.06em;\n  margin: 4px 0 10px;\n}\np {\n  font-size: 13px;\n  line-height: 1.5;\n  margin: 7px auto;\n  max-width: 36ch;\n}\n.archive {\n  position: relative;\n  aspect-ratio: 1;\n"
+    }
+  ]
+}
+````
+
+### 6727. 2026-10-31T14:10:38.045Z — assistant (source line 25482)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "The 180px plate needs at most a 36px bottom inset to clear FHD’s bottom 20% band. I’ll use 32px, leaving 4px clearance. The 900×300 takeover cannot fit wholly in any outer band, so I’ll place it in a narrow side column, preserving its text sizes, controls and verified countdown.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6728. 2026-10-31T14:10:48.188Z — tool call (source line 25483)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_fd438117cbe94adbb3c3176fb462a0ae",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='public/overlay.js';s=open(p).read();s=s.replace(\\\"  document.body.style.setProperty('--overlay-scale', String(options.scale * fit));\\\", \\\"\\\"\\\"  const safe = (options.layout === 'card' ? 32 : 48) * fit;\\n  // Responsive fit honours the requested scale until the whole plate would\\n  // enter the central 60%. Keep default card in the bottom/top band and the\\n  // taller verified-arrival column in the left band; never crop content.\\n  const cardScale = Math.min(options.scale * fit, (innerHeight * 0.2 - safe) / 180);\\n  const arrivalScale = Math.min(options.scale * fit,\\n    (innerWidth * 0.2 - safe) / 336, (innerHeight - 2 * safe) / 720);\\n  document.body.style.setProperty('--overlay-scale', String(options.layout === 'card' ? cardScale : options.scale * fit));\\n  document.body.style.setProperty('--overlay-arrival-scale', String(arrivalScale));\\\"\\\"\\\")\\ns=s.replace(\\\"`${48 * fit}px`\\\", \\\"`${safe}px`\\\",1);open(p,'w').write(s)\\np='public/overlay.css';s=open(p).read();start=s.index('/* Group 3:');a=s[:start];b=s[start:]\\nb=b.replace('  filter: none;','  filter: none;\\\\n  box-shadow: none;\\\\n  outline: none;')\\nb=b.replace('  width: 900px;\\\\n  height: 300px;\\\\n  left: 50%;', '  width: 336px;\\\\n  height: 720px;\\\\n  left: var(--overlay-safe);')\\nb=b.replace('  transform: translateX(-50%) scale(var(--overlay-scale, 1));','  transform: scale(var(--overlay-arrival-scale, 1));').replace('  transform-origin: center bottom;','  transform-origin: left bottom;')\\nb=b.replace('  top: 80px;\\\\n  left: 20px;\\\\n  width: 140px;', '  top: 20px;\\\\n  left: 98px;\\\\n  width: 140px;')\\nb=b.replace('  top: 20px;\\\\n  left: 180px;', '  top: 180px;\\\\n  left: 20px;\\\\n  width: 294px;')\\nb=b.replace('  top: 80px;\\\\n  left: 180px;', '  top: 350px;\\\\n  left: 20px;')\\nb=b.replace('  top: 102px;\\\\n  left: 360px;', '  top: 446px;\\\\n  left: 20px;\\\\n  width: 294px;')\\nb=b.replace('  top: 176px;\\\\n  left: 180px;', '  top: 548px;\\\\n  left: 20px;\\\\n  width: 294px;')\\nb=b.replace('  left: 180px;\\\\n  bottom: 22px;\\\\n  width: 680px;', '  left: 20px;\\\\n  bottom: 22px;\\\\n  width: 294px;')\\nb=b.replace('body.layout-card.arrival-takeover .relic-overlay {\\\\n  left: 50%;', 'body.layout-card.arrival-takeover .relic-overlay {\\\\n  left: var(--overlay-safe);')\\ns=a+b;open(p,'w').write(s)\\nPY\",\"max_output_tokens\":300}))\n"
+}
+````
+
+### 6729. 2026-10-31T14:10:48.300Z — tool result (source line 25486)
+
+````text
+{
+  "call_id": "call_fd438117cbe94adbb3c3176fb462a0ae",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "635c99",
+        "wall_time_seconds": 0.00000408,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    }
+  ]
+}
+````
+
+### 6730. 2026-10-31T14:11:30.077Z — tool call (source line 25490)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_ad03678f299947cd995e0585fc917cfa",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='public/overlay.js';s=open(p).read().replace('(innerHeight * 0.2 - safe) / 180','(innerHeight * 0.2 - safe - fit) / 180').replace('(innerWidth * 0.2 - safe) / 336','(innerWidth * 0.2 - safe - fit) / 336');open(p,'w').write(s)\\np='scripts/browser-smoke-full-overlay.js';s=open(p).read();s=s.replace('const geometry = async () =>\\\\n    card.evaluate', 'const geometry = async (target = card) =>\\\\n    target.evaluate')\\ns=s.replace(\\\"      const plate = document.querySelector('.relic-overlay').getBoundingClientRect();\\\", \\\"      const plateNode = document.querySelector('.relic-overlay');\\\\n      const plate = plateNode.getBoundingClientRect();\\\\n      const plateStyle = getComputedStyle(plateNode);\\\")\\ns=s.replace(\\\"const critical = ['.archive', 'h1', '#status', '#count'].map((q) =>\\\\n        document.querySelector(q).getBoundingClientRect(),\\\\n      );\\\", \\\"const critical = ['.archive', 'h1', '#status', '#count', '#arrival-title', '#arrival-countdown', '#arrival-action', '#arrival-counts', '#arrival-progress'].map((q) => document.querySelector(q)).filter((n) => n && n.getClientRects().length).map((n) => n.getBoundingClientRect());\\\")\\ns=s.replace('        plateOverlap: area(plate, central),', \\\"\\\"\\\"        plateOverlap: area(plate, central),\\n        // getBoundingClientRect includes the transformed outer border box.\\n        // Reject outside shadow/filter/outline paint instead of ignoring it.\\n        noOuterPaint: plateStyle.boxShadow === 'none' && plateStyle.filter === 'none' && (plateStyle.outlineStyle === 'none' || parseFloat(plateStyle.outlineWidth) === 0),\\n        unmaskedPlate: plateStyle.clipPath === 'none' && plateStyle.overflowX !== 'hidden' && plateStyle.overflowY !== 'hidden',\\n        criticalInside: critical.every((r) => r.left >= plate.left && r.right <= plate.right && r.top >= plate.top && r.bottom <= plate.bottom),\\\"\\\"\\\")\\ns=s.replace('fhd.x !== 48','fhd.x !== 32').replace('fhd.y !== 852','fhd.y !== 868').replace('fhd.plateOverlap !== 224 * 12', 'fhd.plateOverlap !== 0 ||\\\\n    !fhd.noOuterPaint || !fhd.unmaskedPlate || !fhd.criticalInside')\\ns=s.replace('[960, 540, 24, 426, 280, 90]', '[960, 540, 16, 434, 280, 90]')\\ns=s.replace('half.x !== 24','half.x !== 16').replace('half.y !== 426','half.y !== 434').replace('half.plateOverlap !== 56 * 12','half.plateOverlap !== 0 ||\\\\n    !half.noOuterPaint || !half.unmaskedPlate || !half.criticalInside')\\ns=s.replace('Logical560x180 at48safe; original FHD and half-scale viewport, honest 12px plate-only central intrusion', 'Logical560x180 at32safe; original FHD and half-scale viewport, whole painted plate outside central60')\\ns=s.replace('[1920, 1080, 48, 852, 560, 180]', '[1920, 1080, 32, 868, 560, 180]')\\ns=s.replace('takeover.width !== 900 || takeover.height !== 300','takeover.width !== 336 || takeover.height !== 720')\\n# Add reusable whole-paint acceptance helper before first fhd sample.\\ns=s.replace('  const fhd = await geometry();', '''  const assertWholePlate = async (target, phaseCode) => {\\n    const measured = await geometry(target);\\n    layoutMeasurements.push({ viewportWidth: target.viewportSize().width, viewportHeight: target.viewportSize().height, phaseCode, ...measured });\\n    if (measured.plateOverlap !== 0 || measured.criticalOverlap !== 0 || !measured.noOuterPaint || !measured.unmaskedPlate || !measured.criticalInside)\\n      throw Error('whole painted plate exclusion');\\n  };\\n  const fhd = await geometry();''')\\n# idle reduced at each original viewport, restore media before original normal continuation\\ns=s.replace(\\\"  await captureOverlay(card, 'overlay-card-fhd.png');\\\", \\\"  await card.emulateMedia({ reducedMotion: 'reduce' });\\\\n  await assertWholePlate(card, 10);\\\\n  await card.emulateMedia({ reducedMotion: 'no-preference' });\\\\n  await captureOverlay(card, 'overlay-card-fhd.png');\\\")\\ns=s.replace(\\\"  await captureOverlay(card, 'overlay-card-960.png');\\\", \\\"  await card.emulateMedia({ reducedMotion: 'reduce' });\\\\n  await assertWholePlate(card, 11);\\\\n  await card.emulateMedia({ reducedMotion: 'no-preference' });\\\\n  await captureOverlay(card, 'overlay-card-960.png');\\\")\\ns=s.replace(\\\"  await captureOverlay(receiver, 'overlay-arrival-host.png');\\\", \\\"\\\"\\\"  await captureOverlay(receiver, 'overlay-arrival-host.png');\\n  for (const target of [card, receiver]) {\\n    for (const reducedMotion of ['no-preference', 'reduce']) {\\n      await target.emulateMedia({ reducedMotion });\\n      for (const [width, height] of [[1920, 1080], [960, 540]]) {\\n        await target.setViewportSize({ width, height });\\n        await target.waitForFunction((w) => { const r = document.querySelector('.relic-overlay').getBoundingClientRect(); return innerWidth === w && r.width === (w === 1920 ? 336 : 168); }, width);\\n        await assertWholePlate(target, reducedMotion === 'reduce' ? 13 : 12);\\n      }\\n    }\\n    await target.setViewportSize({ width: 1920, height: 1080 });\\n    await target.emulateMedia({ reducedMotion: 'no-preference' });\\n  }\\\"\\\"\\\")\\ns=s.replace(\\\"  if ((await f.runtime.state.getPublicJourney()).rings !== 2) throw Error('actual ring');\\\", \\\"  if ((await f.runtime.state.getPublicJourney()).rings !== 2) throw Error('actual ring');\\\\n  await settleCard([1920, 1080, 32, 868, 560, 180], 14);\\\\n  await assertWholePlate(card, 14);\\\\n  await card.setViewportSize({ width: 960, height: 540 });\\\\n  await settleCard([960, 540, 16, 434, 280, 90], 15);\\\\n  await assertWholePlate(card, 15);\\\")\\nopen(p,'w').write(s)\\nPY\",\"max_output_tokens\":300}))\n"
+}
+````
+
+### 6731. 2026-10-31T14:11:30.188Z — tool result (source line 25493)
+
+````text
+{
+  "call_id": "call_ad03678f299947cd995e0585fc917cfa",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "ec3896",
+        "wall_time_seconds": 0.00000384,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    }
+  ]
+}
+````
+
+### 6732. 2026-10-31T14:11:57.306Z — tool call (source line 25497)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_0dea5ff766bc4e418a39bce371c2c234",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '85,111p' public/overlay.js\\nsed -n '1223,1249p' public/overlay.css\\nsed -n '1362,1378p' public/overlay.css\\nhead -20 docs/PANEL_STATUS.md\\nsed -n '218,257p' scripts/browser-smoke-full-overlay.js\\nrg -n '900|560|852|426|2688|672|48safe' scripts/browser-smoke-full-overlay.js test/overlay-group3.test.js\",\"max_output_tokens\":2100})).output)\n"
+}
+````
+
+### 6733. 2026-10-31T14:11:57.441Z — tool result (source line 25500)
+
+````text
+{
+  "call_id": "call_0dea5ff766bc4e418a39bce371c2c234",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "Warning: truncated output (original token count: 2519)\nTotal output lines: 135\n\ndocument.body.dataset.obs = String(options.obs);\n// Full defaults retain the historical centred composition; only explicit pos opts out.\nif (options.layout === 'full' && new URLSearchParams(location.search).has('pos'))\n  document.body.dataset.fullPosition = 'true';\nconst fitOverlay = () => {\n  const fit = Math.min(innerWidth / 1920, innerHeight / 1080);\n  const safe = (options.layout === 'card' ? 32 : 48) * fit;\n  // Responsive fit honours the requested scale until the whole plate would\n  // enter the central 60%. Keep default card in the bottom/top band and the\n  // taller verified-arrival column in the left band; never crop content.\n  const cardScale = Math.min(options.scale * fit, (innerHeight * 0.2 - safe - fit) / 180);\n  const arrivalScale = Math.min(options.scale * fit,\n    (innerWidth * 0.2 - safe - fit) / 336, (innerHeight - 2 * safe) / 720);\n  document.body.style.setProperty('--overlay-scale', String(options.layout === 'card' ? cardScale : options.scale * fit));\n  document.body.style.setProperty('--overlay-arrival-scale', String(arrivalScale));\n  // Full mode uses its original responsive CSS, without FHD fitting or safe-area shrink.\n  document.body.style.setProperty('--overlay-requested-scale', String(options.scale));\n  document.body.style.setProperty('--overlay-safe', `${safe}px`);\n  document.body.style.setProperty(\n    '--corner-safe',\n    `${Math.min(innerWidth, innerHeight) <= 256 ? 0 : 48 * fit}px`,\n  );\n  document.body.style.setProperty(\n    '--corner-scale',\n    String(Math.min(options.scale, innerWidth / 160, innerHeight / 160)),\n  );\n};\n#command-coach[hidden] {\n  display: none;\n}\nbody.layout-card.arrival-takeover .relic-overlay {\n  position: fixed;\n  width: 336px;\n  height: 720px;\n  left: var(--overlay-safe);\n  right: auto;\n  bottom: var(--overlay-safe);\n  top: auto;\n  padding: 20px;\n  transform: scale(var(--overlay-arrival-scale, 1));\n  scale: 1;\n  transform-origin: left bottom;\n  background: rgba(16, 29, 48, 0.86);\n  border: 1px solid #dba95c55;\n  border-radius: 16px;\n  backdrop-filter: blur(8px);\n  filter: none;\n  box-shadow: none;\n  outline: none;\n}\nbody.layout-card.arrival-takeover .archive {\n  position: absolute;\n  top: 20px;\n  left: 98px;\n}\nbody.layout-corner.pos-tl .relic-overlay,\nbody.layout-corner.pos-tr .relic-overlay {\n  top: var(--corner-safe);\n  transform-origin: left top;\n}\nbody.layout-corner.pos-tr .relic-overlay {\n  transform-origin: right top;\n}\nbody.layout-card.arrival-takeover .relic-overlay {\n  left: var(--overlay-safe);\n  right: auto;\n  top: auto;\n  bottom: var(--overlay-safe);\n  transform-origin: left bottom;\n}\n\n# Panel acceptance status · private review R0 · 31 October 2026\n\n## CURRENT acceptance · R0 private review · 31 October 2026, 08:21:15 UTC\n\n[Secret-free parent receipt](PANEL_RELEASE.json) binds deployed runtime **ad48ec9ce346e2e577546a12305d329ba72e940f**, not a future documentation commit. R0 =1261 native/0skip,46 unique browser flows/152 checks, CI41180909135 bothgreen,63 assets plus generatedroot/network, new review-1031 at0%. Parent performed execution/publication; this source only reconciles docs. New review access expires2026-11-01T08:14:19.911Z; older tags remain public/unlisted. No current source-author provider/credential operation.\n\nSHIPPED means the described scoped condition is implemented and release-supported, not physical Twitch/OBS or universal acceptance. PARTLY DONE retains the exact unproved subcondition. **Current total:59 SHIPPED /13 PARTLY DONE /1 NOT STARTED =73.** Historical source304 baseline53/19/1 remains below unchanged; no cohort totals are added.\n\n<!-- PANEL_CURRENT_START -->\n| ID | Status | Current implementation, scoped proof and precise residual |\n| --- | --- | --- |\n| X01 | SHIPPED | R0: runtime ad48ec9ce346e2e577546a12305d329ba72e940f, review-1031 at0%; exact CI41180909135, one image,63 assets/generated root/network parity. Parent preserved production eventsub-fix-on100%, all old allocations, IAM/flags/resources/defaultmain. Later docs commit is not a new runtime SHA or rebuild. |\n| X02 | SHIPPED | Verified owner authorization1565854078880190495 permits bounded reviewed chunks/parallel sessions/feature zero previews, not traffic shifts…419 tokens truncated…IPPED | No case-insensitive event-name/city/domain matches found by source text inspection of `public/`, `src/` and current judge-doc set (README/JUDGES/PROVENANCE/DEVPOST/PROJECT_GUIDE/SCREENSHOTS). Neutral asset refs/config in `public/editions.js`; J1 source/tests plus R0 browser cohort editions. Not an all-history/binary scan. Current bounded implementation/regression coverage is included in R0; no broader physical/manual claim. |\n| G1.02 | SHIPPED | `Season One · Autumn 2026`, neutral crystal/sigil and `Event-days badge · 13–15 Nov`: `public/editions.js`, `src/scoreboard.js`, `public/scoreboard.js`, `test/editions.test.js` / scoreboard tests. Calendar/retained-hold semantics preserved; no attendance claim. Current bounded implementation/regression coverage is included in R0; no broader physical/manual claim. |\n| G1.03 | SHIPPED | Single fan footer wording on applicable pages/cards, no overlay disclaimer clutter; `public/*html`, ring/keeper-card, `test/tier1.test.js`. README uses neutral original `public/relic.svg`, not old branded screenshot. ARCHIVE PNGs remain intentionally unchanged and metadata-only in current docs; not new artwork/proof. Current bounded implementation/regression coverage is included in R0; no broader physical/manual claim. |\n    target.evaluate(() => {\n      const plateNode = document.querySelector('.relic-overlay');\n      const plate = plateNode.getBoundingClientRect();\n      const plateStyle = getComputedStyle(plateNode);\n      const central = {\n        left: innerWidth * 0.2,\n        right: innerWidth * 0.8,\n        top: innerHeight * 0.2,\n        bottom: innerHeight * 0.8,\n      };\n      const area = (a, b) =>\n        Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) *\n        Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));\n      const critical = ['.archive', 'h1', '#status', '#count', '#arrival-title', '#arrival-countdown', '#arrival-action', '#arrival-counts', '#arrival-progress'].map((q) => document.querySelector(q)).filter((n) => n && n.getClientRects().length).map((n) => n.getBoundingClientRect());\n      return {\n        x: plate.x,\n        y: plate.y,\n        width: plate.width,\n        height: plate.height,\n        criticalOverlap: critical.reduce((n, r) => n + area(r, central), 0),\n        plateOverlap: area(plate, central),\n        // getBoundingClientRect includes the transformed outer border box.\n        // Reject outside shadow/filter/outline paint instead of ignoring it.\n        noOuterPaint: plateStyle.boxShadow === 'none' && plateStyle.filter === 'none' && (plateStyle.outlineStyle === 'none' || parseFloat(plateStyle.outlineWidth) === 0),\n        unmaskedPlate: plateStyle.clipPath === 'none' && plateStyle.overflowX !== 'hidden' && plateStyle.overflowY !== 'hidden',\n        criticalInside: critical.every((r) => r.left >= plate.left && r.right <= plate.right && r.top >= plate.top && r.bottom <= plate.bottom),\n        heading: parseFloat(getComputedStyle(document.querySelector('h1')).fontSize),\n        body: parseFloat(getComputedStyle(document.querySelector('#status')).fontSize),\n        artSlotWidth: document.querySelector('.archive').getBoundingClientRect().width,\n        artSlotHeight: document.querySelector('.archive').getBoundingClientRect().height,\n        svgElementWidth: document.querySelector('.crystal').getBoundingClientRect().width,\n        svgElementHeight: document.querySelector('.crystal').getBoundingClientRect().height,\n        rasterWidth: document.querySelector('canvas.relic3d').width,\n        rasterHeight: document.querySelector('canvas.relic3d').height,\n      };\n    });\n  const settleCard = async (expected, phaseCode) => {\n    try {\n      await card.waitForFunction(\n        ([vw, vh, x, y, width, height]) => {\nscripts/browser-smoke-full-overlay.js:316:    fhd.width !== 560 ||\nscripts/browser-smoke-full-overlay.js:359:    name: 'Logical560x180 at32safe; original FHD and half-scale viewport, whole painted plate outside central60',\nscripts/browser-smoke-full-overlay.js:364:  await settleCard([1920, 1080, 32, 868, 560, 180], 2);\nscripts/browser-smoke-full-overlay.js:399:  await settleCard([1920, 1080, 32, 868, 560, 180], 14);\n"
+    }
+  ]
+}
+````
+
+### 6734. 2026-10-31T14:12:39.209Z — tool call (source line 25504)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_9e8b783f780d41b196af94f6401ab573",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='scripts/browser-smoke-full-overlay.js';s=open(p).read().replace(\\\"rasterWidth: document.querySelector('canvas.relic3d').width\\\", \\\"rasterWidth: document.querySelector('canvas.relic3d')?.width ?? 0\\\").replace(\\\"rasterHeight: document.querySelector('canvas.relic3d').height\\\", \\\"rasterHeight: document.querySelector('canvas.relic3d')?.height ?? 0\\\");open(p,'w').write(s)\\np='docs/PANEL_STATUS.md';s=open(p).read();a=s.index('<!-- PANEL_CURRENT_START -->');b=s.index('<!-- PANEL_CURRENT_END -->',a);block=s[a:b];lines=block.splitlines();lines=[\\\"| G3.05 | PARTLY DONE | Source340 local geometry implemented; parent QA/publication pending. Whole plate, not just critical content: default560×180 now32px safe (FHD outer box32,868–592,1048; central bottom864,4px clearance), at960 half280×90 at16,434 with2px clearance. Verified takeover is336×720 in left outer band (FHD right368 vs central left384;960 right184 vs192), preserving44/72/32/28px logical type and progress/control semantics. Requested scale is responsively constrained before an outer plate would cross the band. No outer shadow/filter/outline; border-box measurement includes painted border, no masks/cropping. Existing full-overlay probe now asserts exact whole-plate overlap0 in FHD/960 idle, source/host takeover, completion and normal/reduced modes; caps and critical-content guards retained. UNRUN by source; no new green/physical proof. R0's12px intrusion remains historical below. |\\\" if x.startswith('| G3.05 |') else x for x in lines];s=s[:a]+'\\\\n'.join(lines)+'\\\\n'+s[b:];open(p,'w').write(s)\\nPY\",\"max_output_tokens\":200}))\ntext(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/test/overlay-group3.test.js\\n@@\\n import { overlaySoakOptions } from '../test-support/overlay-soak.js';\\n+\\n+test('whole card plate geometry clears central60 without reducing logical text or cropping', async () => {\\n+  const css = await readFile(new URL('../public/overlay.css', import.meta.url), 'utf8');\\n+  const js = await readFile(new URL('../public/overlay.js', import.meta.url), 'utf8');\\n+  assert.match(js, /options\\\\.layout === 'card' \\\\? 32 : 48/);\\n+  assert.match(js, /Math\\\\.min\\\\(options\\\\.scale \\\\* fit, \\\\(innerHeight \\\\* 0\\\\.2 - safe - fit\\\\) \\\\/ 180\\\\)/);\\n+  assert.match(css, /body\\\\.layout-card\\\\.arrival-takeover \\\\.relic-overlay\\\\s*\\\\{\\\\s*position: fixed;\\\\s*width: 336px;\\\\s*height: 720px;/);\\n+  for (const size of [44, 72, 32, 28]) assert.match(css, new RegExp(`(?:font:|font-size:)[^;]*\\\\\\\\b${size}px`));\\n+  for (const fit of [1, 0.5]) {\\n+    const central = { left: 384 * fit, top: 216 * fit, right: 1536 * fit, bottom: 864 * fit };\\n+    const area = (r) => Math.max(0, Math.min(r.right, central.right) - Math.max(r.left, central.left)) * Math.max(0, Math.min(r.bottom, central.bottom) - Math.max(r.top, central.top));\\n+    assert.equal(area({ left: 32 * fit, right: 592 * fit, top: 868 * fit, bottom: 1048 * fit }), 0);\\n+    assert.equal(area({ left: 32 * fit, right: 368 * fit, top: 328 * fit, bottom: 1048 * fit }), 0);\\n+  }\\n+});\\n*** End Patch\"));\n"
+}
+````
+
+### 6735. 2026-10-31T14:12:39.347Z — tool result (source line 25508)
+
+````text
+{
+  "call_id": "call_9e8b783f780d41b196af94f6401ab573",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "192ce5",
+        "wall_time_seconds": 0.00000404,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 6736. 2026-10-31T14:13:02.936Z — tool call (source line 25512)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_62bbd62a7fda46ddb6fa94c4ee58c4b7",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '1328,1352p' public/overlay.css\\nsed -n '1269,1323p' public/overlay.css\\nsed -n '1180,1210p' public/overlay.css\\nrg -n 'arrival-title' public/overlay.js public/overlay-live.html\",\"max_output_tokens\":1000})).output)\n"
+}
+````
+
+### 6737. 2026-10-31T14:13:03.087Z — tool result (source line 25515)
+
+````text
+{
+  "call_id": "call_62bbd62a7fda46ddb6fa94c4ee58c4b7",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "}\nbody.layout-card.ring-forged .archive {\n  animation: obs-ring-forged 600ms ease-out;\n}\n@keyframes obs-ring-forged {\n  50% {\n    filter: drop-shadow(0 0 12px #dba95c);\n  }\n}\n@media (prefers-reduced-motion: reduce) {\n  body.layout-card.ring-forged .archive {\n    animation: none;\n  }\n}\nbody.layout-card #status {\n  overflow-wrap: anywhere;\n}\nbody.layout-corner .relic-overlay {\n  position: fixed;\n  scale: var(--corner-scale, 1);\n}\nbody.layout-corner.pos-bl .relic-overlay,\nbody.layout-corner.pos-tl .relic-overlay {\n  left: var(--corner-safe);\n  transform-origin: left bottom;\n  display: none;\n}\n#arrival-panel {\n  color: #e3e8ef;\n}\n#arrival-title {\n  position: absolute;\n  top: 180px;\n  left: 20px;\n  width: 294px;\n  margin: 0;\n  font:\n    44px/1.2 Cinzel,\n    Georgia,\n    serif;\n}\n#arrival-countdown {\n  position: absolute;\n  top: 350px;\n  left: 20px;\n  font: 72px/1.1 system-ui;\n  font-variant-numeric: tabular-nums;\n}\n#arrival-action {\n  position: absolute;\n  top: 446px;\n  left: 20px;\n  width: 294px;\n  margin: 0;\n  max-width: none;\n  font: 32px/1.2 system-ui;\n}\n#arrival-counts {\n  position: absolute;\n  top: 548px;\n  left: 20px;\n  width: 294px;\n  margin: 0;\n  font: 28px/1.2 system-ui;\n}\n#arrival-progress {\n  position: absolute;\n  height: 28px;\n  left: 20px;\n  bottom: 22px;\n  width: 294px;\n  accent-color: #dba95c;\n}\n#command-coach {\n  position: absolute;\n  bottom: 2px;\n  right: 20px;\n  margin: 0;\n  font: 24px/1.2 system-ui;\n  color: #e3e8ef;\nbody.layout-card.pos-tl .relic-overlay {\n  left: var(--overlay-safe);\n  transform-origin: left bottom;\n}\nbody.layout-card.pos-br .relic-overlay,\nbody.layout-card.pos-tr .relic-overlay {\n  right: var(--overlay-safe);\n  transform-origin: right bottom;\n}\nbody.layout-card.pos-bl .relic-overlay,\nbody.layout-card.pos-br .relic-overlay {\n  bottom: var(--overlay-safe);\n}\nbody.layout-card.pos-tl .relic-overlay,\nbody.layout-card.pos-tr .relic-overlay {\n  top: var(--overlay-safe);\n  transform-origin: left top;\n}\nbody.layout-card.pos-tr .relic-overlay {\n  transform-origin: right top;\n}\n/* Explicit full/corner scale is consumed; the legacy footprint remains default. */\nbody:is(.layout-full, .layout-corner) .relic-overlay {\n  scale: var(--overlay-requested-scale, 1);\n  transform-origin: top left;\n}\nbody.layout-full[data-full-position].pos-bl .relic-overlay,\nbody.layout-full[data-full-position].pos-tl .relic-overlay {\n  justify-self: start;\n}\nbody.layout-full[data-full-position].pos-br .relic-overlay,\npublic/overlay-live.html:38:        <h2 id=\"arrival-title\">The relic has arrived</h2>\n"
+    }
+  ]
+}
+````
+
+### 6738. 2026-10-31T14:13:45.700Z — tool call (source line 25521)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_35ed42436c384b3e99ca760b084e2282",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='docs/PANEL_STATUS.md';s=open(p).read().replace('Remaining owner-only decisions: literal12px plate/central60 conflict;', \\\"G3.05's prior geometry conflict is superseded by source340 implementation awaiting parent QA, not a measured pass. Remaining owner-only decisions:\\\",1);open(p,'w').write(s)\\np='scripts/browser-smoke-full-overlay.js';s=open(p).read().replace('  await assertWholePlate(card, 14);', \\\"  await assertWholePlate(card, 14);\\\\n  await card.emulateMedia({ reducedMotion: 'reduce' });\\\\n  await assertWholePlate(card, 16);\\\\n  await card.emulateMedia({ reducedMotion: 'no-preference' });\\\").replace('  await assertWholePlate(card, 15);', \\\"  await assertWholePlate(card, 15);\\\\n  await card.emulateMedia({ reducedMotion: 'reduce' });\\\\n  await assertWholePlate(card, 17);\\\");open(p,'w').write(s)\\nPY\",\"max_output_tokens\":200}))\n"
+}
+````
+
+### 6739. 2026-10-31T14:13:45.798Z — tool result (source line 25524)
+
+````text
+{
+  "call_id": "call_35ed42436c384b3e99ca760b084e2282",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "e38bbf",
+        "wall_time_seconds": 0.00000356,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    }
+  ]
+}
+````
+
+### 6740. 2026-10-31T14:14:10.655Z — tool call (source line 25530)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_994a9168deec4f92b3d7d50682d480d4",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/test/overlay-group3.test.js\\n@@\\n-  assert.match(js, /Math\\\\.min\\\\(options\\\\.scale \\\\* fit, \\\\(innerHeight \\\\* 0\\\\.2 - safe - fit\\\\) \\\\/ 180\\\\)/);\\n+  assert.match(js, /Math\\\\.min\\\\(\\\\s*options\\\\.scale \\\\* fit,\\\\s*\\\\(innerHeight \\\\* 0\\\\.2 - safe - fit\\\\) \\\\/ 180\\\\s*,?\\\\s*\\\\)/);\\n*** End Patch\"));\n"
+}
+````
+
+### 6741. 2026-10-31T14:14:10.792Z — tool result (source line 25533)
+
+````text
+{
+  "call_id": "call_994a9168deec4f92b3d7d50682d480d4",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 6742. 2026-10-31T14:14:17.150Z — assistant (source line 25536)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Changed 5 files: overlay CSS/geometry JS, full-overlay browser probe, existing overlay unit tests, and G3.05 status.\n\n- Default plate remains560×180 at32px inset:4px clearance from the central rectangle at FHD,2px at960.\n- Takeover becomes336×720 in the left band:16px clearance at FHD,8px at960.\n- Text sizes and controls remain; requested scale is constrained before intrusion.\n\nTests now require whole border-box overlap0, no external shadow/filter paint, and normal/reduced idle, takeover and completion coverage. All unrun; parent QA pending. Stopped.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6743. 2026-10-31T14:18:45.069Z — user (source line 25544)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "Original341 DOC/ASSERTIONONLY beforeG305commit. Actualnative3401268tests1267PASS1FAILzeroSkip. ONLYtest/readiness-docs.test.js110 provenance/private draft test expectedhistoricalPANEL regex /G3[.]05 PARTLY DONE...12 logical px/. Source340updatedBOTHdatedR0/baselineandcurrentG305rows, violatingpreservationofhistoricalproof. Actualnativefull-overlay340PASS9checks completeFHD960normal/reducedidle/takeovercompletionwholeborderoverlap0+noshadow/filter. RestoreDATEDR0/baselineG305rowold12logical/2688/672truth(nowexplicitlyhistorical). KeepLATESTcurrentassessmentG305SHIPPEDnew560x18032pxsafe4/2clearance+takeover336x720leftband16/8clearance, citeparentactual9checksnotphysicalOBS. Currentstatussummaryif59shipped13partial1not shouldnow60/12/1; baselinesremain53/19/1R0historicalcountsunchanged. UpdateONLYtest/readiness-docs.test.jsG305assertions torequirebothpreservedhistoricalqualificationANDcurrent0wholeplateclosedproof, no removingprovenance/private/4paraphrase/datedproofasserts. ParentdocworkerownsREADME/DEVPOST/QUICKSTART/DEMO/CODEX_SESSIONSotherworktree doNOTtouch. No runtimechanges/other tests/exec/Git/cloud/format/raw/private. Parentfullnativerecheckthencommitpush340341. SourceONLYboundedquickSTOP."
+  }
+]
+````
+
+### 6744. 2026-10-31T14:18:49.914Z — assistant (source line 25547)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll restore the historical G3.05 row, mark the current assessment shipped with the parent’s nine-check proof, and update only its documentation assertions.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6745. 2026-10-31T14:18:52.211Z — tool call (source line 25548)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_9a125613163c4a54bdc4eefe7501a29f",
+  "input": "text((await tools.exec_command({cmd:\"rg -n 'G3.05|59 SHIPPED|13 PARTLY|53/19|60/12|G3.*9|G3.*PARTLY|12 logical|PANEL_CURRENT|Current total|Group' docs/PANEL_STATUS.md test/readiness-docs.test.js\\nsed -n '105,165p' test/readiness-docs.test.js\\nsed -n '81,101p' docs/PANEL_STATUS.md\\nsed -n '167,191p' docs/PANEL_STATUS.md\",\"max_output_tokens\":4500})).output)\n"
+}
+````
+
+### 6746. 2026-10-31T14:18:52.326Z — tool result (source line 25551)
+
+````text
+{
+  "call_id": "call_9a125613163c4a54bdc4eefe7501a29f",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "Warning: truncated output (original token count: 6246)\nTotal output lines: 154\n\ntest/readiness-docs.test.js:249:  assert.equal(panel.split('<!-- PANEL_CURRENT_START -->').length, 2);\ntest/readiness-docs.test.js:250:  assert.equal(panel.split('<!-- PANEL_CURRENT_END -->').length, 2);\ntest/readiness-docs.test.js:252:    .split('<!-- PANEL_CURRENT_START -->')[1]\ntest/readiness-docs.test.js:253:    .split('<!-- PANEL_CURRENT_END -->')[0];\ntest/readiness-docs.test.js:279:  assert.match(current, /G3\\.05 \\| PARTLY DONE[^\\n]*12 logical px/);\ndocs/PANEL_STATUS.md:7:SHIPPED means the described scoped condition is implemented and release-supported, not physical Twitch/OBS or universal acceptance. PARTLY DONE retains the exact unproved subcondition. **Current total:59 SHIPPED /13 PARTLY DONE /1 NOT STARTED =73.** Historical source304 baseline53/19/1 remains below unchanged; no cohort totals are added.\ndocs/PANEL_STATUS.md:9:<!-- PANEL_CURRENT_START -->\ndocs/PANEL_STATUS.md:38:| G3.01 | SHIPPED | Default logicalFHD card560×180/bl48; actual1920×1080 and960×540→280×90/24-safe tested without capture reflow. `public/overlay.js` fit, `overlay.css`, `scripts/browser-smoke-full-overlay.js` + parent-viewed genuine clips/R0 browser cohort. Current bounded implementation/regression coverage is included in R0; no broader physical/manual claim. |\ndocs/PANEL_STATUS.md:40:| G3.03 | SHIPPED | Card relic140, heading36/body28/min24 logicalscale1, requested plate alpha.86/border/radius16/blur8. `overlay.css`; full-overlay browser measures FHD font/box/raster. At960 logical content is physically half-size, not asserted28 CSS-screen px. Current bounded implementation/regression coverage is included in R0; no broader physical/manual claim. |\ndocs/PANEL_STATUS.md:41:| G3.04 | PARTLY DONE | Pale critical text/alpha.86 plate has source-derived≥7:1 worst-white blend; R0 full-overlay FHD/960 critical bounds/clips pass. No universal actual busy-gameplay pixel/computed-layer≥7:1 measurement for EVERYcritical text/state was supplied; source contrast arithmetic and viewed procedural clips are not physical gameplay proof. |\ndocs/PANEL_STATUS.md:42:| G3.05 | PARTLY DONE | Source340 local geometry implemented; parent QA/publication pending. Whole plate, not just critical content: default560×180 now32px safe (FHD outer box32,868–592,1048; central bottom864,4px clearance), at960 half280×90 at16,434 with2px clearance. Verified takeover is336×720 in left outer band (FHD right368 vs central left384;960 right184 vs192), preserving44/72/32/28px logical type and progress/control semantics. Requested scale is responsively constrained before an outer plate would cross the band. No outer shadow/filter/outline; border-box measurement includes painted border, no masks/cropping. Existing full-overlay probe now asserts exact whole-plate overlap0 in FHD/960 idle, source/host takeover, completion and normal/reduced modes; caps and critical-content guards retained. UNRUN by source; no new green/physical proof. R0's12px intrusion remains historical below. |\ndocs/PANEL_STATUS.md:43:| G3.06 | SHIPPED | 900×300 lower-centre takeover with44/72 tabular/32/28 type in CSS; `overlayArrival` requires valid landing-v2/nonawaitingRaid, source!offer/host!accept actual counts/deadline, ends/completion→null. Signed fixture/R0 browser cohort verifies both roles, dimensions and real180s. Forged-ring burst derived only from completed verified model; no fake early transfer. Current bounded implementation/regression coverage is included in R0; no broader physical/manual claim. |\ndocs/PANEL_STATUS.md:46:| G3.09 | SHIPPED | R0 real native OBS read idle3600273ms/host3605600,13GC/105151frames/1WS/0inputs/errors/forbidden; synthetic post-idle WSS arrival passed. OBSUA/obs=1 read retention separate from ordinary/control hidden-idle stop; no action/provider/storage writes. Not physical OBS, maximum160load or SLA. |\ndocs/PANEL_STATUS.md:47:| G3.10 | PARTLY DONE | Card-only coach600000ms/8000ms source timing remains, suppressed during takeover and no command dispatch. R0 hour proves read retention, not a dedicated visual boundary/capture of every10-minute8-second coach interval. Exact owner visual/timing acceptance remains scoped. |\ndocs/PANEL_STATUS.md:50:| G3.13 | PARTLY DONE | R0 card/full/corner/FHD960/roles/180s/signed/replay/localpreview probes pass; earlier four genuine clips remain scoped. Entire layout×position×scale capture matrix, physical encoded gameplay contrast and all hour adverse reconnect permutations remain unproved; no cap/timeout waiver. |\ndocs/PANEL_STATUS.md:71:| G5.09 | SHIPPED | Local-only iframe arrival is reused Group3 guarded preview, no WS/API/action/live-ready signal; actual click waits real ready marker. `first-run.js`, app CSP, onboarding/full-overlay tests. Cannot validate installed OBS by copying/checking a box. Current bounded implementation/regression coverage is included in R0; no broader physical/manual claim. |\ndocs/PANEL_STATUS.md:85:<!-- PANEL_CURRENT_END -->\ndocs/PANEL_STATUS.md:87:| Group | SHIPPED | PARTLY DONE | NOT STARTED | Verdict |\ndocs/PANEL_STATUS.md:92:| G3 | 9 | 4 | 0 | PARTLY DONE |\ndocs/PANEL_STATUS.md:97:G3.05's prior geometry conflict is superseded by source340 implementation awaiting parent QA, not a measured pass. Remaining owner-only decisions: painted Atlas≥440 interpretation and three-cold-image outline acceptance; universal typography/date/gameplay7:1 interpretation; every-scene/every4s physical motion claim; visual10min/8scoach; OSWebShare/manualAT; approval/backup-gated compaction. New private preview does not permit real OAuth/control mutations, moderation delivery or production promotion. Current capture proof is4viewed PNGs/230301bytes: desktop1920×540 crops at original viewport, Keeper list post-disclosure not header, mobile390×844; not physical/adoption evidence. Native film150037/60007hidden/8scenes/0inputs/downloads and hour3600273/host3605600/13GC/105151frames/1WS/0inputs/errors/forbidden are R0, not older receipts. Only one4s active pixel sample was observed. No current external gameplay/physicalOBS claim.\ndocs/PANEL_STATUS.md:101:The following original304 rows and original311 addendum are retained as dated history, not current pending/deployed status. [Source304 baseline at14a4](https://github.com/OlsOls2/raid-relic/commit/14a4f138858de911741510fc5b14c051594f2604) was later documented locally; this link identifies its base, not a claim that source304 was already in14a4. The preserved historical baseline is53/19/1.\ndocs/PANEL_STATUS.md:126:| Scope | Conditions | SHIPPED | PARTLY DONE | NOT STARTED | Group verdict |\ndocs/PANEL_STATUS.md:129:| Group1 season/hero/type | 10 | 7 | 3 | 0 | PARTLY DONE |\ndocs/PANEL_STATUS.md:130:| Group2 film/judge | 10 | 9 | 1 | 0 | PARTLY DONE |\ndocs/PANEL_STATUS.md:131:| Group3 OBS/claims/replies | 13 | 9 | 4 | 0 | PARTLY DONE |\ndocs/PANEL_STATUS.md:132:| Group4 front door/Keeper/Atlas | 12 | 10 | 2 | 0 | PARTLY DONE |\ndocs/PANEL_STATUS.md:133:| Group5 control/moderation/filter | 12 | 10 | 2 | 0 | PARTLY DONE |\ndocs/PANEL_STATUS.md:134:| Group6 closeout/operations | 10 | 4 | 5 | 1 | PARTLY DONE |\ndocs/PANEL_STATUS.md:145:| X05 | PARTLY DONE | Current docs lag F14: `docs/PROVENANCE.md` calls film last published, Groups3–5 unpublished and the completed hour running; `CODEX_USAGE.md` / `DEVPOST_DRAFT.md` retain pending-candidate language. Update dated release/proof pointers, preserving old checkpoints. Source author did not edit these in this audit. |\ndocs/PANEL_STATUS.md:148:## Group 1 · season, relic hero, palette and type\ndocs/PANEL_STATUS.md:163:## Group 2 · film and judge timing/kiosk\ndocs/PANEL_STATUS.md:178:## Group 3 · OBS cards, verified claims, replies and preview\ndocs/PANEL_STATUS.md:182:| G3.01 | SHIPPED | Default logicalFHD card560×180/bl48; actual1920×1080 and960×540→280×90/24-safe tested without capture reflow. `public/overlay.js` fit, `overlay.css`, `scripts/browser-smoke-full-overlay.js` + parent-viewed genuine clips/B301f. |\ndocs/PANEL_STATUS.md:184:| G3.03 | SHIPPED | Card relic140, heading36/body28/min24 logicalscale1, requested plate alpha.86/border/radius16/blur8. `overlay.css`; full-overlay browser measures FHD font/box/raster. At960 logical content is physically half-size, not asserted28 CSS-screen px. |\ndocs/PANEL_STATUS.md:185:| G3.04 | PARTLY DONE |≥7:1 critical text: `test/overlay-group3.test.js` computes pale-ink worst-case white-background plate blend; busy procedural-background FHD/960 clips viewed. **Browser-derived computed foreground/backplate contrast≥7 at both sizes is not a named assertion** (generic accessibility gate is4.5). Add actual computed-layer/raster-backed contrast check for every critical text; no invented failure/score from screenshots. |\ndocs/PANEL_STATUS.md:186:| G3.05 | PARTLY DONE | Critical art/text outside central60% has actual overlap0; outer plate truthfully intrudes **12 logical px / 2,688 FHD square px** (960:672). Full-overlay browser asserts those exact values. Literal entire-card zero central overlap…1746 tokens truncated…ublic/prod/IAM/oldtags unchanged. Individual remaining owner decisions below (centralplate,paintedAtlas,coldoutline,gameplaycontrast,coach,OSshare/manualAT,operations) prevent blanket all-panel acceptance or adoption/physical claims. |\n<!-- PANEL_CURRENT_END -->\n\n| Group | SHIPPED | PARTLY DONE | NOT STARTED | Verdict |\n| --- | ---: | ---: | ---: | --- |\n| X | 6 | 0 | 0 | SHIPPED |\n| G1 | 7 | 3 | 0 | PARTLY DONE |\n| G2 | 9 | 1 | 0 | PARTLY DONE |\n| G3 | 9 | 4 | 0 | PARTLY DONE |\n| G4 | 9 | 3 | 0 | PARTLY DONE |\n| G5 | 11 | 1 | 0 | PARTLY DONE |\n| G6 | 8 | 1 | 1 | PARTLY DONE |\n\nG3.05's prior geometry conflict is superseded by source340 implementation awaiting parent QA, not a measured pass. Remaining owner-only decisions: painted Atlas≥440 interpretation and three-cold-image outline acceptance; universal typography/date/gameplay7:1 interpretation; every-scene/every4s physical motion claim; visual10min/8scoach; OSWebShare/manualAT; approval/backup-gated compaction. New private preview does not permit real OAuth/control mutations, moderation delivery or production promotion. Current capture proof is4viewed PNGs/230301bytes: desktop1920×540 crops at original viewport, Keeper list post-disclosure not header, mobile390×844; not physical/adoption evidence. Native film150037/60007hidden/8scenes/0inputs/downloads and hour3600273/host3605600/13GC/105151frames/1WS/0inputs/errors/forbidden are R0, not older receipts. Only one4s active pixel sample was observed. No current external gameplay/physicalOBS claim.\n\n## Historical source304 audit and subsequent pre-release review\n\nThe following original304 rows and original311 addendum are retained as dated history, not current pending/deployed status. [Source304 baseline at14a4](https://github.com/OlsOls2/raid-relic/commit/14a4f138858de911741510fc5b14c051594f2604) was later documented locally; this link identifies its base, not a claim that source304 was already in14a4. The preserved historical baseline is53/19/1.\n| G2.01 | SHIPPED | Monotonic `performance.now()` elapsed sampling,250ms logical interval, constant-work catch-up; visual rAF does not count time. `public/film-state.js`, `film.js`, `test/film.test.js`. No provider/game authority. |\n| G2.02 | SHIPPED | Distinct150s film/45s exact `/demo/judge` pace;35s `/demo/` separately preserved. `filmDuration`, `sampleFilmClock`, route/tests; B301f real film-timing includes untouched45s judge. No shortened film masquerading as150s. |\n| G2.03 | SHIPPED | `?autoplay=1&kiosk=1` starts0, ignores hidden logical pause, ends deterministic card; normal controls/cursor concealed, focusable Pause/Play+Space remain. `filmPlaybackOptions`, `filmStep`, `film.css .film-kiosk`; timing browser plus FILM956 no-input150s. |\n| G2.04 | SHIPPED | Normal reduced motion pauses auto-progress, actual false→true reconciled once in existing tick/action and change listener; manual Play remains possible; explicit kiosk exception. `reconcileFilmMotion`, film.js; held-vendor init/badge cleanup/reduced tests retained. No paused polling added. |\n| G2.05 | SHIPPED | Reduced caption transition1500ms, static SVG/no intense particles/burst: `film.js` caption animation, `film.css @media(prefers-reduced-motion)`, renderer disposal. Browser validates fallback+truthful ring1 even pending-init transition. |\n| G2.06 | SHIPPED | Original generic stream frame/scrolling fictional chat, distinct Send Off/Arrival scene styles, small permanent SIMULATED chip. `public/film.html`, `film.css`, fixed `FILM_SCENES`; parent-viewed original frames, B301f film tests. No music/external art/live fixture data. |\n| G2.07 | PARTLY DONE | Slow push1→1.08,600ms claim/engraving growth/burst and counter animation exist in `film.js`/`film.css`. **No interval-by-interval proof that every normal scene has actual visible motion within every4s** was identified; end-card hold is intentionally static. Add per-scene actual raster/transform samples, excluding reduced/manual pause and final hold; don't infer motion merely from CSS presence. |\n| G2.08 | SHIPPED | Film-scoped enlarged painted relic, external small growth badge and tip/edition-label separation; `film.css .relic-column`, film-specific renderer framing. Legacy film browser checks normal/SVG framing and overlap; parent viewed revised dominant crystal frames. No Atlas/overlay default camera/cap changes. |\n| G2.09 | SHIPPED | Lower-third captions28px,≤2 lines in tested desktop/mobile/reduced layout; film CSS and `scripts/browser-smoke-film-timing.js`. Scoped observed geometry, not a universal font/device guarantee. Cinzel scene headings preserved. |\n| G2.10 | SHIPPED | Genuine native tab hidden≥60s / unattended full150, first clocks0,8 scenes,0 inputs/downloads; `test-support/native-film-review.js`, `scripts/observe-film-walltime.js`, FILM956. Browser helper uses raw CDP pipe, not Playwright focus emulation/fake visibility. Contact sheet uses bounded lossless PNG; no screenshot reconstruction or resource waiver. Genuine browser hidden ≠ physical recorder occlusion/OBS proof. |\n\n## Group 3 · OBS cards, verified claims, replies and preview\n\n| ID | Status | Condition, source/proof, precise gap and testability |\n| --- | --- | --- |\n| G3.01 | SHIPPED | Default logicalFHD card560×180/bl48; actual1920×1080 and960×540→280×90/24-safe tested without capture reflow. `public/overlay.js` fit, `overlay.css`, `scripts/browser-smoke-full-overlay.js` + parent-viewed genuine clips/B301f. |\n| G3.02 | SHIPPED | Closed layout card/full/corner, four pos, scale0.75–1.5, `corner=1` alias; duplicates/unknown/conflicts rejected. `overlayOptions` in `overlay-client.js`, shared app query validation, `test/overlay-group3.test.js`. Full default keeps historic centered composition, **not** default-card fit/padding; only explicit full pos opts out. Corner retains historical compact caption; new takeover/coach/burst **card-only**. |\n| G3.03 | SHIPPED | Card relic140, heading36/body28/min24 logicalscale1, requested plate alpha.86/border/radius16/blur8. `overlay.css`; full-overlay browser measures FHD font/box/raster. At960 logical content is physically half-size, not asserted28 CSS-screen px. |\n| G3.04 | PARTLY DONE |≥7:1 critical text: `test/overlay-group3.test.js` computes pale-ink worst-case white-background plate blend; busy procedural-background FHD/960 clips viewed. **Browser-derived computed foreground/backplate contrast≥7 at both sizes is not a named assertion** (generic accessibility gate is4.5). Add actual computed-layer/raster-backed contrast check for every critical text; no invented failure/score from screenshots. |\n| G3.05 | PARTLY DONE | Critical art/text outside central60% has actual overlap0; outer plate truthfully intrudes **12 logical px / 2,688 FHD square px** (960:672). Full-overlay browser asserts those exact values. Literal entire-card zero central overlap is **not satisfied** by560+48 geometry. Need owner acceptance of critical-only interpretation or scoped design decision; never report whole-plate overlap0. Transparent outside plate/no edition/zero pills retained. |\n| G3.06 | SHIPPED |900×300 lower-centre takeover with44/72 tabular/32/28 type in CSS; `overlayArrival` requires valid landing-v2/nonawaitingRaid, source!offer/host!accept actual counts/deadline, ends/completion→null. Signed fixture/B301f verifies both roles, dimensions and real180s. Forged-ring burst derived only from completed verified model; no fake early transfer. |\n| G3.07 | SHIPPED | One receiving prompt only after verified arrival; sender offer ACK and one completion per room. `src/store.js`, `src/claim-ack.js` immutable earned receipt keys, `BOT_COPY.arrival`, claim/recovery/Group3 tests and claims browser exact4 transport messages for one-offer/accept case. HMAC/room/actor/rollback/replay/concurrency unchanged. Not proof of arbitrary-burst message count. |\n| G3.08 | PARTLY DONE | Central friendly `public/ritual-copy.js` plus checked-in fixed BOT_COPY snapshot and parameterized where/Seeker/score/share/completion examples (`test/overlay-group3.test.js`). Help has !where/!seek. **EVERY reply/branch** is broader: e.g. optional P7 chat text remains inline at `src/p7.js` around512; no complete emitter→snapshot inventory located. Inventory every enabled/disabled reply before asserting universal snapshot coverage; no real chat needed. |\n| G3.09 | SHIPPED | OBSStudio UA orobs=1 persistent read mode distinct from ordinary/control idle stop; `overlay-client.js`, connection-manager admission, local options tests. H14 proves≥60min one-WS read/animation without trusted input, then isolated synthetic WSS arrival. No auth/game/provider/storage action, no new keepalive/poll unless needed. Not physical OBS. |\n| G3.10 | SHIPPED | Idle command coach every600000ms for8000ms, card-only and suppressed during takeover; `overlay.js` existing visual loop/age and visibility. No command dispatch. Parameter/timing source tests exist; H14 is not a separate visual capture of all six coach windows. |\n"
+    }
+  ]
+}
+````
+
+### 6747. 2026-10-31T14:19:03.514Z — tool call (source line 25555)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_2a3acd9c1b0240ada01d660e474d21b3",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '240,286p' test/readiness-docs.test.js\\nsed -n '110,125p' test/readiness-docs.test.js\\nrg -n '59|13|9, 4|PARTLY DONE|R0' test/readiness-docs.test.js | tail -14\",\"max_output_tokens\":1900})).output)\n"
+}
+````
+
+### 6748. 2026-10-31T14:19:03.594Z — tool result (source line 25558)
+
+````text
+{
+  "call_id": "call_2a3acd9c1b0240ada01d660e474d21b3",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "  assert.equal(release.evidence.selectedBytes, 20119022);\n  assert.equal(release.evidence.wholeEntryOmissions, 6);\n  assert.equal(release.evidence.secondaryFindings, 0);\n  assert.equal(release.evidence.partLimitBytes, 16777216);\n  assert.equal(release.evidence.totalLimitBytes, 33554432);\n  assert.equal(release.evidence.workerPrivateTranscriptsIncluded, false);\n  assert.equal(release.noProductionPromotion, true);\n  assert.equal(release.noPublicPostsOrOutreach, true);\n  const panel = await readFile('docs/PANEL_STATUS.md', 'utf8');\n  assert.equal(panel.split('<!-- PANEL_CURRENT_START -->').length, 2);\n  assert.equal(panel.split('<!-- PANEL_CURRENT_END -->').length, 2);\n  const current = panel\n    .split('<!-- PANEL_CURRENT_START -->')[1]\n    .split('<!-- PANEL_CURRENT_END -->')[0];\n  const rows = [\n    ...current.matchAll(/^\\| (X\\d{2}|G[1-6]\\.\\d{2}) \\| (SHIPPED|PARTLY DONE|NOT STARTED) \\|/gm),\n  ];\n  const expectedIds = Array.from({ length: 6 }, (_, i) => 'X' + String(i + 1).padStart(2, '0'));\n  for (const [group, size] of [\n    [1, 10],\n    [2, 10],\n    [3, 13],\n    [4, 12],\n    [5, 12],\n    [6, 10],\n  ])\n    for (let i = 1; i <= size; i++)\n      expectedIds.push('G' + group + '.' + String(i).padStart(2, '0'));\n  assert.deepEqual(\n    rows.map((row) => row[1]),\n    expectedIds,\n  );\n  assert.equal(new Set(rows.map((row) => row[1])).size, 73);\n  assert.deepEqual(\n    ['SHIPPED', 'PARTLY DONE', 'NOT STARTED'].map(\n      (state) => rows.filter((row) => row[2] === state).length,\n    ),\n    [59, 13, 1],\n  );\n  assert.match(current, /G3\\.05 \\| PARTLY DONE[^\\n]*12 logical px/);\n  assert.match(current, /G6\\.07 \\| NOT STARTED/);\n  assert.match(panel, /53 SHIPPED, 19 PARTLY DONE, 1 NOT STARTED/);\n  assert.match(\n    provenance,\n    /remote\\/default `main` \\*\\*3991bb84b9a3d60d1681e8d18e68b5e9cb44f511\\*\\* is an ancestor of14a4/,\n  );\n  assert.match(provenance, /No forced rewrite, main merge or default-branch switch was performed/);\ntest('provenance and private draft separate historical/published/local proof and four paraphrased episodes', async () => {\n  const paths = [\n    'README.md',\n    'docs/PROJECT_GUIDE.md',\n    'docs/PROVENANCE.md',\n    'docs/DEVPOST_DRAFT.md',\n    'docs/CODEX_USAGE.md',\n    'docs/SCREENSHOTS.md',\n    'docs/JUDGES.md',\n  ];\n  const text = {};\n  for (const path of paths) {\n    text[path] = await readFile(path, 'utf8');\n    assert.ok(Buffer.byteLength(text[path]) <= 131072);\n  }\n  const provenance = text['docs/PROVENANCE.md'],\n255:    ...current.matchAll(/^\\| (X\\d{2}|G[1-6]\\.\\d{2}) \\| (SHIPPED|PARTLY DONE|NOT STARTED) \\|/gm),\n261:    [3, 13],\n274:    ['SHIPPED', 'PARTLY DONE', 'NOT STARTED'].map(\n277:    [59, 13, 1],\n279:  assert.match(current, /G3\\.05 \\| PARTLY DONE[^\\n]*12 logical px/);\n281:  assert.match(panel, /53 SHIPPED, 19 PARTLY DONE, 1 NOT STARTED/);\n354:      '6197c17f9e9c2eb7cb8b045f246588066999590fe4a37765779789d12ddc5bd0',\n373:      104131,\n374:      '9be007861da071e31b95df43147fd5679ab590eee77a1ddfc3ea7e3dcd47c1c9',\n394:    '01a19023-5596-7dd2-825a-5c0e25286d42',\n411:    'Final canonical R0 QA passed1261/1261native0skip',\n427:      'a86afc33bbf796f080e9985965fdb38cd1e637bf',\n439:      'e7f29c14e5d513d8948d682276dd615825b1d729',\n448:      /FULL-HISTORY MERGED; worker commit `[^`]+`; included in R0\\/runtimead48/,\n"
+    }
+  ]
+}
+````
+
+### 6749. 2026-10-31T14:19:24.790Z — tool call (source line 25562)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_78b9dc017ece48c3966104a3d8af25dc",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='docs/PANEL_STATUS.md';s=open(p).read();a=s.index('<!-- PANEL_CURRENT_START -->');b=s.index('<!-- PANEL_CURRENT_END -->',a);block=s[a:b];lines=block.splitlines();lines=[\\\"| G3.05 | SHIPPED | Source340/341 current assessment: parent actual full-overlay native browser PASS9 checks. Whole painted border-box overlap0 at FHD1920×1080 and960×540 in normal/reduced idle, source/host takeover and completion; no outside shadow/filter/outline or masking. Default560×180 at32px safe gives4px FHD/2px960 clearance. Takeover336×720 left-band gives16px FHD/8px960 clearance;44/72/32/28px logical type preserved, requested scale responsively constrained before band intrusion. Critical-content/raster/resource guards retained. This is native browser proof, not physical OBS. Implementation QA passed; parent commit/publication pending, not geometry deployed in historical R0. |\\\" if line.startswith('| G3.05 |') else line for line in lines];s=s[:a]+'\\\\n'.join(lines)+'\\\\n'+s[b:]\\ns=s.replace('**Current total:59 SHIPPED /13 PARTLY DONE /1 NOT STARTED =73.**', '**Current total:60 SHIPPED /12 PARTLY DONE /1 NOT STARTED =73.** R0 historical assessment remains59/13/1; G3.05 alone advances here on parent source340 browser proof, with commit/publication pending.')\\ns=s.replace('| G3 | 9 | 4 | 0 | PARTLY DONE |', '| G3 | 10 | 3 | 0 | PARTLY DONE |',1)\\ns=s.replace(\\\"G3.05's prior geometry conflict is superseded by source340 implementation awaiting parent QA, not a measured pass.\\\", \\\"G3.05's prior geometry conflict is superseded by source340 implementation and parent actual9-check native browser PASS; commit/publication pending, not physical OBS proof.\\\",1)\\n# Historical source304/R0 row remains the original failed literal-plate criterion.\\ns=s.replace('| G3.05 | PARTLY DONE | Critical art/text', '| G3.05 | PARTLY DONE | Historical source304/R0, before340: Critical art/text',1)\\nopen(p,'w').write(s)\\nPY\",\"max_output_tokens\":200}))\ntext(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/test/readiness-docs.test.js\\n@@\\n-    [59, 13, 1],\\n+    [60, 12, 1],\\n   );\\n-  assert.match(current, /G3\\\\.05 \\\\| PARTLY DONE[^\\\\n]*12 logical px/);\\n+  assert.match(current, /G3\\\\.05 \\\\| SHIPPED[^\\\\n]*parent actual full-overlay native browser PASS9 checks/);\\n+  assert.match(current, /G3\\\\.05[^\\\\n]*Whole painted border-box overlap0[^\\\\n]*FHD1920×1080 and960×540[^\\\\n]*normal\\\\/reduced idle, source\\\\/host takeover and completion/);\\n+  assert.match(current, /G3\\\\.05[^\\\\n]*Default560×180 at32px safe gives4px FHD\\\\/2px960 clearance[^\\\\n]*Takeover336×720 left-band gives16px FHD\\\\/8px960 clearance/);\\n+  assert.match(current, /G3\\\\.05[^\\\\n]*not physical OBS[^\\\\n]*commit\\\\/publication pending[^\\\\n]*not geometry deployed in historical R0/);\\n+  const historical = panel.split('<!-- PANEL_CURRENT_END -->')[1];\\n+  assert.match(historical, /G3\\\\.05 \\\\| PARTLY DONE[^\\\\n]*Historical source304\\\\/R0, before340[^\\\\n]*12 logical px \\\\/ 2,688 FHD square px[^\\\\n]*960:672[^\\\\n]*not satisfied/);\\n+  assert.match(panel, /R0 historical assessment remains59\\\\/13\\\\/1/);\\n*** End Patch\"));\n"
+}
+````
+
+### 6750. 2026-10-31T14:19:24.941Z — tool result (source line 25566)
+
+````text
+{
+  "call_id": "call_78b9dc017ece48c3966104a3d8af25dc",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "c12118",
+        "wall_time_seconds": 0.000003841,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 6751. 2026-10-31T14:19:34.554Z — assistant (source line 25571)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Changed only `docs/PANEL_STATUS.md` and `test/readiness-docs.test.js`.\n\nPreserved the historical12px/2,688/672 intrusion record. Current G3.05 is SHIPPED with parent-reported9-check native proof; totals are60/12/1. Commit/publication remains pending, with no physical OBS claim.\n\nNo runtime changes or execution. Stopped.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6752. 2026-10-31T14:22:37.735Z — user (source line 25579)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "Original342 G4.04next. G305COMMITTED+PUSHED092a89d2e67c12c7f1d3f71667d6a25751140e3d: FULL1268/1268zeroSkip+nativewholeplate9checksPASS(parent), historicalPANELpreservedcurrent60/12/1. NewG4.04 userasksboundedNATIVEcoldnavigation firstPaint/LCP /,/atlas,/keeper/:channel,/overlay againstRECORDEDPROD baseline;fixworstoffenderIFover~2.5s. ParentALREADYactualNETWORKenabledOSbwrapnativeChromeSandboxtrue measuredPUBLICproduction6f1ae8d(sendoff-fix-on-1031@100at14:08) baseline14:13:39UTC: Chrome1561365x768DPR1,freshcontextpernav,CDPHTTPcacheDisabled/clear,serviceworkerblocked,normalmotion,NOCPU/networkthrottle,GETHEADsameoriginonly/no input/providerwrites,8sLCPobservation3samples×4routes. FULLSAFEJSON .openclaw/tmp/raid-relic-cold-nav-prod-baseline.json; standaloneoperatorimplementation .openclaw/tmp/raid-relic-cold-nav-live.mjs andlauncher.cjs permittedREAD only(theseNOsecrets). Routes/root LCP428/360/352ms;atlas348/352/380;keeperolsols3356/332/340;overlay1593561134356/360/364;HTTP200all. Native genuineFP/FCP/LCP/lcpTAGandnavTTFB captured. No over2.5s =>NO needlessruntimeperfchange or fabricatedspeedup. SERVERcoldNOTFORCED/nop95/SLA/physicalOBSclaim. NeedREPOCHECKdurable+baselinefile/documentation/negativecontracttests, finalcandidatecomparisonlaterparent. ExtendONEexistingbrowser-script preferablybrowser-smoke-reliability.js viaEXPLICIT --cold-navigation earlybranch(default46flowUNCHANGED); NOnewfirstpartyJSfile160/deps. Boundedmax3samples/routes4/8swindow/20snav/overall150s, preservemainQA budgets unchanged; sameoriginGETHEADallowlist/no clicks/noOAuth/control POST. PerformanceObserverinstallbeforenav buffered; FPandLCP finitepositive/visible200/no missing0. Recordmethod/browser/viewport/cache/servercoldscope/rows,median+maxvs2500ms,compareperroutebaseline notinventp95. BaselineJSONcopyONLYlegitimateSAFEdata to docs/COLD_NAV_BASELINE_1031.json plusSHORTdocs/COLD_NAVIGATION.md or existingPERFORMANCEdoc iffits. Previewperformance needsprivateaccess butCODEWRITERmustNOTreadsecrets: define --preview-access-stdin flag readsFD0canonical43char key onlyinmemory/contextsameoriginHTTPheader, neverreport/log/artifacts; no credentialvalue/rawkey/envfileinrepo. Ifnotneededcouldparentexternaltrustedwrapperinjectheader; clearcontractdocument. OperatorparentwillrunharnessinsidecleanNETWORKVMwithno privateFS; normaldefaultmockbrowsercohortstaysNOexternalnetwork. JSONreportfixedartifacts path bounded≤64KiB/consoleCOLD_NAV_RESULTsanitizedmetadata safe. No paid/mininstance/flag/server/cloud changes. Unitnegativeinput/baselines/missingmetric casesinsideEXISTINGtest/reliability.test.js orappropriateexistingfile; no actualliveopsbyyou/sourceONLYNOexecution/Git/format/cloud/rawCody/selected/SM/privateAPI. UpdatecurrentG404statusimplemented awaitingactualrepoHarnesscandidateQA, keepdatedR0no-baselinehistorytruthful; parentreportsbaselineobservedNOTimprovement. docsWorkerOWNSREADME/DEVPOST_DRAFT/JUDGES_QUICKSTART/DEMO_SCRIPT/CODEX_SESSIONS donottouch; yourscopeexistingperfscript/tests/newsmallbaselineJSON+perfdoc/PANEL_STATUSG404only. Parentwillfullnative/testharnessandcommitpushincrement BEFOREmergeworkerDocs. Freeze18UKskipcompactionallsourcebefore18. SameONLYlead01a1705c, STOPboundedwithfiles/inputs/runcommand/unrun. RuntimeG305+retainedofflinefixpreserved."
+  }
+]
+````
+
+### 6753. 2026-10-31T14:22:41.461Z — assistant (source line 25582)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll read the safe baseline and operator harness, then add an explicit cold-navigation mode while leaving the default browser flow unchanged. The recorded samples are below2.5s, so I won’t make a runtime performance change without new evidence.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6754. 2026-10-31T14:22:42.813Z — tool call (source line 25583)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_d5815dda8d89437185fe8aefc55e505f",
+  "input": "const r=await tools.exec_command({cmd:\"head -65 scripts/browser-smoke-reliability.js\\nhead -45 test/reliability.test.js\\ncat /home/ubuntu/.openclaw/workspace/.openclaw/tmp/raid-relic-cold-nav-prod-baseline.json\\nsed -n '1,210p' /home/ubuntu/.openclaw/workspace/.openclaw/tmp/raid-relic-cold-nav-live.mjs\",\"max_output_tokens\":6500});text(r.output)\n"
+}
+````
+
+### 6755. 2026-10-31T14:22:42.926Z — tool result (source line 25586)
+
+````text
+{
+  "call_id": "call_d5815dda8d89437185fe8aefc55e505f",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "// Canonical-origin LOCAL TLS/WSS only. No upstream EventSub WebSocket exists.\nimport assert from 'node:assert/strict';\nimport { mkdir, writeFile } from 'node:fs/promises';\nimport { visualReview, growthPixels } from '../test-support/visual-review.js';\nimport { HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\nlet review,\n  stage = 'setup',\n  passed = false,\n  failureCategory = null,\n  connections = 0,\n  closedConnections = 0;\nconst checks = [],\n  diagnostic = {};\ntry {\n  review = await visualReview({ durable: true });\n  const { page, context, fixture: f, origin } = review;\n  // Install before module evaluation: overlay-client captures timer functions\n  // at creation. The clock runs normally until the explicit idle fast-forward.\n  await page.clock.install();\n  await context.routeWebSocket('**/*', (route) =>\n    new URL(route.url()).origin === origin.replace('https:', 'wss:')\n      ? route.connectToServer()\n      : route.close(),\n  );\n  page.on('websocket', (socket) => {\n    connections++;\n    socket.on('close', () => closedConnections++);\n  });\n  for (const id of [BOT, HOME, OTHER]) await f.login(id);\n  for (const id of [HOME, OTHER]) {\n    await f.control(id, 'bootstrap');\n    f.advance();\n    await f.control(id, 'keep');\n    f.advance();\n  }\n  await f.chat(HOME, '9600', '!mark moon');\n  await f.chat(HOME, HOME, '!relic approve m1');\n  f.advance(31000);\n  assert.equal(JSON.parse((await f.control(HOME, 'send:' + OTHER)).body).status, 'accepted');\n  await f.raid(HOME, OTHER, 4);\n  await f.chat(HOME, '9601', '!offer');\n  await f.chat(OTHER, '9701', '!accept');\n  const hop = (await f.runtime.state.getKeeperRegistry()).pendingHop;\n  f.advance(23000);\n  stage = 'late-initial-snapshot';\n  await page.setViewportSize({ width: 1280, height: 800 });\n  await page.goto(origin + '/overlay/' + OTHER);\n  await page.bringToFront();\n  await page.waitForFunction(() => document.body.dataset.connection === 'connected');\n  await page.waitForFunction(\n    () => Number(document.querySelector('.archive').dataset.cinematicElapsed) >= 23000,\n  );\n  assert.match(await page.locator('#claim-label').innerText(), /Offer 1\\/2.*Accept 1\\/2/);\n  assert.equal(\n    Number(await page.locator('.p3-flash').evaluate((el) => getComputedStyle(el).opacity)),\n    0,\n  );\n  await page.waitForFunction(\n    () => Number(document.querySelector('canvas.relic3d')?.dataset.frames) > 0,\n  );\n  assert.equal(await growthPixels(page, async () => {}), true);\n  stage = 'offline-reconnect';\n  await context.setOffline(true);\n  review.dropConnections();\n  await page.waitForFunction(() => document.body.dataset.connection !== 'connected');\nhead: cannot open 'test/reliability.test.js' for reading: No such file or directory\n{\n  \"at\": \"2026-10-31T14:13:39.675Z\",\n  \"origin\": \"https://sendoff-fix-on-1031---raid-relic-vz4bhnskgq-uc.a.run.app\",\n  \"browser\": \"native Chromium 156.0.8078.47\",\n  \"viewport\": [\n    1365,\n    768\n  ],\n  \"dpr\": 1,\n  \"samples\": 3,\n  \"observationMs\": 8000,\n  \"httpCacheDisabled\": true,\n  \"freshContextPerNavigation\": true,\n  \"cpuThrottle\": false,\n  \"networkThrottle\": false,\n  \"serverColdStartForced\": false,\n  \"noInputOrProviderWrites\": true,\n  \"rows\": [\n    {\n      \"route\": \"/\",\n      \"sample\": 0,\n      \"status\": 200,\n      \"error\": null,\n      \"paints\": [\n        {\n          \"name\": \"first-paint\",\n          \"time\": 428\n        },\n        {\n          \"name\": \"first-contentful-paint\",\n          \"time\": 428\n        }\n      ],\n      \"lcp\": {\n        \"time\": 428,\n        \"size\": 60630,\n        \"tag\": \"H1\",\n        \"id\": \"title\"\n      },\n      \"navigation\": {\n        \"ttfb\": 158.5,\n        \"dom\": 669.3000000715256,\n        \"load\": 782.1000000238419,\n        \"transfer\": 9097\n      },\n      \"visibility\": \"visible\"\n    },\n    {\n      \"route\": \"/\",\n      \"sample\": 1,\n      \"status\": 200,\n      \"error\": null,\n      \"paints\": [\n        {\n          \"name\": \"first-paint\",\n          \"time\": 360\n        },\n        {\n          \"name\": \"first-contentful-paint\",\n          \"time\": 360\n        }\n      ],\n      \"lcp\": {\n        \"time\": 360,\n        \"size\": 60630,\n        \"tag\": \"H1\",\n        \"id\": \"title\"\n      },\n      \"navigation\": {\n        \"ttfb\": 130,\n        \"dom\": 627.8999999761581,\n        \"load\": 758.2999999523163,\n        \"transfer\": 9097\n      },\n      \"visibility\": \"visible\"\n    },\n    {\n      \"route\": \"/\",\n      \"sample\": 2,\n      \"status\": 200,\n      \"error\": null,\n      \"paints\": [\n        {\n          \"name\": \"first-paint\",\n          \"time\": 352\n        },\n        {\n          \"name\": \"first-contentful-paint\",\n          \"time\": 352\n        }\n      ],\n      \"lcp\": {\n        \"time\": 352,\n        \"size\": 60630,\n        \"tag\": \"H1\",\n        \"id\": \"title\"\n      },\n      \"navigation\": {\n        \"ttfb\": 130.5,\n        \"dom\": 625.8000000715256,\n        \"load\": 740.6000000238419,\n        \"transfer\": 9097\n      },\n      \"visibility\": \"visible\"\n    },\n    {\n      \"route\": \"/atlas/\",\n      \"sample\": 0,\n      \"status\": 200,\n      \"error\": null,\n      \"paints\": [\n        {\n          \"name\": \"first-paint\",\n          \"time\": 348\n        },\n        {\n          \"name\": \"first-contentful-paint\",\n          \"time\": 348\n        }\n      ],\n      \"lcp\": {\n        \"time\": 348,\n        \"size\": 82200,\n        \"tag\": \"H1\",\n        \"id\": \"title\"\n      },\n      \"navigation\": {\n        \"ttfb\": 123.5,\n        \"dom\": 599.2000000476837,\n        \"load\": 695.2000000476837,\n        \"transfer\": 8550\n      },\n      \"visibility\": \"visible\"\n    },\n    {\n      \"route\": \"/atlas/\",\n      \"sample\": 1,\n      \"status\": 200,\n      \"error\": null,\n      \"paints\": [\n        {\n          \"name\": \"first-paint\",\n          \"time\": 352\n        },\n        {\n          \"name\": \"first-contentful-paint\",\n          \"time\": 352\n        }\n      ],\n      \"lcp\": {\n        \"time\": 352,\n        \"size\": 82200,\n        \"tag\": \"H1\",\n        \"id\": \"title\"\n      },\n      \"navigation\": {\n        \"ttfb\": 120.29999995231628,\n        \"dom\": 625.8999999761581,\n        \"load\": 750.7999999523163,\n        \"transfer\": 8550\n      },\n      \"visibility\": \"visible\"\n    },\n    {\n      \"route\": \"/atlas/\",\n      \"sample\": 2,\n      \"status\": 200,\n      \"error\": null,\n      \"paints\": [\n        {\n          \"name\": \"first-paint\",\n          \"time\": 380\n        },\n        {\n          \"name\": \"first-contentful-paint\",\n          \"time\": 380\n        }\n      ],\n      \"lcp\": {\n        \"time\": 380,\n        \"size\": 82200,\n        \"tag\": \"H1\",\n        \"id\": \"title\"\n      },\n      \"navigation\": {\n        \"ttfb\": 144.5,\n        \"dom\": 648.8999999761581,\n        \"load\": 760.1999999284744,\n        \"transfer\": 8550\n      },\n      \"visibility\": \"visible\"\n    },\n    {\n      \"route\": \"/keeper/olsols3\",\n      \"sample\": 0,\n      \"status\": 200,\n      \"error\": null,\n      \"paints\": [\n        {\n          \"name\": \"first-paint\",\n          \"time\": 356\n        },\n        {\n          \"name\": \"first-contentful-paint\",\n          \"time\": 356\n        }\n      ],\n      \"lcp\": {\n        \"time\": 356,\n        \"size\": 50400,\n        \"tag\": \"H1\",\n        \"id\": \"keeper-title\"\n      },\n      \"navigation\": {\n        \"ttfb\": 145.20000004768372,\n        \"dom\": 767,\n        \"load\": 767.2000000476837,\n        \"transfer\": 3084\n      },\n      \"visibility\": \"visible\"\n    },\n    {\n      \"route\": \"/keeper/olsols3\",\n      \"sample\": 1,\n      \"status\": 200,\n      \"error\": null,\n      \"paints\": [\n        {\n          \"name\": \"first-paint\",\n          \"time\": 332\n        },\n        {\n          \"name\": \"first-contentful-paint\",\n          \"time\": 332\n        }\n      ],\n      \"lcp\": {\n        \"time\": 332,\n        \"size\": 50400,\n        \"tag\": \"H1\",\n        \"id\": \"keeper-title\"\n      },\n      \"navigation\": {\n        \"ttfb\": 133.10000002384186,\n        \"dom\": 733.8000000715256,\n        \"load\": 734,\n        \"transfer\": 3084\n      },\n      \"visibility\": \"visible\"\n    },\n    {\n      \"route\": \"/keeper/olsols3\",\n      \"sample\": 2,\n      \"status\": 200,\n      \"error\": null,\n      \"paints\": [\n        {\n          \"name\": \"first-paint\",\n          \"time\": 340\n        },\n        {\n          \"name\": \"first-contentful-paint\",\n          \"time\": 340\n        }\n      ],\n      \"lcp\": {\n        \"time\": 340,\n        \"size\": 50400,\n        \"tag\": \"H1\",\n        \"id\": \"keeper-title\"\n      },\n      \"navigation\": {\n        \"ttfb\": 137.09999990463257,\n        \"dom\": 698.8999999761581,\n        \"load\": 699.0999999046326,\n        \"transfer\": 3084\n      },\n      \"visibility\": \"visible\"\n    },\n    {\n      \"route\": \"/overlay/1593561134\",\n      \"sample\": 0,\n      \"status\": 200,\n      \"error\": null,\n      \"paints\": [\n        {\n          \"name\": \"first-paint\",\n          \"time\": 356\n        },\n        {\n          \"name\": \"first-contentful-paint\",\n          \"time\": 356\n        }\n      ],\n      \"lcp\": {\n        \"time\": 356,\n        \"size\": 71586,\n        \"tag\": \"IMG\",\n        \"id\": \"\"\n      },\n      \"navigation\": {\n        \"ttfb\": 120.89999997615814,\n        \"dom\": 615,\n        \"load\": 745.8999999761581,\n        \"transfer\": 3062\n      },\n      \"visibility\": \"visible\"\n    },\n    {\n      \"route\": \"/overlay/1593561134\",\n      \"sample\": 1,\n      \"status\": 200,\n      \"error\": null,\n      \"paints\": [\n        {\n          \"name\": \"first-paint\",\n          \"time\": 360\n        },\n        {\n          \"name\": \"first-contentful-paint\",\n          \"time\": 360\n        }\n      ],\n      \"lcp\": {\n        \"time\": 360,\n        \"size\": 71586,\n        \"tag\": \"IMG\",\n        \"id\": \"\"\n      },\n      \"navigation\": {\n        \"ttfb\": 129.5,\n        \"dom\": 613.5999999046326,\n        \"load\": 742.6999999284744,\n        \"transfer\": 3062\n      },\n      \"visibility\": \"visible\"\n    },\n    {\n      \"route\": \"/overlay/1593561134\",\n      \"sample\": 2,\n      \"status\": 200,\n      \"error\": null,\n      \"paints\": [\n        {\n          \"name\": \"first-paint\",\n          \"time\": 364\n        },\n        {\n          \"name\": \"first-contentful-paint\",\n          \"time\": 364\n        }\n      ],\n      \"lcp\": {\n        \"time\": 364,\n        \"size\": 71586,\n        \"tag\": \"IMG\",\n        \"id\": \"\"\n      },\n      \"navigation\": {\n        \"ttfb\": 134.59999990463257,\n        \"dom\": 652.8999999761581,\n        \"load\": 658.7999999523163,\n        \"transfer\": 3062\n      },\n      \"visibility\": \"visible\"\n    }\n  ]\n}import fs from'node:fs';import{chromium}from'/node_modules/playwright-core/index.mjs';const origin=process.argv[2],samples=Number(process.argv[3]??3);if(!(new URL(origin).protocol==='https:'&&new URL(origin).hostname.endsWith('.run.app')&&new URL(origin).origin===origin)||!Number.isInteger(samples)||samples<1||samples>3)throw Error('Timing scope');const routes=['/','/atlas/','/keeper/olsols3','/overlay/1593561134'],rows=[];const browser=await chromium.launch({executablePath:'/snap/bin/chromium',headless:true,chromiumSandbox:true,args:['--disable-dev-shm-usage']});try{for(const route of routes)for(let sample=0;sample<samples;sample++){const context=await browser.newContext({viewport:{width:1365,height:768},deviceScaleFactor:1,serviceWorkers:'block'});await context.route('**/*',r=>{const u=new URL(r.request().url());return u.origin===origin&&['GET','HEAD'].includes(r.request().method())?r.continue():r.abort('blockedbyclient');});const page=await context.newPage(),cdp=await context.newCDPSession(page);await cdp.send('Network.enable');await cdp.send('Network.setCacheDisabled',{cacheDisabled:true});await cdp.send('Network.clearBrowserCache');await page.addInitScript(()=>{window.__coldLCP=[];new PerformanceObserver(list=>{for(const e of list.getEntries())window.__coldLCP.push({time:e.startTime,size:e.size,tag:e.element?.tagName??null,id:(e.element?.id??'').slice(0,80)});}).observe({type:'largest-contentful-paint',buffered:true});});let status=null,error=null;try{const response=await page.goto(origin+route,{waitUntil:'domcontentloaded',timeout:20000});status=response.status();await page.waitForTimeout(8000);}catch(e){error=e.name;}const timing=await page.evaluate(()=>({paints:performance.getEntriesByType('paint').map(e=>({name:e.name,time:e.startTime})),lcp:window.__coldLCP?.at(-1)??null,navigation:performance.getEntriesByType('navigation').map(e=>({ttfb:e.responseStart,dom:e.domContentLoadedEventEnd,load:e.loadEventEnd,transfer:e.transferSize}))[0],visibility:document.visibilityState}));rows.push({route,sample,status,error,...timing});console.log('COLD_NAV_PROGRESS '+JSON.stringify({route,sample,status,lcp:timing.lcp?.time??null}));await context.close();}}finally{await browser.close();}console.log('COLD_NAV_RESULT '+JSON.stringify({at:new Date().toISOString(),origin,browser:'native Chromium '+browser.version(),viewport:[1365,768],dpr:1,samples,observationMs:8000,httpCacheDisabled:true,freshContextPerNavigation:true,cpuThrottle:false,networkThrottle:false,serverColdStartForced:false,noInputOrProviderWrites:true,rows}));"
+    }
+  ]
+}
+````
+
+### 6756. 2026-10-31T14:22:52.411Z — tool call (source line 25590)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_8eaf58a5988045c3b80fb84b8f042034",
+  "input": "text((await tools.exec_command({cmd:\"tail -42 scripts/browser-smoke-reliability.js\\nrg -n 'executable|PLAYWRIGHT|chromium.launch' test-support/visual-review.js\\nrg --files test | rg 'reliab|performance|control-wizard'\\nrg -n 'G4.04' docs/PANEL_STATUS.md\\ncat /home/ubuntu/.openclaw/workspace/.openclaw/tmp/raid-relic-cold-nav-live-launcher.cjs 2>/dev/null | head -15\",\"max_output_tokens\":1500})).output)\n"
+}
+````
+
+### 6757. 2026-10-31T14:22:52.527Z — tool result (source line 25593)
+
+````text
+{
+  "call_id": "call_8eaf58a5988045c3b80fb84b8f042034",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "    await new Promise((resolve) => setTimeout(resolve, 20));\n  assert.equal(closedConnections, closedBeforeIdle + 1);\n  assert.equal(await page.locator('#runes img').count(), 0);\n  const idleConnections = connections;\n  await page.clock.fastForward(10000);\n  assert.equal(connections, idleConnections);\n  assert.equal(await page.locator('body').getAttribute('data-connection'), 'suspended');\n  stage = 'human-idle-trusted-resume';\n  await page.keyboard.press('Shift');\n  await page.waitForFunction(() => document.body.dataset.connection === 'connected');\n  assert.equal(connections, idleConnections + 1);\n  assert.equal(await page.locator('#runes img').count(), 0);\n  assert.equal((await f.runtime.overlayFeeds[OTHER].snapshot()).approvedCount, 0);\n  assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);\n  assert.equal(\n    Number(await page.locator('.p3-flash').evaluate((el) => getComputedStyle(el).opacity)),\n    0,\n  );\n  assert.deepEqual(review.stats(), { errors: 0, external: 0 });\n  diagnostic.independentIdleResumeChecks = 1;\n  checks.push({\n    name: 'Browser-clock ten-minute human idle closes actual WSS; trusted Shift resumes fresh erased projection without arrival replay',\n    passed: true,\n  });\n  diagnostic.connections = connections;\n  passed = true;\n} catch (e) {\n  failureCategory = ['AssertionError', 'TimeoutError', 'TypeError'].includes(e?.name)\n    ? e.name\n    : 'browser-or-fixture';\n  const line = /browser-smoke-reliability[.]js:(\\d+)/.exec(e?.stack ?? '');\n  if (line) diagnostic.assertionLine = Number(line[1]);\n  diagnostic.connections = connections;\n  diagnostic.browserErrors = review?.stats().errors ?? 0;\n} finally {\n  await review?.close();\n  await mkdir('artifacts', { recursive: true });\n  const report = JSON.stringify({ passed, stage, failureCategory, checks, diagnostic });\n  assert.ok(Buffer.byteLength(report) <= 65536);\n  await writeFile('artifacts/reliability-browser-results.json', report + '\\n');\n}\nif (!passed) process.exitCode = 1;\n12:    return { executablePath: '/snap/bin/chromium', headless: true, chromiumSandbox: true };\n14:    const cache = process.env.PLAYWRIGHT_BROWSERS_PATH;\n18:      executablePath = await realpath(chromium.executablePath());\n19:    if (!executablePath.startsWith(root + sep)) throw Error('Browser outside toolchain cache');\n20:    await access(executablePath, constants.X_OK);\n21:    return { executablePath, headless: true, chromiumSandbox: true };\n101:    browser = await chromium.launch({\ntest/reliability-demo.test.js\ntest/control-wizard.test.js\n54:| G4.04 | PARTLY DONE | Lighter first paint: existing fonts/conditional3D and no new paid service/min-instance change, R0 preserves resources. **No cold first-paint/LCP comparison against a defined baseline/budget** was identified. Need bounded native cold-navigation timing if a performance improvement claim is required; do not invent GPU/network SLA. Current bounded implementation/regression coverage is included in R0; no broader physical/manual claim. |\n203:| G4.04 | PARTLY DONE | Lighter first paint: existing fonts/conditional3D and no new paid service/min-instance change, F14 preserves resources. **No cold first-paint/LCP comparison against a defined baseline/budget** was identified. Need bounded native cold-navigation timing if a performance improvement claim is required; do not invent GPU/network SLA. |\n254:6. **Keeper/Atlas public-date/first-paint acceptance (G4.04/.09), approximately45–90min tests/measurement:** rare-state visible-date inventory, cold first-paint baseline if improvement is to be claimed. Existing1920/390 geometry/real thumbnails/≤2buttons/+N/axe scopes already established; no redesign required merely to add evidence.\n"
+    }
+  ]
+}
+````
+
+### 6758. 2026-10-31T14:22:56.866Z — tool call (source line 25597)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_5d77c908cdca44e19828d037ceb7bad2",
+  "input": "text((await tools.exec_command({cmd:\"head -28 test-support/visual-review.js\\nhead -35 test/reliability-demo.test.js\\nls /home/ubuntu/.openclaw/workspace/.openclaw/tmp/raid-relic-cold-nav*\",\"max_output_tokens\":1100})).output)\n"
+}
+````
+
+### 6759. 2026-10-31T14:22:56.978Z — tool result (source line 25600)
+
+````text
+{
+  "call_id": "call_5d77c908cdca44e19828d037ceb7bad2",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "import { localOverlayArrival, validSnapshot } from '../public/overlay-client.js';\n// Native local QA only: explicit synthetic grants, self-only TLS, Chromium sandbox.\nimport { createServer } from 'node:https';\nimport { createLocalTLS } from './local-tls.js';\nimport { attachOverlaySockets } from '../src/overlay-sockets.js';\nimport { pilotFixture } from './pilot-fixture.js';\nimport { access, constants, realpath } from 'node:fs/promises';\nimport { isAbsolute, sep } from 'node:path';\nexport async function localChromiumOptions(chromium) {\n  try {\n    await access('/snap/bin/chromium', constants.X_OK);\n    return { executablePath: '/snap/bin/chromium', headless: true, chromiumSandbox: true };\n  } catch {\n    const cache = process.env.PLAYWRIGHT_BROWSERS_PATH;\n    if (!cache || !isAbsolute(cache) || cache === '/')\n      throw Error('Explicit local browser cache required');\n    const root = await realpath(cache),\n      executablePath = await realpath(chromium.executablePath());\n    if (!executablePath.startsWith(root + sep)) throw Error('Browser outside toolchain cache');\n    await access(executablePath, constants.X_OK);\n    return { executablePath, headless: true, chromiumSandbox: true };\n  }\n}\nexport async function visualReview({\n  seekers = false,\n  durable = false,\n  backgroundThrottling = false,\n  headed = false,\nimport test from 'node:test';\nimport { createHmac } from 'node:crypto';\nimport assert from 'node:assert/strict';\nimport { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\nimport { createRuntime } from '../src/runtime.js';\nconst raidPosts = (f) =>\n  f.calls.filter((c) => new URL(c.url).pathname.endsWith('/raids') && c.method === 'POST');\nconst refreshPosts = (f) =>\n  f.calls.filter(\n    (c) =>\n      new URL(c.url).pathname.endsWith('/token') &&\n      new URLSearchParams(c.body).get('grant_type') === 'refresh_token',\n  );\nasync function pending(kind) {\n  const f = await pilotFixture(kind, {\n    rotateTokens: true,\n    chronicleEnv: { P9_STREAK_ENABLED: 'true', MARK_AUTO_APPROVE_ENABLED: 'true' },\n  });\n  for (const id of [BOT, HOME, OTHER]) await f.login(id);\n  for (const id of [HOME, OTHER]) {\n    assert.equal((await f.control(id, 'bootstrap')).status, 200);\n    f.advance();\n    await f.control(id, 'keep');\n    f.advance();\n  }\n  await f.chat(HOME, '8600', '!mark moon');\n  f.advance(31000);\n  assert.equal(JSON.parse((await f.control(HOME, 'send:' + OTHER)).body).status, 'accepted');\n  const sentAt = f.now();\n  const receipt = () =>\n    f.signed(\n      'channel.raid',\n      { from_broadcaster_user_id: HOME, to_broadcaster_user_id: OTHER, viewers: 4 },\n      HOME,\n      { from_broadcaster_user_id: HOME },\n/home/ubuntu/.openclaw/workspace/.openclaw/tmp/raid-relic-cold-nav-launch.cjs\n/home/ubuntu/.openclaw/workspace/.openclaw/tmp/raid-relic-cold-nav-live.mjs\n/home/ubuntu/.openclaw/workspace/.openclaw/tmp/raid-relic-cold-nav-prod-baseline.json\n/home/ubuntu/.openclaw/workspace/.openclaw/tmp/raid-relic-cold-nav-prod-baseline.txt\n"
+    }
+  ]
+}
+````
+
+### 6760. 2026-10-31T14:23:43.984Z — tool call (source line 25606)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_43cba8eb0d474fc6b24f46f67aaa21f2",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\nfrom pathlib import Path\\np=Path('scripts/browser-smoke-reliability.js');s=p.read_text();s=s.replace(\\\"import { visualReview, growthPixels }\\\", \\\"import { pathToFileURL } from 'node:url';\\\\nimport { readFile } from 'node:fs/promises';\\\\nimport { visualReview, growthPixels, localChromiumOptions }\\\")\\na=s.index('let review,');s=s[:a]+'async function runReliability() {\\\\n'+s[a:]+'\\\\n}\\\\n';p.write_text(s)\\n# Exact parent-reported safe data, not private evidence or credentials.\\nPath('docs/COLD_NAV_BASELINE_1031.json').write_bytes(Path('/home/ubuntu/.openclaw/workspace/.openclaw/tmp/raid-relic-cold-nav-prod-baseline.json').read_bytes())\\nPY\",\"max_output_tokens\":200}))\n"
+}
+````
+
+### 6761. 2026-10-31T14:23:44.131Z — tool result (source line 25609)
+
+````text
+{
+  "call_id": "call_43cba8eb0d474fc6b24f46f67aaa21f2",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "aeec71",
+        "wall_time_seconds": 0.00000348,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    }
+  ]
+}
+````
+
+### 6762. 2026-10-31T14:24:22.821Z — tool call (source line 25613)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_077c0eb762154330ad4c3dc521d64498",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/scripts/browser-smoke-reliability.js\\n@@\\n import { HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\\n+export const COLD_ROUTES = Object.freeze(['/', '/atlas/', '/keeper/olsols3', '/overlay/1593561134']);\\n+export function coldOptions(args) {\\n+  const values = new Map();\\n+  for (const arg of args) {\\n+    const match = /^(--cold-navigation|--preview-access-stdin|--origin|--samples)(?:=(.*))?$/.exec(arg);\\n+    if (!match || values.has(match[1])) throw Error('Cold input');\\n+    const flag = ['--cold-navigation', '--preview-access-stdin'].includes(match[1]);\\n+    if (flag ? match[2] !== undefined : !match[2]) throw Error('Cold input');\\n+    values.set(match[1], flag ? true : match[2]);\\n+  }\\n+  const origin = values.get('--origin');\\n+  const url = new URL(origin);\\n+  if (!values.has('--cold-navigation') || url.protocol !== 'https:' || url.origin !== origin ||\\n+      url.username || url.password || !url.hostname.endsWith('.run.app')) throw Error('Cold origin');\\n+  const samples = values.get('--samples') ?? '3';\\n+  if (!/^[1-3]$/.test(samples)) throw Error('Cold samples');\\n+  return { origin, samples: Number(samples), privateAccess: values.has('--preview-access-stdin') };\\n+}\\n+export function coldReadAllowed(origin, address, method) {\\n+  try {\\n+    const url = new URL(address);\\n+    return url.origin === origin && !url.username && !url.password &&\\n+      ['GET', 'HEAD'].includes(method) && !/%|\\\\\\\\/.test(url.pathname) &&\\n+      !/^\\\\/(?:control|auth|oauth|eventsub|internal|_preview)(?:\\\\/|$)/.test(url.pathname);\\n+  } catch { return false; }\\n+}\\n+export function coldAccess(bytes) {\\n+  if (!Buffer.isBuffer(bytes) || bytes.length > 44) throw Error('Cold access');\\n+  const value = bytes.toString('ascii').replace(/\\\\n$/, '');\\n+  if (!/^[A-Za-z0-9_-]{43}$/.test(value) || Buffer.from(value, 'base64url').length !== 32 ||\\n+      Buffer.from(value, 'base64url').toString('base64url') !== value) throw Error('Cold access');\\n+  return value;\\n+}\\n+export function validateColdRow(row) {\\n+  const positive = (v) => Number.isFinite(v) && v > 0 && v <= 150000;\\n+  if (!COLD_ROUTES.includes(row?.route) || !Number.isInteger(row.sample) || row.sample < 0 || row.sample > 2 ||\\n+      row.status !== 200 || row.error !== null || row.visibility !== 'visible' ||\\n+      !Array.isArray(row.paints) || row.paints.length !== 2 ||\\n+      !['first-paint', 'first-contentful-paint'].every((name) => row.paints.filter((p) => p.name === name && positive(p.time)).length === 1) ||\\n+      !positive(row.lcp?.time) || !positive(row.lcp?.size) || !/^[A-Z][A-Z0-9]{0,15}$/.test(row.lcp?.tag ?? '') ||\\n+      !positive(row.navigation?.ttfb) || !positive(row.navigation?.dom) || !positive(row.navigation?.load) ||\\n+      !Number.isFinite(row.navigation?.transfer) || row.navigation.transfer < 0) throw Error('Cold metric');\\n+  return row;\\n+}\\n+export function coldSummary(rows, samples) {\\n+  if (!Number.isInteger(samples) || samples < 1 || samples > 3 || rows.length !== samples * 4) throw Error('Cold rows');\\n+  const keys = new Set();\\n+  for (const row of rows) {\\n+    validateColdRow(row);\\n+    const key = row.route + ':' + row.sample;\\n+    if (row.sample >= samples || keys.has(key)) throw Error('Cold duplicate');\\n+    keys.add(key);\\n+  }\\n+  return COLD_ROUTES.map((route) => {\\n+    const times = rows.filter((r) => r.route === route).map((r) => r.lcp.time).sort((a, b) => a - b);\\n+    const medianMs = times.length % 2 ? times[Math.floor(times.length / 2)] : (times[0] + times[1]) / 2;\\n+    return { route, medianMs, maxMs: times.at(-1), budgetMs: 2500, withinBudget: times.at(-1) <= 2500 };\\n+  });\\n+}\\n+export function coldBaseline(value) {\\n+  if (value?.at !== '2026-10-31T14:13:39.675Z' ||\\n+      value.origin !== 'https://sendoff-fix-on-1031---raid-relic-vz4bhnskgq-uc.a.run.app' ||\\n+      value.browser !== 'native Chromium 156.0.8078.47' || JSON.stringify(value.viewport) !== '[1365,768]' ||\\n+      value.dpr !== 1 || value.samples !== 3 || value.observationMs !== 8000 ||\\n+      value.httpCacheDisabled !== true || value.freshContextPerNavigation !== true ||\\n+      value.cpuThrottle !== false || value.networkThrottle !== false || value.serverColdStartForced !== false ||\\n+      value.noInputOrProviderWrites !== true) throw Error('Cold baseline');\\n+  return coldSummary(value.rows, 3);\\n+}\\n+async function readColdAccess() {\\n+  return new Promise((resolve, reject) => {\\n+    let bytes = Buffer.alloc(0);\\n+    const cleanup = () => { clearTimeout(timer); process.stdin.off('data', data); process.stdin.off('end', end); process.stdin.off('error', fail); process.stdin.pause(); };\\n+    const fail = () => { cleanup(); reject(Error('Cold access')); };\\n+    const data = (chunk) => { if (bytes.length + chunk.length > 44) return fail(); bytes = Buffer.concat([bytes, chunk]); };\\n+    const end = () => { cleanup(); try { const key = coldAccess(bytes); bytes.fill(0); resolve(key); } catch { bytes.fill(0); reject(Error('Cold access')); } };\\n+    const timer = setTimeout(fail, 5000);\\n+    process.stdin.on('data', data); process.stdin.once('end', end); process.stdin.once('error', fail); process.stdin.resume();\\n+  });\\n+}\\n+async function runColdNavigation(args) {\\n+  let browser, context, key = null, deadlineTimer;\\n+  const rows = [];\\n+  const report = { passed: false, stage: 'input', failureCategory: null, rows };\\n+  const start = performance.now();\\n+  try {\\n+    const options = coldOptions(args);\\n+    const baselineBytes = await readFile(new URL('../docs/COLD_NAV_BASELINE_1031.json', import.meta.url));\\n+    if (baselineBytes.length > 65536) throw Error('Cold baseline');\\n+    const baseline = coldBaseline(JSON.parse(baselineBytes));\\n+    if (options.privateAccess) key = await readColdAccess();\\n+    report.stage = 'browser';\\n+    const { chromium } = await import('playwright');\\n+    browser = await chromium.launch(await localChromiumOptions(chromium));\\n+    let expired = false;\\n+    deadlineTimer = setTimeout(() => { expired = true; void browser.close().catch(() => {}); }, Math.max(1, 150000 - (performance.now() - start)));\\n+    Object.assign(report, { origin: options.origin, browser: 'native Chromium ' + browser.version(), viewport: [1365, 768], dpr: 1,\\n+      samples: options.samples, observationMs: 8000, httpCacheDisabled: true, freshContextPerNavigation: true,\\n+      cpuThrottle: false, networkThrottle: false, serverColdStartForced: false, noInputOrProviderWrites: true,\\n+      websocketPolicy: 'blocked-read-only-measurement', privateAccessSupplied: options.privateAccess, trustedInputCount: 0 });\\n+    for (const route of COLD_ROUTES) for (let sample = 0; sample < options.samples; sample++) {\\n+      if (expired || performance.now() - start >= 150000) throw Error('Cold deadline');\\n+      report.stage = 'navigation';\\n+      context = await browser.newContext({ viewport: { width: 1365, height: 768 }, deviceScaleFactor: 1, serviceWorkers: 'block', reducedMotion: 'no-preference', acceptDownloads: false });\\n+      let forbidden = 0, downloads = 0;\\n+      await context.route('**/*', async (r) => {\\n+        if (!coldReadAllowed(options.origin, r.request().url(), r.request().method())) { forbidden++; return r.abort(); }\\n+        // Credential is injected only after exact same-origin/method/path checks.\\n+        // It is never a context-wide header forwarded through a redirect.\\n+        return key ? r.continue({ headers: { ...r.request().headers(), 'x-preview-access': key } }) : r.continue();\\n+      });\\n+      await context.routeWebSocket('**/*', (r) => r.close());\\n+      const page = await context.newPage();\\n+      page.on('download', () => downloads++);\\n+      const cdp = await context.newCDPSession(page);\\n+      await cdp.send('Network.enable');\\n+      await cdp.send('Network.setCacheDisabled', { cacheDisabled: true });\\n+      await cdp.send('Network.clearBrowserCache');\\n+      await page.addInitScript(() => {\\n+        window.__coldNavigationLCP = null;\\n+        new PerformanceObserver((list) => { for (const e of list.getEntries()) window.__coldNavigationLCP = { time: e.startTime, size: e.size, tag: e.element?.tagName ?? null }; }).observe({ type: 'largest-contentful-paint', buffered: true });\\n+      });\\n+      const response = await page.goto(options.origin + route, { waitUntil: 'domcontentloaded', timeout: 20000 });\\n+      const observed = performance.now();\\n+      report.stage = 'observation';\\n+      while (performance.now() - observed < 8000) await new Promise((resolve) => setTimeout(resolve, Math.ceil(8000 - (performance.now() - observed)) + 1));\\n+      const metrics = await page.evaluate(() => {\\n+        const n = performance.getEntriesByType('navigation')[0];\\n+        return { paints: performance.getEntriesByType('paint').map((e) => ({ name: e.name, time: e.startTime })),\\n+          lcp: window.__coldNavigationLCP, navigation: n ? { ttfb: n.responseStart, dom: n.domContentLoadedEventEnd, load: n.loadEventEnd, transfer: n.transferSize } : null,\\n+          visibility: document.visibilityState, previewGate: document.title === 'Private preview' || Boolean(document.querySelector('form[action=\\\"/_preview/access\\\"]')) };\\n+      });\\n+      if (forbidden || downloads || metrics.previewGate || expired || new URL(page.url()).origin !== options.origin) throw Error('Cold boundary');\\n+      const row = { route, sample, status: response?.status() ?? 0, error: null, paints: metrics.paints, lcp: metrics.lcp, navigation: metrics.navigation, visibility: metrics.visibility };\\n+      validateColdRow(row); rows.push(row);\\n+      await context.close(); context = null;\\n+    }\\n+    report.stage = 'comparison';\\n+    const summary = coldSummary(rows, options.samples);\\n+    report.comparison = summary.map((r, i) => ({ ...r, baselineMedianMs: baseline[i].medianMs, baselineMaxMs: baseline[i].maxMs, medianDeltaMs: r.medianMs - baseline[i].medianMs, maxDeltaMs: r.maxMs - baseline[i].maxMs }));\\n+    report.passed = summary.every((r) => r.withinBudget);\\n+    if (!report.passed) report.failureCategory = 'lcp-budget';\\n+  } catch {\\n+    report.failureCategory = 'input-toolchain-boundary-or-metric';\\n+  } finally {\\n+    clearTimeout(deadlineTimer);\\n+    await context?.close().catch(() => {});\\n+    await browser?.close().catch(() => {});\\n+    key = null;\\n+    report.actualElapsedMs = Math.round(performance.now() - start);\\n+    const closed = JSON.stringify(report);\\n+    if (Buffer.byteLength(closed) > 65536) throw Error('Cold report bound');\\n+    await mkdir('artifacts', { recursive: true });\\n+    await writeFile('artifacts/cold-navigation-browser-results.json', closed + '\\\\n');\\n+    console.log('COLD_NAV_RESULT ' + closed);\\n+  }\\n+  if (!report.passed) process.exitCode = 1;\\n+}\\n*** End Patch\"));\n"
+}
+````
+
+### 6763. 2026-10-31T14:24:22.872Z — tool result (source line 25616)
+
+````text
+{
+  "call_id": "call_077c0eb762154330ad4c3dc521d64498",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 6764. 2026-10-31T14:25:10.808Z — assistant (source line 25623)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "The optional mode will use fresh contexts, pre-navigation LCP observation, disabled HTTP cache, and fail on missing metrics or LCP over2.5s. It will report per-route median/max comparisons. Preview access will come only from bounded stdin and be injected only into checked same-origin reads; it won’t appear in reports. WebSocket blocking is recorded explicitly, since that method difference limits comparisons with the operator baseline.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6765. 2026-10-31T14:25:26.294Z — tool call (source line 25624)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_dd138fe18ac348858805579b37df026f",
+  "input": "text(await tools.exec_command({cmd:\"cat >> scripts/browser-smoke-reliability.js <<'EOF'\\n\\nif (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {\\n  if (process.argv.length === 2) await runReliability();\\n  else await runColdNavigation(process.argv.slice(2));\\n}\\nEOF\\npython3 - <<'PY'\\np='scripts/browser-smoke-reliability.js';s=open(p).read().replace(\\\"if (!/^[A-Za-z0-9_-]{43}$/.test(value)\\\", \\\"if (!Buffer.from(value + (bytes.at(-1) === 10 ? '\\\\\\\\n' : ''), 'ascii').equals(bytes) || !/^[A-Za-z0-9_-]{43}$/.test(value)\\\")\\ns=s.replace('!positive(row.lcp?.time) || !positive(row.lcp?.size)', '!positive(row.lcp?.time) || !Number.isFinite(row.lcp?.size) || row.lcp.size <= 0 || row.lcp.size > 1365 * 768')\\ns=s.replace(\\\"new URL(page.url()).origin !== options.origin\\\", \\\"new URL(page.url()).origin !== options.origin || new URL(page.url()).pathname !== route\\\")\\nopen(p,'w').write(s)\\nPY\",\"max_output_tokens\":200}))\ntext(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/test/reliability-demo.test.js\\n@@\\n import { createRuntime } from '../src/runtime.js';\\n+import { readFile } from 'node:fs/promises';\\n+import { coldOptions, coldReadAllowed, coldAccess, coldSummary, coldBaseline, validateColdRow } from '../scripts/browser-smoke-reliability.js';\\n+\\n+test('cold-navigation input, credential and read boundaries are closed without importing a running browser', () => {\\n+  const origin = 'https://candidate---example.a.run.app';\\n+  assert.deepEqual(coldOptions(['--cold-navigation', '--origin=' + origin]), { origin, samples: 3, privateAccess: false });\\n+  for (const args of [[], ['--cold-navigation'], ['--cold-navigation', '--origin=http://example.run.app'], ['--cold-navigation', '--origin=' + origin + '/'], ['--cold-navigation', '--origin=' + origin, '--samples=4'], ['--cold-navigation', '--origin=' + origin, '--samples=0'], ['--cold-navigation', '--origin=' + origin, '--samples=1', '--samples=2'], ['--cold-navigation', '--origin=' + origin, '--unknown'], ['--cold-navigation=true', '--origin=' + origin]]) assert.throws(() => coldOptions(args));\\n+  assert.equal(coldReadAllowed(origin, origin + '/atlas/', 'GET'), true);\\n+  assert.equal(coldReadAllowed(origin, origin + '/atlas.js', 'HEAD'), true);\\n+  for (const path of ['/oauth/keeper/start', '/control/123/status', '/auth/callback', '/eventsub', '/internal/wander/tick', '/_preview/access', '/%6fauth/keeper/start']) assert.equal(coldReadAllowed(origin, origin + path, 'GET'), false);\\n+  for (const method of ['POST', 'PUT', 'DELETE']) assert.equal(coldReadAllowed(origin, origin + '/', method), false);\\n+  assert.equal(coldReadAllowed(origin, 'https://provider.invalid/', 'GET'), false);\\n+  const dummy = Buffer.alloc(32, 7).toString('base64url');\\n+  assert.equal(coldAccess(Buffer.from(dummy + '\\\\n')), dummy);\\n+  for (const bytes of [Buffer.from(dummy + '\\\\nextra'), Buffer.from(dummy + '\\\\r\\\\n'), Buffer.from('a'.repeat(43)), Buffer.from(dummy + '='), Buffer.alloc(43, 200)]) assert.throws(() => coldAccess(bytes));\\n+});\\n+test('cold-navigation baseline and metrics reject missing, duplicate or forged samples; summaries use median/max only', async () => {\\n+  const baseline = JSON.parse(await readFile('docs/COLD_NAV_BASELINE_1031.json', 'utf8'));\\n+  const summary = coldBaseline(baseline);\\n+  assert.deepEqual(summary.map((r) => [r.medianMs, r.maxMs]), [[360, 428], [352, 380], [340, 356], [360, 364]]);\\n+  assert.ok(summary.every((r) => r.withinBudget));\\n+  for (const patch of [{ status: 401 }, { visibility: 'hidden' }, { error: 'TimeoutError' }, { lcp: null }, { lcp: { ...baseline.rows[0].lcp, time: 0 } }, { lcp: { ...baseline.rows[0].lcp, time: NaN } }, { paints: [] }, { navigation: { ...baseline.rows[0].navigation, ttfb: 0 } }]) assert.throws(() => validateColdRow({ ...baseline.rows[0], ...patch }));\\n+  assert.throws(() => coldSummary(baseline.rows.slice(1), 3));\\n+  assert.throws(() => coldSummary([baseline.rows[1], ...baseline.rows.slice(1)], 3));\\n+  assert.throws(() => coldBaseline({ ...baseline, serverColdStartForced: true }));\\n+  assert.throws(() => coldBaseline({ ...baseline, samples: 4 }));\\n+  const slow = structuredClone(baseline.rows);\\n+  slow[0].lcp.time = 2501;\\n+  assert.equal(coldSummary(slow, 3)[0].withinBudget, false);\\n+});\\n*** End Patch\"));\n"
+}
+````
+
+### 6766. 2026-10-31T14:25:26.936Z — tool result (source line 25628)
+
+````text
+{
+  "call_id": "call_dd138fe18ac348858805579b37df026f",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "ba53f8",
+        "wall_time_seconds": 0.00000396,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 6767. 2026-10-31T14:26:36.995Z — tool call (source line 25634)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_bb8ba20c4a734e3c86ce3b57fc2291ce",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='scripts/browser-smoke-reliability.js';s=open(p).read().replace(\\\"import { readFile } from 'node:fs/promises';\\\", \\\"import { open } from 'node:fs/promises';\\\\nimport { constants } from 'node:fs';\\\")\\ns=s.replace(\\\"!url.hostname.endsWith('.run.app')\\\", \\\"!/^(?:[a-z][a-z0-9-]{0,62}---)?raid-relic-vz4bhnskgq-uc\\\\\\\\.a\\\\\\\\.run\\\\\\\\.app$/.test(url.hostname)\\\")\\ns=s.replace(\\\"    const baselineBytes = await readFile(new URL('../docs/COLD_NAV_BASELINE_1031.json', import.meta.url));\\\\n    if (baselineBytes.length > 65536) throw Error('Cold baseline');\\\", \\\"\\\"\\\"    const baselineFile = await open(new URL('../docs/COLD_NAV_BASELINE_1031.json', import.meta.url), constants.O_RDONLY | constants.O_NOFOLLOW);\\n    let baselineBytes;\\n    try {\\n      const stat = await baselineFile.stat();\\n      if (!stat.isFile() || stat.nlink !== 1 || stat.size <= 0 || stat.size > 65536) throw Error('Cold baseline');\\n      baselineBytes = await baselineFile.readFile();\\n      if (baselineBytes.length !== stat.size || baselineBytes.length > 65536) throw Error('Cold baseline');\\n    } finally { await baselineFile.close(); }\\\"\\\"\\\")\\ns=s.replace(\\\"browser = await chromium.launch(await localChromiumOptions(chromium));\\\", \\\"browser = await chromium.launch({ ...await localChromiumOptions(chromium), timeout: 20000 });\\\")\\ns=s.replace(\\\"    report.actualElapsedMs = Math.round(performance.now() - start);\\\", \\\"    report.actualElapsedMs = Math.round(performance.now() - start);\\\\n    if (report.actualElapsedMs > 150000) { report.passed = false; report.failureCategory = 'overall-deadline'; }\\\")\\nopen(p,'w').write(s)\\np='test/reliability-demo.test.js';s=open(p).read().replace(\\\"const origin = 'https://candidate---example.a.run.app';\\\", \\\"const origin = 'https://candidate---raid-relic-vz4bhnskgq-uc.a.run.app';\\\");s=s.replace(\\\"assert.equal(coldReadAllowed(origin, origin + '/atlas/', 'GET'), true);\\\", \\\"assert.throws(() => coldOptions(['--cold-navigation', '--origin=https://other.a.run.app']));\\\\n  assert.equal(coldReadAllowed(origin, origin + '/atlas/', 'GET'), true);\\\");open(p,'w').write(s)\\nPY\",\"max_output_tokens\":200}))\ntext(await tools.apply_patch(\"*** Begin Patch\\n*** Add File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/docs/COLD_NAVIGATION.md\\n+# Native cold navigation · 31 October 2026\\n+\\n+The parent recorded [this safe production baseline](COLD_NAV_BASELINE_1031.json)\\n+at 14:13:39 UTC against `sendoff-fix-on-1031`, reported runtime `6f1ae8d`.\\n+Production allocation is a dated observation, not an immutable current claim.\\n+\\n+| Route | LCP median ms | LCP maximum ms |\\n+| --- | ---: | ---: |\\n+| `/` | 360 | 428 |\\n+| `/atlas/` | 352 | 380 |\\n+| `/keeper/olsols3` | 340 | 356 |\\n+| `/overlay/1593561134` | 360 | 364 |\\n+\\n+All twelve recorded HTTP responses were200, with genuine positive FP/FCP/LCP,\\n+visible documents and navigation timings. None exceeded the2,500ms budget.\\n+**No runtime speedup or performance fix is justified by this baseline.**\\n+The source author copied only the parent-authorized safe JSON; no measurement\\n+was executed by the source author.\\n+\\n+## Parent-only repeatable candidate check\\n+\\n+Inside the parent's network-enabled isolated QA VM, using the existing read-only\\n+source/toolchain, Chromium sandbox, clear environment and resource limits:\\n+\\n+```sh\\n+node scripts/browser-smoke-reliability.js --cold-navigation --origin=https://TAG---raid-relic-vz4bhnskgq-uc.a.run.app --samples=3\\n+```\\n+\\n+For a private preview, append `--preview-access-stdin`. A trusted parent wrapper\\n+must pipe exactly the canonical43-character access code (optional final LF) into\\n+FD0. Never put a code in a URL, shell argument, environment file, repository,\\n+report or screenshot. The reader bounds input to44bytes/5seconds; headers are\\n+injected only after exact same-origin GET/HEAD checks. Redirects to another origin\\n+are blocked. Only this application's canonical/tag hostname family is accepted.\\n+The gate form itself is rejected as a performance result, even when HTTP200.\\n+\\n+The default invocation without arguments remains the existing offline synthetic\\n+reliability workflow. Cold mode is explicit and never runs automatically in that\\n+46-flow cohort. Importing its pure validators in unit tests starts no browser.\\n+\\n+Method: native sandboxed Chromium;1365×768,DPR1, normal motion; fresh context per\\n+navigation; service workers blocked; CDP cache disable+clear; PerformanceObserver\\n+installed before navigation with buffered LCP; no CPU/network throttling; no\\n+clicks, keys, form submissions, downloads, OAuth/control/provider action requests.\\n+Same-origin GET/HEAD only, with auth/control/internal routes blocked. Cold mode\\n+blocks WebSockets explicitly; the original operator baseline did not explicitly\\n+block them, so this difference limits causal comparison, especially for overlay\\n+read projections. This is client request isolation, not a new audit of server\\n+internals. Neither mode forces a Cloud Run server cold start.\\n+\\n+Four fixed routes, at most three samples each,20second navigation timeout,\\n+8second actual monotonic observation per navigation,150second overall budget.\\n+FP/FCP/LCP/TTFB and visible200 pages are required; absent/zero/nonfinite metrics,\\n+duplicate samples, gate pages and forbidden requests fail closed. The report\\n+contains bounded route/metric metadata, LCP tag (no text/DOM/element IDs), browser,\\n+cache/method scope, median/max and per-route baseline deltas. It is written to\\n+`artifacts/cold-navigation-browser-results.json` (≤64KiB), also emitted as\\n+`COLD_NAV_RESULT`. Any LCP maximum above2,500ms fails the budget check.\\n+\\n+Candidate harness execution/comparison is **pending parent QA**. Three samples\\n+are not p95, an SLA, a forced server-cold benchmark, physical OBS proof, or a\\n+claim of improvement. Record candidate runtime/source identity separately using\\n+parent release evidence; a documentation commit is not a deployed runtime.\\n*** End Patch\"));\n"
+}
+````
+
+### 6768. 2026-10-31T14:26:37.144Z — tool result (source line 25638)
+
+````text
+{
+  "call_id": "call_bb8ba20c4a734e3c86ce3b57fc2291ce",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "3e220f",
+        "wall_time_seconds": 0.00000344,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 6769. 2026-10-31T14:27:10.305Z — tool call (source line 25642)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_18ba334ff2e143cba3cad8d6fc76cd92",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='docs/PANEL_STATUS.md';s=open(p).read();a=s.index('<!-- PANEL_CURRENT_START -->');b=s.index('<!-- PANEL_CURRENT_END -->',a);block=s[a:b];lines=block.splitlines();lines=[\\\"| G4.04 | PARTLY DONE | Source342 durable cold-navigation harness implemented; candidate execution/comparison awaiting parent QA. Parent production baseline2026-10-31T14:13:39UTC (reported6f1ae8d/sendoff-fix-on-1031) has3fresh-context samples per route: root LCPmedian/max360/428ms, Atlas352/380, Keeperolsols3 340/356, overlay1593561134 360/364; all200 and positive native FP/FCP/LCP. None exceeds2500ms, so no runtime perf change or speedup claim. Safe `docs/COLD_NAV_BASELINE_1031.json` and `docs/COLD_NAVIGATION.md`; explicit `browser-smoke-reliability.js --cold-navigation` uses normal-motion1365×768DPR1, cache-disabled,8s observations,≤3samples×4routes,20s navigation/150s total, strict read isolation and bounded secret-free report. Production server-cold not forced; no p95/SLA/physicalOBS claim. New harness blocks WebSockets explicitly, unlike the operator baseline's unspecified WS policy; comparison is qualified. Historical R0 had no recorded cold baseline, preserved below. |\\\" if x.startswith('| G4.04 |') else x for x in lines];s=s[:a]+'\\\\n'.join(lines)+'\\\\n'+s[b:];open(p,'w').write(s)\\nPY\\nsed -n '1,65p' scripts/browser-smoke-reliability.js\\ntail -9 scripts/browser-smoke-reliability.js\",\"max_output_tokens\":1500}))\n"
+}
+````
+
+### 6770. 2026-10-31T14:27:10.422Z — tool result (source line 25645)
+
+````text
+{
+  "call_id": "call_18ba334ff2e143cba3cad8d6fc76cd92",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "36eb18",
+        "wall_time_seconds": 0.00000496,
+        "exit_code": 0,
+        "original_token_count": 1079,
+        "output": "// Canonical-origin LOCAL TLS/WSS only. No upstream EventSub WebSocket exists.\nimport assert from 'node:assert/strict';\nimport { mkdir, writeFile } from 'node:fs/promises';\nimport { pathToFileURL } from 'node:url';\nimport { open } from 'node:fs/promises';\nimport { constants } from 'node:fs';\nimport { visualReview, growthPixels, localChromiumOptions } from '../test-support/visual-review.js';\nimport { HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\nexport const COLD_ROUTES = Object.freeze(['/', '/atlas/', '/keeper/olsols3', '/overlay/1593561134']);\nexport function coldOptions(args) {\n  const values = new Map();\n  for (const arg of args) {\n    const match = /^(--cold-navigation|--preview-access-stdin|--origin|--samples)(?:=(.*))?$/.exec(arg);\n    if (!match || values.has(match[1])) throw Error('Cold input');\n    const flag = ['--cold-navigation', '--preview-access-stdin'].includes(match[1]);\n    if (flag ? match[2] !== undefined : !match[2]) throw Error('Cold input');\n    values.set(match[1], flag ? true : match[2]);\n  }\n  const origin = values.get('--origin');\n  const url = new URL(origin);\n  if (!values.has('--cold-navigation') || url.protocol !== 'https:' || url.origin !== origin ||\n      url.username || url.password || !/^(?:[a-z][a-z0-9-]{0,62}---)?raid-relic-vz4bhnskgq-uc\\.a\\.run\\.app$/.test(url.hostname)) throw Error('Cold origin');\n  const samples = values.get('--samples') ?? '3';\n  if (!/^[1-3]$/.test(samples)) throw Error('Cold samples');\n  return { origin, samples: Number(samples), privateAccess: values.has('--preview-access-stdin') };\n}\nexport function coldReadAllowed(origin, address, method) {\n  try {\n    const url = new URL(address);\n    return url.origin === origin && !url.username && !url.password &&\n      ['GET', 'HEAD'].includes(method) && !/%|\\\\/.test(url.pathname) &&\n      !/^\\/(?:control|auth|oauth|eventsub|internal|_preview)(?:\\/|$)/.test(url.pathname);\n  } catch { return false; }\n}\nexport function coldAccess(bytes) {\n  if (!Buffer.isBuffer(bytes) || bytes.length > 44) throw Error('Cold access');\n  const value = bytes.toString('ascii').replace(/\\n$/, '');\n  if (!Buffer.from(value + (bytes.at(-1) === 10 ? '\\n' : ''), 'ascii').equals(bytes) || !/^[A-Za-z0-9_-]{43}$/.test(value) || Buffer.from(value, 'base64url').length !== 32 ||\n      Buffer.from(value, 'base64url').toString('base64url') !== value) throw Error('Cold access');\n  return value;\n}\nexport function validateColdRow(row) {\n  const positive = (v) => Number.isFinite(v) && v > 0 && v <= 150000;\n  if (!COLD_ROUTES.includes(row?.route) || !Number.isInteger(row.sample) || row.sample < 0 || row.sample > 2 ||\n      row.status !== 200 || row.error !== null || row.visibility !== 'visible' ||\n      !Array.isArray(row.paints) || row.paints.length !== 2 ||\n      !['first-paint', 'first-contentful-paint'].every((name) => row.paints.filter((p) => p.name === name && positive(p.time)).length === 1) ||\n      !positive(row.lcp?.time) || !Number.isFinite(row.lcp?.size) || row.lcp.size <= 0 || row.lcp.size > 1365 * 768 || !/^[A-Z][A-Z0-9]{0,15}$/.test(row.lcp?.tag ?? '') ||\n      !positive(row.navigation?.ttfb) || !positive(row.navigation?.dom) || !positive(row.navigation?.load) ||\n      !Number.isFinite(row.navigation?.transfer) || row.navigation.transfer < 0) throw Error('Cold metric');\n  return row;\n}\nexport function coldSummary(rows, samples) {\n  if (!Number.isInteger(samples) || samples < 1 || samples > 3 || rows.length !== samples * 4) throw Error('Cold rows');\n  const keys = new Set();\n  for (const row of rows) {\n    validateColdRow(row);\n    const key = row.route + ':' + row.sample;\n    if (row.sample >= samples || keys.has(key)) throw Error('Cold duplicate');\n    keys.add(key);\n  }\n  return COLD_ROUTES.map((route) => {\n    const times = rows.filter((r) => r.route === route).map((r) => r.lcp.time).sort((a, b) => a - b);\n    const medianMs = times.length % 2 ? times[Math.floor(times.length / 2)] : (times[0] + times[1]) / 2;\n    return { route, medianMs, maxMs: times.at(-1), budgetMs: 2500, withinBudget: times.at(-1) <= 2500 };\n}\nif (!passed) process.exitCode = 1;\n\n}\n\nif (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {\n  if (process.argv.length === 2) await runReliability();\n  else await runColdNavigation(process.argv.slice(2));\n}\n"
+      }
+    }
+  ]
+}
+````
+
+### 6771. 2026-10-31T14:27:55.423Z — tool call (source line 25651)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_b7ea0673461748dca9698340567984e3",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='scripts/browser-smoke-reliability.js';s=open(p).read().replace('// Canonical-origin LOCAL TLS/WSS only. No upstream EventSub WebSocket exists.', '// Default: LOCAL synthetic TLS/WSS reliability. Explicit --cold-navigation:\\\\n// parent-owned read-only network timing; never an upstream EventSub socket.')\\ns=s.replace(\\\"const fail = () => { cleanup(); reject(Error('Cold access')); };\\\", \\\"const fail = () => { bytes.fill(0); cleanup(); reject(Error('Cold access')); };\\\")\\ns=s.replace(\\\"      report.stage = 'navigation';\\\", \\\"      report.stage = 'navigation';\\\\n      report.activeRoute = route; report.activeSample = sample;\\\")\\ns=s.replace(\\\"      if (forbidden || downloads || metrics.previewGate\\\", \\\"      report.boundary = { forbiddenRequests: forbidden, downloads, previewGate: metrics.previewGate, status: response?.status() ?? 0 };\\\\n      if (forbidden || downloads || metrics.previewGate\\\")\\nopen(p,'w').write(s)\\nPY\",\"max_output_tokens\":200}))\n"
+}
+````
+
+### 6772. 2026-10-31T14:27:55.587Z — tool result (source line 25654)
+
+````text
+{
+  "call_id": "call_b7ea0673461748dca9698340567984e3",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "527fce",
+        "wall_time_seconds": 0.00000388,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    }
+  ]
+}
+````
+
+### 6773. 2026-10-31T14:28:17.645Z — tool call (source line 25658)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_7805059151634faebc312304cd3a52c5",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\np='docs/COLD_NAVIGATION.md';s=open(p).read().replace('https://TAG---raid-relic-vz4bhnskgq-uc.a.run.app', 'https://tag---raid-relic-vz4bhnskgq-uc.a.run.app').replace('For a private preview, append', 'Replace `tag` with the parent-verified preview tag; the example is not a published-candidate claim.\\\\nFor a private preview, append');open(p,'w').write(s)\\nPY\",\"max_output_tokens\":100}))\n"
+}
+````
+
+### 6774. 2026-10-31T14:28:17.745Z — tool result (source line 25661)
+
+````text
+{
+  "call_id": "call_7805059151634faebc312304cd3a52c5",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "e6cad8",
+        "wall_time_seconds": 0.0000036,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    }
+  ]
+}
+````
+
+### 6775. 2026-10-31T14:28:22.641Z — assistant (source line 25664)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Changed 5 files: existing reliability script/test, safe baseline JSON, cold-navigation guide, and current G4.04 status.\n\nAdded explicit `--cold-navigation --origin=… --samples=3`; optional `--preview-access-stdin` keeps credentials out of arguments/reports. Default offline flow remains unchanged. Reports are bounded to64KiB with median/max comparisons and strict missing-metric/budget failures.\n\nBaseline maxima are348–428ms, below2.5s; no runtime performance change made. WebSocket-method differences are documented.\n\nNew harness/tests remain unrun. Parent candidate QA pending. Stopped.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````

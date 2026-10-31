@@ -1,23 +1,23 @@
 {
   "formatVersion": 2,
   "sessionID": "01a1705c-a87d-7143-80f6-021e47b78ced",
-  "inputLeaf": "rollout-release337-01a1705c-a87d-7143-80f6-021e47b78ced.jsonl",
-  "rawSnapshotSHA256": "b2ab4d7bb181142bf7643e67ab052b3c39c6edfe5434eae0e31df52addc55f02",
-  "rawBytes": 129567699,
+  "inputLeaf": "rollout-release342-01a1705c-a87d-7143-80f6-021e47b78ced.jsonl",
+  "rawSnapshotSHA256": "d888bb67b1a88a2781a03f0722cf604ace5935f0e36ca230be353bd0953fc2ee",
+  "rawBytes": 130338019,
   "eventCounts": {
     "session_meta": 1,
-    "event_msg": 11714,
-    "response_item": 10098,
-    "world_state": 192,
-    "turn_context": 339,
-    "token_usage_record": 3022,
+    "event_msg": 11847,
+    "response_item": 10203,
+    "world_state": 193,
+    "turn_context": 344,
+    "token_usage_record": 3055,
     "compacted": 24
   },
-  "exportedEntries": 6702,
+  "exportedEntries": 6775,
   "omissions": {
     "private": 121,
     "media": 9,
-    "unselected": 18687,
+    "unselected": 18891,
     "truncated": 20,
     "credentialLookingItems": 76,
     "credentialReasons": {
@@ -26,10 +26,10 @@
     }
   },
   "firstTimestamp": "2026-10-25T00:01:23.357Z",
-  "cutoff": "2026-10-31T12:22:34.710Z",
-  "exportSHA256": "eae4588b6bfb552b79598810678cf7b840c41986cada5a12c3d815348a346b82",
-  "exportBytes": 21002289,
-  "sourceRunLogCount": 338,
+  "cutoff": "2026-10-31T14:28:22.681Z",
+  "exportSHA256": "2db64deaa7e9d3d6c1087c59a4859f5f993e6652ba170034c03e8aa735c1e8d1",
+  "exportBytes": 21188376,
+  "sourceRunLogCount": 343,
   "sourceRunLogs": [
     {
       "leaf": "run-000.jsonl",
@@ -1720,27 +1720,52 @@
       "leaf": "run-337.jsonl",
       "bytes": 48004,
       "sha256": "0126d2bbc0dee4be12f54be0c04307694673aa877ed6396f524d2b319c3a8b36"
+    },
+    {
+      "leaf": "run-338.jsonl",
+      "bytes": 12275,
+      "sha256": "0416bf416a24e9db5e3d79549c52470ecd3a53f99f9c5d508ffa03944b8e4f3b"
+    },
+    {
+      "leaf": "run-339.jsonl",
+      "bytes": 19517,
+      "sha256": "c65535c166ee10d933474374750d955649d7ef6ded5f0676f6d72d8153d5c47a"
+    },
+    {
+      "leaf": "run-340.jsonl",
+      "bytes": 58178,
+      "sha256": "2c0e416d4e72e8bf65acbf813e0f9acd84633fbefc9f206400716d2ba8fbdde0"
+    },
+    {
+      "leaf": "run-341.jsonl",
+      "bytes": 34897,
+      "sha256": "de1fba5651160a69b3f77b24171439520de5615ee9d8978efe8771b39e5bb892"
+    },
+    {
+      "leaf": "run-342.jsonl",
+      "bytes": 82253,
+      "sha256": "dac72c98bbe47ba32267ebf3a0d9ad5d4ed9f27d79995fd67be797af2c0b21b7"
     }
   ],
   "scope": "Selected sanitized native JSONL; private/internal/media omitted and per-item output bounded. Raw snapshot remains local ignored. Secondary scanner findings cause whole selected-entry omission, including public identifiers; zero-finding rescan required.",
   "parts": [
     {
       "order": 1,
-      "path": "EXPORTED_TRANSCRIPT.part-001-eae4588b6bfb552b79598810678cf7b840c41986cada5a12c3d815348a346b82.md",
+      "path": "EXPORTED_TRANSCRIPT.part-001-2db64deaa7e9d3d6c1087c59a4859f5f993e6652ba170034c03e8aa735c1e8d1.md",
       "bytes": 16770524,
-      "sha256": "27490ee8fb0b0d33adfa4268069d55f8f69751fd4511a39b6a4ac8465b006918",
+      "sha256": "16a3d69958fc81fe42acd7d0326c0ceb0f22e42ef0b1b31a8005558065e81343",
       "entries": 5513
     },
     {
       "order": 2,
-      "path": "EXPORTED_TRANSCRIPT.part-002-eae4588b6bfb552b79598810678cf7b840c41986cada5a12c3d815348a346b82.md",
-      "bytes": 4231765,
-      "sha256": "9a333d5c32273ff76327c6f0a6b055a68cd417112757074db33db73c7feb0f37",
-      "entries": 1189
+      "path": "EXPORTED_TRANSCRIPT.part-002-2db64deaa7e9d3d6c1087c59a4859f5f993e6652ba170034c03e8aa735c1e8d1.md",
+      "bytes": 4417852,
+      "sha256": "9b2de0ca92944ef041c20c481f96ced928241b111da644317d17e41f3f9cf857",
+      "entries": 1262
     }
   ],
   "indexBytes": 862,
-  "indexSHA256": "11c589f157ed41a0a61563933076636e14583fe9823ec89fa6fe42155e43a27f",
+  "indexSHA256": "8862dd86f682315e6b5a4235af091cff67f69380596244a9d92cb524ba1cd520",
   "secondaryScan": {
     "status": "zero-findings",
     "findings": 8,
@@ -1749,9 +1774,9 @@
       "twitch-api-token": 4,
       "generic-api-key": 4
     },
-    "omissionReportSHA256": "33377749610ac6b7479ef6d8fbb8fae8551cd744373c9b4843b57167d3927a32",
-    "reportSHA256": "5eebd75a13d2b6bd1613d3c39fd7146ce05ec6cbdd47fd753ff0e97784b19317",
-    "scannedExportSHA256": "eae4588b6bfb552b79598810678cf7b840c41986cada5a12c3d815348a346b82",
-    "scannedPartsSHA256": "8aae21f481637e45b43b1f958cc5a83127b56c77f1f0b0d0a13eb091097d64b6"
+    "omissionReportSHA256": "3941377afb8f94a50e4e3268f80ad48f074f36bad6fe46d793f799a4ca937b55",
+    "reportSHA256": "20597297651bd02bebfe3222676ddf8ba0a30d247a9430f252923b6d70ed9f1a",
+    "scannedExportSHA256": "2db64deaa7e9d3d6c1087c59a4859f5f993e6652ba170034c03e8aa735c1e8d1",
+    "scannedPartsSHA256": "f11fd4db02feb0086e459351ae69d08ea3be2cf2052555cb0ef6b9a555809f41"
   }
 }
