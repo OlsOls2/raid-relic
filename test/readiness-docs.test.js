@@ -2,11 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, stat } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-test('judge front door uses published private production-policy preview with GET-only walk and scoped historical proof', async () => {
+test('judge front door uses activated read-only judge admission and preserves scoped historical owner-preview proof', async () => {
   const s = await readFile('README.md', 'utf8');
   const guide = await readFile('docs/PROJECT_GUIDE.md', 'utf8');
   const quick = await readFile('docs/JUDGES_QUICKSTART.md', 'utf8');
   const demo = await readFile('docs/DEMO_SCRIPT.md', 'utf8');
+  const admission = await readFile('docs/JUDGE_ADMISSION.md', 'utf8');
   const compact = (value) => value.replace(/\s+/g, ' ');
   assert.ok(s.trimEnd().split('\n').length <= 60);
   for (const term of [
@@ -21,7 +22,7 @@ test('judge front door uses published private production-policy preview with GET
     'Unofficial fan project. Not affiliated with Twitch.',
   ])
     assert.ok(s.includes(term), term);
-  const origin = 'https://judge-freeze-1031---raid-relic-vz4bhnskgq-uc.a.run.app';
+  const origin = 'https://judge-mode-1031---raid-relic-vz4bhnskgq-uc.a.run.app';
   for (const route of [
     '',
     '/atlas/',
@@ -32,12 +33,73 @@ test('judge front door uses published private production-policy preview with GET
     '/demo/',
   ])
     assert.ok(s.includes(origin + route), route);
-  assert.match(s, /access[- ]gated[^\n]*not a read-only preview/i);
-  assert.match(s, /access code[^\n]*owner[^\n]*private DM/);
-  assert.match(s, /no Twitch login/i);
-  assert.match(s, /GET-only: no OAuth, control, Setup, Send Off, chat or other Twitch actions/);
-  assert.match(s, /P5_PREVIEW_READ_ONLY=false/);
-  assert.doesNotMatch(s, /real Twitch OAuth\/control mutations are blocked/);
+  assert.match(s, /read-only judge sandbox/i);
+  assert.match(s, /`<JUDGE_CODE>`[^\n]*private judging instructions/);
+  assert.match(s, /no owner contact or Twitch login is needed/);
+  assert.match(s, /Never put the code in this repository or a URL/);
+  assert.match(s, /server read-only and judge admission are ON/);
+  assert.match(s, /2026-11-16T00:00:00Z exclusive/);
+  assert.match(s, /OAuth, control, Setup, Send Off, chat and other Twitch actions are blocked/);
+  assert.match(s, /raid-relic-judge-mode-fixed-1031/);
+  assert.match(s, /runtime f8151d2/);
+  assert.match(s, /26 HTTP-only checks[^\n]*separately from the first revision/);
+  assert.match(s, /HTTP acceptance is not deployed browser\/WSS, visual or physical proof/);
+  assert.match(s, /owner-only preview[^\n]*historical, not the submission link/);
+  for (const doc of [quick, admission]) {
+    assert.ok(doc.includes(origin));
+    assert.ok(doc.includes('`<JUDGE_CODE>`'));
+    assert.match(doc, /no owner contact or Twitch login/i);
+    assert.match(doc, /2026-11-16T00:00:00Z exclusive/);
+    assert.match(doc, /raid-relic-judge-mode-fixed-1031/);
+    assert.match(doc, /f8151d2ed5abdbb487dd91654d9b594adb747d7e/);
+    assert.match(doc, /26[^\n]*HTTP|HTTP[^\n]*26/);
+    assert.match(doc, /not[^\n]*WSS[^\n]*visual|No deployed WSS or browser test/);
+    assert.match(doc, /1277[^\n]*zero skips|1277native\/0skips/);
+    assert.match(doc, /41228565537/);
+  }
+  assert.match(
+    admission,
+    /sha256:a9586b561ae4c3cc4021674f784b656648f34b3c3d9062ef706e871062dff705/,
+  );
+  assert.match(
+    admission,
+    /exactly one digest-only secret[^\n]*raid-relic-judge-digest-1031[^\n]*version1/,
+  );
+  assert.match(admission, /exactly one secret-scoped accessor grant/);
+  assert.match(admission, /roles\/secretmanager\.secretAccessor/);
+  assert.match(
+    admission,
+    /serviceAccount:raid-relic-runtime@raid-relic-hackathon\.iam\.gserviceaccount\.com/,
+  );
+  assert.match(admission, /on that secret only/);
+  assert.match(admission, /No project IAM[^\n]*raw-code secret\/version/);
+  assert.match(admission, /No raw-code Secret Manager object\/version was created/);
+  assert.match(
+    admission,
+    /\/home\/ubuntu\/\.raid-relic-judge\/JUDGE_CODE[^\n]*mode0600[^\n]*directory0700/,
+  );
+  assert.match(admission, /source author[^\n]*never read it/);
+  assert.match(admission, /--update-secrets=JUDGE_ACCESS_SHA256=raid-relic-judge-digest-1031:1/);
+  assert.match(admission, /P5_PREVIEW_READ_ONLY=true/);
+  assert.match(admission, /P5_PREVIEW_PRIVATE_ENABLED=false/);
+  assert.match(admission, /JUDGE_ADMISSION_ENABLED=true/);
+  assert.ok(admission.includes('OVERLAY_ORIGIN=' + origin));
+  assert.match(admission, /overlay-sockets\.js[^\n]*rejects upgrades with other request origins/);
+  assert.match(admission, /two configuration revisions, one final tagged target/);
+  assert.match(admission, /first[^\n]*raid-relic-judge-mode-1031[^\n]*untagged at0%/i);
+  assert.match(admission, /no image rebuild or redeploy/);
+  assert.doesNotMatch(
+    admission,
+    /corrected-revision HTTP acceptance is pending|its result is \*\*pending\*\*/,
+  );
+  assert.deepEqual(
+    [...admission.matchAll(/gcloud secrets create ([a-z0-9-]+)/g)].map((m) => m[1]),
+    ['raid-relic-judge-digest-1031'],
+  );
+  assert.doesNotMatch(
+    admission,
+    /gcloud projects add-iam-policy-binding|gcloud secrets versions add/,
+  );
   assert.match(s, /Ring 12[^\n]*approved light|approved light[^\n]*Ring 12/);
   assert.match(s, /offline|stream closure/);
   assert.match(s, /under five minutes/i);
@@ -80,7 +142,7 @@ test('judge front door uses published private production-policy preview with GET
     /multiple \*\*simultaneous\*\* relics.*future work.*not a current feature/,
   );
   assert.match(guide, /client-only expiry/);
-  for (const doc of [s, quick, demo]) {
+  for (const doc of [quick, demo]) {
     assert.match(doc, /judge-freeze-1031/);
     assert.doesNotMatch(
       doc,
@@ -126,7 +188,10 @@ test('judge front door uses published private production-policy preview with GET
   assert.match(quick, /native1268zeroSkip and nine whole-plate native checks/);
   assert.match(quick, /e80b322[^\n]*native1270zeroSkip/);
   assert.match(quick, /maxima508\/404\/364\/364ms[^\n]*baseline428\/380\/356\/364ms/);
-  assert.match(quick, /earlier overlapping cohorts remain separate from the final release proof/);
+  assert.match(
+    quick,
+    /earlier overlapping cohorts remain separate from the historical owner-preview proof/,
+  );
   assert.match(quick, /no speedup, forced server-cold, p95 or SLA claim/);
   assert.match(demo, /2:45 shot list/);
   assert.match(demo, /Keep the edit below three minutes/);
