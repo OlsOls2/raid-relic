@@ -1,5 +1,5 @@
 import { keeperNames as networkNames } from './keeper-network.js';
-import { actionMessage, botConsentStartURL, setupRetryAllowed } from './control-view.js';
+import { actionMessage, botConsentStartURL, setupRetryAllowed, readinessLights } from './control-view.js';
 import { boundedResponse, createControlPoller } from './control-read.js';
 import { mountFirstRun } from './first-run.js';
 const forgeLink = document.getElementById('forge-owner-link');
@@ -82,6 +82,28 @@ const labels = {
 };
 const status = document.getElementById('result');
 const sendResult = document.getElementById('send-result');
+function renderLights(pilot, actions = []) {
+  for (const [key, value] of Object.entries(readinessLights(pilot, actions))) {
+    const light = document.getElementById(`light-${key}`),
+      reason = document.getElementById(`light-${key}-reason`),
+      fix = document.getElementById(`light-${key}-fix`);
+    light.dataset.state = value.state;
+    light.textContent = `${{ bot: 'Bot', subscriptions: 'Subscriptions', live: 'Stream' }[key]}: ${value.state === 'ready' ? 'observed' : value.state === 'offline' ? 'offline' : 'not confirmed'}`;
+    reason.textContent = value.reason;
+    fix.hidden = !value.fix;
+    fix.removeAttribute('href');
+    fix.onclick = null;
+    if (value.fix) {
+      fix.href = '#' + value.fix;
+      fix.textContent = value.label;
+      fix.onclick = (event) => {
+        event.preventDefault();
+        // Navigation only. Never dispatch Setup or reconnect on behalf of a light.
+        if (!busy) firstRun.revealControl(value.fix);
+      };
+    }
+  }
+}
 function disable(value) {
   busy = value;
   document.querySelectorAll('button').forEach((b) => {
@@ -91,6 +113,18 @@ function disable(value) {
   document.getElementById('expire-handoff').disabled = value || !expiryRecovery?.canExpire;
   target.disabled = value || !csrf || !candidates.length;
   document.getElementById('cancel-queued').disabled = value || !recovery?.canCancel;
+  document.getElementById('recovery-disabled-reason').textContent = value
+    ? 'Wait for the current status read or action to finish.'
+    : !csrf ? 'Sign in and read your own saved recovery status first.'
+      : recovery?.canCancel
+        ? 'Confirmation cancels only the exact saved never-dispatched queue; it cannot cancel a Twitch raid.'
+        : 'No cancellable never-dispatched queue is confirmed; accepted or unknown requests need operator review.';
+  document.getElementById('expiry-disabled-reason').textContent = value
+    ? 'Wait for the current status read or action to finish.'
+    : !csrf ? 'Sign in and read your own saved recovery status first.'
+      : expiryRecovery?.canExpire
+        ? 'Only this saved ended app handoff can be retired; the holder stays unchanged.'
+        : 'No source-owned ended confirmed handoff is available to retire.';
   for (const button of document.querySelectorAll('#raid button.send-off'))
     button.disabled =
       value ||
@@ -122,16 +156,12 @@ function invalidate() {
   }
   if (document.getElementById('p7-gates'))
     document.getElementById('p7-gates').textContent = 'Refresh to read operator-configured gates.';
-  for (const key of ['bot', 'subscriptions', 'live']) {
-    const light = document.getElementById(`light-${key}`);
-    light.dataset.state = 'unknown';
-    light.textContent = `${{ bot: 'Bot', subscriptions: 'Subscriptions', live: 'Stream' }[key]}: not yet checked`;
-  }
+  renderLights(null);
   document.getElementById('keeper-summary').textContent = 'Read status before taking action.';
   csrf = null;
   candidates = [];
   recovery = expiryRecovery = null;
-  for (const group of ['setup', 'keeper', 'raid']) document.getElementById(group).replaceChildren();
+  for (const group of ['setup', 'keeper', 'raid', 'advanced-send-actions']) document.getElementById(group).replaceChildren();
   disable(busy);
 }
 async function refresh({ preserveResult = true, signal } = {}) {
@@ -178,32 +208,7 @@ async function refresh({ preserveResult = true, signal } = {}) {
     document.getElementById('simulator').hidden = value.pilot.mode !== 'simulator';
     simulated = value.pilot.mode === 'simulator';
     document.getElementById('ledger').hidden = !simulated;
-    const lights = {
-      bot: value.pilot.botGrantStored === true,
-      subscriptions: value.pilot.subscriptions?.ready === true,
-      live: value.pilot.online === true,
-    };
-    const enabledSubscriptions = value.pilot.subscriptions?.conditions?.filter(
-      (c) => c.status === 'enabled',
-    ).length;
-    for (const [key, ready] of Object.entries(lights)) {
-      const light = document.getElementById(`light-${key}`);
-      light.dataset.state = ready ? 'ready' : key === 'live' ? 'offline' : 'unknown';
-      light.textContent = ready
-        ? {
-            bot: 'Bot: saved grant connected (not a live moderator check).',
-            subscriptions: 'Subscriptions: all five enabled at the last setup.',
-            live: 'Stream: observed live; Send Off rechecks it.',
-          }[key]
-        : {
-            bot: 'Bot: not connected; ask the owner to connect raidrelicbot.',
-            subscriptions: `Subscriptions: ${Number.isInteger(enabledSubscriptions) ? enabledSubscriptions + '/5 enabled' : 'not listening for raids yet'}; use Set up channel.`,
-            live: "Stream: you're offline at the last observation; Send Off requires a live stream.",
-          }[key];
-      light.title = light.textContent;
-    }
-    document.getElementById('bot-fix').hidden = !lights.bot;
-    document.getElementById('copy-mod').hidden = !lights.bot;
+    renderLights(value.pilot, value.actions);
     if (consentURL) {
       consentURL.value = '';
       copyConsent.disabled = true;
@@ -281,7 +286,7 @@ async function refresh({ preserveResult = true, signal } = {}) {
         dd.textContent = JSON.stringify(value.pilot[key], null, 2);
         document.getElementById('ledger').append(dt, dd);
       }
-    for (const group of ['setup', 'keeper', 'raid'])
+    for (const group of ['setup', 'keeper', 'raid', 'advanced-send-actions'])
       document.getElementById(group).replaceChildren();
     candidates = (value.pilot.candidates ?? []).filter(
       (c) => c.id !== id && names[c.id] && c.observedOnline && c.optedIn && c.eligible,
@@ -323,7 +328,7 @@ async function refresh({ preserveResult = true, signal } = {}) {
           action === 'bootstrap'
             ? 'setup'
             : action === 'process' || action.startsWith('send:')
-              ? 'raid'
+              ? 'advanced-send-actions'
               : 'keeper',
         )
         .append(button);
@@ -473,6 +478,8 @@ async function run(action, { continued = false } = {}) {
     dispatchInFlight = false;
     disable(false);
     poller.resume();
+    if (action === 'bootstrap' && !retrySetup) firstRun.focusCurrent('setup');
+    if (action === 'keep') firstRun.focusCurrent('overlay');
     if (retrySetup && setupLeft > 0 && !document.hidden && Date.now() < setupDeadline) {
       setupTimer = setTimeout(() => {
         void run('bootstrap', { continued: true });

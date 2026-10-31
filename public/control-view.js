@@ -1,6 +1,38 @@
 import { keeperNames as networkNames } from './keeper-network.js';
 // Closed-vocabulary UI; never render upstream bodies, arbitrary messages or JSON.
 export const keeperNames = networkNames;
+
+// The server reports saved candidate-cache time independently of this page's GET age.
+export function targetObservationText(pilot, now = Date.now()) {
+  const at = pilot?.candidatesObservedAt;
+  if (at === null)
+    return 'Targets: not observed. Status reads do not observe Twitch; use Set up channel to request an observation.';
+  if (!Number.isSafeInteger(at) || at < 0 || !Number.isSafeInteger(now) || now < at)
+    return 'Saved target-observation age unavailable; status read age is not provider freshness.';
+  return `Saved target observation: ${Math.floor((now - at) / 1000)} s ago; not a fresh Twitch check or a readiness guarantee.`;
+}
+
+// One reason and zero or one navigation fix per light; links reveal existing controls only.
+export function readinessLights(pilot, actions = []) {
+  if (!pilot) return Object.fromEntries(['bot', 'subscriptions', 'live'].map((key) => [key, {
+    state: 'unknown',
+    reason: 'Sign in first; channel status has not been checked.',
+    fix: 'reconnect',
+    label: 'Connect Twitch',
+  }]));
+  const setupFix = actions.includes('bootstrap') ? 'first-bootstrap' : null;
+  return {
+    bot: pilot.botGrantStored === true
+      ? { state: 'ready', reason: 'Saved bot grant connected; moderator role is not verified here.', fix: null }
+      : { state: 'unknown', reason: 'No saved bot grant; ask the owner to connect raidrelicbot.', fix: null },
+    subscriptions: pilot.subscriptions?.ready === true
+      ? { state: 'ready', reason: 'All five subscriptions enabled at the last setup.', fix: null }
+      : { state: 'unknown', reason: 'Five enabled subscriptions are not yet confirmed.', fix: setupFix, label: 'Review subscription setup' },
+    live: pilot.online === true
+      ? { state: 'ready', reason: 'Stream observed live; Send Off rechecks eligibility.', fix: null }
+      : { state: 'offline', reason: 'Stream is offline or not yet observed live; Send Off requires a live stream.', fix: setupFix, label: 'Check stream after going live' },
+  };
+}
 export function actionMessage(value, targetLogin) {
   if (value?.authorization === 'ready')
     return 'Your Keeper authorization is ready. Refresh status to check current targets; ordinary status reads never renew tokens.';

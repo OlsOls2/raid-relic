@@ -176,13 +176,24 @@ try {
   );
   await capture(control, 'p4-polish-control.png');
   stage = 'human-raid-settings';
-  let posts = 0;
+  let posts = 0,
+    unknownSend = false,
+    releaseUnknown,
+    unknownStarted;
+  const unknownGate = new Promise((resolve) => { releaseUnknown = resolve; });
+  const unknownRequest = new Promise((resolve) => { unknownStarted = resolve; });
   await control.route(`**/control/${HOME}`, async (r) => {
     if (r.request().method() !== 'POST') return r.continue();
     const b = r.request().postDataJSON();
     assert.equal(b.action, `send:${OTHER}`);
     assert.deepEqual(Object.keys(b).sort(), ['action', 'csrf']);
     posts++;
+    if (unknownSend) {
+      unknownStarted();
+      await unknownGate;
+      await r.fulfill({ status: 200, json: { status: 'unknown' } });
+      return;
+    }
     await r.fulfill({
       status: 200,
       json: {
@@ -200,8 +211,29 @@ try {
     .waitFor();
   assert.equal(posts, 1);
   assert(!(await control.locator('main').innerText()).includes('not displayed'));
+  assert.equal(await control.locator('#send-result').textContent(), await control.locator('#result').textContent());
+  stage = 'unknown-send-stays-locked';
+  unknownSend = true;
+  await control.waitForFunction(() => document.querySelector('#raid .send-off')?.disabled === false);
+  await control.locator('#raid .send-off').click();
+  await unknownRequest;
+  await control.waitForFunction(() => document.querySelector('#send-step').getAttribute('aria-busy') === 'true');
+  assert.equal(await control.locator('#send-progress').isVisible(), true);
+  assert.equal(await control.locator('#raid .send-off').isDisabled(), true);
+  await control.locator('#raid .send-off').evaluate((n) => n.click());
+  assert.equal(posts, 2, 'Disabled in-flight send cannot submit a duplicate');
+  releaseUnknown();
+  await control.locator('#send-result').filter({ hasText: 'outcome is unknown' }).waitFor();
+  await control.waitForFunction(() => !document.querySelector('#refresh').disabled);
+  assert.equal(await control.locator('#raid .send-off').isDisabled(), true);
+  assert.match(await control.locator('#send-disabled-reason').textContent(), /locked.*uncertain outcome/);
+  await control.locator('#refresh').click();
+  await control.waitForFunction(() => !document.querySelector('#refresh').disabled);
+  await control.locator('#raid .send-off').evaluate((n) => n.click());
+  assert.equal(posts, 2, 'Refresh cannot unlock or repeat an unknown dispatch');
+  assert.match(await control.locator('#send-result').textContent(), /outcome is unknown/);
   checks.push({
-    name: 'SIMULATOR live-mode cached lights, bounded retry, native font and closed human settings guidance',
+    name: 'SIMULATOR cached lights/settings guidance plus adjacent pending/unknown result, one dispatch and no retry after read refresh',
     passed: true,
   });
   stage = 'actual-mock-transfer';
