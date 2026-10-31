@@ -50,6 +50,16 @@ export function setupReadiness(
     ageSeconds: fresh ? Math.floor((now - readAt) / 1000) : null,
   });
 }
+
+// Presentation selection only: moving a control never invokes it or grants consent.
+export function wizardPrimary(pilot, { copied = false, obs = false } = {}) {
+  return {
+    setup: pilot?.subscriptions?.ready === true && pilot.optedIn !== true
+      ? 'first-keep'
+      : 'first-bootstrap',
+    overlay: copied && !obs ? 'first-obs-check' : 'first-obs-copy',
+  };
+}
 export async function copyOBS(url, clipboard) {
   const parsed = new URL(url);
   if (

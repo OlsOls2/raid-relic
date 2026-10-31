@@ -3,12 +3,64 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { createControlPoller, controlPollDelay } from '../public/control-read.js';
-import { setupRetryAllowed } from '../public/control-view.js';
-import { setupReadiness } from '../public/onboarding.js';
+import { setupRetryAllowed, readinessLights, targetObservationText } from '../public/control-view.js';
+import { setupReadiness, wizardPrimary } from '../public/onboarding.js';
 import { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';
 const settle = async () => {
   for (let i = 0; i < 12; i++) await Promise.resolve();
 };
+
+test('current primary transitions keep subscription setup, explicit opt-in and manual OBS confirmation independent', () => {
+  const initial = { subscriptions: { ready: false }, optedIn: false };
+  const saved = structuredClone(initial);
+  assert.deepEqual(wizardPrimary(null), { setup: 'first-bootstrap', overlay: 'first-obs-copy' });
+  assert.equal(wizardPrimary(initial).setup, 'first-bootstrap');
+  const reconciled = { ...initial, subscriptions: { ready: true } };
+  assert.equal(wizardPrimary(reconciled).setup, 'first-keep');
+  assert.equal(reconciled.optedIn, false, 'Choosing the next control cannot opt in');
+  assert.equal(wizardPrimary(reconciled, { copied: true }).overlay, 'first-obs-check');
+  assert.equal(wizardPrimary(reconciled, { copied: false, obs: false }).overlay, 'first-obs-copy');
+  assert.equal(wizardPrimary(reconciled, { copied: true, obs: true }).overlay, 'first-obs-copy');
+  const opted = { ...reconciled, optedIn: true };
+  assert.equal(wizardPrimary(opted).setup, 'first-bootstrap', 'Already opted in offers only an observation recheck');
+  assert.equal(wizardPrimary({ ...opted, subscriptions: { ready: false } }).setup, 'first-bootstrap');
+  assert.deepEqual(initial, saved);
+  assert.equal(reconciled.optedIn, false);
+});
+
+test('readiness fixes map to existing controls with one reason and no invented moderator authority', () => {
+  const unknown = readinessLights(null);
+  for (const value of Object.values(unknown)) {
+    assert.equal(value.fix, 'reconnect');
+    assert.match(value.reason, /Sign in first/);
+  }
+  const pilot = { botGrantStored: false, subscriptions: { ready: false }, online: false };
+  const before = structuredClone(pilot);
+  const missing = readinessLights(pilot, ['bootstrap']);
+  assert.equal(missing.bot.fix, null, 'Missing bot grant needs owner, not extra optional scopes');
+  assert.match(missing.bot.reason, /owner.*raidrelicbot/);
+  assert.equal(missing.subscriptions.fix, 'first-bootstrap');
+  assert.equal(missing.live.fix, 'first-bootstrap');
+  assert.match(missing.live.reason, /offline.*requires a live stream/);
+  for (const value of Object.values(readinessLights(pilot, []))) assert.equal(value.fix, null);
+  const ready = readinessLights({ botGrantStored: true, subscriptions: { ready: true }, online: true }, ['bootstrap']);
+  for (const value of Object.values(ready)) {
+    assert.equal(value.state, 'ready');
+    assert.equal(value.fix, null);
+    assert.equal(typeof value.reason, 'string');
+  }
+  assert.match(ready.bot.reason, /moderator role is not verified/);
+  assert.deepEqual(pilot, before, 'Rendering cannot reconcile or mutate channel state');
+});
+
+test('target observation age never substitutes status-read age, null or malformed timestamps', () => {
+  assert.match(targetObservationText({ candidatesObservedAt: null, statusReadAt: 30000 }, 30000), /not observed/);
+  assert.match(targetObservationText({ candidatesObservedAt: 1000, statusReadAt: 31000 }, 31000), /30 s ago.*not a fresh Twitch check/);
+  assert.match(targetObservationText({ candidatesObservedAt: 1000, statusReadAt: 42000 }, 42000), /41 s ago/);
+  for (const at of [undefined, '1000', NaN, Infinity, -1, 40000])
+    assert.match(targetObservationText({ candidatesObservedAt: at, statusReadAt: 30000 }, 30000), /unavailable.*not provider freshness/);
+  assert.match(targetObservationText({ candidatesObservedAt: 0 }, 0), /0 s ago/);
+});
 function clock() {
   const timers = new Map();
   let id = 0;

@@ -64,7 +64,14 @@ select:focus-visible {
   font-size: 14px;
   flex: 1 1 180px;
 }
-.status-lights p:before {
+.status-lights > div {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+.status-lights > div > p + p {
+  margin-block: 6px;
+}
+.status-lights p[data-state]:before {
   content: '';
   display: inline-block;
   width: 10px;
@@ -72,6 +79,20 @@ select:focus-visible {
   border-radius: 50%;
   background: #dba95c;
   margin-right: 8px;
+}
+.current-action {
+  margin-block: 12px;
+}
+.step-utilities {
+  margin-block: 16px;
+  padding-inline-start: 12px;
+  border-inline-start: 2px solid var(--slate);
+}
+.step-utilities > summary {
+  font-size: 15px;
+}
+.status-lights [hidden], #first-run [hidden] {
+  display: none;
 }
 .status-lights [data-state='ready']:before {
   background: #bde4cb;
