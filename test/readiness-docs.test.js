@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, stat } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-test('judge front door uses public no-code browsing with guarded controls and optional sandbox history', async () => {
+test('judge front door lists only public production with guarded controls and scoped historical proof', async () => {
   const s = await readFile('README.md', 'utf8');
   const guide = await readFile('docs/PROJECT_GUIDE.md', 'utf8');
   const quick = await readFile('docs/JUDGES_QUICKSTART.md', 'utf8');
@@ -23,7 +23,6 @@ test('judge front door uses public no-code browsing with guarded controls and op
   ])
     assert.ok(s.includes(term), term);
   const origin = 'https://raid-relic-760724762396.us-central1.run.app';
-  const sandboxOrigin = 'https://judge-mode-1031---raid-relic-vz4bhnskgq-uc.a.run.app';
   for (const route of [
     '',
     '/atlas/',
@@ -37,7 +36,7 @@ test('judge front door uses public no-code browsing with guarded controls and op
   const draft = await readFile('docs/DEVPOST_DRAFT.md', 'utf8');
   for (const doc of [s, quick, admission, draft]) {
     assert.ok(doc.includes(origin));
-    assert.match(doc, /no access code and no login/i);
+    assert.match(doc, /no login required for public content/i);
     assert.match(doc, /Public content browsing is read-only/);
     assert.match(doc, /production is not globally read-only/);
     assert.match(
@@ -48,71 +47,33 @@ test('judge front door uses public no-code browsing with guarded controls and op
     assert.match(doc, /Arbitrary judges do not gain controls/i);
     assert.match(doc, /no consent, live setup or raid authority/);
     assert.match(doc, /Privacy was[^\n]*prelaunch timing[^\n]*not a judge restriction/i);
-    assert.ok(doc.includes(sandboxOrigin));
-    assert.match(doc, /optional[^\n]*fallback|optional[^\n]*sandbox/i);
+    assert.doesNotMatch(
+      doc,
+      /judge-mode|sandbox|fallback|access[- ]code|credential|JUDGE_CODE|secretmanager|gcloud|\bIAM\b|\/home\/ubuntu\/\.raid-relic-judge/i,
+    );
+    const productUrls = [...doc.matchAll(/https?:\/\/[^\s)<>]+/g)].map((m) => new URL(m[0]));
+    const productOrigins = [
+      ...new Set(
+        productUrls.filter((url) => url.hostname.endsWith('.run.app')).map((url) => url.origin),
+      ),
+    ];
+    assert.deepEqual(productOrigins, [origin]);
+    assert.doesNotMatch(doc, /https?:\/\/[^\s)]+[?&](?:key|token|access_token)=/i);
   }
   assert.match(s, /No owner contact is required/);
   assert.match(s, /do not trigger Twitch actions/);
   assert.match(
-    s,
-    /server-enforced OAuth\/control\/SendOff denial applies only there, not to public production/,
+    admission,
+    /Existing authorised owner Twitch controls retain their identity, session, role, Origin\/CSRF, consent and provider-readiness checks/,
   );
-  assert.match(s, /owner-only preview[^\n]*historical, not the submission link/);
-  assert.match(quick, /Sandbox code-mode guards do not apply to public production/);
-  for (const doc of [quick, admission]) {
-    assert.ok(doc.includes(sandboxOrigin));
-    assert.ok(doc.includes('`<JUDGE_CODE>`'));
-    assert.match(doc, /no owner contact or Twitch login/i);
-    assert.match(doc, /2026-11-16T00:00:00Z exclusive/);
-    assert.match(doc, /raid-relic-judge-mode-fixed-1031/);
-    assert.match(doc, /f8151d2ed5abdbb487dd91654d9b594adb747d7e/);
-    assert.match(doc, /26[^\n]*HTTP|HTTP[^\n]*26/);
-    assert.match(doc, /not[^\n]*WSS[^\n]*visual|No deployed WSS or browser test/);
-    assert.match(doc, /1277[^\n]*zero skips|1277native\/0skips/);
-    assert.match(doc, /41228565537/);
-  }
+  assert.match(admission, /Viewing public pages grants no consent, live setup or raid authority/);
+  assert.match(admission, /not open public signup/);
+  assert.match(admission, /pending text and private viewer identifiers remain private/i);
+  assert.match(admission, /Forgetting does not refund quota/);
+  assert.match(admission, /downloaded files cannot be recalled/);
   assert.match(
     admission,
-    /sha256:a9586b561ae4c3cc4021674f784b656648f34b3c3d9062ef706e871062dff705/,
-  );
-  assert.match(
-    admission,
-    /exactly one digest-only secret[^\n]*raid-relic-judge-digest-1031[^\n]*version1/,
-  );
-  assert.match(admission, /exactly one secret-scoped accessor grant/);
-  assert.match(admission, /roles\/secretmanager\.secretAccessor/);
-  assert.match(
-    admission,
-    /serviceAccount:raid-relic-runtime@raid-relic-hackathon\.iam\.gserviceaccount\.com/,
-  );
-  assert.match(admission, /on that secret only/);
-  assert.match(admission, /No project IAM[^\n]*raw-code secret\/version/);
-  assert.match(admission, /No raw-code Secret Manager object\/version was created/);
-  assert.match(
-    admission,
-    /\/home\/ubuntu\/\.raid-relic-judge\/JUDGE_CODE[^\n]*mode0600[^\n]*directory0700/,
-  );
-  assert.match(admission, /source author[^\n]*never read it/);
-  assert.match(admission, /--update-secrets=JUDGE_ACCESS_SHA256=raid-relic-judge-digest-1031:1/);
-  assert.match(admission, /P5_PREVIEW_READ_ONLY=true/);
-  assert.match(admission, /P5_PREVIEW_PRIVATE_ENABLED=false/);
-  assert.match(admission, /JUDGE_ADMISSION_ENABLED=true/);
-  assert.ok(admission.includes('OVERLAY_ORIGIN=' + sandboxOrigin));
-  assert.match(admission, /overlay-sockets\.js[^\n]*rejects upgrades with other request origins/);
-  assert.match(admission, /two configuration revisions, one final tagged target/);
-  assert.match(admission, /first[^\n]*raid-relic-judge-mode-1031[^\n]*untagged at0%/i);
-  assert.match(admission, /no image rebuild or redeploy/);
-  assert.doesNotMatch(
-    admission,
-    /corrected-revision HTTP acceptance is pending|its result is \*\*pending\*\*/,
-  );
-  assert.deepEqual(
-    [...admission.matchAll(/gcloud secrets create ([a-z0-9-]+)/g)].map((m) => m[1]),
-    ['raid-relic-judge-digest-1031'],
-  );
-  assert.doesNotMatch(
-    admission,
-    /gcloud projects add-iam-policy-binding|gcloud secrets versions add/,
+    /No new QA, runtime change, deployment, traffic change or consent is claimed/,
   );
   assert.match(s, /Ring 12[^\n]*approved light|approved light[^\n]*Ring 12/);
   assert.match(s, /offline|stream closure/);
@@ -156,7 +117,7 @@ test('judge front door uses public no-code browsing with guarded controls and op
     /multiple \*\*simultaneous\*\* relics.*future work.*not a current feature/,
   );
   assert.match(guide, /client-only expiry/);
-  for (const doc of [quick, demo]) {
+  for (const doc of [demo]) {
     assert.match(doc, /judge-freeze-1031/);
     assert.doesNotMatch(
       doc,
@@ -168,7 +129,7 @@ test('judge front door uses public no-code browsing with guarded controls and op
     assert.match(doc, /production[- ](?:mode|environment)|PRODENV/);
     assert.match(doc, /private access|accessprivate|access-gated/);
   }
-  for (const doc of [quick, demo]) {
+  for (const doc of [demo]) {
     for (const value of [
       '2b218b390210f709f031eac4b79b2606b1ff09e0',
       'raid-relic-judge-freeze-fix-1031',
@@ -194,6 +155,19 @@ test('judge front door uses public no-code browsing with guarded controls and op
     assert.match(doc, /no OAuth, control, Setup, Send Off, chat or other Twitch actions/);
     assert.match(doc, /Worker transcripts|worker transcripts/);
   }
+  for (const value of [
+    '2b218b390210f709f031eac4b79b2606b1ff09e0',
+    '15:43:10.690 UTC',
+    '15:43:20.341 UTC',
+    '41215789683',
+    '1271 native tests, zero skips; 46 browser flows /153 checks PASS',
+    '6775entries/343CLI digests',
+    '21,188,376selected bytes',
+    '6702prior headers',
+    'Later343–347',
+  ])
+    assert.ok(quick.includes(value), value);
+  assert.match(quick, /historical results, not a new QA run/i);
   assert.match(quick, /180d995dccd2d6550cee78f001a9b7d28d6842e1/);
   assert.match(quick, /12:46:33 UTC, 31 October 2026/);
   assert.match(quick, /1,267 native tests, zero skips; 46 browser flows \/ 153 checks PASS/);
@@ -204,7 +178,7 @@ test('judge front door uses public no-code browsing with guarded controls and op
   assert.match(quick, /maxima508\/404\/364\/364ms[^\n]*baseline428\/380\/356\/364ms/);
   assert.match(
     quick,
-    /earlier overlapping cohorts remain separate from the historical owner-preview proof/,
+    /earlier overlapping cohorts remain separate from the dated historical release proof/,
   );
   assert.match(quick, /no speedup, forced server-cold, p95 or SLA claim/);
   assert.match(demo, /2:45 shot list/);
