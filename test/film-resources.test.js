@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { filmResourceReason, FILM_INLINE_RUNE } from '../test-support/film-resources.js';
 const origin = 'https://localhost:5191',
   preview = 'blob:' + origin + '/owned';
@@ -125,4 +126,47 @@ test('film date-module admission stays exact, same-origin and GET-only', () => {
     filmResourceReason(request('blob:' + origin + '/streak-view.js'), policy),
     'unowned-blob',
   );
+});
+
+test('mobile film badge clears the maximum crystal push without shrinking subject or changing desktop anchor', async () => {
+  const css = await readFile(new URL('../public/film.css', import.meta.url), 'utf8');
+  const mobileStart = css.lastIndexOf('@media (max-width: 700px) {');
+  assert.ok(mobileStart > 0);
+  const mobile = css.slice(mobileStart, css.indexOf('@media', mobileStart + 1));
+  assert.match(
+    mobile,
+    /#film-art \.growth-fallback\s*\{\s*top:\s*calc\(104% \+ 8px\);\s*margin-top:\s*0;\s*\}/,
+  );
+  const defaultBadge = css.match(/#film-art \.growth-fallback\s*\{([^}]+)\}/)?.[1];
+  assert.ok(defaultBadge);
+  assert.match(defaultBadge, /top:\s*100%;/);
+  assert.match(defaultBadge, /margin-top:\s*8px;/);
+  assert.match(defaultBadge, /height:\s*44px;/);
+  assert.doesNotMatch(
+    mobile,
+    /#film-art \.growth-fallback\s*\{[^}]*\b(?:height|width|scale|transform):/,
+  );
+  assert.match(css, /transform:\s*scale\(var\(--film-push, 1\)\)/);
+  assert.match(mobile, /#film-caption\s*\{[^}]*font-size:\s*28px;/);
+  assert.match(
+    css,
+    /\[data-film-scene='3'\] #film-art \.growth-fallback\s*\{\s*animation:\s*film-ring 600ms ease-out;/,
+  );
+});
+
+test('mobile reduced SVG has a larger static contain frame without changing the stage or raster measurement', async () => {
+  const css = await readFile(new URL('../public/film.css', import.meta.url), 'utf8');
+  const block = css.match(
+    /@media \(max-width: 700px\) and \(prefers-reduced-motion: reduce\)\s*\{[\s\S]*?#film-art > img\.crystal\s*\{([^}]+)\}/,
+  )?.[1];
+  assert.ok(block);
+  assert.match(block, /inset:\s*-4% auto auto -14%;/);
+  assert.match(block, /width:\s*128%;/);
+  assert.match(block, /height:\s*108%;/);
+  assert.match(block, /object-fit:\s*contain;/);
+  assert.match(block, /transform:\s*none;/);
+  assert.match(block, /transition:\s*none;/);
+  assert.doesNotMatch(block, /animation:|#film-stage|canvas/);
+  assert.match(css, /top:\s*calc\(104% \+ 8px\)/);
+  assert.match(css, /height:\s*max\(620px, calc\(100svh - 24px\)\)/);
 });

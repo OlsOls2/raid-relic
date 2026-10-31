@@ -145,7 +145,8 @@ export function createOAuth({
       (role === detectRole &&
         (data.scopes.length !== SCOPES.streamer.length ||
           new Set(data.scopes).size !== data.scopes.length ||
-          !Number.isSafeInteger(data.expires_in) || data.expires_in <= 120))
+          !Number.isSafeInteger(data.expires_in) ||
+          data.expires_in <= 120))
     )
       throw new Error('Token identity or grants invalid');
     return { scopes: data.scopes, expiresIn: data.expires_in, userId: data.user_id };
@@ -257,9 +258,11 @@ export function createOAuth({
       },
     });
     try {
-      if (typeof path !== 'string' || path.length > 8192) return response(400, 'Invalid authorization request');
+      if (typeof path !== 'string' || path.length > 8192)
+        return response(400, 'Invalid authorization request');
       const url = new URL(path, redirect.origin);
-      const detectStart = url.pathname === '/oauth/keeper/start' && path.split('?')[0] === '/oauth/keeper/start';
+      const detectStart =
+        url.pathname === '/oauth/keeper/start' && path.split('?')[0] === '/oauth/keeper/start';
       const keeperMatch = /^\/oauth\/keeper\/(\d{1,32})\/start$/.exec(url.pathname);
       const match = /^\/oauth\/(streamer|bot)\/start$/.exec(url.pathname);
       if (method !== 'GET') return response(405, 'Method not allowed');
@@ -271,7 +274,13 @@ export function createOAuth({
         if (url.search && !p7) return response(400, 'Invalid authorization request');
         const id = keeperMatch?.[1];
         if (id && !keeperIds.includes(id)) return response(404, 'Not found');
-        const role = detectStart ? detectRole : id ? (id === streamerId ? 'streamer' : `keeper:${id}`) : match[1];
+        const role = detectStart
+          ? detectRole
+          : id
+            ? id === streamerId
+              ? 'streamer'
+              : `keeper:${id}`
+            : match[1];
         const state = nonce();
         const browser = nonce();
         const allocated = await store.createState(
@@ -309,19 +318,31 @@ export function createOAuth({
       const browser = cookies.length === 1 ? cookies[0].slice(cookieName.length + 1) : '';
       if (!/^[\w-]{43}$/.test(state ?? '') || !/^[\w-]{43}$/.test(browser)) return failure();
       const stored = await store.consumeState(hash(state), hash(browser), now());
-      if (!stored || (!validRole(stored.role) && stored.role !== detectRole) || (stored.p7 && stored.role !== 'bot'))
+      if (
+        !stored ||
+        (!validRole(stored.role) && stored.role !== detectRole) ||
+        (stored.p7 && stored.role !== 'bot')
+      )
         return failure();
       if (url.searchParams.has('error')) return failure();
       const code = url.searchParams.get('code');
       if (!code || code.length > 2048) return failure();
       if (stored.role === detectRole) {
-        const token = await exchange({ grant_type: 'authorization_code', code, redirect_uri: redirectUri });
+        const token = await exchange({
+          grant_type: 'authorization_code',
+          code,
+          redirect_uri: redirectUri,
+        });
         if (token.access_token.length > 4096 || token.refresh_token.length > 4096) return failure();
         const proof = await validate(token, detectRole, SCOPES.streamer);
         if (!proof || stored.expiresAt <= now()) return failure();
         // No lease, grant or session is created for unknown/bot identities.
         if (!keeperIds.includes(proof.userId))
-          return response(403, 'This account is not admitted to the configured pilot. Ask the owner for an invitation through your existing private contact. No Keeper authorization or session was saved.', { 'set-cookie': cookie('', 0) });
+          return response(
+            403,
+            'This account is not admitted to the configured pilot. Ask the owner for an invitation through your existing private contact. No Keeper authorization or session was saved.',
+            { 'set-cookie': cookie('', 0) },
+          );
         const role = proof.userId === streamerId ? 'streamer' : `keeper:${proof.userId}`;
         await locked(role, async (owner) => {
           if (stored.expiresAt <= now()) throw Error('Authorization expired');

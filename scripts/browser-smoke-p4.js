@@ -180,8 +180,12 @@ try {
     unknownSend = false,
     releaseUnknown,
     unknownStarted;
-  const unknownGate = new Promise((resolve) => { releaseUnknown = resolve; });
-  const unknownRequest = new Promise((resolve) => { unknownStarted = resolve; });
+  const unknownGate = new Promise((resolve) => {
+    releaseUnknown = resolve;
+  });
+  const unknownRequest = new Promise((resolve) => {
+    unknownStarted = resolve;
+  });
   await control.route(`**/control/${HOME}`, async (r) => {
     if (r.request().method() !== 'POST') return r.continue();
     const b = r.request().postDataJSON();
@@ -211,13 +215,20 @@ try {
     .waitFor();
   assert.equal(posts, 1);
   assert(!(await control.locator('main').innerText()).includes('not displayed'));
-  assert.equal(await control.locator('#send-result').textContent(), await control.locator('#result').textContent());
+  assert.equal(
+    await control.locator('#send-result').textContent(),
+    await control.locator('#result').textContent(),
+  );
   stage = 'unknown-send-stays-locked';
   unknownSend = true;
-  await control.waitForFunction(() => document.querySelector('#raid .send-off')?.disabled === false);
+  await control.waitForFunction(
+    () => document.querySelector('#raid .send-off')?.disabled === false,
+  );
   await control.locator('#raid .send-off').click();
   await unknownRequest;
-  await control.waitForFunction(() => document.querySelector('#send-step').getAttribute('aria-busy') === 'true');
+  await control.waitForFunction(
+    () => document.querySelector('#send-step').getAttribute('aria-busy') === 'true',
+  );
   assert.equal(await control.locator('#send-progress').isVisible(), true);
   assert.equal(await control.locator('#raid .send-off').isDisabled(), true);
   await control.locator('#raid .send-off').evaluate((n) => n.click());
@@ -226,7 +237,10 @@ try {
   await control.locator('#send-result').filter({ hasText: 'outcome is unknown' }).waitFor();
   await control.waitForFunction(() => !document.querySelector('#refresh').disabled);
   assert.equal(await control.locator('#raid .send-off').isDisabled(), true);
-  assert.match(await control.locator('#send-disabled-reason').textContent(), /locked.*uncertain outcome/);
+  assert.match(
+    await control.locator('#send-disabled-reason').textContent(),
+    /locked.*uncertain outcome/,
+  );
   await control.locator('#refresh').click();
   await control.waitForFunction(() => !document.querySelector('#refresh').disabled);
   await control.locator('#raid .send-off').evaluate((n) => n.click());

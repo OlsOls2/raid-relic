@@ -46,6 +46,21 @@ export function carriedRuneLabel(handoff) {
     ? 'No approved runes carried'
     : `${handoff.carriedApprovedCount} approved runes carried`;
 }
+// Supplementary description never replaces ring/streak/approved-count text.
+// Tight card/corner layouts use this accessible description, without adding a
+// visual line that would overflow their fixed plate. Full mode shares the same
+// non-disruptive description; existing title/aria-label semantics stay intact.
+export function presentCarriedSummary(summary, counters, label) {
+  summary.textContent = label ?? '';
+  summary.hidden = label === null;
+  for (const counter of counters) {
+    const ids = (counter.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean);
+    const next = ids.filter((id) => id !== summary.id);
+    if (label !== null) next.push(summary.id);
+    if (next.length) counter.setAttribute('aria-describedby', next.join(' '));
+    else counter.removeAttribute('aria-describedby');
+  }
+}
 const channel = /^\/overlay\/(\d{1,32})$/.exec(location.pathname)?.[1];
 const echoNote = document.createElement('span');
 echoNote.className = 'echo-note';
@@ -54,6 +69,12 @@ document.querySelector('.archive').append(echoNote);
 const runes = document.querySelector('#runes');
 const state = document.querySelector('#status');
 const count = document.querySelector('#count');
+const carriedSummary = document.createElement('span');
+carriedSummary.id = 'carried-summary';
+carriedSummary.hidden = true;
+carriedSummary.className = 'carried-summary';
+count.parentElement.append(carriedSummary);
+
 const holderLink = document.createElement('a');
 holderLink.id = 'holder-link';
 holderLink.href = '/atlas/';
@@ -305,6 +326,7 @@ function render(snapshot) {
   document.querySelector('#charge').style.width = '0%';
   if (!snapshot) {
     holderLink.remove();
+    presentCarriedSummary(carriedSummary, [count, document.querySelector('#compact-count')], null);
     count.textContent = 'No current state';
     document.querySelector('#compact-count').textContent = 'No current state';
     return;
@@ -394,14 +416,11 @@ function render(snapshot) {
     ? `${snapshot.approvedCount} approved marks · charge ${snapshot.approvedCount}/160`
     : `${snapshot.approvedCount} approved runes`;
   if (options.layout === 'card') count.textContent = `${snapshot.approvedCount} approved runes`;
-  const carried = carriedRuneLabel(snapshot.handoff);
-  if (carried !== null) {
-    count.textContent = carried;
-    const compact = document.querySelector('#compact-count');
-    compact.textContent = carried;
-    compact.removeAttribute('title');
-    compact.removeAttribute('aria-label');
-  }
+  presentCarriedSummary(
+    carriedSummary,
+    [count, document.querySelector('#compact-count')],
+    carriedRuneLabel(snapshot.handoff),
+  );
   document.querySelector('#charge').style.width = `${(snapshot.approvedCount / 160) * 100}%`;
   document.querySelector('.charge-track').hidden = !simulated;
   snapshot.marks.forEach((mark, index) => {

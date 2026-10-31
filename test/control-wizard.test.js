@@ -3,7 +3,11 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { createControlPoller, controlPollDelay } from '../public/control-read.js';
-import { setupRetryAllowed, readinessLights, targetObservationText } from '../public/control-view.js';
+import {
+  setupRetryAllowed,
+  readinessLights,
+  targetObservationText,
+} from '../public/control-view.js';
 import { setupReadiness, wizardPrimary } from '../public/onboarding.js';
 import { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';
 const settle = async () => {
@@ -22,8 +26,15 @@ test('current primary transitions keep subscription setup, explicit opt-in and m
   assert.equal(wizardPrimary(reconciled, { copied: false, obs: false }).overlay, 'first-obs-copy');
   assert.equal(wizardPrimary(reconciled, { copied: true, obs: true }).overlay, 'first-obs-copy');
   const opted = { ...reconciled, optedIn: true };
-  assert.equal(wizardPrimary(opted).setup, 'first-bootstrap', 'Already opted in offers only an observation recheck');
-  assert.equal(wizardPrimary({ ...opted, subscriptions: { ready: false } }).setup, 'first-bootstrap');
+  assert.equal(
+    wizardPrimary(opted).setup,
+    'first-bootstrap',
+    'Already opted in offers only an observation recheck',
+  );
+  assert.equal(
+    wizardPrimary({ ...opted, subscriptions: { ready: false } }).setup,
+    'first-bootstrap',
+  );
   assert.deepEqual(initial, saved);
   assert.equal(reconciled.optedIn, false);
 });
@@ -43,7 +54,10 @@ test('readiness fixes map to existing controls with one reason and no invented m
   assert.equal(missing.live.fix, 'first-bootstrap');
   assert.match(missing.live.reason, /offline.*requires a live stream/);
   for (const value of Object.values(readinessLights(pilot, []))) assert.equal(value.fix, null);
-  const ready = readinessLights({ botGrantStored: true, subscriptions: { ready: true }, online: true }, ['bootstrap']);
+  const ready = readinessLights(
+    { botGrantStored: true, subscriptions: { ready: true }, online: true },
+    ['bootstrap'],
+  );
   for (const value of Object.values(ready)) {
     assert.equal(value.state, 'ready');
     assert.equal(value.fix, null);
@@ -54,11 +68,23 @@ test('readiness fixes map to existing controls with one reason and no invented m
 });
 
 test('target observation age never substitutes status-read age, null or malformed timestamps', () => {
-  assert.match(targetObservationText({ candidatesObservedAt: null, statusReadAt: 30000 }, 30000), /not observed/);
-  assert.match(targetObservationText({ candidatesObservedAt: 1000, statusReadAt: 31000 }, 31000), /30 s ago.*not a fresh Twitch check/);
-  assert.match(targetObservationText({ candidatesObservedAt: 1000, statusReadAt: 42000 }, 42000), /41 s ago/);
+  assert.match(
+    targetObservationText({ candidatesObservedAt: null, statusReadAt: 30000 }, 30000),
+    /not observed/,
+  );
+  assert.match(
+    targetObservationText({ candidatesObservedAt: 1000, statusReadAt: 31000 }, 31000),
+    /30 s ago.*not a fresh Twitch check/,
+  );
+  assert.match(
+    targetObservationText({ candidatesObservedAt: 1000, statusReadAt: 42000 }, 42000),
+    /41 s ago/,
+  );
   for (const at of [undefined, '1000', NaN, Infinity, -1, 40000])
-    assert.match(targetObservationText({ candidatesObservedAt: at, statusReadAt: 30000 }, 30000), /unavailable.*not provider freshness/);
+    assert.match(
+      targetObservationText({ candidatesObservedAt: at, statusReadAt: 30000 }, 30000),
+      /unavailable.*not provider freshness/,
+    );
   assert.match(targetObservationText({ candidatesObservedAt: 0 }, 0), /0 s ago/);
 });
 function clock() {

@@ -19,7 +19,8 @@ main {
 }
 h1 {
   font:
-    clamp(36px, 6vw, 62px)/1.12 Cinzel, Georgia,
+    clamp(36px, 6vw, 62px)/1.12 Cinzel,
+    Georgia,
     serif;
   font-weight: 400;
   margin: 20px 0;

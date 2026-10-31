@@ -13,6 +13,8 @@ let browser,
   sockets,
   stage = 'startup',
   failed = false,
+  failureCategory = null,
+  sourceAssertionLine = 0,
   connectionCounts,
   storeKind;
 const checks = [];
@@ -157,34 +159,42 @@ try {
       name: `SIMULATOR ${kind} two-hop former holder receives full180s verified zero-mark arrival over one stable WSS`,
       passed: true,
     });
-    stage = 'late-notices';
+    stage = 'late-vote-quiet-suppression';
     const end = (await f.runtime.state.getKeeperRegistry()).pendingHop.endsAt;
     const posts = () => f.calls.filter((c) => c.url.endsWith('/chat/messages'));
     const n = posts().length;
     f.advance(end - f.now() + 27000);
     await f.chat(OTHER, OTHER, '!accept', { messageId: 'landing-closed-one' });
+    assert.equal(posts().length, n);
     f.advance(44000);
     await f.chat(OTHER, OTHER, '!accept', { messageId: 'landing-closed-two' });
-    assert.equal(posts().length, n + 2);
-    for (const call of posts().slice(-2)) {
-      assert.equal(JSON.parse(call.body).broadcaster_id, OTHER);
-      assert.match(JSON.parse(call.body).message, /binding window has closed/);
-    }
+    assert.equal(posts().length, n);
     await f.chat(OTHER, OTHER, '!accept', { messageId: 'landing-closed-one' });
-    assert.equal(posts().length, n + 2);
+    assert.equal(posts().length, n);
+    await f.chat(OTHER, OTHER, '!accept', { messageId: 'landing-closed-two' });
+    assert.equal(posts().length, n);
     const rows = (await f.runtime.state.getPrivateClaimAcks(OTHER)).rows;
-    for (const messageId of ['landing-closed-one', 'landing-closed-two'])
-      assert.equal(
-        rows.find((r) => r.key === ackKey({ broadcasterId: OTHER, chatterId: OTHER, messageId }))
-          .status,
-        'sent',
+    for (const messageId of ['landing-closed-one', 'landing-closed-two']) {
+      const matching = rows.filter(
+        (r) => r.key === ackKey({ broadcasterId: OTHER, chatterId: OTHER, messageId }),
       );
+      assert.equal(matching.length, 1);
+      // ackDocument retains only the bounded ignored anti-replay tombstone;
+      // no queued/sent delivery, private message or completion proof exists.
+      assert.equal(matching[0].status, 'ignored');
+      assert.deepEqual(Object.keys(matching[0]).sort(), [
+        'expiresAt',
+        'key',
+        'requestActor',
+        'status',
+      ]);
+    }
     assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, HOME);
     assert.equal((await f.runtime.state.getPublicJourney()).rings, 2);
     connectionCounts = await page.evaluate(() => window.__landingSockets);
     assert.deepEqual(connectionCounts, { created: 1, opened: 1, closed: 0 });
     checks.push({
-      name: `SIMULATOR ${kind} two late eligible commands receive SENT notices, duplicate stays silent and no transfer/ring occurs`,
+      name: `SIMULATOR ${kind} two late votes and both exact replays remain quiet with ignored tombstones and no transfer/ring`,
       passed: true,
     });
     await context.close();
@@ -193,8 +203,19 @@ try {
     await new Promise((r) => server.close(r));
     server = null;
   }
-} catch {
+} catch (error) {
   failed = true;
+  failureCategory =
+    error?.name === 'AssertionError'
+      ? 'assertion'
+      : error?.name === 'TimeoutError'
+        ? 'timeout'
+        : error?.name === 'TypeError'
+          ? 'type-error'
+          : 'browser-or-fixture';
+  sourceAssertionLine = Number(
+    /browser-smoke-landing[.]js:(\d+)/.exec(error?.stack ?? '')?.[1] ?? 0,
+  );
 } finally {
   await browser?.close().catch(() => {});
   sockets?.close();
@@ -205,7 +226,16 @@ try {
   await writeFile(
     'artifacts/landing-browser-results.json',
     JSON.stringify(
-      { simulator: true, passed: !failed, stage, storeKind, connectionCounts, checks },
+      {
+        simulator: true,
+        passed: !failed,
+        stage,
+        storeKind,
+        failureCategory,
+        sourceAssertionLine,
+        connectionCounts,
+        checks,
+      },
       null,
       2,
     ),

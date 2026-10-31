@@ -156,7 +156,10 @@ test('provenance and private draft separate historical/published/local proof and
   assert.match(provenance, /No access key was provisioned or read/);
   assert.match(provenance, /unlisted tag URLs were unauthenticated\/public200/);
   assert.match(provenance, /repo privacy.*read-only flags do not make the site access-private/);
-  assert.match(provenance, /remote\/default `main` \*\*3991bb84b9a3d60d1681e8d18e68b5e9cb44f511\*\* is an ancestor of14a4/);
+  assert.match(
+    provenance,
+    /remote\/default `main` \*\*3991bb84b9a3d60d1681e8d18e68b5e9cb44f511\*\* is an ancestor of14a4/,
+  );
   assert.match(provenance, /No forced rewrite, main merge or default-branch switch was performed/);
   assert.match(provenance, /promotion\/default change is not authorized/);
   const handoff = await readFile('docs/PANEL_OPERATOR_HANDOFF.md', 'utf8');
@@ -300,7 +303,10 @@ test('authorized session registry separates merged report-only history, five act
     assert.ok(workerRows[index].includes(ids[index + 2]));
     assert.ok(workerRows[index].includes(branch));
     assert.ok(workerRows[index].includes(role));
-    assert.match(workerRows[index], /LOCAL UNCOMMITTED contribution; worker stopped; composite whole-tree QA result unknown/);
+    assert.match(
+      workerRows[index],
+      /LOCAL UNCOMMITTED contribution; worker stopped; composite whole-tree QA result unknown/,
+    );
   }
   assert.match(registry, /No new worker commit, merge, deployment or passing cohort is inferred/);
   assert.match(registry, /only `docs\/RUNTIME_RELEASE_QA\.md`/);

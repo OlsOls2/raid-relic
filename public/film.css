@@ -614,6 +614,12 @@ body[data-film-playing='false']
   #film-stage {
     height: 620px;
   }
+  /* The crystal's maximum 1.08 push extends 4% below its reserved box.
+     Keep the separate badge beyond that painted extent, plus the existing gap. */
+  #film-art .growth-fallback {
+    top: calc(104% + 8px);
+    margin-top: 0;
+  }
   .relic-column {
     inset: 100px 16px 100px;
   }
@@ -691,5 +697,20 @@ body[data-film-playing='false']
   }
   .film-claim-burst {
     display: none;
+  }
+}
+
+@media (max-width: 700px) and (prefers-reduced-motion: reduce) {
+  /* A 240:300 contain image was width-limited by the narrow column. Enlarge
+     its transparent frame by 4/3 (96% -> 128%), not its art or raster. The
+     solid 23..217 SVG body stays within the column's outer reserved width.
+     At most 4% vertical extension retains the mobile badge's 104% + 8px gap. */
+  #film-art > img.crystal {
+    inset: -4% auto auto -14%;
+    width: 128%;
+    height: 108%;
+    object-fit: contain;
+    transform: none;
+    transition: none;
   }
 }

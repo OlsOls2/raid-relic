@@ -2,14 +2,20 @@
 export function claimComplete(login, carriedApprovedCount) {
   const destination =
     typeof login === 'string' && /^[a-z0-9_]{1,25}$/.test(login) ? '@' + login : 'its new Keeper';
-  const carried = Number.isInteger(carriedApprovedCount) && carriedApprovedCount >= 0 && carriedApprovedCount <= 160
-    ? ` ${carriedApprovedCount} approved ${carriedApprovedCount === 1 ? 'rune' : 'runes'} carried.` : '';
+  const carried =
+    Number.isInteger(carriedApprovedCount) &&
+    carriedApprovedCount >= 0 &&
+    carriedApprovedCount <= 160
+      ? ` ${carriedApprovedCount} approved ${carriedApprovedCount === 1 ? 'rune' : 'runes'} carried.`
+      : '';
   return `Claim complete: the relic transferred to ${destination}; one new ring.${carried}`;
 }
 
 export function wanderNotice(kind, login) {
-  if (kind === 'warning') return 'The relic has been idle. It may wander to an opted-in Keeper after the warning period. Add an approved mark or start a valid Send Off to keep playing.';
-  if (kind !== 'arrival' || typeof login !== 'string' || !/^[a-z0-9_]{1,25}$/.test(login)) throw Error('Invalid Wander notice');
+  if (kind === 'warning')
+    return 'The relic has been idle. It may wander to an opted-in Keeper after the warning period. Add an approved mark or start a valid Send Off to keep playing.';
+  if (kind !== 'arrival' || typeof login !== 'string' || !/^[a-z0-9_]{1,25}$/.test(login))
+    throw Error('Invalid Wander notice');
   return `The relic wandered here to @${login}; no raid or audience transfer occurred. Leave !mark word to add a community rune.`;
 }
 

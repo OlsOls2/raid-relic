@@ -80,10 +80,15 @@ export function reduceClaims(
   const hop = registry.pendingHop;
   // Landing replaces the provisional hop in send-state. The matching existing
   // intent carries only this six-bit reservation watermark across that rebuild.
-  const noticeIntent = hop && registry.send?.id === hop.intentId &&
-    registry.send?.sourceId === hop?.from && registry.send?.targetId === hop?.to &&
+  const noticeIntent =
+    hop &&
+    registry.send?.id === hop.intentId &&
+    registry.send?.sourceId === hop?.from &&
+    registry.send?.targetId === hop?.to &&
     registry.send?.sourceStreamId === hop?.sourceStreamId &&
-    registry.send?.targetStreamId === hop?.targetStreamId ? registry.send : null;
+    registry.send?.targetStreamId === hop?.targetStreamId
+      ? registry.send
+      : null;
   if (noticeIntent?.noticeMask !== undefined && hop.noticeMask === undefined)
     hop.noticeMask = noticeIntent.noticeMask;
   if (hop && !hop.finalized && !hop.cancelled) {
@@ -356,14 +361,13 @@ export function reduceClaims(
     noticeIntent.noticeMask = hop.noticeMask;
   // Completion/arrival reserve later in this same transaction. Account for
   // their widest mask now without increasing the existing registry byte cap.
-  const registryBytes = () => Buffer.byteLength(JSON.stringify(
-    hop ? { ...registry, pendingHop: { ...hop, noticeMask: 63 } } : registry,
-  ));
-  if (registryBytes() > 4096)
-    throw new Error('Relic registry capacity reached');
+  const registryBytes = () =>
+    Buffer.byteLength(
+      JSON.stringify(hop ? { ...registry, pendingHop: { ...hop, noticeMask: 63 } } : registry),
+    );
+  if (registryBytes() > 4096) throw new Error('Relic registry capacity reached');
   observeStreak(registry, now, streakEnabled);
-  if (streakEnabled && registryBytes() > 4096)
-    throw Error('Relic registry capacity reached');
+  if (streakEnabled && registryBytes() > 4096) throw Error('Relic registry capacity reached');
   return {
     registry,
     marks,
@@ -376,7 +380,8 @@ export function reduceClaims(
       : null,
     // Truthy quiet result marks votes as handled for the generic command lane.
     // It carries no text, actor history or delivery authority.
-    acknowledgement: acknowledgement ??
+    acknowledgement:
+      acknowledgement ??
       (hop && ['offer', 'accept'].includes(chat?.markAction?.type) ? { quiet: true } : null),
     acknowledgementKind,
     ackDeadline: ackDeadline ?? registry.pendingHop?.endsAt,

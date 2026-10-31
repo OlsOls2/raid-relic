@@ -346,10 +346,7 @@ try {
   assert.equal(await page.locator('#start-connect').getAttribute('href'), '/oauth/keeper/start');
   assert.notEqual(await page.locator('#start-connect').getAttribute('aria-disabled'), 'true');
   await page.locator('#start-channel').fill('olsols2');
-  assert.equal(
-    await page.locator('#start-connect').getAttribute('href'),
-    '/oauth/keeper/start',
-  );
+  assert.equal(await page.locator('#start-connect').getAttribute('href'), '/oauth/keeper/start');
   assert.match(await page.locator('#start-status').innerText(), /not verified ready/);
   await scanFrontdoor(page, 'start-configured');
   assert.deepEqual(await page.evaluate(() => window.__onboardCopies), []);
@@ -447,14 +444,26 @@ try {
   assert.equal(await page.locator('#copy-mod').isVisible(), false);
   const beforeFix = f.calls.length;
   const beforeFixChannel = await f.runtime.state.getStreamStatus(OTHER);
-  assert.equal(await page.locator('#light-subscriptions-fix').getAttribute('href'), '#first-bootstrap');
-  assert.equal(await page.locator('#light-subscriptions-fix').getAttribute('aria-describedby'), 'light-subscriptions-reason');
+  assert.equal(
+    await page.locator('#light-subscriptions-fix').getAttribute('href'),
+    '#first-bootstrap',
+  );
+  assert.equal(
+    await page.locator('#light-subscriptions-fix').getAttribute('aria-describedby'),
+    'light-subscriptions-reason',
+  );
   await page.locator('#light-subscriptions-fix').click();
-  assert.equal(await page.locator('#first-bootstrap').evaluate((n) => n === document.activeElement), true);
+  assert.equal(
+    await page.locator('#first-bootstrap').evaluate((n) => n === document.activeElement),
+    true,
+  );
   assert.equal(f.calls.length, beforeFix, 'Fix navigation must not dispatch setup');
   assert.deepEqual(await f.runtime.state.getStreamStatus(OTHER), beforeFixChannel);
   for (const key of ['bot', 'subscriptions', 'live']) {
-    assert.equal(await page.locator(`#light-${key}`).getAttribute('aria-describedby'), `light-${key}-reason`);
+    assert.equal(
+      await page.locator(`#light-${key}`).getAttribute('aria-describedby'),
+      `light-${key}-reason`,
+    );
     assert.ok((await page.locator(`#light-${key}-reason`).textContent()).trim().length > 0);
     assert.equal(await page.locator(`#light-${key}-fix`).count(), 1);
   }
@@ -477,7 +486,11 @@ try {
       page.locator('#' + id).click(),
     ]);
     assert.equal(response.status(), 200);
-    const expected = { 'first-bootstrap': 'bootstrap', 'first-keep': 'keep', 'first-seek': 'seek-on' };
+    const expected = {
+      'first-bootstrap': 'bootstrap',
+      'first-keep': 'keep',
+      'first-seek': 'seek-on',
+    };
     assert.equal(response.request().postDataJSON().action, expected[id]);
     await page.waitForFunction(() => !document.querySelector('#refresh').disabled);
   }
@@ -491,7 +504,10 @@ try {
   assert.equal((await f.runtime.state.getStreamStatus(OTHER)).optedIn, false);
   assert.equal(await page.locator('#setup-primary > button').getAttribute('id'), 'first-keep');
   assert.equal(await page.locator('#first-bootstrap').isVisible(), false);
-  assert.equal(await page.locator('#first-keep').evaluate((n) => document.activeElement === n), true);
+  assert.equal(
+    await page.locator('#first-keep').evaluate((n) => document.activeElement === n),
+    true,
+  );
   assert.equal(await page.locator('#light-subscriptions-fix').isVisible(), false);
   stage = 'explicit-opt-in';
   await action('first-keep');
@@ -502,7 +518,10 @@ try {
   assert.equal(await page.locator('#setup-primary > button').getAttribute('id'), 'first-bootstrap');
   assert.equal(await page.locator('#first-keep').isVisible(), false);
   await page.getByRole('link', { name: 'Add overlay', exact: true }).click();
-  assert.equal(await page.locator('#overlay-primary > button').getAttribute('id'), 'first-obs-copy');
+  assert.equal(
+    await page.locator('#overlay-primary > button').getAttribute('id'),
+    'first-obs-copy',
+  );
   assert.equal(await page.locator('#overlay-utilities').evaluate((n) => n.open), false);
   assert.equal(await page.locator('#first-obs-confirm').isVisible(), false);
   const beforeOverlay = f.calls.length;
@@ -510,13 +529,22 @@ try {
   await page.locator('#first-obs-copy').click();
   assert.match(await page.locator('#first-copy-status').innerText(), /URL copied/);
   assert.equal(await page.locator('#first-obs').getAttribute('data-state'), 'unknown');
-  assert.equal(await page.locator('#overlay-primary > label').getAttribute('id'), 'first-obs-check');
+  assert.equal(
+    await page.locator('#overlay-primary > label').getAttribute('id'),
+    'first-obs-check',
+  );
   assert.equal(await page.locator('#first-obs-copy').isVisible(), false);
   assert.equal(await page.locator('#first-obs-confirm').isChecked(), false);
-  assert.equal(await page.locator('#first-obs-confirm').evaluate((n) => document.activeElement === n), true);
+  assert.equal(
+    await page.locator('#first-obs-confirm').evaluate((n) => document.activeElement === n),
+    true,
+  );
   await page.locator('#first-obs-confirm').check();
   assert.equal(await page.locator('#first-obs').getAttribute('data-state'), 'ready');
-  assert.equal(await page.locator('#overlay-primary > button').getAttribute('id'), 'first-obs-copy');
+  assert.equal(
+    await page.locator('#overlay-primary > button').getAttribute('id'),
+    'first-obs-copy',
+  );
   assert.equal(f.calls.length, beforeOverlay, 'Clipboard/manual OBS actions cannot call providers');
   assert.deepEqual(await f.runtime.state.getStreamStatus(OTHER), beforeOverlayChannel);
   stage = 'explicit-seeker';
@@ -682,22 +710,105 @@ try {
   });
   stage = 'control-saved-observation-and-recovery-reasons';
   // Mock only this authenticated read response; no provider fetch or real target lookup.
-  const savedStatus = JSON.parse((await f.request(`/control/${OTHER}/status`, 'GET', { cookie: f.cookies[OTHER] })).body);
+  const savedStatus = JSON.parse(
+    (await f.request(`/control/${OTHER}/status`, 'GET', { cookie: f.cookies[OTHER] })).body,
+  );
   const now = await page.evaluate(() => Date.now());
   let observedAt = now - 30000;
   let offlineObservation = false;
   const statusPattern = `**/control/${OTHER}/status`;
-  const mockStatus = async (route) => route.fulfill({ status: 200, json: {
-    ...savedStatus,
-    pilot: { ...savedStatus.pilot, online: offlineObservation ? false : savedStatus.pilot.online,
-      candidates: [], candidatesObservedAt: observedAt, statusReadAt: now },
-  } });
+  let routeHitCount = 0;
+  let pilotHasObservation = false;
+  let controlRoomMatches = false;
+  const mockStatus = async (route) => {
+    routeHitCount++;
+    const value = {
+      ...savedStatus,
+      pilot: {
+        ...savedStatus.pilot,
+        online: offlineObservation ? false : savedStatus.pilot.online,
+        candidates: [],
+        candidatesObservedAt: observedAt,
+        statusReadAt: now,
+      },
+    };
+    pilotHasObservation = Number.isSafeInteger(value.pilot.candidatesObservedAt);
+    controlRoomMatches =
+      value.keeperId === OTHER &&
+      new URL(route.request().url()).pathname === `/control/${OTHER}/status`;
+    await route.fulfill({
+      status: 200,
+      headers: { 'x-local-observation-fixture': 'saved' },
+      json: value,
+    });
+  };
+  async function recordObservationDiagnostic() {
+    const labels = await page.evaluate(() => {
+      const target = document.querySelector('#target-observation-age').textContent;
+      const read = document.querySelector('#first-freshness').textContent;
+      const age = (text, pattern) => {
+        const match = pattern.exec(text);
+        const value = match ? Number(match[1]) : -1;
+        return Number.isSafeInteger(value) && value >= 0 ? value : -1;
+      };
+      return {
+        actualObservationAge: age(target, /observation: (\d+) s ago/),
+        actualReadAge: age(read, /Status read (\d+) s ago/),
+        targetLabelCategory: target.startsWith('Saved target observation:')
+          ? 'read'
+          : target.startsWith('Targets: not observed.')
+            ? 'unknown'
+            : 'unavailable',
+        readLabelCategory: read.startsWith('Status read ')
+          ? 'read'
+          : read.startsWith('Sign in ')
+            ? 'unknown'
+            : 'unavailable',
+      };
+    });
+    diagnostic.observation = {
+      ...labels,
+      routeHitCount,
+      pilotHasObservation,
+      controlRoomMatches,
+      expectedDelta: 30000,
+    };
+    return labels;
+  }
+  async function refreshMockObservation() {
+    const response = page.waitForResponse(
+      (value) =>
+        new URL(value.url()).pathname === `/control/${OTHER}/status` &&
+        value.request().method() === 'GET' &&
+        value.headers()['x-local-observation-fixture'] === 'saved',
+    );
+    await page.locator('#refresh').click();
+    assert.equal((await response).status(), 200);
+    await page.waitForFunction(() => !document.querySelector('#refresh').disabled);
+  }
   await page.route(statusPattern, mockStatus);
   const callsBeforeAge = f.calls.length;
-  await page.locator('#refresh').click();
-  await page.waitForFunction(() => !document.querySelector('#refresh').disabled);
-  const initialObservationAge = Number((await page.locator('#target-observation-age').textContent()).match(/observation: (\d+) s ago/)?.[1]);
-  const initialReadAge = Number((await page.locator('#first-freshness').textContent()).match(/Status read (\d+) s ago/)?.[1]);
+  await refreshMockObservation();
+  try {
+    // An enabled refresh button alone does not identify which response rendered.
+    await page.waitForFunction(() => {
+      const target = document.querySelector('#target-observation-age').textContent;
+      const read = document.querySelector('#first-freshness').textContent;
+      const observation = /observation: (\d+) s ago/.exec(target);
+      const status = /Status read (\d+) s ago/.exec(read);
+      return (
+        observation &&
+        status &&
+        Number(observation[1]) >= 30 &&
+        Number(observation[1]) > Number(status[1])
+      );
+    });
+  } finally {
+    await recordObservationDiagnostic();
+  }
+  const initialObservationAge = diagnostic.observation.actualObservationAge;
+  const initialReadAge = diagnostic.observation.actualReadAge;
+  assert.ok(routeHitCount > 0 && pilotHasObservation && controlRoomMatches);
   assert.ok(initialObservationAge >= 30 && initialObservationAge > initialReadAge);
   await page.getByRole('link', { name: 'Send Off', exact: true }).click();
   const emptyText = await page.locator('#target-empty').innerText();
@@ -705,33 +816,84 @@ try {
   assert.match(emptyText, /live and explicitly opted in/);
   assert.match(emptyText, /admission invitation/);
   assert.equal(await page.locator('#raid button').count(), 0);
-  assert.equal(await page.locator('#advanced-send-actions button').filter({ hasText: 'Process queued own send' }).count(), 1);
+  assert.equal(
+    await page
+      .locator('#advanced-send-actions button')
+      .filter({ hasText: 'Process queued own send' })
+      .count(),
+    1,
+  );
   await page.clock.runFor(11000);
-  const laterObservationAge = Number((await page.locator('#target-observation-age').textContent()).match(/observation: (\d+) s ago/)?.[1]);
+  const laterObservationAge = Number(
+    (await page.locator('#target-observation-age').textContent()).match(
+      /observation: (\d+) s ago/,
+    )?.[1],
+  );
   assert.ok(laterObservationAge >= initialObservationAge + 11);
   assert.equal(await page.locator('#first-optin').getAttribute('data-state'), 'ready');
   observedAt = null;
-  await page.locator('#refresh').click();
-  await page.waitForFunction(() => !document.querySelector('#refresh').disabled);
-  assert.match(await page.locator('#target-observation-age').textContent(), /Targets: not observed/);
-  const refreshedReadAge = Number((await page.locator('#first-freshness').textContent()).match(/Status read (\d+) s ago/)?.[1]);
+  await refreshMockObservation();
+  try {
+    await page.waitForFunction(() =>
+      document
+        .querySelector('#target-observation-age')
+        .textContent.startsWith('Targets: not observed.'),
+    );
+  } finally {
+    await recordObservationDiagnostic();
+  }
+  assert.match(
+    await page.locator('#target-observation-age').textContent(),
+    /Targets: not observed/,
+  );
+  const refreshedReadAge = Number(
+    (await page.locator('#first-freshness').textContent()).match(/Status read (\d+) s ago/)?.[1],
+  );
   assert.ok(refreshedReadAge < initialObservationAge);
   assert.equal(f.calls.length, callsBeforeAge, 'Observation labels and GET mocks cannot reconcile');
   assert.equal(await page.locator('#cancel-queued').isDisabled(), true);
-  assert.equal(await page.locator('#cancel-queued').getAttribute('aria-describedby'), 'recovery-status recovery-disabled-reason');
-  assert.match(await page.locator('#recovery-disabled-reason').textContent(), /No cancellable never-dispatched queue/);
+  assert.equal(
+    await page.locator('#cancel-queued').getAttribute('aria-describedby'),
+    'recovery-status recovery-disabled-reason',
+  );
+  assert.match(
+    await page.locator('#recovery-disabled-reason').textContent(),
+    /No cancellable never-dispatched queue/,
+  );
   assert.equal(await page.locator('#expire-handoff').isDisabled(), true);
-  assert.equal(await page.locator('#expire-handoff').getAttribute('aria-describedby'), 'expiry-state expiry-disabled-reason');
-  assert.match(await page.locator('#expiry-disabled-reason').textContent(), /No source-owned ended confirmed handoff/);
+  assert.equal(
+    await page.locator('#expire-handoff').getAttribute('aria-describedby'),
+    'expiry-state expiry-disabled-reason',
+  );
+  assert.match(
+    await page.locator('#expiry-disabled-reason').textContent(),
+    /No source-owned ended confirmed handoff/,
+  );
   offlineObservation = true;
-  await page.locator('#refresh').click();
-  await page.waitForFunction(() => !document.querySelector('#refresh').disabled);
-  assert.match(await page.locator('#light-live-reason').textContent(), /offline.*requires a live stream/);
+  await refreshMockObservation();
+  try {
+    await page.waitForFunction(() =>
+      document.querySelector('#light-live-reason').textContent.includes('requires a live stream'),
+    );
+  } finally {
+    await recordObservationDiagnostic();
+  }
+  assert.match(
+    await page.locator('#light-live-reason').textContent(),
+    /offline.*requires a live stream/,
+  );
   assert.equal(await page.locator('#light-live-fix').getAttribute('href'), '#first-bootstrap');
   await page.locator('#light-live-fix').click();
   assert.equal(await page.locator('#setup-step').evaluate((n) => n.open), true);
-  assert.equal(await page.locator('#first-bootstrap').evaluate((n) => document.activeElement === n), true);
-  assert.equal(f.calls.length, callsBeforeAge, 'Offline fix reveals existing Setup without invoking it');
+  assert.equal(
+    await page.locator('#first-bootstrap').evaluate((n) => document.activeElement === n),
+    true,
+  );
+  assert.equal(
+    f.calls.length,
+    callsBeforeAge,
+    'Offline fix reveals existing Setup without invoking it',
+  );
   await page.unroute(statusPattern, mockStatus);
   checks.push({
     name: 'Current-primary transitions preserve explicit consent; light navigation is read-only; saved observation age/null are distinct from GET age and recovery reasons are associated',
@@ -786,8 +948,14 @@ try {
   );
   assert.equal(await page.locator('#first-session').getAttribute('data-state'), 'unknown');
   assert.equal(await page.locator('#first-keep').isDisabled(), true);
-  assert.match(await page.locator('#recovery-disabled-reason').textContent(), /Sign in.*own saved recovery status/);
-  assert.match(await page.locator('#expiry-disabled-reason').textContent(), /Sign in.*own saved recovery status/);
+  assert.match(
+    await page.locator('#recovery-disabled-reason').textContent(),
+    /Sign in.*own saved recovery status/,
+  );
+  assert.match(
+    await page.locator('#expiry-disabled-reason').textContent(),
+    /Sign in.*own saved recovery status/,
+  );
   for (const key of ['bot', 'subscriptions', 'live']) {
     assert.match(await page.locator(`#light-${key}-reason`).textContent(), /Sign in first/);
     assert.equal(await page.locator(`#light-${key}-fix`).getAttribute('href'), '#reconnect');

@@ -223,7 +223,10 @@ async function runReadinessA11y() {
     await page.locator('#how-we-verify > summary').focus();
     await page.keyboard.press('Enter');
     assert.equal(await page.locator('#how-we-verify').evaluate((n) => n.open), true);
-    assert.match(await page.locator('#how-we-verify').innerText(), /verified.*both eligible chats/s);
+    assert.match(
+      await page.locator('#how-we-verify').innerText(),
+      /verified.*both eligible chats/s,
+    );
     assert.equal(await page.locator('.landing-archive').evaluate((n) => n.open), false);
     await page.locator('.landing-archive > summary').focus();
     await page.keyboard.press('Enter');
@@ -423,165 +426,563 @@ async function runReadinessA11y() {
 }
 
 // Explicit LOCAL HTTPS + actual browser/WSS fixture; import-safe for transport tests.
-const run=promisify(execFile);
-const ORIGIN='https://localhost:5191';
-const DUMMY=Buffer.alloc(32,11).toString('base64url'); // Fixed synthetic fixture, never operator material.
-const JS=`window.previewFixture={ready:true,messages:0,closed:0,errors:0};
+const run = promisify(execFile);
+const ORIGIN = 'https://localhost:5191';
+const DUMMY = Buffer.alloc(32, 11).toString('base64url'); // Fixed synthetic fixture, never operator material.
+const JS = `window.previewFixture={ready:true,messages:0,closed:0,errors:0};
 window.openPreviewFixture=function(){var ws=new WebSocket('wss://localhost:5191/ws/201');
 ws.onmessage=function(e){if(e.data==='{"type":"snapshot","fixture":true,"revision":1}')previewFixture.messages++;};
 ws.onclose=function(){previewFixture.closed++;};ws.onerror=function(){previewFixture.errors++;};};`;
-const APP='<!doctype html><html lang="en"><meta charset="utf-8"><title>LOCAL fixture</title><script src="/fixture.js" defer></script><main><h1>LOCAL synthetic product</h1><p>No provider or game state.</p></main></html>';
-function leaked(req) {return JSON.stringify(req.headers).includes(DUMMY)||JSON.stringify(req.rawHeaders).includes(DUMMY);}
-export async function privatePreviewFixture({enabled=true,expiryMs=60000}={}) {
-  if(!Number.isInteger(expiryMs)||expiryMs<100||expiryMs>86400000)throw Error('Fixture expiry bounds');
-  const directory=await mkdtemp(join(tmpdir(),'raid-private-tls-'));
-  let server,sockets,formMetadata=null;
-  const counts={app:0,readBudget:0,snapshot:0,httpSnapshot:0,subscribe:0,activeSubscriptions:0,credentialLeak:0,readOnlyDenied:0,actions:0,provider:0,requests:0};
-  const close=async()=>{
+const APP =
+  '<!doctype html><html lang="en"><meta charset="utf-8"><title>LOCAL fixture</title><script src="/fixture.js" defer></script><main><h1>LOCAL synthetic product</h1><p>No provider or game state.</p></main></html>';
+function leaked(req) {
+  return (
+    JSON.stringify(req.headers).includes(DUMMY) || JSON.stringify(req.rawHeaders).includes(DUMMY)
+  );
+}
+export async function privatePreviewFixture({ enabled = true, expiryMs = 60000 } = {}) {
+  if (!Number.isInteger(expiryMs) || expiryMs < 100 || expiryMs > 86400000)
+    throw Error('Fixture expiry bounds');
+  const directory = await mkdtemp(join(tmpdir(), 'raid-private-tls-'));
+  let server,
+    sockets,
+    formMetadata = null;
+  const counts = {
+    app: 0,
+    readBudget: 0,
+    snapshot: 0,
+    httpSnapshot: 0,
+    subscribe: 0,
+    activeSubscriptions: 0,
+    credentialLeak: 0,
+    readOnlyDenied: 0,
+    actions: 0,
+    provider: 0,
+    requests: 0,
+  };
+  const close = async () => {
     sockets?.close();
-    if(server){server.closeAllConnections();if(server.listening)await new Promise(r=>server.close(r));}
-    await rm(directory,{recursive:true,force:true});
+    if (server) {
+      server.closeAllConnections();
+      if (server.listening) await new Promise((r) => server.close(r));
+    }
+    await rm(directory, { recursive: true, force: true });
   };
   try {
-    await chmod(directory,0o700);
-    const keyPath=join(directory,'local.key'),certPath=join(directory,'local.pem');
-    await run('/usr/bin/openssl',['req','-x509','-newkey','rsa:2048','-nodes','-days','1','-subj','/CN=localhost','-addext','subjectAltName=DNS:localhost,IP:127.0.0.1','-keyout',keyPath,'-out',certPath],{timeout:15000,maxBuffer:16384});
-    await chmod(keyPath,0o600);
-    const expiresAt=Date.now()+expiryMs;
-    const gate=createPrivatePreview({P5_PREVIEW_PRIVATE_ENABLED:String(enabled),P5_PREVIEW_READ_ONLY:'true',P5_PREVIEW_ACCESS_SHA256:createHash('sha256').update(DUMMY).digest('hex'),P5_PREVIEW_ACCESS_EXPIRES_AT:new Date(expiresAt).toISOString()});
-    const handler=(req,res)=>{
-      counts.app++;if(leaked(req))counts.credentialLeak++;
-      const headers={'cache-control':'no-store','x-content-type-options':'nosniff','content-security-policy':"default-src 'none'; script-src 'self'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'"};
+    await chmod(directory, 0o700);
+    const keyPath = join(directory, 'local.key'),
+      certPath = join(directory, 'local.pem');
+    await run(
+      '/usr/bin/openssl',
+      [
+        'req',
+        '-x509',
+        '-newkey',
+        'rsa:2048',
+        '-nodes',
+        '-days',
+        '1',
+        '-subj',
+        '/CN=localhost',
+        '-addext',
+        'subjectAltName=DNS:localhost,IP:127.0.0.1',
+        '-keyout',
+        keyPath,
+        '-out',
+        certPath,
+      ],
+      { timeout: 15000, maxBuffer: 16384 },
+    );
+    await chmod(keyPath, 0o600);
+    const expiresAt = Date.now() + expiryMs;
+    const gate = createPrivatePreview({
+      P5_PREVIEW_PRIVATE_ENABLED: String(enabled),
+      P5_PREVIEW_READ_ONLY: 'true',
+      P5_PREVIEW_ACCESS_SHA256: createHash('sha256').update(DUMMY).digest('hex'),
+      P5_PREVIEW_ACCESS_EXPIRES_AT: new Date(expiresAt).toISOString(),
+    });
+    const handler = (req, res) => {
+      counts.app++;
+      if (leaked(req)) counts.credentialLeak++;
+      const headers = {
+        'cache-control': 'no-store',
+        'x-content-type-options': 'nosniff',
+        'content-security-policy':
+          "default-src 'none'; script-src 'self'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'",
+      };
       // Mock product's master read-only boundary, not a successful fake action.
-      if(req.method!=='GET'){counts.readOnlyDenied++;res.writeHead(403,headers);res.end('Read-only fixture');return;}
-      if(req.url==='/') {res.writeHead(200,{...headers,'content-type':'text/html; charset=utf-8'});res.end(APP);}
-      else if(req.url==='/fixture.js'){res.writeHead(200,{...headers,'content-type':'text/javascript; charset=utf-8'});res.end(JS);}
-      else if(req.url==='/health'||req.url==='/snapshot'){if(req.url==='/snapshot')counts.httpSnapshot++;res.writeHead(200,{...headers,'content-type':'application/json'});res.end('{"fixture":true}');}
-      else {res.writeHead(404,headers);res.end('Not found');}
-    };
-    server=createServer({key:await readFile(keyPath),cert:await readFile(certPath)},(req,res)=>{
-      counts.requests++;
-      if(req.method==='POST'&&req.url==='/_preview/access') {
-        const origin=req.headers.origin,site=req.headers['sec-fetch-site'];
-        formMetadata={
-          originCategory:origin===undefined?'missing':origin==='null'?'null':origin===ORIGIN?'same':'other',
-          hostMatchesFixture:req.headers.host==='localhost:5191',
-          secFetchSiteCategory:['same-origin','same-site','cross-site','none'].includes(site)?site:site===undefined?'missing':'other',
-          contentTypeExact:req.headers['content-type']==='application/x-www-form-urlencoded',
-          contentLength:/^\d{1,6}$/.test(req.headers['content-length']??'')?Number(req.headers['content-length']):-1,
-        };
+      if (req.method !== 'GET') {
+        counts.readOnlyDenied++;
+        res.writeHead(403, headers);
+        res.end('Read-only fixture');
+        return;
       }
-      if(counts.requests>128){res.writeHead(429,{'connection':'close'});res.end();return;}
-      return gate.wrapHandler(handler)(req,res);
-    });
-    server.requestTimeout=15000;server.headersTimeout=10000;
-    const wire=gate.upgradeServer(server),wrappers=new Map();
+      if (req.url === '/') {
+        res.writeHead(200, { ...headers, 'content-type': 'text/html; charset=utf-8' });
+        res.end(APP);
+      } else if (req.url === '/fixture.js') {
+        res.writeHead(200, { ...headers, 'content-type': 'text/javascript; charset=utf-8' });
+        res.end(JS);
+      } else if (req.url === '/health' || req.url === '/snapshot') {
+        if (req.url === '/snapshot') counts.httpSnapshot++;
+        res.writeHead(200, { ...headers, 'content-type': 'application/json' });
+        res.end('{"fixture":true}');
+      } else {
+        res.writeHead(404, headers);
+        res.end('Not found');
+      }
+    };
+    server = createServer(
+      { key: await readFile(keyPath), cert: await readFile(certPath) },
+      (req, res) => {
+        counts.requests++;
+        if (req.method === 'POST' && req.url === '/_preview/access') {
+          const origin = req.headers.origin,
+            site = req.headers['sec-fetch-site'];
+          formMetadata = {
+            originCategory:
+              origin === undefined
+                ? 'missing'
+                : origin === 'null'
+                  ? 'null'
+                  : origin === ORIGIN
+                    ? 'same'
+                    : 'other',
+            hostMatchesFixture: req.headers.host === 'localhost:5191',
+            secFetchSiteCategory: ['same-origin', 'same-site', 'cross-site', 'none'].includes(site)
+              ? site
+              : site === undefined
+                ? 'missing'
+                : 'other',
+            contentTypeExact: req.headers['content-type'] === 'application/x-www-form-urlencoded',
+            contentLength: /^\d{1,6}$/.test(req.headers['content-length'] ?? '')
+              ? Number(req.headers['content-length'])
+              : -1,
+          };
+        }
+        if (counts.requests > 128) {
+          res.writeHead(429, { connection: 'close' });
+          res.end();
+          return;
+        }
+        return gate.wrapHandler(handler)(req, res);
+      },
+    );
+    server.requestTimeout = 15000;
+    server.headersTimeout = 10000;
+    const wire = gate.upgradeServer(server),
+      wrappers = new Map();
     // Measurement inside admission, before the unchanged actual WS adapter.
-    const inspected={on(event,listener){const wrapped=(req,...args)=>{if(leaked(req))counts.credentialLeak++;return listener(req,...args);};wrappers.set(listener,wrapped);wire.on(event,wrapped);},off(event,listener){wire.off(event,wrappers.get(listener));wrappers.delete(listener);}};
-    sockets=attachOverlaySockets(inspected,{channel:'201',async snapshot(){counts.snapshot++;return {type:'snapshot',fixture:true,revision:1};},subscribe(){counts.subscribe++;counts.activeSubscriptions++;return ()=>{counts.activeSubscriptions--;};}},{origins:[ORIGIN],maxClients:2,allowRead:()=>{counts.readBudget++;return true;}});
-    await new Promise((r,j)=>{server.once('error',j);server.listen(5191,'127.0.0.1',r);});
-    return {origin:ORIGIN,key:DUMMY,expiresAt,stats:()=>({...counts,clients:sockets.clients.size}),formMetadata:()=>formMetadata&&({...formMetadata}),close};
-  } catch {await close();throw Error('Private fixture startup failed');}
-}
-export function privateFixtureRequest(path,{method='GET',headers={},body=''}={}) {
-  return new Promise((resolve,reject)=>{
-    let size=0,settled=false;const chunks=[];
-    if(typeof path!=='string'||!path.startsWith('/')||path.length>2048){reject(Error('Fixture request path rejected'));return;}
-    const req=httpsRequest({hostname:'localhost',port:5191,path,method,headers,rejectUnauthorized:false,agent:false},res=>{
-      res.on('data',chunk=>{size+=chunk.length;if(size>65536){req.destroy();if(!settled){settled=true;reject(Error('Fixture response bound'));}}else chunks.push(chunk);});
-      res.on('error',()=>{if(!settled){settled=true;reject(Error('Fixture HTTPS response failed'));}});
-      res.on('end',()=>{if(!settled){settled=true;resolve({status:res.statusCode,headers:res.headers,body:Buffer.concat(chunks,size).toString('utf8')});}});
+    const inspected = {
+      on(event, listener) {
+        const wrapped = (req, ...args) => {
+          if (leaked(req)) counts.credentialLeak++;
+          return listener(req, ...args);
+        };
+        wrappers.set(listener, wrapped);
+        wire.on(event, wrapped);
+      },
+      off(event, listener) {
+        wire.off(event, wrappers.get(listener));
+        wrappers.delete(listener);
+      },
+    };
+    sockets = attachOverlaySockets(
+      inspected,
+      {
+        channel: '201',
+        async snapshot() {
+          counts.snapshot++;
+          return { type: 'snapshot', fixture: true, revision: 1 };
+        },
+        subscribe() {
+          counts.subscribe++;
+          counts.activeSubscriptions++;
+          return () => {
+            counts.activeSubscriptions--;
+          };
+        },
+      },
+      {
+        origins: [ORIGIN],
+        maxClients: 2,
+        allowRead: () => {
+          counts.readBudget++;
+          return true;
+        },
+      },
+    );
+    await new Promise((r, j) => {
+      server.once('error', j);
+      server.listen(5191, '127.0.0.1', r);
     });
-    req.setTimeout(5000,()=>req.destroy());req.on('error',()=>{if(!settled){settled=true;reject(Error('Fixture HTTPS request failed'));}});req.end(body);
+    return {
+      origin: ORIGIN,
+      key: DUMMY,
+      expiresAt,
+      stats: () => ({ ...counts, clients: sockets.clients.size }),
+      formMetadata: () => formMetadata && { ...formMetadata },
+      close,
+    };
+  } catch {
+    await close();
+    throw Error('Private fixture startup failed');
+  }
+}
+export function privateFixtureRequest(path, { method = 'GET', headers = {}, body = '' } = {}) {
+  return new Promise((resolve, reject) => {
+    let size = 0,
+      settled = false;
+    const chunks = [];
+    if (typeof path !== 'string' || !path.startsWith('/') || path.length > 2048) {
+      reject(Error('Fixture request path rejected'));
+      return;
+    }
+    const req = httpsRequest(
+      {
+        hostname: 'localhost',
+        port: 5191,
+        path,
+        method,
+        headers,
+        rejectUnauthorized: false,
+        agent: false,
+      },
+      (res) => {
+        res.on('data', (chunk) => {
+          size += chunk.length;
+          if (size > 65536) {
+            req.destroy();
+            if (!settled) {
+              settled = true;
+              reject(Error('Fixture response bound'));
+            }
+          } else chunks.push(chunk);
+        });
+        res.on('error', () => {
+          if (!settled) {
+            settled = true;
+            reject(Error('Fixture HTTPS response failed'));
+          }
+        });
+        res.on('end', () => {
+          if (!settled) {
+            settled = true;
+            resolve({
+              status: res.statusCode,
+              headers: res.headers,
+              body: Buffer.concat(chunks, size).toString('utf8'),
+            });
+          }
+        });
+      },
+    );
+    req.setTimeout(5000, () => req.destroy());
+    req.on('error', () => {
+      if (!settled) {
+        settled = true;
+        reject(Error('Fixture HTTPS request failed'));
+      }
+    });
+    req.end(body);
   });
 }
 async function deniedSocket() {
-  return new Promise((resolve,reject)=>{
-    let settled=false;
-    const ws=new WebSocket('wss://localhost:5191/ws/201',{origin:ORIGIN,rejectUnauthorized:false,handshakeTimeout:5000});
-    const timer=setTimeout(()=>{if(!settled){settled=true;ws.terminate();reject(Error('Fixture WS denial deadline'));}},6000);
-    ws.on('unexpected-response',(req,res)=>{if(!settled){settled=true;clearTimeout(timer);res.on('error',()=>{});res.resume();req.destroy();ws.terminate();resolve(res.statusCode);}});
-    ws.on('open',()=>{if(!settled){settled=true;clearTimeout(timer);ws.terminate();reject(Error('Unexpected unauthenticated WS'));}});
-    ws.on('error',()=>{if(!settled){settled=true;clearTimeout(timer);reject(Error('Fixture WS handshake failed'));}});
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const ws = new WebSocket('wss://localhost:5191/ws/201', {
+      origin: ORIGIN,
+      rejectUnauthorized: false,
+      handshakeTimeout: 5000,
+    });
+    const timer = setTimeout(() => {
+      if (!settled) {
+        settled = true;
+        ws.terminate();
+        reject(Error('Fixture WS denial deadline'));
+      }
+    }, 6000);
+    ws.on('unexpected-response', (req, res) => {
+      if (!settled) {
+        settled = true;
+        clearTimeout(timer);
+        res.on('error', () => {});
+        res.resume();
+        req.destroy();
+        ws.terminate();
+        resolve(res.statusCode);
+      }
+    });
+    ws.on('open', () => {
+      if (!settled) {
+        settled = true;
+        clearTimeout(timer);
+        ws.terminate();
+        reject(Error('Unexpected unauthenticated WS'));
+      }
+    });
+    ws.on('error', () => {
+      if (!settled) {
+        settled = true;
+        clearTimeout(timer);
+        reject(Error('Fixture WS handshake failed'));
+      }
+    });
   });
 }
 async function runPrivatePreviewBrowser() {
-  let fixture,browser,context,page,passed=false,stage='startup',failureCategory=null;
-  const checks=[],diagnostic={assertionLine:0},cookieFlags={};
-  let errors=0,forbidden=0,requests=0,downloads=0;
+  let fixture,
+    browser,
+    context,
+    page,
+    passed = false,
+    stage = 'startup',
+    failureCategory = null;
+  const checks = [],
+    diagnostic = { assertionLine: 0 },
+    cookieFlags = {};
+  let errors = 0,
+    forbidden = 0,
+    requests = 0,
+    downloads = 0;
   try {
-    if(!process.getuid?.())throw Error('Fixture nonroot browser required');
-    fixture=await privatePreviewFixture();
-    const root=await privateFixtureRequest('/');assert.equal(root.status,200);assert.match(root.body,/<main><h1>Private preview/);assert.doesNotMatch(root.body,/Twitch|raidrelichq|olsols|<script|<img/);
-    for(const path of ['/health','/fixture.js','/snapshot','/oauth/keeper/start','/eventsub','/api/journey','/ws/201','/?key='+DUMMY])assert.equal((await privateFixtureRequest(path)).status,401);
-    assert.equal(await deniedSocket(),401);
-    let stats=fixture.stats();for(const name of ['app','readBudget','snapshot','subscribe','credentialLeak','provider','actions'])assert.equal(stats[name],0);
-    checks.push({name:'Unauthenticated HTTPS assets/API/auth/health and actual WSS denied before product/feed work',passed:true});
-    const {chromium}=await import('playwright-core');
-    browser=await chromium.launch(await localChromiumOptions(chromium));
-    context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width:390,height:844},serviceWorkers:'block'});
-    const allowed=new Set(['/','/_preview/access','/fixture.js','/snapshot','/readonly-action','/favicon.ico']);
-    await context.route('**/*',route=>{
-      const u=new URL(route.request().url());requests++;
-      const method=route.request().method();
-      if(requests>64||u.origin!==ORIGIN||!allowed.has(u.pathname)||u.search||!(method==='GET'||(method==='POST'&&['/_preview/access','/readonly-action'].includes(u.pathname)))){forbidden++;return route.abort();}
+    if (!process.getuid?.()) throw Error('Fixture nonroot browser required');
+    fixture = await privatePreviewFixture();
+    const root = await privateFixtureRequest('/');
+    assert.equal(root.status, 200);
+    assert.match(root.body, /<main><h1>Private preview/);
+    assert.doesNotMatch(root.body, /Twitch|raidrelichq|olsols|<script|<img/);
+    for (const path of [
+      '/health',
+      '/fixture.js',
+      '/snapshot',
+      '/oauth/keeper/start',
+      '/eventsub',
+      '/api/journey',
+      '/ws/201',
+      '/?key=' + DUMMY,
+    ])
+      assert.equal((await privateFixtureRequest(path)).status, 401);
+    assert.equal(await deniedSocket(), 401);
+    let stats = fixture.stats();
+    for (const name of [
+      'app',
+      'readBudget',
+      'snapshot',
+      'subscribe',
+      'credentialLeak',
+      'provider',
+      'actions',
+    ])
+      assert.equal(stats[name], 0);
+    checks.push({
+      name: 'Unauthenticated HTTPS assets/API/auth/health and actual WSS denied before product/feed work',
+      passed: true,
+    });
+    const { chromium } = await import('playwright-core');
+    browser = await chromium.launch(await localChromiumOptions(chromium));
+    context = await browser.newContext({
+      ignoreHTTPSErrors: true,
+      viewport: { width: 390, height: 844 },
+      serviceWorkers: 'block',
+    });
+    const allowed = new Set([
+      '/',
+      '/_preview/access',
+      '/fixture.js',
+      '/snapshot',
+      '/readonly-action',
+      '/favicon.ico',
+    ]);
+    await context.route('**/*', (route) => {
+      const u = new URL(route.request().url());
+      requests++;
+      const method = route.request().method();
+      if (
+        requests > 64 ||
+        u.origin !== ORIGIN ||
+        !allowed.has(u.pathname) ||
+        u.search ||
+        !(
+          method === 'GET' ||
+          (method === 'POST' && ['/_preview/access', '/readonly-action'].includes(u.pathname))
+        )
+      ) {
+        forbidden++;
+        return route.abort();
+      }
       return route.continue();
     });
-    page=await context.newPage();page.on('pageerror',()=>errors++);page.on('download',()=>downloads++);
-    page.on('websocket',ws=>{if(ws.url()!=='wss://localhost:5191/ws/201')forbidden++;});
-    stage='real-https-form';
-    await page.goto(ORIGIN);assert.equal(await page.locator('main h1').innerText(),'Private preview');
+    page = await context.newPage();
+    page.on('pageerror', () => errors++);
+    page.on('download', () => downloads++);
+    page.on('websocket', (ws) => {
+      if (ws.url() !== 'wss://localhost:5191/ws/201') forbidden++;
+    });
+    stage = 'real-https-form';
+    await page.goto(ORIGIN);
+    assert.equal(await page.locator('main h1').innerText(), 'Private preview');
     await page.getByLabel('Access code').fill(DUMMY);
-    const response=page.waitForResponse(r=>r.request().method()==='POST'&&new URL(r.url()).pathname==='/_preview/access');
-    await page.getByRole('button',{name:'Enter private preview',exact:true}).click();
-    diagnostic.formHTTPStatus=(await response).status();
-    diagnostic.formRequest=fixture.formMetadata();
-    assert.equal(diagnostic.formHTTPStatus,303);
-    await page.waitForFunction(()=>window.previewFixture?.ready===true);
-    assert.equal(page.url(),ORIGIN+'/');
-    const cookies=await context.cookies(ORIGIN),cookie=cookies.find(c=>c.name==='__Host-raid-preview');
-    assert.ok(cookie);if(cookie.value!==DUMMY)throw Error('Fixture cookie binding');
-    Object.assign(cookieFlags,{secure:Number(cookie.secure),httpOnly:Number(cookie.httpOnly),sameSiteStrict:Number(cookie.sameSite==='Strict'),hostOnly:Number(cookie.domain==='localhost'),rootPath:Number(cookie.path==='/'),withinExpiry:Number(cookie.expires*1000<=fixture.expiresAt+1000)});
-    assert.ok(Object.values(cookieFlags).every(v=>v===1));
-    const privacy=await page.evaluate(key=>({url:location.href.includes(key),referrer:document.referrer.includes(key),storage:localStorage.length+sessionStorage.length,cookieVisible:document.cookie.includes('__Host-raid-preview'),global:Object.values(Object.getOwnPropertyDescriptors(window)).some(d=>typeof d.value==='string'&&d.value.includes(key))}),DUMMY);
-    assert.deepEqual(privacy,{url:false,referrer:false,storage:0,cookieVisible:false,global:false});
-    await page.evaluate(()=>window.openPreviewFixture());
-    await page.waitForFunction(()=>window.previewFixture.messages===1);
-    assert.equal(await page.evaluate(()=>window.previewFixture.errors),0);
-    assert.equal((await page.request.get(ORIGIN+'/snapshot')).status(),200);
-    assert.equal((await page.request.post(ORIGIN+'/readonly-action')).status(),403);
-    stats=fixture.stats();assert.equal(stats.snapshot,1);assert.equal(stats.httpSnapshot,1);assert.equal(stats.subscribe,1);assert.equal(stats.clients,1);assert.equal(stats.credentialLeak,0);assert.equal(stats.actions,0);assert.equal(stats.provider,0);assert.equal(stats.readOnlyDenied,1);
-    checks.push({name:'Actual HTTPS form303, Secure HttpOnly host cookie, native WSS fixture projection and retained read-only denial',passed:true});
-    await page.close();await context.close();context=null;await fixture.close();fixture=null;
+    const response = page.waitForResponse(
+      (r) => r.request().method() === 'POST' && new URL(r.url()).pathname === '/_preview/access',
+    );
+    await page.getByRole('button', { name: 'Enter private preview', exact: true }).click();
+    diagnostic.formHTTPStatus = (await response).status();
+    diagnostic.formRequest = fixture.formMetadata();
+    assert.equal(diagnostic.formHTTPStatus, 303);
+    await page.waitForFunction(() => window.previewFixture?.ready === true);
+    assert.equal(page.url(), ORIGIN + '/');
+    const cookies = await context.cookies(ORIGIN),
+      cookie = cookies.find((c) => c.name === '__Host-raid-preview');
+    assert.ok(cookie);
+    if (cookie.value !== DUMMY) throw Error('Fixture cookie binding');
+    Object.assign(cookieFlags, {
+      secure: Number(cookie.secure),
+      httpOnly: Number(cookie.httpOnly),
+      sameSiteStrict: Number(cookie.sameSite === 'Strict'),
+      hostOnly: Number(cookie.domain === 'localhost'),
+      rootPath: Number(cookie.path === '/'),
+      withinExpiry: Number(cookie.expires * 1000 <= fixture.expiresAt + 1000),
+    });
+    assert.ok(Object.values(cookieFlags).every((v) => v === 1));
+    const privacy = await page.evaluate(
+      (key) => ({
+        url: location.href.includes(key),
+        referrer: document.referrer.includes(key),
+        storage: localStorage.length + sessionStorage.length,
+        cookieVisible: document.cookie.includes('__Host-raid-preview'),
+        global: Object.values(Object.getOwnPropertyDescriptors(window)).some(
+          (d) => typeof d.value === 'string' && d.value.includes(key),
+        ),
+      }),
+      DUMMY,
+    );
+    assert.deepEqual(privacy, {
+      url: false,
+      referrer: false,
+      storage: 0,
+      cookieVisible: false,
+      global: false,
+    });
+    await page.evaluate(() => window.openPreviewFixture());
+    await page.waitForFunction(() => window.previewFixture.messages === 1);
+    assert.equal(await page.evaluate(() => window.previewFixture.errors), 0);
+    assert.equal((await page.request.get(ORIGIN + '/snapshot')).status(), 200);
+    assert.equal((await page.request.post(ORIGIN + '/readonly-action')).status(), 403);
+    stats = fixture.stats();
+    assert.equal(stats.snapshot, 1);
+    assert.equal(stats.httpSnapshot, 1);
+    assert.equal(stats.subscribe, 1);
+    assert.equal(stats.clients, 1);
+    assert.equal(stats.credentialLeak, 0);
+    assert.equal(stats.actions, 0);
+    assert.equal(stats.provider, 0);
+    assert.equal(stats.readOnlyDenied, 1);
+    checks.push({
+      name: 'Actual HTTPS form303, Secure HttpOnly host cookie, native WSS fixture projection and retained read-only denial',
+      passed: true,
+    });
+    await page.close();
+    await context.close();
+    context = null;
+    await fixture.close();
+    fixture = null;
     // Create deadline only AFTER browser warmup. Real elapsed, no fake clock or input keepalive.
-    stage='absolute-expiry';fixture=await privatePreviewFixture({expiryMs:12000});
-    context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width:390,height:844},serviceWorkers:'block'});
-    await context.route('**/*',r=>{const u=new URL(r.request().url());requests++;if(requests>64||u.origin!==ORIGIN||!['/','/_preview/access','/fixture.js','/favicon.ico'].includes(u.pathname)||u.search||!(r.request().method()==='GET'||(r.request().method()==='POST'&&u.pathname==='/_preview/access'))){forbidden++;return r.abort();}return r.continue();});
-    page=await context.newPage();page.on('pageerror',()=>errors++);page.on('download',()=>downloads++);
-    await page.goto(ORIGIN);await page.getByLabel('Access code').fill(DUMMY);
-    const expiryResponse=page.waitForResponse(r=>r.request().method()==='POST'&&new URL(r.url()).pathname==='/_preview/access');
-    await page.getByRole('button',{name:'Enter private preview',exact:true}).click();
-    diagnostic.expiryFormHTTPStatus=(await expiryResponse).status();
-    diagnostic.expiryFormRequest=fixture.formMetadata();
-    assert.equal(diagnostic.expiryFormHTTPStatus,303);
-    await page.waitForFunction(()=>window.previewFixture?.ready===true);await page.evaluate(()=>window.openPreviewFixture());await page.waitForFunction(()=>window.previewFixture.messages===1);
-    const before=performance.now();await page.waitForFunction(()=>window.previewFixture.closed===1,undefined,{timeout:15000});
-    diagnostic.expiryWaitMs=Math.round(performance.now()-before);assert.ok(Date.now()>=fixture.expiresAt);
-    diagnostic.expectedExpirySocketErrors=await page.evaluate(()=>window.previewFixture.errors);assert.ok(diagnostic.expectedExpirySocketErrors<=1);
-    assert.equal((await privateFixtureRequest('/health',{headers:{'X-Preview-Access':DUMMY}})).status,401);
-    stats=fixture.stats();assert.equal(stats.clients,0);assert.equal(stats.credentialLeak,0);assert.equal(stats.actions,0);assert.equal(stats.provider,0);
-    checks.push({name:'Real short absolute expiry destroys admitted WSS and rejects subsequent HTTPS; not an hour/physical OBS proof',passed:true});
-    assert.equal(errors,0);assert.equal(forbidden,0);assert.equal(downloads,0);passed=true;
-  } catch(error) {
-    failureCategory=['AssertionError','TimeoutError','TypeError'].includes(error?.name)?error.name:'fixture-or-browser';
-    diagnostic.assertionLine=Number(/browser-smoke-readiness-a11y[.]js:(\d+)/.exec(error?.stack??'')?.[1]??0);
+    stage = 'absolute-expiry';
+    fixture = await privatePreviewFixture({ expiryMs: 12000 });
+    context = await browser.newContext({
+      ignoreHTTPSErrors: true,
+      viewport: { width: 390, height: 844 },
+      serviceWorkers: 'block',
+    });
+    await context.route('**/*', (r) => {
+      const u = new URL(r.request().url());
+      requests++;
+      if (
+        requests > 64 ||
+        u.origin !== ORIGIN ||
+        !['/', '/_preview/access', '/fixture.js', '/favicon.ico'].includes(u.pathname) ||
+        u.search ||
+        !(
+          r.request().method() === 'GET' ||
+          (r.request().method() === 'POST' && u.pathname === '/_preview/access')
+        )
+      ) {
+        forbidden++;
+        return r.abort();
+      }
+      return r.continue();
+    });
+    page = await context.newPage();
+    page.on('pageerror', () => errors++);
+    page.on('download', () => downloads++);
+    await page.goto(ORIGIN);
+    await page.getByLabel('Access code').fill(DUMMY);
+    const expiryResponse = page.waitForResponse(
+      (r) => r.request().method() === 'POST' && new URL(r.url()).pathname === '/_preview/access',
+    );
+    await page.getByRole('button', { name: 'Enter private preview', exact: true }).click();
+    diagnostic.expiryFormHTTPStatus = (await expiryResponse).status();
+    diagnostic.expiryFormRequest = fixture.formMetadata();
+    assert.equal(diagnostic.expiryFormHTTPStatus, 303);
+    await page.waitForFunction(() => window.previewFixture?.ready === true);
+    await page.evaluate(() => window.openPreviewFixture());
+    await page.waitForFunction(() => window.previewFixture.messages === 1);
+    const before = performance.now();
+    await page.waitForFunction(() => window.previewFixture.closed === 1, undefined, {
+      timeout: 15000,
+    });
+    diagnostic.expiryWaitMs = Math.round(performance.now() - before);
+    assert.ok(Date.now() >= fixture.expiresAt);
+    diagnostic.expectedExpirySocketErrors = await page.evaluate(() => window.previewFixture.errors);
+    assert.ok(diagnostic.expectedExpirySocketErrors <= 1);
+    assert.equal(
+      (await privateFixtureRequest('/health', { headers: { 'X-Preview-Access': DUMMY } })).status,
+      401,
+    );
+    stats = fixture.stats();
+    assert.equal(stats.clients, 0);
+    assert.equal(stats.credentialLeak, 0);
+    assert.equal(stats.actions, 0);
+    assert.equal(stats.provider, 0);
+    checks.push({
+      name: 'Real short absolute expiry destroys admitted WSS and rejects subsequent HTTPS; not an hour/physical OBS proof',
+      passed: true,
+    });
+    assert.equal(errors, 0);
+    assert.equal(forbidden, 0);
+    assert.equal(downloads, 0);
+    passed = true;
+  } catch (error) {
+    failureCategory = ['AssertionError', 'TimeoutError', 'TypeError'].includes(error?.name)
+      ? error.name
+      : 'fixture-or-browser';
+    diagnostic.assertionLine = Number(
+      /browser-smoke-readiness-a11y[.]js:(\d+)/.exec(error?.stack ?? '')?.[1] ?? 0,
+    );
   } finally {
-    await context?.close().catch(()=>{});await browser?.close().catch(()=>{});await fixture?.close().catch(()=>{});
-    await mkdir('artifacts',{recursive:true});
-    const report=JSON.stringify({passed,stage,failureCategory,checks,diagnostic,cookieFlags,errors,forbidden,downloads,requests,browserClockUsed:false,physicalOBS:false});
-    assert.ok(Buffer.byteLength(report)<=65536);await writeFile('artifacts/private-preview-browser-results.json',report+'\n');
+    await context?.close().catch(() => {});
+    await browser?.close().catch(() => {});
+    await fixture?.close().catch(() => {});
+    await mkdir('artifacts', { recursive: true });
+    const report = JSON.stringify({
+      passed,
+      stage,
+      failureCategory,
+      checks,
+      diagnostic,
+      cookieFlags,
+      errors,
+      forbidden,
+      downloads,
+      requests,
+      browserClockUsed: false,
+      physicalOBS: false,
+    });
+    assert.ok(Buffer.byteLength(report) <= 65536);
+    await writeFile('artifacts/private-preview-browser-results.json', report + '\n');
   }
-  if(!passed)process.exitCode=1;
+  if (!passed) process.exitCode = 1;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {

@@ -13,6 +13,8 @@ let active,
   tls,
   page,
   failed = false,
+  failureCategory = null,
+  diagnostic = {},
   stage = 'setup';
 const checks = [],
   captures = [],
@@ -152,7 +154,43 @@ try {
   assert.equal(starts, 0);
   assert.match(await page.locator('#p7-gates').textContent(), /MASTER: OFF/);
   assert.match(await page.locator('#p7-setup').textContent(), /Off by default/);
-  assert.equal(await page.locator('.status-lights p').count(), 3);
+  // Each logical light has a separate reason paragraph; paragraphs are not lights.
+  const logicalLights = await page.locator('.status-lights [data-state]').evaluateAll((nodes) =>
+    nodes.map((node) => ({
+      id: node.id,
+      state: node.dataset.state,
+      description: node.getAttribute('aria-describedby'),
+    })),
+  );
+  assert.deepEqual(
+    logicalLights.map((light) => light.id),
+    ['light-bot', 'light-subscriptions', 'light-live'],
+  );
+  for (const light of logicalLights) {
+    assert.ok(['unknown', 'ready', 'offline'].includes(light.state));
+    assert.equal(light.description, light.id + '-reason');
+    assert.equal(await page.locator('#' + light.description).count(), 1);
+    assert.ok((await page.locator('#' + light.description).textContent()).trim().length > 0);
+    assert.equal(await page.locator('#' + light.id + '-fix').count(), 1);
+    assert.ok(
+      await page
+        .locator('#' + light.id + '-fix')
+        .evaluate(
+          (node) =>
+            node.tagName === 'A' &&
+            node.getAttribute('aria-describedby') === node.id.replace(/-fix$/, '-reason'),
+        ),
+    );
+    assert.ok(
+      await page
+        .locator('#' + light.id)
+        .evaluate(
+          (node) =>
+            [...node.parentElement.querySelectorAll('a')].filter((link) => !link.hidden).length <=
+            1,
+        ),
+    );
+  }
   await page.locator('#p7-setup').scrollIntoViewIfNeeded();
   if (process.env.P7_CAPTURE === '1') {
     const b = await page.screenshot({ fullPage: false });
@@ -256,8 +294,35 @@ try {
     name: 'HTTP localhost5191 Simulator copies only own APP start URL with no OAuth navigation/provider calls',
     passed: true,
   });
-} catch {
+} catch (error) {
   failed = true;
+  failureCategory =
+    error?.name === 'AssertionError'
+      ? 'assertion'
+      : error?.name === 'TimeoutError'
+        ? 'timeout'
+        : error?.name === 'TypeError'
+          ? 'type-error'
+          : 'browser-or-fixture';
+  diagnostic = {
+    assertionLine: Number(/browser-smoke-p7[.]js:(\d+)/.exec(error?.stack ?? '')?.[1] ?? 0),
+    expectedStage: stage,
+  };
+  try {
+    Object.assign(
+      diagnostic,
+      await page.evaluate(() => ({
+        logicalLightCount: document.querySelectorAll('.status-lights [data-state]').length,
+        lightParagraphCount: document.querySelectorAll('.status-lights p').length,
+        configuredLink:
+          document.querySelector('#p7-consent-link')?.getAttribute('href') ===
+          location.origin + '/oauth/bot/start?features=p7',
+        masterOff: /MASTER: OFF/.test(document.querySelector('#p7-gates')?.textContent ?? ''),
+      })),
+    );
+  } catch {
+    diagnostic.readFailed = true;
+  }
 } finally {
   await browser?.close().catch(() => {});
   server?.closeAllConnections();
@@ -275,7 +340,8 @@ try {
         simulator: true,
         passed: !failed,
         stage,
-        failureCategory: failed ? 'assertion-or-browser' : null,
+        failureCategory,
+        diagnostic,
         errors,
         checks,
         captures,

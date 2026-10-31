@@ -76,8 +76,12 @@ test('archive palette provides AA normal-text contrast without external typograp
   };
   const color = (token) => resolve('--' + token);
   const required = {
-    deep: '#101d30', slate: '#26354b', moon: '#e3e8ef',
-    muted: '#bbc6d7', amber: '#dba95c', violet: '#b7a2df',
+    deep: '#101d30',
+    slate: '#26354b',
+    moon: '#e3e8ef',
+    muted: '#bbc6d7',
+    amber: '#dba95c',
+    violet: '#b7a2df',
   };
   assert.deepEqual(
     Object.fromEntries(Object.keys(required).map((token) => [token, color(token)])),
@@ -87,18 +91,31 @@ test('archive palette provides AA normal-text contrast without external typograp
   // rerun also checks the resolver rather than assuming its failure bounds.
   assert.throws(() => resolve('--missing'), /Unresolved palette variable/);
   assert.throws(
-    () => resolve('--a', new Map([['--a', 'var(--b)'], ['--b', 'var(--a)']])),
+    () =>
+      resolve(
+        '--a',
+        new Map([
+          ['--a', 'var(--b)'],
+          ['--b', 'var(--a)'],
+        ]),
+      ),
     /Palette variable cycle/,
   );
   assert.throws(
     () => resolve('--a', new Map([['--a', 'var(--missing)']])),
     /Unresolved palette variable/,
   );
-  const deepChain = new Map(Array.from({ length: 9 }, (_, index) => [
-    '--step-' + index, index === 8 ? '#101d30' : `var(--step-${index + 1})`,
-  ]));
+  const deepChain = new Map(
+    Array.from({ length: 9 }, (_, index) => [
+      '--step-' + index,
+      index === 8 ? '#101d30' : `var(--step-${index + 1})`,
+    ]),
+  );
   assert.throws(() => resolve('--step-0', deepChain), /Palette variable depth exceeded/);
-  assert.throws(() => resolve('--a', new Map([['--a', 'rgb(0,0,0)']])), /Unsupported palette expression/);
+  assert.throws(
+    () => resolve('--a', new Map([['--a', 'rgb(0,0,0)']])),
+    /Unsupported palette expression/,
+  );
   const luminance = (hex) =>
     hex
       .slice(1)
@@ -117,10 +134,16 @@ test('archive palette provides AA normal-text contrast without external typograp
   const faces = [...fonts.matchAll(/@font-face\s*\{([^{}]*)\}/gi)];
   assert.equal(faces.length, 1);
   assert.match(faces[0][1], /font-family\s*:\s*Cinzel\s*;/);
-  assert.match(faces[0][1], /src\s*:\s*url\(\s*(['"])\/fonts\/Cinzel\.ttf\1\s*\)\s*format\(\s*(['"])truetype\2\s*\)\s*;/);
+  assert.match(
+    faces[0][1],
+    /src\s*:\s*url\(\s*(['"])\/fonts\/Cinzel\.ttf\1\s*\)\s*format\(\s*(['"])truetype\2\s*\)\s*;/,
+  );
   assert.deepEqual(
     [...fonts.matchAll(/url\(\s*(['"]?)([^'"\s)]+)\1\s*\)/gi)].map((match) => match[2]),
     ['/fonts/Cinzel.ttf'],
   );
-  assert.match(fonts, /Cinzel, Google Fonts pinned 3dd78844021e948ceb633d1dcee3f7885561b5d9; SIL OFL 1\.1\./);
+  assert.match(
+    fonts,
+    /Cinzel, Google Fonts pinned 3dd78844021e948ceb633d1dcee3f7885561b5d9; SIL OFL 1\.1\./,
+  );
 });

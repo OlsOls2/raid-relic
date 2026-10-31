@@ -14,6 +14,9 @@ let browser,
   diagnostic = null,
   failureCategory = null,
   stage = 'startup',
+  expectedMs = null,
+  snapshotMode = 'unknown',
+  journeyRings = null,
   failure = false;
 const checks = [],
   captures = new Map(),
@@ -154,6 +157,7 @@ try {
     assert.deepEqual((await f.runtime.state.getKeeperRegistry()).pendingHop.offers, ['811']);
     const start = (await f.runtime.state.getKeeperRegistry()).pendingHop.startedAt;
     async function seek(ms) {
+      expectedMs = ms;
       await page.evaluate((ms) => {
         window.__bindingPerf = ms;
       }, ms);
@@ -231,6 +235,7 @@ try {
       assert(alpha > 0 && alpha <= 0.45);
       assert(await page.locator('.p3-shock').isVisible());
     }
+    stage = `${mode}-impact-exit-3700`;
     await seek(3700);
     assert.equal(await page.locator('.p3-flash').isVisible(), false);
     for (const ms of [5500, 12000, 19000]) {
@@ -299,6 +304,7 @@ try {
       [HOME, OTHER],
     );
     for (const ms of [20250, 20800, 21800, 22800, 23200]) {
+      stage = `${mode}-fusion-plateau-${ms}`;
       await seek(ms);
       await page.waitForFunction(
         () =>
@@ -331,6 +337,7 @@ try {
       });
       assert(composite);
       if (mode === 'webgl' && ms === 20800) {
+        stage = `${mode}-fusion-gold-pixels-${ms}`;
         const pixel = await page.locator('canvas.relic3d').evaluate(
           (canvas) =>
             new Promise((resolve) => {
@@ -370,20 +377,33 @@ try {
         await capture(page, 'binding-fusion.png');
       }
     }
+    stage = `${mode}-fusion-exit-23650`;
     await seek(23650);
     await page.waitForFunction(() => document.querySelector('.p3-fusion').hidden);
+    stage = `${mode}-fusion-exit-24000`;
     await seek(24000);
     await page.waitForFunction(() => document.querySelector('.p3-fusion').hidden);
     assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
     if (mode === 'webgl') await capture(page, 'binding-settled.png');
     assert.deepEqual(await page.evaluate(() => window.__bindingSockets), { created: 1, closed: 0 });
+    stage = `${mode}-cold-reload-lineage`;
+    const completedSnapshot = await f.runtime.overlayFeeds[OTHER].snapshot();
+    snapshotMode = ['live', 'simulator'].includes(completedSnapshot.mode)
+      ? completedSnapshot.mode
+      : 'unknown';
+    journeyRings = (await f.runtime.state.getPublicJourney()).rings;
+    assert.equal(snapshotMode, 'simulator', 'pilot fixture explicitly defaults to simulator');
+    assert.equal(completedSnapshot.lineageRings, 1);
+    assert.equal(journeyRings, 1);
     await page.reload();
     await page.bringToFront();
     await page.locator('#lineage').filter({ hasText: '1 completed' }).waitFor();
+    stage = `${mode}-cold-no-replay-silence`;
     await page.waitForFunction(
       () =>
         document.querySelector('.p3-fusion').hidden && document.querySelector('.p3-flash').hidden,
     );
+    stage = `${mode}-reduced-silence`;
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForFunction(
       () =>
@@ -391,6 +411,7 @@ try {
           (s) => document.querySelector(s).hidden,
         ) && document.querySelector('.archive').dataset.ambientCount === '0',
     );
+    stage = `${mode}-corner-counter`;
     await page.setViewportSize({ width: 160, height: 160 });
     await page.goto(`${origin}/overlay/${OTHER}?corner=1`);
     await page.locator('#compact-count').filter({ hasText: 'Rings 1' }).waitFor();
@@ -429,9 +450,39 @@ try {
         archive = document.querySelector('.archive'),
         flash = document.querySelector('.p3-flash'),
         fusion = document.querySelector('.p3-fusion'),
-        canvas = document.querySelector('canvas.relic3d');
+        canvas = document.querySelector('canvas.relic3d'),
+        lineage = document.querySelector('#lineage'),
+        lineageText = lineage?.textContent ?? '',
+        state = document.body?.dataset.state,
+        phase = archive?.dataset.phase;
+      const category = (value, allowed) => (allowed.includes(value) ? value : 'unknown');
       return {
         actualElapsed: numeric(Number(archive?.dataset.cinematicElapsed)),
+        lineageOneRing: /^Ring 1(?:\b|$)/.test(lineageText),
+        lineageOneCompleted: /^1 completed\b/.test(lineageText),
+        lineageHidden: lineage ? lineage.hidden : null,
+        rootState: category(state, [
+          'ready',
+          'waiting',
+          'paused',
+          'incoming',
+          'unavailable',
+          'connecting',
+        ]),
+        phase: category(phase, [
+          'streak',
+          'impact',
+          'ambient',
+          'fusion',
+          'settled',
+          'idle',
+          'waiting',
+          'none',
+        ]),
+        growthTotal: numeric(Number(document.querySelector('.growth-fallback')?.dataset.total)),
+        compactOneRing: /\bRings? 1\b/.test(
+          document.querySelector('#compact-count')?.textContent ?? '',
+        ),
         flashAlpha: flash ? numeric(Number(getComputedStyle(flash).opacity)) : null,
         fusionGlow: archive
           ? numeric(Number(archive.style.getPropertyValue('--fusion-glow')))
@@ -442,8 +493,9 @@ try {
         socketsClosed: numeric(window.__bindingSockets?.closed),
       };
     });
+    diagnostic = { ...diagnostic, expectedMs, snapshotMode, journeyRings };
   } catch {
-    diagnostic = null;
+    diagnostic = { expectedMs, snapshotMode, journeyRings };
   }
 } finally {
   await browser?.close().catch(() => {});

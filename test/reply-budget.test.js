@@ -7,14 +7,23 @@ import { LINEAGE_LIMITS } from '../src/claims.js';
 import { handoffView } from '../src/public-view.js';
 import { claimComplete, wanderNotice, BOT_COPY, claimVoteCopy } from '../public/ritual-copy.js';
 import { createMarkService } from '../src/marks.js';
-import { completionAck, completionEligible, ackStep, carriedApprovedCount, reserveHopNotice,
-  trackHopNotices, announcementBudgetAvailable, HOP_NOTICE_POLICY } from '../src/claim-ack.js';
+import {
+  completionAck,
+  completionEligible,
+  ackStep,
+  carriedApprovedCount,
+  reserveHopNotice,
+  trackHopNotices,
+  announcementBudgetAvailable,
+  HOP_NOTICE_POLICY,
+} from '../src/claim-ack.js';
 
 // All transport below is the injected pilot mock; chat inputs pass the real
 // signed EventSub/runtime path. No stored result is substituted for a vote.
-const posts = (f) => f.calls.filter((c) =>
-  c.method === 'POST' && new URL(c.url).pathname === '/helix/chat/messages')
-  .map((c) => JSON.parse(c.body));
+const posts = (f) =>
+  f.calls
+    .filter((c) => c.method === 'POST' && new URL(c.url).pathname === '/helix/chat/messages')
+    .map((c) => JSON.parse(c.body));
 async function ready(kind, viewers = 100) {
   const f = await pilotFixture(kind);
   for (const id of [BOT, HOME, OTHER]) await f.login(id);
@@ -42,7 +51,9 @@ for (const kind of ['memory', 'firestore']) {
     await f.control(HOME, `send:${OTHER}`);
     // 150 genuine distinct sending voters; all valid votes up to the unchanged
     // per-side cap survive even after progress notices have been exhausted.
-    await Promise.all(Array.from({ length: 150 }, (_, i) => f.chat(HOME, String(10000 + i), '!offer')));
+    await Promise.all(
+      Array.from({ length: 150 }, (_, i) => f.chat(HOME, String(10000 + i), '!offer')),
+    );
     let root = await f.runtime.state.getKeeperRegistry();
     assert.equal(root.pendingHop.verified, false);
     assert.equal(root.pendingHop.threshold, 10);
@@ -51,7 +62,10 @@ for (const kind of ['memory', 'firestore']) {
     assert.equal((await f.runtime.state.getPublicJourney()).rings, 0);
     assert.equal(posts(f).length, 2);
     assert.equal(posts(f)[0].broadcaster_id, HOME);
-    assert.equal(posts(f)[0].message, 'Offers 1/10. Waiting for Twitch to confirm the raid. Waiting for 9 offers in @raidrelichq and 10 accepts in @olsols2.');
+    assert.equal(
+      posts(f)[0].message,
+      'Offers 1/10. Waiting for Twitch to confirm the raid. Waiting for 9 offers in @raidrelichq and 10 accepts in @olsols2.',
+    );
     f.advance(90000);
     const landed = f.now();
     await f.raid(HOME, OTHER, 100);
@@ -60,34 +74,66 @@ for (const kind of ['memory', 'firestore']) {
     assert.equal(root.pendingHop.claimStartedAt, landed);
     assert.equal(root.pendingHop.threshold, 10);
     assert.equal(root.pendingHop.offers.length, 10);
-    assert.deepEqual(posts(f).filter((p) => p.message === BOT_COPY.arrival).map((p) => p.broadcaster_id), [OTHER]);
+    assert.deepEqual(
+      posts(f)
+        .filter((p) => p.message === BOT_COPY.arrival)
+        .map((p) => p.broadcaster_id),
+      [OTHER],
+    );
     if (kind === 'firestore') await f.restart();
-    await Promise.all(Array.from({ length: 9 }, (_, i) => f.chat(OTHER, String(20000 + i), '!accept')));
+    await Promise.all(
+      Array.from({ length: 9 }, (_, i) => f.chat(OTHER, String(20000 + i), '!accept')),
+    );
     root = await f.runtime.state.getKeeperRegistry();
     assert.equal(root.pendingHop.accepts.length, 9);
     assert.equal(root.pendingHop.offers.length, 10);
     assert.equal(root.holderId, HOME);
     // The tenth is concurrently replayed; the remaining 140 distinct requests
     // are delivered after completion and must not create generic error replies.
-    await Promise.all(Array.from({ length: 8 }, () => f.chat(OTHER, '20009', '!accept', { messageId: 'budget-final' })));
-    await Promise.all(Array.from({ length: 140 }, (_, i) => f.chat(OTHER, String(20010 + i), '!accept')));
+    await Promise.all(
+      Array.from({ length: 8 }, () =>
+        f.chat(OTHER, '20009', '!accept', { messageId: 'budget-final' }),
+      ),
+    );
+    await Promise.all(
+      Array.from({ length: 140 }, (_, i) => f.chat(OTHER, String(20010 + i), '!accept')),
+    );
     root = await f.runtime.state.getKeeperRegistry();
     assert.equal(root.holderId, OTHER);
     assert.equal(root.pendingHop.finalized, true);
     assert.equal(root.pendingHop.noticeMask, 59);
     assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
-    assert.equal(posts(f).length, 5, 'actual mocked transport POST count across both rooms; one slot stays available for optional P7');
+    assert.equal(
+      posts(f).length,
+      5,
+      'actual mocked transport POST count across both rooms; one slot stays available for optional P7',
+    );
     assert.equal(posts(f).filter((p) => p.message.startsWith('Claim complete:')).length, 2);
-    assert.deepEqual(posts(f).filter((p) => p.message.startsWith('Claim complete:')).map((p) => p.message), [
+    assert.deepEqual(
+      posts(f)
+        .filter((p) => p.message.startsWith('Claim complete:'))
+        .map((p) => p.message),
+      [
         'Claim complete: the relic transferred to @olsols2; one new ring. 0 approved runes carried.',
         'Claim complete: the relic transferred to @olsols2; one new ring. 0 approved runes carried.',
-      ]);
+      ],
+    );
     const projection = await f.runtime.overlayFeeds[OTHER].snapshot();
     assert.equal(projection.handoff.carriedApprovedCount, 0);
-    for (const privateKey of ['chatterId', 'sourceStreamId', 'noticeMask', 'noticePolicy', 'userId'])
+    for (const privateKey of [
+      'chatterId',
+      'sourceStreamId',
+      'noticeMask',
+      'noticePolicy',
+      'userId',
+    ])
       assert.ok(!JSON.stringify(projection.handoff).includes(privateKey), privateKey);
     f.advance(700000);
-    await Promise.all(Array.from({ length: 300 }, (_, i) => f.chat(i % 2 ? HOME : OTHER, String(30000 + i), i % 2 ? '!offer' : '!accept')));
+    await Promise.all(
+      Array.from({ length: 300 }, (_, i) =>
+        f.chat(i % 2 ? HOME : OTHER, String(30000 + i), i % 2 ? '!offer' : '!accept'),
+      ),
+    );
     assert.equal(posts(f).length, 5, 'receipt expiry does not restore notice budget');
     await retainedBounds(f);
     f.advance();
@@ -110,14 +156,22 @@ for (const kind of ['memory', 'firestore']) {
     f.chatFailure(null);
     await f.chat(HOME, '51001', '!offer', { messageId: 'unknown-first' });
     assert.equal(posts(f).length, 1);
-    await Promise.all(Array.from({ length: 149 }, (_, i) => f.chat(HOME, String(51002 + i), '!offer')));
+    await Promise.all(
+      Array.from({ length: 149 }, (_, i) => f.chat(HOME, String(51002 + i), '!offer')),
+    );
     const root = await f.runtime.state.getKeeperRegistry();
     assert.equal(root.pendingHop.offers.length, 10);
     assert.equal(root.pendingHop.noticeMask, 3);
-    assert.equal((await f.runtime.state.getPrivateClaimAcks(HOME)).rows.filter((r) => r.status === 'unknown').length, 1);
+    assert.equal(
+      (await f.runtime.state.getPrivateClaimAcks(HOME)).rows.filter((r) => r.status === 'unknown')
+        .length,
+      1,
+    );
     f.advance(5000);
     await f.raid(HOME, OTHER, 100);
-    await Promise.all(Array.from({ length: 150 }, (_, i) => f.chat(OTHER, String(61000 + i), '!accept')));
+    await Promise.all(
+      Array.from({ length: 150 }, (_, i) => f.chat(OTHER, String(61000 + i), '!accept')),
+    );
     assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, OTHER);
     assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
     assert.ok(posts(f).length <= 6);
@@ -132,7 +186,10 @@ for (const kind of ['memory', 'firestore']) {
     await f.chat(OTHER, '64001', '!accept');
     await f.chat(HOME, '64002', '!offer');
     assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, OTHER);
-    assert.equal(posts(f).filter((p) => p.message === 'Offers 1/1. Both chats reached the threshold.').length, 1);
+    assert.equal(
+      posts(f).filter((p) => p.message === 'Offers 1/1. Both chats reached the threshold.').length,
+      1,
+    );
     assert.equal(posts(f).filter((p) => p.message === BOT_COPY.arrival).length, 0);
     assert.equal(posts(f).filter((p) => p.message.startsWith('Claim complete:')).length, 2);
     assert.ok(posts(f).length <= 6);
@@ -143,7 +200,11 @@ for (const kind of ['memory', 'firestore']) {
     await f.control(HOME, `send:${OTHER}`);
     await f.chat(HOME, '71001', '!offer');
     await f.chat(HOME, '71001', '!relic forgetme');
-    await f.runtime.state.setChannelPolicy(HOME, { banned: false, blockedUserIds: ['71002'] }, f.now());
+    await f.runtime.state.setChannelPolicy(
+      HOME,
+      { banned: false, blockedUserIds: ['71002'] },
+      f.now(),
+    );
     await f.chat(HOME, '71002', '!offer');
     await f.chat(HOME, '71003', '!offer');
     await f.chat(OTHER, '71003', '!accept'); // cross-side reuse is forbidden
@@ -161,7 +222,9 @@ for (const kind of ['memory', 'firestore']) {
     assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, HOME);
     assert.equal((await f.runtime.state.getPublicJourney()).rings, 0);
     const n = posts(f).length;
-    await Promise.all(Array.from({ length: 300 }, (_, i) => f.chat(OTHER, String(73000 + i), '!accept')));
+    await Promise.all(
+      Array.from({ length: 300 }, (_, i) => f.chat(OTHER, String(73000 + i), '!accept')),
+    );
     assert.equal(posts(f).length, n);
     assert.ok(n <= 6);
   });
@@ -179,17 +242,27 @@ for (const kind of ['memory', 'firestore']) {
       await f.chat(OTHER, '92002', '!accept');
       let journey = await f.runtime.state.getPublicJourney();
       assert.equal(journey.stops[0].marks.length, 1);
-      assert.equal((await f.runtime.state.getPublicPresentation(OTHER, f.now())).handoff.carriedApprovedCount, 1);
+      assert.equal(
+        (await f.runtime.state.getPublicPresentation(OTHER, f.now())).handoff.carriedApprovedCount,
+        1,
+      );
       const text = JSON.stringify(journey);
       assert.ok(text.includes('moon'));
-      for (const secret of ['secretpending', '91001', '91002', 'userId']) assert.ok(!text.includes(secret));
-      assert.deepEqual(posts(f).filter((p) => p.message.startsWith('Claim complete:')).map((p) => p.message), [
+      for (const secret of ['secretpending', '91001', '91002', 'userId'])
+        assert.ok(!text.includes(secret));
+      assert.deepEqual(
+        posts(f)
+          .filter((p) => p.message.startsWith('Claim complete:'))
+          .map((p) => p.message),
+        [
           'Claim complete: the relic transferred to @olsols2; one new ring. 1 approved rune carried.',
           'Claim complete: the relic transferred to @olsols2; one new ring. 1 approved rune carried.',
-        ]);
+        ],
+      );
       const service = createMarkService(f.runtime.state, { now: f.now });
       const actor = { broadcasterId: HOME, chatterId: HOME };
-      if (action === 'forget') await service.forgetMe(HOME, { broadcasterId: HOME, chatterId: '91001' });
+      if (action === 'forget')
+        await service.forgetMe(HOME, { broadcasterId: HOME, chatterId: '91001' });
       if (action === 'block') await service.blockUser(HOME, actor, '91001');
       if (action === 'veto') {
         await service.vetoLast(HOME, actor);
@@ -251,11 +324,19 @@ for (const kind of ['memory', 'firestore']) {
     const journey = await f.runtime.state.getPublicJourney();
     assert.equal(journey.rings, 1);
     assert.deepEqual(journey.stops[0].marks, []);
-    assert.deepEqual(posts(f).filter((p) => p.message.startsWith('Claim complete:')).map((p) => p.message), [
-      'Claim complete: the relic transferred to @olsols2; one new ring. 0 approved runes carried.',
-      'Claim complete: the relic transferred to @olsols2; one new ring. 0 approved runes carried.',
-    ]);
-    assert.equal((await f.runtime.state.getPublicPresentation(OTHER, f.now())).handoff.carriedApprovedCount, 0);
+    assert.deepEqual(
+      posts(f)
+        .filter((p) => p.message.startsWith('Claim complete:'))
+        .map((p) => p.message),
+      [
+        'Claim complete: the relic transferred to @olsols2; one new ring. 0 approved runes carried.',
+        'Claim complete: the relic transferred to @olsols2; one new ring. 0 approved runes carried.',
+      ],
+    );
+    assert.equal(
+      (await f.runtime.state.getPublicPresentation(OTHER, f.now())).handoff.carriedApprovedCount,
+      0,
+    );
   });
 }
 
@@ -282,7 +363,14 @@ test('Firestore retry and failed commit roll back notice reservation, vote, cont
 
 test('fixed slot reservations cannot wrap, refund, or exceed six and each next hop starts independently', () => {
   const hop = {};
-  const slots = ['sender', 'progress1', 'announcement', 'arrival', 'sourceComplete', 'targetComplete'];
+  const slots = [
+    'sender',
+    'progress1',
+    'announcement',
+    'arrival',
+    'sourceComplete',
+    'targetComplete',
+  ];
   for (const slot of slots) assert.equal(reserveHopNotice(hop, slot), true);
   assert.equal(hop.noticeMask, 63);
   for (const slot of slots) assert.equal(reserveHopNotice(hop, slot), false);
@@ -292,8 +380,16 @@ test('fixed slot reservations cannot wrap, refund, or exceed six and each next h
 });
 
 test('new-hop provenance is explicit; landing preserves reservations and legacy hops never gain announcement eligibility', () => {
-  const provisional = { eventId: 'intent', intentId: 'intent', from: HOME, to: OTHER,
-    sourceStreamId: '9001', targetStreamId: '9002', policy: 'preclaim-v1', verified: false };
+  const provisional = {
+    eventId: 'intent',
+    intentId: 'intent',
+    from: HOME,
+    to: OTHER,
+    sourceStreamId: '9001',
+    targetStreamId: '9002',
+    policy: 'preclaim-v1',
+    verified: false,
+  };
   const fresh = { pendingHop: structuredClone(provisional) };
   trackHopNotices({}, fresh);
   assert.equal(fresh.pendingHop.noticePolicy, HOP_NOTICE_POLICY);
@@ -321,19 +417,44 @@ test('new-hop provenance is explicit; landing preserves reservations and legacy 
 });
 
 test('count-only completion projection matches exact verified archive; absent/invalid/mismatched omit', () => {
-  const hop = { eventId: 'verified', from: HOME, to: OTHER, sourceStreamId: '9001', verified: true,
-    finalized: true, startedAt: 0, endsAt: 180000, threshold: 1 };
-  const stop = { eventId: 'verified', stopId: hash('verified'), from: HOME, to: OTHER,
-    streamId: '9001', claimedAt: 1, marks: [{ id: 'm1', userId: 'private-author', text: 'moon' }] };
+  const hop = {
+    eventId: 'verified',
+    from: HOME,
+    to: OTHER,
+    sourceStreamId: '9001',
+    verified: true,
+    finalized: true,
+    startedAt: 0,
+    endsAt: 180000,
+    threshold: 1,
+  };
+  const stop = {
+    eventId: 'verified',
+    stopId: hash('verified'),
+    from: HOME,
+    to: OTHER,
+    streamId: '9001',
+    claimedAt: 1,
+    marks: [{ id: 'm1', userId: 'private-author', text: 'moon' }],
+  };
   assert.equal(carriedApprovedCount(hop, { stops: [stop] }), 1);
   const view = handoffView({ pendingHop: hop }, OTHER, 2, { stops: [stop] });
   assert.equal(view.carriedApprovedCount, 1);
   assert.ok(!JSON.stringify(view).includes('private-author'));
   assert.ok(!JSON.stringify(view).includes('moon'));
   assert.equal(carriedApprovedCount(hop, { stops: [{ ...stop, marks: [] }] }), 0);
-  for (const patch of [{ eventId: 'other' }, { from: OTHER }, { to: HOME }, { streamId: 'other' },
-    { stopId: 'other' }, { kind: 'wander' }, { marks: Array(161).fill({}) }, { marks: null },
-    { marks: [null] }, { marks: [{ id: 'm2', userId: 'private', text: 'secret', status: 'pending' }] }])
+  for (const patch of [
+    { eventId: 'other' },
+    { from: OTHER },
+    { to: HOME },
+    { streamId: 'other' },
+    { stopId: 'other' },
+    { kind: 'wander' },
+    { marks: Array(161).fill({}) },
+    { marks: null },
+    { marks: [null] },
+    { marks: [{ id: 'm2', userId: 'private', text: 'secret', status: 'pending' }] },
+  ])
     assert.equal(carriedApprovedCount(hop, { stops: [{ ...stop, ...patch }] }), undefined);
   for (const patch of [{ verified: false }, { finalized: false }, { cancelled: true }])
     assert.equal(carriedApprovedCount({ ...hop, ...patch }, { stops: [stop] }), undefined);
@@ -343,48 +464,138 @@ test('count-only completion projection matches exact verified archive; absent/in
 });
 
 test('dispatch derives count from the current matching stop, never the queued snapshot; old fixtures omit count', () => {
-  const hop = { eventId: 'fresh', from: HOME, to: OTHER, sourceStreamId: '9001', targetStreamId: '9002',
-    verified: true, finalized: true, raidSentAt: 1, endsAt: 180001 };
-  const channels = Object.fromEntries([HOME, OTHER].map((id, i) => [id, {
-    online: true, streamId: String(9001 + i), consentAt: 0, optedIn: true, blockedUserIds: [],
-  }]));
-  const marks = Object.fromEntries([HOME, OTHER].map((id, i) => [id, {
-    context: { optedIn: true, streamId: String(9001 + i) }, blocked: [],
-  }]));
+  const hop = {
+    eventId: 'fresh',
+    from: HOME,
+    to: OTHER,
+    sourceStreamId: '9001',
+    targetStreamId: '9002',
+    verified: true,
+    finalized: true,
+    raidSentAt: 1,
+    endsAt: 180001,
+  };
+  const channels = Object.fromEntries(
+    [HOME, OTHER].map((id, i) => [
+      id,
+      {
+        online: true,
+        streamId: String(9001 + i),
+        consentAt: 0,
+        optedIn: true,
+        blockedUserIds: [],
+      },
+    ]),
+  );
+  const marks = Object.fromEntries(
+    [HOME, OTHER].map((id, i) => [
+      id,
+      {
+        context: { optedIn: true, streamId: String(9001 + i) },
+        blocked: [],
+      },
+    ]),
+  );
   const registry = { pendingHop: hop, holderId: OTHER, raidWatermark: 1 };
   const notice = completionAck(null, OTHER, 'fresh', hop.endsAt, 2, hop, channels);
-  const lineage = { stops: [{ stopId: hash('fresh'), eventId: 'fresh', from: HOME, to: OTHER,
-    streamId: '9001', marks: [] }] }; // current archive after erasure, no cached count
-  assert.equal(completionEligible(notice.doc, notice.key, registry, channels, marks, 3, lineage), true);
-  assert.equal(ackStep(notice.doc, { type: 'claim', key: notice.key }, channels[OTHER], marks[OTHER], 3, true).result.message,
-    'Claim complete: the relic transferred to @olsols2; one new ring. 0 approved runes carried.');
+  const lineage = {
+    stops: [
+      {
+        stopId: hash('fresh'),
+        eventId: 'fresh',
+        from: HOME,
+        to: OTHER,
+        streamId: '9001',
+        marks: [],
+      },
+    ],
+  }; // current archive after erasure, no cached count
+  assert.equal(
+    completionEligible(notice.doc, notice.key, registry, channels, marks, 3, lineage),
+    true,
+  );
+  assert.equal(
+    ackStep(notice.doc, { type: 'claim', key: notice.key }, channels[OTHER], marks[OTHER], 3, true)
+      .result.message,
+    'Claim complete: the relic transferred to @olsols2; one new ring. 0 approved runes carried.',
+  );
   assert.equal(completionEligible(notice.doc, notice.key, registry, channels, marks, 3), true);
-  assert.equal(notice.doc.rows[0].message, 'Claim complete: the relic transferred to @olsols2; one new ring.');
+  assert.equal(
+    notice.doc.rows[0].message,
+    'Claim complete: the relic transferred to @olsols2; one new ring.',
+  );
   const mismatch = structuredClone(lineage);
   mismatch.stops[0].streamId = 'other';
-  assert.equal(completionEligible(notice.doc, notice.key, registry, channels, marks, 3, mismatch), true);
-  assert.equal(notice.doc.rows[0].message, 'Claim complete: the relic transferred to @olsols2; one new ring.');
+  assert.equal(
+    completionEligible(notice.doc, notice.key, registry, channels, marks, 3, mismatch),
+    true,
+  );
+  assert.equal(
+    notice.doc.rows[0].message,
+    'Claim complete: the relic transferred to @olsols2; one new ring.',
+  );
   channels[HOME].paused = true;
-  assert.equal(completionEligible(notice.doc, notice.key, registry, channels, marks, 3, lineage), false);
+  assert.equal(
+    completionEligible(notice.doc, notice.key, registry, channels, marks, 3, lineage),
+    false,
+  );
 });
 
 test('completion and Wander zero/one/plural full-string fixtures and actual producer inventory', async () => {
-  assert.equal(claimComplete('olsols2'), 'Claim complete: the relic transferred to @olsols2; one new ring.');
-  assert.equal(claimComplete('olsols2', 0), 'Claim complete: the relic transferred to @olsols2; one new ring. 0 approved runes carried.');
-  assert.equal(claimComplete('olsols2', 1), 'Claim complete: the relic transferred to @olsols2; one new ring. 1 approved rune carried.');
-  assert.equal(claimComplete('olsols2', 2), 'Claim complete: the relic transferred to @olsols2; one new ring. 2 approved runes carried.');
-  assert.equal(claimComplete('olsols2', 160), 'Claim complete: the relic transferred to @olsols2; one new ring. 160 approved runes carried.');
+  assert.equal(
+    claimComplete('olsols2'),
+    'Claim complete: the relic transferred to @olsols2; one new ring.',
+  );
+  assert.equal(
+    claimComplete('olsols2', 0),
+    'Claim complete: the relic transferred to @olsols2; one new ring. 0 approved runes carried.',
+  );
+  assert.equal(
+    claimComplete('olsols2', 1),
+    'Claim complete: the relic transferred to @olsols2; one new ring. 1 approved rune carried.',
+  );
+  assert.equal(
+    claimComplete('olsols2', 2),
+    'Claim complete: the relic transferred to @olsols2; one new ring. 2 approved runes carried.',
+  );
+  assert.equal(
+    claimComplete('olsols2', 160),
+    'Claim complete: the relic transferred to @olsols2; one new ring. 160 approved runes carried.',
+  );
   for (const invalid of [undefined, null, -1, 161, 1.1, '1', NaN, Infinity])
-    assert.equal(claimComplete('olsols2', invalid), 'Claim complete: the relic transferred to @olsols2; one new ring.');
-  assert.equal(wanderNotice('warning'), 'The relic has been idle. It may wander to an opted-in Keeper after the warning period. Add an approved mark or start a valid Send Off to keep playing.');
+    assert.equal(
+      claimComplete('olsols2', invalid),
+      'Claim complete: the relic transferred to @olsols2; one new ring.',
+    );
+  assert.equal(
+    wanderNotice('warning'),
+    'The relic has been idle. It may wander to an opted-in Keeper after the warning period. Add an approved mark or start a valid Send Off to keep playing.',
+  );
   for (const [login, expected] of [
-    ['raidrelichq', 'The relic wandered here to @raidrelichq; no raid or audience transfer occurred. Leave !mark word to add a community rune.'],
-    ['olsols2', 'The relic wandered here to @olsols2; no raid or audience transfer occurred. Leave !mark word to add a community rune.'],
-    ['olsols3', 'The relic wandered here to @olsols3; no raid or audience transfer occurred. Leave !mark word to add a community rune.'],
-  ]) assert.equal(wanderNotice('arrival', login), expected);
+    [
+      'raidrelichq',
+      'The relic wandered here to @raidrelichq; no raid or audience transfer occurred. Leave !mark word to add a community rune.',
+    ],
+    [
+      'olsols2',
+      'The relic wandered here to @olsols2; no raid or audience transfer occurred. Leave !mark word to add a community rune.',
+    ],
+    [
+      'olsols3',
+      'The relic wandered here to @olsols3; no raid or audience transfer occurred. Leave !mark word to add a community rune.',
+    ],
+  ])
+    assert.equal(wanderNotice('arrival', login), expected);
   assert.throws(() => wanderNotice('arrival', '@untrusted'));
   assert.throws(() => wanderNotice('other', 'olsols2'));
-  assert.equal(claimVoteCopy('offers', { from: HOME, to: OTHER, threshold: 1, offers: ['1'], accepts: ['2'], verified: true }, { [HOME]: 'raidrelichq', [OTHER]: 'olsols2' }), 'Offers 1/1. Both chats reached the threshold.');
+  assert.equal(
+    claimVoteCopy(
+      'offers',
+      { from: HOME, to: OTHER, threshold: 1, offers: ['1'], accepts: ['2'], verified: true },
+      { [HOME]: 'raidrelichq', [OTHER]: 'olsols2' },
+    ),
+    'Offers 1/1. Both chats reached the threshold.',
+  );
   // Inventory: claim/command outboxes -> catalog + parameterized snapshots in
   // overlay-group3; share outbox -> marksShareReply there; Wander -> this full
   // fixture + wander.test delivery fixtures; P7 announcement -> existing exact
@@ -395,9 +606,18 @@ test('completion and Wander zero/one/plural full-string fixtures and actual prod
     ['src/claim-ack.js', /sendChat\(message,\s*\{\s*retryUnauthorized: false/],
     ['src/my-marks.js', /sendChat\(marksShareReply\(/],
     ['src/wander.js', /wanderNotice\(row.kind, keepers\[row.host\]\)/],
-    ['test/p7.test.js', /The relic is bound to @olsols2\. Ring 1\. Thank you, @raidrelichq\. Welcome raiders—leave !mark to add a community rune\./],
-    ['test/recording-replies.test.js', /assert\.equal\(replies\(\)\.at\(-1\), 'Your mark is public on the relic\.'\)/],
-    ['test/recording-replies.test.js', /assert\.equal\(replies\(\)\.at\(-1\), 'Vetoed latest mark\.'\)/],
+    [
+      'test/p7.test.js',
+      /The relic is bound to @olsols2\. Ring 1\. Thank you, @raidrelichq\. Welcome raiders—leave !mark to add a community rune\./,
+    ],
+    [
+      'test/recording-replies.test.js',
+      /assert\.equal\(replies\(\)\.at\(-1\), 'Your mark is public on the relic\.'\)/,
+    ],
+    [
+      'test/recording-replies.test.js',
+      /assert\.equal\(replies\(\)\.at\(-1\), 'Vetoed latest mark\.'\)/,
+    ],
   ];
   for (const [path, pattern] of inventory)
     assert.match(await readFile(new URL('../' + path, import.meta.url), 'utf8'), pattern);

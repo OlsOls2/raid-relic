@@ -82,11 +82,12 @@ export function mountFirstRun(id, run) {
         : pilot.optedIn
           ? 'Already opted in; Set up channel can recheck subscriptions and stream observations.'
           : 'Set up subscriptions first; this does not opt you in.';
-    $('overlay-current-reason').textContent = primary.overlay === 'first-obs-check'
-      ? 'URL copied in this page; confirm installation only after your own OBS check.'
-      : r.obs
-        ? 'Your manual check is saved only in this page, not verified by the server.'
-        : 'Copy the URL, then confirm installation yourself; neither proves live delivery.';
+    $('overlay-current-reason').textContent =
+      primary.overlay === 'first-obs-check'
+        ? 'URL copied in this page; confirm installation only after your own OBS check.'
+        : r.obs
+          ? 'Your manual check is saved only in this page, not verified by the server.'
+          : 'Copy the URL, then confirm installation yourself; neither proves live delivery.';
     for (const [key, ready, label] of [
       ['session', r.session, 'Matching private session read (not a fresh grant check)'],
       ['optin', r.optedIn, 'Explicit Keeper opt-in'],
@@ -139,8 +140,11 @@ export function mountFirstRun(id, run) {
         (action === 'seek-on' && ['holding', 'opt-in-first', 'disabled'].includes(r.queue));
       $(node).setAttribute(
         'aria-describedby',
-        action === 'seek-on' ? 'first-queue' : action === 'bootstrap' || action === 'keep'
-          ? 'first-action-reason setup-current-reason' : 'first-action-reason',
+        action === 'seek-on'
+          ? 'first-queue'
+          : action === 'bootstrap' || action === 'keep'
+            ? 'first-action-reason setup-current-reason'
+            : 'first-action-reason',
       );
     }
     $('first-obs-copy').disabled = busy || !links || !r.fresh;
@@ -171,8 +175,7 @@ export function mountFirstRun(id, run) {
       $('first-copy-status').textContent = await copyOBS(links.overlay, navigator.clipboard);
       copied = true;
       render();
-      if ($('overlay-step').open && !$('first-obs-confirm').checked)
-        $('first-obs-confirm').focus();
+      if ($('overlay-step').open && !$('first-obs-confirm').checked) $('first-obs-confirm').focus();
     } catch {
       $('first-obs-url').focus();
       $('first-obs-url').select();

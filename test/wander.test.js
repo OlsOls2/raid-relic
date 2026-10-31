@@ -42,9 +42,12 @@ for (const kind of ['memory', 'firestore']) {
     );
     f.advanceHours(60);
     assert.equal(status(await f.tick()), 'warning-queued');
-    assert.deepEqual(posts(f).map((p) => p.message), [
-      'The relic has been idle. It may wander to an opted-in Keeper after the warning period. Add an approved mark or start a valid Send Off to keep playing.',
-    ]);
+    assert.deepEqual(
+      posts(f).map((p) => p.message),
+      [
+        'The relic has been idle. It may wander to an opted-in Keeper after the warning period. Add an approved mark or start a valid Send Off to keep playing.',
+      ],
+    );
     await f.signed('stream.offline', { broadcaster_user_id: OTHER }, OTHER);
     f.streams.delete(OTHER);
     f.advanceHours(12);
@@ -63,10 +66,13 @@ for (const kind of ['memory', 'firestore']) {
     assert.equal(journey.stops[0].kind, 'wander');
     assert.equal(journey.stops[0].raidSize, null);
     assert.equal(f.calls.filter((c) => new URL(c.url).pathname === '/helix/raids').length, 0);
-    assert.deepEqual(posts(f).map((p) => p.message), [
-      'The relic has been idle. It may wander to an opted-in Keeper after the warning period. Add an approved mark or start a valid Send Off to keep playing.',
-      'The relic wandered here to @olsols2; no raid or audience transfer occurred. Leave !mark word to add a community rune.',
-    ]);
+    assert.deepEqual(
+      posts(f).map((p) => p.message),
+      [
+        'The relic has been idle. It may wander to an opted-in Keeper after the warning period. Add an approved mark or start a valid Send Off to keep playing.',
+        'The relic wandered here to @olsols2; no raid or audience transfer occurred. Leave !mark word to add a community rune.',
+      ],
+    );
     assert.equal(status(await f.tick({ nonce: 'b'.repeat(32) })), 'duplicate');
     const scores = await f.runtime.state.getScoreboard(f.now());
     assert.ok(

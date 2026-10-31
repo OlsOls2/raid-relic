@@ -23,11 +23,18 @@ export const HOP_NOTICE_POLICY = 'six-chat-v2';
 // Called only where the store observes send-state creating/replacing a hop.
 // Existing/unbudgeted hops are never retrospectively certified.
 export function trackHopNotices(previous, next) {
-  const old = previous?.pendingHop, hop = next?.pendingHop;
+  const old = previous?.pendingHop,
+    hop = next?.pendingHop;
   if (!hop || hop.eventId === old?.eventId) return;
-  const landing = old?.policy === 'preclaim-v1' && !old.verified && old.intentId &&
-    old.intentId === hop.intentId && old.from === hop.from && old.to === hop.to &&
-    old.sourceStreamId === hop.sourceStreamId && old.targetStreamId === hop.targetStreamId;
+  const landing =
+    old?.policy === 'preclaim-v1' &&
+    !old.verified &&
+    old.intentId &&
+    old.intentId === hop.intentId &&
+    old.from === hop.from &&
+    old.to === hop.to &&
+    old.sourceStreamId === hop.sourceStreamId &&
+    old.targetStreamId === hop.targetStreamId;
   if (landing) {
     if (old.noticeMask !== undefined) hop.noticeMask = old.noticeMask;
     if (old.noticePolicy === HOP_NOTICE_POLICY) hop.noticePolicy = HOP_NOTICE_POLICY;
@@ -39,8 +46,13 @@ export function trackHopNotices(previous, next) {
     throw Error('Relic registry capacity reached');
 }
 export function announcementBudgetAvailable(hop) {
-  return hop?.noticePolicy === HOP_NOTICE_POLICY && Number.isInteger(hop.noticeMask) &&
-    hop.noticeMask >= 0 && hop.noticeMask <= 63 && !(hop.noticeMask & 4);
+  return (
+    hop?.noticePolicy === HOP_NOTICE_POLICY &&
+    Number.isInteger(hop.noticeMask) &&
+    hop.noticeMask >= 0 &&
+    hop.noticeMask <= 63 &&
+    !(hop.noticeMask & 4)
+  );
 }
 // Six fixed reservations live with the hop, across both rooms. Queued,
 // cancelled and unknown deliveries all consume their slot permanently.
@@ -48,26 +60,43 @@ export function reserveHopNotice(hop, slot) {
   if (!hop || !Object.hasOwn(noticeSlots, slot)) return false;
   const bit = noticeSlots[slot];
   const used = hop.noticeMask === undefined ? 0 : hop.noticeMask;
-  if (!Number.isInteger(used) || used < 0 || used > 63 || (used & bit)) return false;
+  if (!Number.isInteger(used) || used < 0 || used > 63 || used & bit) return false;
   hop.noticeMask = used | bit;
   return true;
 }
 
 export function carriedApprovedCount(hop, lineage) {
   if (
-    hop?.verified !== true || hop.finalized !== true || hop.cancelled ||
-    typeof hop.eventId !== 'string' || !Array.isArray(lineage?.stops)
-  ) return undefined;
-  const matches = lineage.stops.filter((s) =>
-    s?.eventId === hop.eventId && s.from === hop.from && s.to === hop.to &&
-    s.streamId === hop.sourceStreamId && s.stopId === hash(hop.eventId) && s.kind !== 'wander',
+    hop?.verified !== true ||
+    hop.finalized !== true ||
+    hop.cancelled ||
+    typeof hop.eventId !== 'string' ||
+    !Array.isArray(lineage?.stops)
+  )
+    return undefined;
+  const matches = lineage.stops.filter(
+    (s) =>
+      s?.eventId === hop.eventId &&
+      s.from === hop.from &&
+      s.to === hop.to &&
+      s.streamId === hop.sourceStreamId &&
+      s.stopId === hash(hop.eventId) &&
+      s.kind !== 'wander',
   );
   const stop = matches.length === 1 ? matches[0] : null;
-  return stop && Array.isArray(stop.marks) && stop.marks.length <= 160 &&
-    Array.from(stop.marks).every((m) => m && typeof m.id === 'string' &&
-      typeof m.userId === 'string' && typeof m.text === 'string' &&
-      (m.status === undefined || m.status === 'approved'))
-    ? stop.marks.length : undefined;
+  return stop &&
+    Array.isArray(stop.marks) &&
+    stop.marks.length <= 160 &&
+    Array.from(stop.marks).every(
+      (m) =>
+        m &&
+        typeof m.id === 'string' &&
+        typeof m.userId === 'string' &&
+        typeof m.text === 'string' &&
+        (m.status === undefined || m.status === 'approved'),
+    )
+    ? stop.marks.length
+    : undefined;
 }
 
 export function ackDocument(
@@ -86,7 +115,8 @@ export function ackDocument(
   if (
     ['offer', 'accept'].includes(chat?.markAction?.type) &&
     !['hop-reserved', 'hop-sender'].includes(kind)
-  ) message = null;
+  )
+    message = null;
   const doc = structuredClone(previous ?? { rows: [] });
   doc.rows = doc.rows.filter((r) => r.expiresAt > now);
   for (const row of doc.rows) if (row.completion || row.p7Proof) row.completionReceipt = true;
@@ -366,10 +396,13 @@ export function completionAck(
       ? hash(`claim-arrival:${host}:${eventId}`)
       : completionAckKey(host, eventId);
   if (!doc.rows.some((r) => r.key === key)) {
-    if (hop && !reserveHopNotice(
-      hop,
-      phase === 'arrival' ? 'arrival' : host === hop.from ? 'sourceComplete' : 'targetComplete',
-    ))
+    if (
+      hop &&
+      !reserveHopNotice(
+        hop,
+        phase === 'arrival' ? 'arrival' : host === hop.from ? 'sourceComplete' : 'targetComplete',
+      )
+    )
       return { doc, key: null };
     if (doc.rows.length >= 128) {
       // Earned notices outrank command bookkeeping; never evict another
@@ -389,7 +422,8 @@ export function completionAck(
       status: 'queued',
       message: phase === 'arrival' ? BOT_COPY.arrival : claimComplete(names[hop?.to]),
       ...(phase !== 'arrival' && typeof names[hop?.to] === 'string'
-        ? { destinationLogin: names[hop.to] } : {}),
+        ? { destinationLogin: names[hop.to] }
+        : {}),
       ackUntil: now + 30000,
       ...(hop
         ? {
@@ -464,8 +498,15 @@ export function completionEligible(doc, key, registry, channels, marks, now, lin
       )
     );
   });
-  if (allowed && proof.phase !== 'arrival' && (row.destinationLogin !== undefined || lineage !== undefined))
-    row.message = claimComplete(row.destinationLogin ?? RECEIVING_KEEPERS[hop.to], carriedApprovedCount(hop, lineage));
+  if (
+    allowed &&
+    proof.phase !== 'arrival' &&
+    (row.destinationLogin !== undefined || lineage !== undefined)
+  )
+    row.message = claimComplete(
+      row.destinationLogin ?? RECEIVING_KEEPERS[hop.to],
+      carriedApprovedCount(hop, lineage),
+    );
   return allowed;
 }
 

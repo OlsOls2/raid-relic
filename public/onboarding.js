@@ -54,9 +54,10 @@ export function setupReadiness(
 // Presentation selection only: moving a control never invokes it or grants consent.
 export function wizardPrimary(pilot, { copied = false, obs = false } = {}) {
   return {
-    setup: pilot?.subscriptions?.ready === true && pilot.optedIn !== true
-      ? 'first-keep'
-      : 'first-bootstrap',
+    setup:
+      pilot?.subscriptions?.ready === true && pilot.optedIn !== true
+        ? 'first-keep'
+        : 'first-bootstrap',
     overlay: copied && !obs ? 'first-obs-check' : 'first-obs-copy',
   };
 }

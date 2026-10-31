@@ -17,9 +17,15 @@ function snapshot(policy, role = 'host') {
     handoff.claimStartedAt = 1000;
   }
   return {
-    type: 'snapshot', revision: 1, serverNow: 5000,
-    mode: 'live', status: 'ready', lineageRings: 1,
-    marks: [], approvedCount: 0, handoff,
+    type: 'snapshot',
+    revision: 1,
+    serverNow: 5000,
+    mode: 'live',
+    status: 'ready',
+    lineageRings: 1,
+    marks: [],
+    approvedCount: 0,
+    handoff,
   };
 }
 
@@ -41,12 +47,33 @@ for (const policy of [undefined, 'preclaim-v1', 'landing-v2']) {
         assert.equal(validSnapshot(value), true);
         assert.equal(value.handoff.carriedApprovedCount, count);
       }
-      for (const count of [undefined, null, '0', '1', -1, 161, 0.5, NaN, Infinity, -Infinity, Number.MAX_SAFE_INTEGER + 1]) {
+      for (const count of [
+        undefined,
+        null,
+        '0',
+        '1',
+        -1,
+        161,
+        0.5,
+        NaN,
+        Infinity,
+        -Infinity,
+        Number.MAX_SAFE_INTEGER + 1,
+      ]) {
         value.handoff.carriedApprovedCount = count;
         assert.equal(validSnapshot(value), false);
       }
       value.handoff.carriedApprovedCount = 0;
-      for (const at of [undefined, null, NaN, Infinity, '2000', 999, value.handoff.endsAt, value.handoff.endsAt + 1]) {
+      for (const at of [
+        undefined,
+        null,
+        NaN,
+        Infinity,
+        '2000',
+        999,
+        value.handoff.endsAt,
+        value.handoff.endsAt + 1,
+      ]) {
         value.handoff.completedAt = at;
         assert.equal(validSnapshot(value), false);
       }
@@ -64,12 +91,25 @@ test('carried count cannot bypass existing role, clock, threshold, login, mode o
   const base = snapshot('landing-v2');
   Object.assign(base.handoff, { completedAt: 2000, carriedApprovedCount: 1 });
   for (const patch of [
-    { role: 'other' }, { clockPolicy: 'unknown' }, { endsAt: 181001 },
-    { claimStartedAt: 999 }, { threshold: 11 }, { offers: 3 },
-    { accepts: -1 }, { sourceLogin: 'invalid login' },
-  ]) assert.equal(validSnapshot({ ...base, handoff: { ...base.handoff, ...patch } }), false);
+    { role: 'other' },
+    { clockPolicy: 'unknown' },
+    { endsAt: 181001 },
+    { claimStartedAt: 999 },
+    { threshold: 11 },
+    { offers: 3 },
+    { accepts: -1 },
+    { sourceLogin: 'invalid login' },
+  ])
+    assert.equal(validSnapshot({ ...base, handoff: { ...base.handoff, ...patch } }), false);
   assert.equal(validSnapshot({ ...base, mode: 'unknown' }), false);
-  assert.equal(validSnapshot({ ...base, marks: Array(161).fill({ id: 'm1', runeSvg: '<svg/>' }), approvedCount: 161 }), false);
+  assert.equal(
+    validSnapshot({
+      ...base,
+      marks: Array(161).fill({ id: 'm1', runeSvg: '<svg/>' }),
+      approvedCount: 161,
+    }),
+    false,
+  );
   const preclaim = snapshot('preclaim-v1');
   preclaim.handoff.startedAt = 1500;
   preclaim.handoff.completedAt = 2000;

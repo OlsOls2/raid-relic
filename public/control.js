@@ -1,5 +1,10 @@
 import { keeperNames as networkNames } from './keeper-network.js';
-import { actionMessage, botConsentStartURL, setupRetryAllowed, readinessLights } from './control-view.js';
+import {
+  actionMessage,
+  botConsentStartURL,
+  setupRetryAllowed,
+  readinessLights,
+} from './control-view.js';
 import { boundedResponse, createControlPoller } from './control-read.js';
 import { mountFirstRun } from './first-run.js';
 const forgeLink = document.getElementById('forge-owner-link');
@@ -115,13 +120,15 @@ function disable(value) {
   document.getElementById('cancel-queued').disabled = value || !recovery?.canCancel;
   document.getElementById('recovery-disabled-reason').textContent = value
     ? 'Wait for the current status read or action to finish.'
-    : !csrf ? 'Sign in and read your own saved recovery status first.'
+    : !csrf
+      ? 'Sign in and read your own saved recovery status first.'
       : recovery?.canCancel
         ? 'Confirmation cancels only the exact saved never-dispatched queue; it cannot cancel a Twitch raid.'
         : 'No cancellable never-dispatched queue is confirmed; accepted or unknown requests need operator review.';
   document.getElementById('expiry-disabled-reason').textContent = value
     ? 'Wait for the current status read or action to finish.'
-    : !csrf ? 'Sign in and read your own saved recovery status first.'
+    : !csrf
+      ? 'Sign in and read your own saved recovery status first.'
       : expiryRecovery?.canExpire
         ? 'Only this saved ended app handoff can be retired; the holder stays unchanged.'
         : 'No source-owned ended confirmed handoff is available to retire.';
@@ -161,7 +168,8 @@ function invalidate() {
   csrf = null;
   candidates = [];
   recovery = expiryRecovery = null;
-  for (const group of ['setup', 'keeper', 'raid', 'advanced-send-actions']) document.getElementById(group).replaceChildren();
+  for (const group of ['setup', 'keeper', 'raid', 'advanced-send-actions'])
+    document.getElementById(group).replaceChildren();
   disable(busy);
 }
 async function refresh({ preserveResult = true, signal } = {}) {

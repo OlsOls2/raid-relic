@@ -601,8 +601,11 @@ export function createFirestoreStore(
           previous?.rows?.some(
             (r) => r.key === op.key && r.status === 'dispatching' && r.p7Proof?.to === host,
           );
-        const history = (active || (op.type === 'claim' && previous?.rows?.some((r) => r.key === op.key && r.completion)))
-            ? (await tx.get(ref('lineage', 'single'))).data() : null,
+        const history =
+            active ||
+            (op.type === 'claim' && previous?.rows?.some((r) => r.key === op.key && r.completion))
+              ? (await tx.get(ref('lineage', 'single'))).data()
+              : null,
           jobs = active ? (await tx.get(ref('p7Actions', host))).data() : null;
         const promptTarget = registry?.pendingHop?.to;
         const receiverRef =

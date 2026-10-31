@@ -66,7 +66,11 @@ for (const kind of ['memory', 'firestore']) {
     assert.match(JSON.parse(posts()[1].body).message, /The relic has arrived.*!accept.*!offer/);
     assert.equal(posts()[0].headers.Authorization, `Bearer access-${BOT}`);
     await vote(f, OTHER, HOME, 'same-user', '!accept');
-    assert.equal(posts().length, 2, 'uncounted votes cannot use a generic reply outside the hop budget');
+    assert.equal(
+      posts().length,
+      2,
+      'uncounted votes cannot use a generic reply outside the hop budget',
+    );
     await vote(f, OTHER, HOME, 'same-user', '!accept');
     assert.equal(posts().length, 2);
     await vote(f, OTHER, OTHER, 'accept-one', '!accept');

@@ -142,7 +142,14 @@ test('generated session summary uses verified counts rather than stale run047 pr
     formatVersion: 2,
     parts: [{}],
   });
-  assert.match(chunkedText, /sole APP source author/);
+  assert.match(chunkedText, /original primary author and integration lead/);
+  assert.match(chunkedText, /not the sole author of the current repository/);
+  assert.match(chunkedText, /owner-authorized coding, documentation and QA sessions/);
+  assert.match(
+    chunkedText,
+    /original-only export coverage does not establish complete code authorship/,
+  );
+  assert.doesNotMatch(chunkedText, /sole APP source author/);
   assert.match(chunkedText, /CODEX_SESSIONS/);
   assert.match(chunkedText, /transcripts are not included/);
   assert.ok(!text.includes('CODEX_SESSIONS')); // Legacy generated prose stays byte-compatible.

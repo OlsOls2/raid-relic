@@ -265,23 +265,42 @@ try {
   stage = 'all-scene-viewport-table';
   for (const reducedMotion of [false, true]) {
     await film.emulateMedia({ reducedMotion: reducedMotion ? 'reduce' : 'no-preference' });
-    for (const viewport of [{ width: 1280, height: 720 }, { width: 390, height: 844 }]) {
+    for (const viewport of [
+      { width: 1280, height: 720 },
+      { width: 390, height: 844 },
+    ]) {
       await film.setViewportSize(viewport);
-      for (const [index, ms] of [5000, 25000, 56000, 70000, 90000, 110000, 125000, 150000].entries()) {
+      for (const [index, ms] of [
+        5000, 25000, 56000, 70000, 90000, 110000, 125000, 150000,
+      ].entries()) {
         await seek(film, ms);
         await film.evaluate(() => document.fonts.ready);
         if (index === 7) {
-          await film.waitForFunction(() => !document.querySelector('#film-card-section').hidden &&
-            document.querySelector('#film-card').complete && document.querySelector('#film-card').naturalWidth > 0);
-          sceneViewports.push({ index, ...viewport, reducedMotion, finalHold: true,
-            caption: null, painted: null });
+          await film.waitForFunction(
+            () =>
+              !document.querySelector('#film-card-section').hidden &&
+              document.querySelector('#film-card').complete &&
+              document.querySelector('#film-card').naturalWidth > 0,
+          );
+          sceneViewports.push({
+            index,
+            ...viewport,
+            reducedMotion,
+            finalHold: true,
+            caption: null,
+            painted: null,
+          });
           continue;
         }
-        if (!reducedMotion) await film.waitForFunction(() =>
-          Number(document.querySelector('#film-art canvas')?.dataset.frames) > 0);
+        if (!reducedMotion)
+          await film.waitForFunction(
+            () => Number(document.querySelector('#film-art canvas')?.dataset.frames) > 0,
+          );
         // Existing helper reads genuine GL after-render pixels, or decoded SVG.
-        const painted = await filmPaintedFraming(film,
-          reducedMotion ? undefined : () => film.locator('#film-play').click());
+        const painted = await filmPaintedFraming(
+          film,
+          reducedMotion ? undefined : () => film.locator('#film-play').click(),
+        );
         if (!reducedMotion) await film.locator('#film-play').click();
         const caption = await film.locator('#film-caption').evaluate((node) => ({
           height: node.getBoundingClientRect().height,
@@ -306,15 +325,22 @@ try {
   await film.setViewportSize({ width: 1280, height: 720 });
   await seek(film, 5000);
   await film.locator('#film-play').click();
-  await film.waitForFunction(() => Number(document.querySelector('#film-art canvas')?.dataset.frames) > 0);
-  const sampleState = () => film.evaluate(() => {
-    const canvas = document.querySelector('#film-art canvas');
-    const rect = document.querySelector('#film-art').getBoundingClientRect();
-    return { frames: Number(canvas?.dataset.frames ?? 0), clock: Number(document.body.dataset.filmClock),
-      playing: document.body.dataset.filmPlaying === 'true', hidden: document.hidden,
-      scene: Number(document.body.dataset.filmScene),
-      box: { x: rect.x, y: rect.y, width: rect.width, height: rect.height } };
-  });
+  await film.waitForFunction(
+    () => Number(document.querySelector('#film-art canvas')?.dataset.frames) > 0,
+  );
+  const sampleState = () =>
+    film.evaluate(() => {
+      const canvas = document.querySelector('#film-art canvas');
+      const rect = document.querySelector('#film-art').getBoundingClientRect();
+      return {
+        frames: Number(canvas?.dataset.frames ?? 0),
+        clock: Number(document.body.dataset.filmClock),
+        playing: document.body.dataset.filmPlaying === 'true',
+        hidden: document.hidden,
+        scene: Number(document.body.dataset.filmScene),
+        box: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+      };
+    });
   const firstState = await sampleState();
   const firstPNG = await film.screenshot({ fullPage: false });
   const pixelStart = performance.now();
@@ -323,22 +349,40 @@ try {
   const elapsed = performance.now() - pixelStart;
   const lastState = await sampleState();
   assert.ok(firstPNG.length <= 524288 && lastPNG.length <= 524288);
-  const firstPixels = pngRGBA(firstPNG), lastPixels = pngRGBA(lastPNG);
+  const firstPixels = pngRGBA(firstPNG),
+    lastPixels = pngRGBA(lastPNG);
   assert.equal(firstPixels.width, 1280);
   assert.equal(firstPixels.height, 720);
   assert.equal(lastPixels.width, firstPixels.width);
   assert.equal(lastPixels.height, firstPixels.height);
   assert.ok(firstPixels.width * firstPixels.height * 4 <= 4 * 1024 * 1024);
-  assert.ok([...captures.values()].reduce((sum, b) => sum + b.length, firstPNG.length + lastPNG.length) <= 4 * 1024 * 1024);
+  assert.ok(
+    [...captures.values()].reduce((sum, b) => sum + b.length, firstPNG.length + lastPNG.length) <=
+      4 * 1024 * 1024,
+  );
   let changedPixels = 0;
   const box = firstState.box;
-  for (let y = Math.max(0, Math.ceil(box.y)); y < Math.min(720, Math.floor(box.y + box.height)); y++)
-    for (let x = Math.max(0, Math.ceil(box.x)); x < Math.min(1280, Math.floor(box.x + box.width)); x++) {
-      const a = firstPixels.pixel(x, y), b = lastPixels.pixel(x, y);
+  for (
+    let y = Math.max(0, Math.ceil(box.y));
+    y < Math.min(720, Math.floor(box.y + box.height));
+    y++
+  )
+    for (
+      let x = Math.max(0, Math.ceil(box.x));
+      x < Math.min(1280, Math.floor(box.x + box.width));
+      x++
+    ) {
+      const a = firstPixels.pixel(x, y),
+        b = lastPixels.pixel(x, y);
       if (a.some((v, i) => Math.abs(v - b[i]) > 2)) changedPixels++;
     }
-  diagnostic.activePixelWindow = { elapsedMs: Math.round(elapsed), changedPixels,
-    firstState, lastState, fullTimelineProven: false };
+  diagnostic.activePixelWindow = {
+    elapsedMs: Math.round(elapsed),
+    changedPixels,
+    firstState,
+    lastState,
+    fullTimelineProven: false,
+  };
   assert.ok(elapsed >= 4000);
   assert.ok(firstState.playing && lastState.playing && !firstState.hidden && !lastState.hidden);
   assert.equal(firstState.scene, 0);
@@ -346,7 +390,10 @@ try {
   assert.ok(lastState.frames > firstState.frames && lastState.clock > firstState.clock);
   assert.ok(changedPixels > 0);
   await film.locator('#film-play').click();
-  checks.push({ name: 'All-scene desktop/mobile normal/reduced framing table; one real four-second active artwork pixel-change window (pause/reduced/final hold excluded)', passed: true });
+  checks.push({
+    name: 'All-scene desktop/mobile normal/reduced framing table; one real four-second active artwork pixel-change window (pause/reduced/final hold excluded)',
+    passed: true,
+  });
   for (const [page, requests] of pages) {
     const owned = await page.evaluate(() => ({
       preview: document.querySelector('#film-card').src,
@@ -397,7 +444,14 @@ try {
     assert.ok(bytes.length <= 524288);
     await writeFile('artifacts/' + name + '.png', bytes);
   }
-  const report = JSON.stringify({ passed, stage, failureCategory, checks, diagnostic, sceneViewports });
+  const report = JSON.stringify({
+    passed,
+    stage,
+    failureCategory,
+    checks,
+    diagnostic,
+    sceneViewports,
+  });
   assert.ok(Buffer.byteLength(report) <= 65536);
   await writeFile('artifacts/film-timing-browser-results.json', report + '\n');
 }

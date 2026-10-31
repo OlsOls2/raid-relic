@@ -186,6 +186,11 @@ try {
   assert.equal(registry.pendingHop.arrivalStartedAt, receipt.arrivalStartedAt);
   const journey = await f.runtime.state.getPublicJourney();
   assert.equal(journey.rings, 1);
+  assert.equal(journey.stops.length, 1);
+  assert.equal(journey.stops[0].from, HOME);
+  assert.equal(journey.stops[0].to, OTHER);
+  assert.equal(journey.stops[0].ringIndex, 1);
+  assert.equal(journey.stops[0].marks.length, 1);
   assert.ok(journey.stops[0].marks.some((m) => m.text === 'moon'));
   assert.equal(
     journey.stops[0].marks.some((m) => m.text === 'private'),
@@ -226,7 +231,7 @@ try {
   );
   assert.deepEqual(
     notices
-      .filter((r) => r.message === claimComplete('olsols2'))
+      .filter((r) => r.message === claimComplete('olsols2', 1))
       .map((r) => [r.broadcaster_id, r.sender_id]),
     [
       [HOME, BOT],

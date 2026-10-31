@@ -187,6 +187,15 @@ try {
   stage = 't1-votes-ack';
   await f.chat(HOME, HOME, '!offer', { messageId: 'claims-t1-offer' });
   await f.chat(OTHER, OTHER, '!accept', { messageId: 'claims-t1-accept' });
+  // Bind expected copy to the retained archive, never to the delivered message.
+  const completedJourney = await f.runtime.state.getPublicJourney();
+  assert.equal(completedJourney.rings, 1);
+  assert.equal(completedJourney.stops.length, 1);
+  const completedStop = completedJourney.stops[0];
+  assert.equal(completedStop.from, HOME);
+  assert.equal(completedStop.to, OTHER);
+  assert.equal(completedStop.ringIndex, 1);
+  assert.equal(completedStop.marks.length, 0);
   // Sender vote ACK, one receiver arrival prompt, then one completion per room.
   const chatPosts = () => f.calls.filter((c) => c.url.endsWith('/chat/messages'));
   const replies = chatPosts().map((c) => JSON.parse(c.body));
@@ -216,8 +225,8 @@ try {
     [
       { host: HOME, sender: BOT, message: 'Offers 1/1. Waiting for 1 accept in @olsols2.' },
       { host: OTHER, sender: BOT, message: BOT_COPY.arrival },
-      { host: HOME, sender: BOT, message: claimComplete('olsols2') },
-      { host: OTHER, sender: BOT, message: claimComplete('olsols2') },
+      { host: HOME, sender: BOT, message: claimComplete('olsols2', 0) },
+      { host: OTHER, sender: BOT, message: claimComplete('olsols2', 0) },
     ],
   );
   await recordClaimDiagnostic();

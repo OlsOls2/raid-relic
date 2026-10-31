@@ -21,15 +21,36 @@
       <p id="result" role="status" aria-live="polite">Reading your session…</p>
       <p><a id="reconnect" href="/oauth/keeper/1591805230/start">Connect Twitch</a></p>
       <div class="status-lights" role="group" aria-label="Channel readiness">
-        <div><p id="light-bot" data-state="unknown" aria-describedby="light-bot-reason">Bot</p>
+        <div>
+          <p id="light-bot" data-state="unknown" aria-describedby="light-bot-reason">Bot</p>
           <p id="light-bot-reason">Sign in first; channel status has not been checked.</p>
-          <a id="light-bot-fix" href="#reconnect" aria-describedby="light-bot-reason">Connect Twitch</a></div>
-        <div><p id="light-subscriptions" data-state="unknown" aria-describedby="light-subscriptions-reason">Subscriptions</p>
+          <a id="light-bot-fix" href="#reconnect" aria-describedby="light-bot-reason"
+            >Connect Twitch</a
+          >
+        </div>
+        <div>
+          <p
+            id="light-subscriptions"
+            data-state="unknown"
+            aria-describedby="light-subscriptions-reason"
+          >
+            Subscriptions
+          </p>
           <p id="light-subscriptions-reason">Sign in first; channel status has not been checked.</p>
-          <a id="light-subscriptions-fix" href="#reconnect" aria-describedby="light-subscriptions-reason">Connect Twitch</a></div>
-        <div><p id="light-live" data-state="unknown" aria-describedby="light-live-reason">Stream</p>
+          <a
+            id="light-subscriptions-fix"
+            href="#reconnect"
+            aria-describedby="light-subscriptions-reason"
+            >Connect Twitch</a
+          >
+        </div>
+        <div>
+          <p id="light-live" data-state="unknown" aria-describedby="light-live-reason">Stream</p>
           <p id="light-live-reason">Sign in first; channel status has not been checked.</p>
-          <a id="light-live-fix" href="#reconnect" aria-describedby="light-live-reason">Connect Twitch</a></div>
+          <a id="light-live-fix" href="#reconnect" aria-describedby="light-live-reason"
+            >Connect Twitch</a
+          >
+        </div>
       </div>
       <nav aria-label="Setup steps">
         <ol class="wizard-steps">
@@ -53,26 +74,40 @@
         <details id="setup-step" aria-labelledby="setup-title">
           <summary><h2 id="setup-title">2 · Set up channel</h2></summary>
           <p id="first-subscriptions">○ Subscriptions not checked</p>
-          <p id="setup-current-reason">Set up subscriptions first; opting in is a separate choice.</p>
+          <p id="setup-current-reason">
+            Set up subscriptions first; opting in is a separate choice.
+          </p>
           <div id="setup-primary" class="current-action" aria-label="Current channel setup action">
-          <button id="first-bootstrap" disabled aria-describedby="first-action-reason setup-current-reason">
-            Set up channel
-          </button>
+            <button
+              id="first-bootstrap"
+              disabled
+              aria-describedby="first-action-reason setup-current-reason"
+            >
+              Set up channel
+            </button>
           </div>
           <p id="setup-flow-status" role="status">
             Setup runs only after your click; it never starts a raid.
           </p>
-          <button id="stop-setup" hidden aria-describedby="setup-flow-status">Stop setup checks</button>
+          <button id="stop-setup" hidden aria-describedby="setup-flow-status">
+            Stop setup checks
+          </button>
           <p id="first-optin">○ Explicit Keeper opt-in not checked</p>
           <details id="setup-utilities" class="step-utilities">
             <summary>Channel utilities · moderator hint and separate choices</summary>
-            <p id="bot-fix">If the bot is not a moderator, type /mod raidrelicbot in your own chat.</p>
+            <p id="bot-fix">
+              If the bot is not a moderator, type /mod raidrelicbot in your own chat.
+            </p>
             <button id="copy-mod" aria-describedby="bot-fix">Copy /mod raidrelicbot</button>
             <p id="mod-copy-status" role="status"></p>
             <div id="setup-secondary">
-          <button id="first-keep" disabled aria-describedby="first-action-reason setup-current-reason">
-            Opt in this channel
-          </button>
+              <button
+                id="first-keep"
+                disabled
+                aria-describedby="first-action-reason setup-current-reason"
+              >
+                Opt in this channel
+              </button>
             </div>
           </details>
         </details>
@@ -81,11 +116,21 @@
           <p id="first-obs">○ OBS installation not verified</p>
           <label for="first-obs-url">Own canonical OBS Browser Source URL</label
           ><input id="first-obs-url" readonly />
-          <p id="overlay-current-reason">Copy the URL, then confirm installation yourself; neither proves live delivery.</p>
-          <div id="overlay-primary" class="current-action" aria-label="Current overlay setup action">
-          <button id="first-obs-copy" disabled aria-describedby="first-copy-status overlay-current-reason">
-            Copy my OBS URL
-          </button>
+          <p id="overlay-current-reason">
+            Copy the URL, then confirm installation yourself; neither proves live delivery.
+          </p>
+          <div
+            id="overlay-primary"
+            class="current-action"
+            aria-label="Current overlay setup action"
+          >
+            <button
+              id="first-obs-copy"
+              disabled
+              aria-describedby="first-copy-status overlay-current-reason"
+            >
+              Copy my OBS URL
+            </button>
           </div>
           <p id="first-copy-status" role="status">
             Add a Browser Source at 1920×1080; copying does not prove installation.
@@ -93,24 +138,28 @@
           <details id="overlay-utilities" class="step-utilities">
             <summary>Overlay utilities · manual check and local preview</summary>
             <div id="overlay-secondary">
-          <label id="first-obs-check"
-            ><input id="first-obs-confirm" type="checkbox" aria-describedby="first-copy-status" />
-            I've added it in OBS (my manual check, not server verified)</label
-          >
+              <label id="first-obs-check"
+                ><input
+                  id="first-obs-confirm"
+                  type="checkbox"
+                  aria-describedby="first-copy-status"
+                />
+                I've added it in OBS (my manual check, not server verified)</label
+              >
             </div>
-          <button id="preview-arrival" disabled aria-describedby="preview-status">
-            ▶ Play test arrival on my overlay
-          </button>
-          <p id="preview-status" role="status">
-            LOCAL TEST · embedded fictional preview only; it cannot affect your live source.
-          </p>
-          <iframe
-            id="local-overlay-preview"
-            title="LOCAL TEST · fictional overlay arrival, no live connection"
-            width="960"
-            height="540"
-            hidden
-          ></iframe>
+            <button id="preview-arrival" disabled aria-describedby="preview-status">
+              ▶ Play test arrival on my overlay
+            </button>
+            <p id="preview-status" role="status">
+              LOCAL TEST · embedded fictional preview only; it cannot affect your live source.
+            </p>
+            <iframe
+              id="local-overlay-preview"
+              title="LOCAL TEST · fictional overlay arrival, no live connection"
+              width="960"
+              height="540"
+              hidden
+            ></iframe>
           </details>
         </details>
         <details id="send-step" aria-labelledby="send-title">
@@ -121,14 +170,20 @@
             Twitch confirms the raid and both chats bind it; sending rechecks eligibility.
           </p>
           <label for="raid-target">Observed eligible raid target</label
-          ><select id="raid-target" aria-describedby="target-help target-empty target-observation-age" disabled></select>
-          <p id="target-observation-age" aria-live="off">Saved target-observation age unavailable; status read age is not provider freshness.</p>
+          ><select
+            id="raid-target"
+            aria-describedby="target-help target-empty target-observation-age"
+            disabled
+          ></select>
+          <p id="target-observation-age" aria-live="off">
+            Saved target-observation age unavailable; status read age is not provider freshness.
+          </p>
           <p id="target-empty" role="status">
             No eligible recipient is currently observed. The three configured creator test channels
-            are raidrelichq, olsols2 and olsols3, not evidence of adoption or open signup.
-            Another admitted Keeper must be live and explicitly opted in; this list updates from
-            saved observations, not fresh permission checks. Ask the owner for an admission invitation
-            if your channel isn't admitted.
+            are raidrelichq, olsols2 and olsols3, not evidence of adoption or open signup. Another
+            admitted Keeper must be live and explicitly opted in; this list updates from saved
+            observations, not fresh permission checks. Ask the owner for an admission invitation if
+            your channel isn't admitted.
           </p>
           <p id="send-disabled-reason">Read your own status before requesting a raid.</p>
           <div id="raid" class="actions"></div>
@@ -177,14 +232,22 @@
           </p>
           <div id="advanced-send-actions" class="actions"></div>
           <label for="intent-confirm">Exact queued intent ID from your private status</label
-          ><input id="intent-confirm" aria-describedby="recovery-status" autocomplete="off" spellcheck="false" maxlength="64" /><button
+          ><input
+            id="intent-confirm"
+            aria-describedby="recovery-status"
+            autocomplete="off"
+            spellcheck="false"
+            maxlength="64"
+          /><button
             id="cancel-queued"
             disabled
             aria-describedby="recovery-status recovery-disabled-reason"
           >
             Cancel confirmed never-dispatched queue
           </button>
-          <p id="recovery-disabled-reason">Sign in and read your own saved recovery status first.</p>
+          <p id="recovery-disabled-reason">
+            Sign in and read your own saved recovery status first.
+          </p>
         </section>
 
         <p>
@@ -253,8 +316,16 @@
           <p id="expiry-state">
             Refresh status. Recovery never transfers the relic or cancels a Twitch raid.
           </p>
-          <button id="expire-handoff" disabled aria-describedby="expiry-state expiry-disabled-reason">Expire ended handoff</button>
-          <p id="expiry-disabled-reason">Only a source-owned ended confirmed handoff can be retired.</p>
+          <button
+            id="expire-handoff"
+            disabled
+            aria-describedby="expiry-state expiry-disabled-reason"
+          >
+            Expire ended handoff
+          </button>
+          <p id="expiry-disabled-reason">
+            Only a source-owned ended confirmed handoff can be retired.
+          </p>
           <p>
             Future verified raids of 0–2 viewers need one distinct participant per chat. Send !offer
             in source and !accept in host promptly, within the new 180-second voting window opened

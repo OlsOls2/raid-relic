@@ -91,7 +91,8 @@ select:focus-visible {
 .step-utilities > summary {
   font-size: 15px;
 }
-.status-lights [hidden], #first-run [hidden] {
+.status-lights [hidden],
+#first-run [hidden] {
   display: none;
 }
 .status-lights [data-state='ready']:before {
