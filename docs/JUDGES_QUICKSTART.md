@@ -1,5 +1,12 @@
 # Judge quickstart · private grouped preview · 31 October 2026
 
+## Judge admission instructions · candidate pending parent release QA
+
+Once the parent supplies the judge-mode URL in the private judging submission, open its HTTPS root and enter literal placeholder `<JUDGE_CODE>` replaced by the code in those private submission instructions. Judges need no owner contact or Twitch login. Never append the code to a URL or post it publicly. Judge mode is server-enforced read-only through **16 November2026 00:00UTC exclusive**; OAuth, control, Setup, Send Off, EventSub and other live actions are blocked even after login. “Add to stream” explains this sandbox instead of connecting Twitch. This mode has not yet been deployed or browser-validated; the older owner-preview link below is a separate access policy and its code is not the judge code. [Parent provisioning](JUDGE_ADMISSION.md).
+
+**Current production receipt:** parent independently verified31October18:07UTC `raid-relic-judge-freeze-on-1031` at100%, health200/release2b218b390210f709f031eac4b79b2606b1ff09e0, P5ROfalse/privatefalse, image193e48e…. This public production policy is not the candidate judge sandbox. Older retained-marks100% statements below are historical snapshots; source author made no live verification or traffic change.
+
+
 ## GET-only route walk — about 3:30, under five minutes
 
 1. **0:00–0:30:** open the [private grouped preview](https://judge-freeze-1031---raid-relic-vz4bhnskgq-uc.a.run.app). Enter the access code privately supplied to the owner. It expires **2026-11-01T08:14:19.911Z**. This is access-gated, not anonymous public access. After access, public-content routes need no Twitch login. This walk uses GET only; do not attempt OAuth/control/Twitch actions.
@@ -29,7 +36,7 @@ Use genuine consenting footage only if obtained; otherwise state it is unavailab
 
 Current private zero-traffic preview: [judge-freeze-1031](https://judge-freeze-1031---raid-relic-vz4bhnskgq-uc.a.run.app), revision `raid-relic-judge-freeze-fix-1031`, runtime **2b218b390210f709f031eac4b79b2606b1ff09e0**. Parent reports format-locked **1271 native tests, zero skips; 46 browser flows /153 checks PASS**, [CI41215789683](https://github.com/OlsOls2/raid-relic/actions/runs/41215789683) both green, image `193e48eabeadb1def09806d3a1df94f7b8b517d20ac245639a7210094927565c`. Authorized health200 and63assets/generated network matched; anonymous root serves only the gate, health/static401. Existing owner-DM access code expires **2026-11-01T08:14:19.911Z**; its value is never recorded here.
 
-This is **private access, not a read-only preview**: the production-environment template retains **P5_PREVIEW_READ_ONLY=false** and P7true. Authentication, role, session, CSRF, consent and existing Twitch/action gates remain independent. The judge walk is deliberately **GET-only: no OAuth, control, Setup, Send Off, chat or other Twitch actions**. Parent preserved production `retained-marks-on-1031`/runtime180d995 at100%, all prior tags, IAM/resources/secret references. No promotion is authorized by this document.
+This is **private access, not a read-only preview**: the production-environment template retains **P5_PREVIEW_READ_ONLY=false** and P7true. Authentication, role, session, CSRF, consent and existing Twitch/action gates remain independent. The judge walk is deliberately **GET-only: no OAuth, control, Setup, Send Off, chat or other Twitch actions**. At the historical15:43 staging snapshot, parent preserved then-production `retained-marks-on-1031`/runtime180d995 at100%, all prior tags, IAM/resources/secret references. No promotion is authorized by this document.
 
 There were **two image attempts, one failed startup and one ready grouped preview**: initial runtime363313aee2fd32bb0f6e02a4db26414b9ff06a11/revision `raid-relic-judge-freeze-1031` failed the old read-only-required configuration guard and was not a published preview. Source346 accepts only explicit true/false action-policy settings while retaining private admission guards. The successful image/revision above is the sole ready grouped preview. This docs-only follow-up will have a different repository SHA; runtime bytes remain2b218b and require no third image or redeploy.
 
@@ -47,3 +54,5 @@ Original-only selected evidence is now promoted **through342**:6775entries/343CL
 - Follow the three GET content routes above and check surviving Ring12 approved `light`; do not recreate erased data.
 - The2:45 shot list remains unfilmed/conditional. Genuine Twitch footage is optional, owner-arranged only with already consenting admitted participants and existing fresh authorization; neither this judge walk nor the source agent operates live controls/chat.
 - Do not promote this preview or compact retained data. G6.07 remains NOT STARTED and approval/backup gated; skip it before the18:00UK freeze.
+
+Judge-admission candidate (31 October, source348): [configuration and boundaries](JUDGE_ADMISSION.md). Default OFF, not yet deployed: independent judge code, fixed expiry16 November00:00UTC, server-enforced read-only with no OAuth/control/provider writes. Current published owner-preview receipt above remains historical to that release. Parent independently verified at18:07UTC on31October: production `raid-relic-judge-freeze-on-1031` at100%, health200, release `2b218b390210f709f031eac4b79b2606b1ff09e0`, image193e48e…; P5ROfalse/privatefalse. This is a parent-verified receipt, not source-author live execution. Judge-admission mode is still a local candidate, not deployed.
