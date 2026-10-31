@@ -1,6 +1,6 @@
 # ARCHIVE capture metadata — 27 October 2026
 
-These historical PNGs contain obsolete event branding and are retained without modification, not rendered as current art. Use the [neutral published film-clock judge entry](https://film-clock-1030---raid-relic-vz4bhnskgq-uc.a.run.app/demo/judge) for current review.
+These historical PNGs contain obsolete event branding and are retained without modification, not rendered as current art. Use the [current private neutral judge entry](https://review-1031---raid-relic-vz4bhnskgq-uc.a.run.app/demo/judge) for current review.
 
 The operator captured and actually viewed these three unchanged PNGs at **2026-10-27T02:57:37.192Z**, from [holder-card](https://holder-card---raid-relic-vz4bhnskgq-uc.a.run.app), revision `raid-relic-holder-card-1027`, runtime `4640d0fc17cd8e3b8806ec243e119642e2098dcb`. Each is a **1200×800 viewport crop**, not complete page coverage, canonical-production footage or physical Twitch/OBS proof. Ring/holder/live labels are point-in-time observations, not permanent claims.
 
@@ -38,3 +38,7 @@ The operator captured, viewed and promoted these actual local `/demo/film` rende
 | `docs/media/demo-film-card.png` | 104131 | `9be007861da071e31b95df43147fd5679ab590eee77a1ddfc3ea7e3dcd47c1c9` |
 
 Combined size: 267120 bytes. Each PNG remains below512KiB, each raster below4MiB and aggregate below4MiB. Parent promotion checked no-follow/single-link regular files, PNG signatures/dimensions and actual visual content. No image was generated, reconstructed, retouched, cropped, overwritten or substituted for native output. The original obsolete badges remain inside these archived files. Current README art is the separate unchanged neutral vector `public/relic.svg`; it is not a screenshot or proof.
+
+## Current R0 presentation review · 31 October2026
+
+Parent actually viewed4new native fixture PNGs, total230301bytes. Desktop images are1920×540 crops from the original desktop viewport, not complete FHD screenshots; Keeper view shows the post-disclosure list rather than its header. Mobile is390×844. Neutral art/CTAs/cards/+N were reviewed; no physical gameplay/Twitch/OBS/adoption inference. These are task artifacts, not newly copied repo assets. Earlier ARCHIVE files and all recorded hashes above remain unchanged. README still uses neutral original relic.svg, not a current screenshot or proof. [Receipt](PANEL_RELEASE.json) · [provenance](PROVENANCE.md).

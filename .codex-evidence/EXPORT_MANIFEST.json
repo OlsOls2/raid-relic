@@ -1,23 +1,23 @@
 {
   "formatVersion": 2,
   "sessionID": "01a1705c-a87d-7143-80f6-021e47b78ced",
-  "inputLeaf": "rollout-release322-01a1705c-a87d-7143-80f6-021e47b78ced.jsonl",
-  "rawSnapshotSHA256": "2d3c459a9fbd85cb1bffd02b999cf54600ee00627babfd325e3d13ab6f7b24c2",
-  "rawBytes": 124496497,
+  "inputLeaf": "rollout-release325-01a1705c-a87d-7143-80f6-021e47b78ced.jsonl",
+  "rawSnapshotSHA256": "2fd7ac9039110d9c6785d94257774b820f0f5fae070544f038afa76d19b58f4d",
+  "rawBytes": 125239423,
   "eventCounts": {
     "session_meta": 1,
-    "event_msg": 11198,
-    "response_item": 9655,
+    "event_msg": 11286,
+    "response_item": 9728,
     "world_state": 184,
-    "turn_context": 324,
-    "token_usage_record": 2878,
+    "turn_context": 327,
+    "token_usage_record": 2903,
     "compacted": 23
   },
-  "exportedEntries": 6395,
+  "exportedEntries": 6449,
   "omissions": {
     "private": 121,
     "media": 9,
-    "unselected": 17867,
+    "unselected": 18002,
     "truncated": 20,
     "credentialLookingItems": 76,
     "credentialReasons": {
@@ -26,10 +26,10 @@
     }
   },
   "firstTimestamp": "2026-10-25T00:01:23.357Z",
-  "cutoff": "2026-10-31T06:52:07.077Z",
-  "exportSHA256": "5a03eeeb4955275c700d7ca72169764d5ea816272566c594cc469f880c745f38",
-  "exportBytes": 20119022,
-  "sourceRunLogCount": 323,
+  "cutoff": "2026-10-31T08:33:36.015Z",
+  "exportSHA256": "b82691eaedca0e9e68078a641ccc856997afd3226b5ffa8b1771ca0f7261ec04",
+  "exportBytes": 20308551,
+  "sourceRunLogCount": 326,
   "sourceRunLogs": [
     {
       "leaf": "run-000.jsonl",
@@ -1645,38 +1645,53 @@
       "leaf": "run-322.jsonl",
       "bytes": 14575,
       "sha256": "1e612567868f573f73f11328512ea63f6a1ffad0aa54dd8dd5d17a36e4f2c2f0"
+    },
+    {
+      "leaf": "run-323.jsonl",
+      "bytes": 16749,
+      "sha256": "7d0ee672cfe000a260c55dfb642d2023cf9595e54f428335dc296a4449e704ae"
+    },
+    {
+      "leaf": "run-324.jsonl",
+      "bytes": 13390,
+      "sha256": "6e66e17c8a51b72bbfe42bb2da208c3ac9e3b5dfaf09440d0cff31d055e12cf8"
+    },
+    {
+      "leaf": "run-325.jsonl",
+      "bytes": 237025,
+      "sha256": "60a3dab9cea8f3ae14578f58d7e8e3f218d79e533b3b7077385bdd2490e1eb56"
     }
   ],
   "scope": "Selected sanitized native JSONL; private/internal/media omitted and per-item output bounded. Raw snapshot remains local ignored. Secondary scanner findings cause whole selected-entry omission, including public identifiers; zero-finding rescan required.",
   "parts": [
     {
       "order": 1,
-      "path": "EXPORTED_TRANSCRIPT.part-001-5a03eeeb4955275c700d7ca72169764d5ea816272566c594cc469f880c745f38.md",
+      "path": "EXPORTED_TRANSCRIPT.part-001-b82691eaedca0e9e68078a641ccc856997afd3226b5ffa8b1771ca0f7261ec04.md",
       "bytes": 16770524,
-      "sha256": "aec3278490172c2c5d23e31c989a6c69e5615078a965776bde6fa3c171024c30",
+      "sha256": "33ab5cad7ac6160e3d7700a515af01edf0969150d0341c15830f1e0b17bfb361",
       "entries": 5513
     },
     {
       "order": 2,
-      "path": "EXPORTED_TRANSCRIPT.part-002-5a03eeeb4955275c700d7ca72169764d5ea816272566c594cc469f880c745f38.md",
-      "bytes": 3348498,
-      "sha256": "345d0157a1c73e81780179aca49af8fa4f654ce3175817ea016740008ba76ca9",
-      "entries": 882
+      "path": "EXPORTED_TRANSCRIPT.part-002-b82691eaedca0e9e68078a641ccc856997afd3226b5ffa8b1771ca0f7261ec04.md",
+      "bytes": 3538027,
+      "sha256": "aa39fa9122552e1d43f0a168bbdccf6fa57b4bfc104a82e41af51b3f6aee406e",
+      "entries": 936
     }
   ],
   "indexBytes": 861,
-  "indexSHA256": "e1b9cd3aa78bd54659c47739f88c1db0ee327c55e05a96a900f64607ed01f5b9",
+  "indexSHA256": "9716fffb0d151b9aa372a3628e14d6d520f5325151eb4e65c5404fdc53ec5c50",
   "secondaryScan": {
     "status": "zero-findings",
-    "findings": 6,
-    "omittedEntries": 6,
+    "findings": 8,
+    "omittedEntries": 8,
     "rules": {
       "twitch-api-token": 4,
-      "generic-api-key": 2
+      "generic-api-key": 4
     },
-    "omissionReportSHA256": "5477d1c524818cb1d171e8fa1e4654e205c16994db7ae16bb977ac4018445c4b",
-    "reportSHA256": "f56f8391479781500c1142dda09ebf2430a104cadc6b56e91c0cbc3c3901884e",
-    "scannedExportSHA256": "5a03eeeb4955275c700d7ca72169764d5ea816272566c594cc469f880c745f38",
-    "scannedPartsSHA256": "682b017c2c5fc29717df5110ded61fb2b8b4d79249f23511e8a9d686e8823bc2"
+    "omissionReportSHA256": "6e998569831e48fc671ecae4c2620fafe63359f2c37b4d170889c74fb9ab50eb",
+    "reportSHA256": "6568239151c83db8e8db1e683a2edf8b4a71055b2dccd107f4d5ea1a33315849",
+    "scannedExportSHA256": "b82691eaedca0e9e68078a641ccc856997afd3226b5ffa8b1771ca0f7261ec04",
+    "scannedPartsSHA256": "98c0ae3a1348591d674448584887cd064639aa3642784c44776bb0bddaabbb82"
   }
 }

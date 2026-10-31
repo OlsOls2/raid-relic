@@ -20,7 +20,7 @@ test('judge front door uses canonical links, clear pitch and linked technical ev
     assert.ok(s.includes(term), term);
   assert.ok(
     s.includes(
-      'https://film-clock-1030---raid-relic-vz4bhnskgq-uc.a.run.app/demo/film?autoplay=1&kiosk=1',
+      'https://review-1031---raid-relic-vz4bhnskgq-uc.a.run.app/demo/film?autoplay=1&kiosk=1',
     ),
   );
   assert.match(
@@ -63,9 +63,11 @@ test('judge front door uses canonical links, clear pitch and linked technical ev
     'not a zero-invoice guarantee',
   ])
     assert.ok(s.toLowerCase().includes(term), term);
-  assert.match(guide, /panels14a4 is the latest deployed review release/);
-  assert.match(guide, /newer gate\/connect\/parallel contributions are LOCAL UNCOMMITTED/);
-  assert.doesNotMatch(s, /\b(?:1151|934)\b|\d+\/\d+ native/);
+  assert.match(guide, /private review-1031\/runtimead48 is the latest deployed review release/);
+  assert.match(guide, /real OAuth\/control actions remain denied by its read-only policy/);
+  assert.match(s, /access code delivered only to the owner by private DM/);
+  assert.match(s, /real Twitch OAuth\/control mutations are blocked/);
+  assert.doesNotMatch(s, /\b(?:1261|1151|934)\b|\d+\/\d+ native/);
   assert.match(guide, /ten-second client-only expiry|client-only expiry/);
   assert.ok(!/\| P[1-9] \|/.test(s));
   const built = await readFile('BUILT_WITH_CODEX.md', 'utf8'),
@@ -128,7 +130,7 @@ test('provenance and private draft separate historical/published/local proof and
     '934/934',
     '46 browser flows / 141 checks',
     '41087864748',
-    'LOCAL UNCOMMITTED',
+    'ad48ec9ce346e2e577546a12305d329ba72e940f',
     '14a4f138858de911741510fc5b14c051594f2604',
     '31 October 2026, 00:20:59.568 UTC',
     '41145753035',
@@ -151,11 +153,132 @@ test('provenance and private draft separate historical/published/local proof and
   assert.match(provenance, /panels-1030.*at \*\*0% traffic\*\*/);
   assert.match(provenance, /Earlier published feature checkpoints · historical/);
   assert.match(provenance, /UNFORMATTED immutable docs298 snapshot \/ app296 bytes/);
-  assert.match(provenance, /result is \*\*unknown\*\* here/);
-  assert.match(provenance, /No worker patches are copied\/merged by this documentation turn/);
-  assert.match(provenance, /No access key was provisioned or read/);
-  assert.match(provenance, /unlisted tag URLs were unauthenticated\/public200/);
-  assert.match(provenance, /repo privacy.*read-only flags do not make the site access-private/);
+  for (const fact of [
+    'review-1031',
+    '41180909135',
+    '1261/1261',
+    '46 unique browser flows /152 checks',
+    '150037ms',
+    '60007ms',
+    '3600273ms',
+    '3605600ms',
+    '105151frames',
+    '2026-11-01T08:14:19.911Z',
+    '20,119,022bytes',
+    '6whole-entry omissions',
+    'Later323/324probes and docs325 are not yet selected',
+  ])
+    assert.ok(provenance.includes(fact), fact);
+  assert.match(provenance, /Older tags remain unlisted\/public; service IAM is unchanged/);
+  assert.match(provenance, /Owner received the access code only by verified private DM/);
+  assert.match(provenance, /read-only review \*\*denies real OAuth\/control mutations\*\*/);
+  assert.match(provenance, /later repository SHA\/CI will differ from deployed runtime SHA/);
+  assert.match(provenance, /requires no second image\/deployment/);
+  assert.match(provenance, /not every interval in every scene/);
+  const release = JSON.parse(await readFile('docs/PANEL_RELEASE.json', 'utf8'));
+  assert.equal(release.runtimeCommit, 'ad48ec9ce346e2e577546a12305d329ba72e940f');
+  assert.equal(release.revision, 'raid-relic-review-1031');
+  assert.equal(release.tag, 'review-1031');
+  assert.equal(release.url, 'https://review-1031---raid-relic-vz4bhnskgq-uc.a.run.app');
+  assert.equal(release.traffic, 0);
+  assert.deepEqual(release.tests, {
+    native: 1261,
+    skipped: 0,
+    browserFlows: 46,
+    browserChecks: 152,
+    localSandboxed: true,
+  });
+  assert.equal(release.ci.headSha, release.runtimeCommit);
+  assert.equal(release.ci.conclusion, 'success');
+  assert.equal(release.ci.url, 'https://github.com/OlsOls2/raid-relic/actions/runs/41180909135');
+  assert.equal(
+    release.imageDigest,
+    'sha256:59db65a1bac03b6fbac286b8869949d434131bb6ecf724867c04106e493e3353',
+  );
+  assert.equal(release.servedAssetMatches, 63);
+  assert.equal(release.generatedNetworkMetadataMatches, 1);
+  assert.equal(release.generatedLandingHTMLMatches, 1);
+  assert.deepEqual(release.production, {
+    revision: 'raid-relic-eventsub-fix-on-1027',
+    percent: 100,
+    allPriorAllocationsPreserved: true,
+    iamChanged: false,
+    flagsChanged: false,
+  });
+  assert.deepEqual(release.access, {
+    authenticatedPreviewOnly: true,
+    anonymousRootIsGate: true,
+    anonymousHealthAndStaticDenied: true,
+    codeDeliveredOnlyToVerifiedOwnerDM: true,
+    credentialNeverInURLOrRepository: true,
+    expiresAt: '2026-11-01T08:14:19.911Z',
+    olderTagsNotRetroactivelyGated: true,
+  });
+  assert.deepEqual(release.nativeFilm, {
+    elapsedMs: 150037,
+    hiddenMs: 60007,
+    scenes: 8,
+    inputs: 0,
+    downloads: 0,
+    browserClock: false,
+    setupSeek: false,
+  });
+  assert.deepEqual(release.nativeOBSRead, {
+    idleMs: 3600273,
+    hostMs: 3605600,
+    checkpoints: 13,
+    frames: 105151,
+    sockets: 1,
+    inputs: 0,
+    errors: 0,
+    forbidden: 0,
+    physicalOBS: false,
+    syntheticPostIdleArrival: true,
+  });
+  assert.equal(release.evidence.primaryOnlyThroughRun, 322);
+  assert.equal(release.evidence.parts, 2);
+  assert.equal(release.evidence.selectedBytes, 20119022);
+  assert.equal(release.evidence.wholeEntryOmissions, 6);
+  assert.equal(release.evidence.secondaryFindings, 0);
+  assert.equal(release.evidence.partLimitBytes, 16777216);
+  assert.equal(release.evidence.totalLimitBytes, 33554432);
+  assert.equal(release.evidence.workerPrivateTranscriptsIncluded, false);
+  assert.equal(release.noProductionPromotion, true);
+  assert.equal(release.noPublicPostsOrOutreach, true);
+  const panel = await readFile('docs/PANEL_STATUS.md', 'utf8');
+  assert.equal(panel.split('<!-- PANEL_CURRENT_START -->').length, 2);
+  assert.equal(panel.split('<!-- PANEL_CURRENT_END -->').length, 2);
+  const current = panel
+    .split('<!-- PANEL_CURRENT_START -->')[1]
+    .split('<!-- PANEL_CURRENT_END -->')[0];
+  const rows = [
+    ...current.matchAll(/^\| (X\d{2}|G[1-6]\.\d{2}) \| (SHIPPED|PARTLY DONE|NOT STARTED) \|/gm),
+  ];
+  const expectedIds = Array.from({ length: 6 }, (_, i) => 'X' + String(i + 1).padStart(2, '0'));
+  for (const [group, size] of [
+    [1, 10],
+    [2, 10],
+    [3, 13],
+    [4, 12],
+    [5, 12],
+    [6, 10],
+  ])
+    for (let i = 1; i <= size; i++)
+      expectedIds.push('G' + group + '.' + String(i).padStart(2, '0'));
+  assert.deepEqual(
+    rows.map((row) => row[1]),
+    expectedIds,
+  );
+  assert.equal(new Set(rows.map((row) => row[1])).size, 73);
+  assert.deepEqual(
+    ['SHIPPED', 'PARTLY DONE', 'NOT STARTED'].map(
+      (state) => rows.filter((row) => row[2] === state).length,
+    ),
+    [59, 13, 1],
+  );
+  assert.match(current, /G3\.05 \| PARTLY DONE[^\n]*12 logical px/);
+  assert.match(current, /G6\.07 \| NOT STARTED/);
+  assert.match(panel, /53 SHIPPED, 19 PARTLY DONE, 1 NOT STARTED/);
   assert.match(
     provenance,
     /remote\/default `main` \*\*3991bb84b9a3d60d1681e8d18e68b5e9cb44f511\*\* is an ancestor of14a4/,
@@ -216,7 +339,7 @@ test('current judge docs use neutral original art and preserve obsolete captures
   const judges = await readFile('docs/JUDGES.md', 'utf8');
   assert.match(
     judges,
-    /Open the \[45-second whole-loop sandbox\]\(https:\/\/film-clock-1030---raid-relic-vz4bhnskgq-uc\.a\.run\.app\/demo\/judge\)/,
+    /Open the \[45-second whole-loop sandbox\]\(https:\/\/review-1031---raid-relic-vz4bhnskgq-uc\.a\.run\.app\/demo\/judge\)/,
   );
   assert.ok(
     judges.includes(
@@ -258,7 +381,7 @@ test('current judge docs use neutral original art and preserve obsolete captures
   }
 });
 
-test('authorized session registry separates merged report-only history, five actual authors and pending application integration', async () => {
+test('authorized session registry separates original-only evidence from five actual authors and merged application history', async () => {
   const registry = await readFile('docs/CODEX_SESSIONS.md', 'utf8');
   const report = await readFile('docs/RUNTIME_RELEASE_QA.md', 'utf8');
   assert.ok(Buffer.byteLength(registry) <= 32768 && Buffer.byteLength(report) <= 65536);
@@ -283,8 +406,9 @@ test('authorized session registry separates merged report-only history, five act
     '147 checks',
     '317 source hashes',
     'through source303',
-    'LOCAL UNCOMMITTED',
-    'integration pending',
+    'FULL-HISTORY MERGED',
+    '5b80b423bc7ba9b892dcd0468618586046f7440a',
+    'Final canonical R0 QA passed1261/1261native0skip',
     'full-history merged into published 14a4',
     'Original-session selected evidence covers only the original lead',
     'Worker CLI/session transcripts remain private, separate and unpublished',
@@ -295,20 +419,37 @@ test('authorized session registry separates merged report-only history, five act
   assert.match(registry, /not claimed as sole-lead authorship/);
   const workerRows = registry.split('\n').filter((line) => /^\| `01a190/.test(line));
   assert.equal(workerRows.length, 3);
-  for (const [index, branch, role] of [
-    [0, 'feature/raid-relic-audit-presentation-1031', 'Presentation fonts/tokens'],
-    [1, 'feature/raid-relic-audit-control-1031', 'Control wizard/readiness/observation copy'],
-    [2, 'feature/raid-relic-replies-1031', 'Shared reply copy, six-slot hop notice reservations'],
+  for (const [index, branch, role, commit] of [
+    [
+      0,
+      'feature/raid-relic-audit-presentation-1031',
+      'Presentation fonts/tokens',
+      'a86afc33bbf796f080e9985965fdb38cd1e637bf',
+    ],
+    [
+      1,
+      'feature/raid-relic-audit-control-1031',
+      'Control wizard/readiness/observation copy',
+      '90aa1e680af50cb668abe8b1f9329aedb3cdc2c0',
+    ],
+    [
+      2,
+      'feature/raid-relic-replies-1031',
+      'Shared reply copy, six-slot hop notice reservations',
+      'e7f29c14e5d513d8948d682276dd615825b1d729',
+    ],
   ]) {
     assert.ok(workerRows[index].includes(ids[index + 2]));
     assert.ok(workerRows[index].includes(branch));
     assert.ok(workerRows[index].includes(role));
+    assert.ok(workerRows[index].includes(commit));
     assert.match(
       workerRows[index],
-      /LOCAL UNCOMMITTED contribution; worker stopped; composite whole-tree QA result unknown/,
+      /FULL-HISTORY MERGED; worker commit `[^`]+`; included in R0\/runtimead48/,
     );
   }
-  assert.match(registry, /No new worker commit, merge, deployment or passing cohort is inferred/);
+  assert.match(registry, /Actual commits\/merges above come from the parent receipt/);
+  assert.match(registry, /Later323\/324probes and docs325 are not yet selected/);
   assert.match(registry, /only `docs\/RUNTIME_RELEASE_QA\.md`/);
   assert.match(report, /canonical-formatted source parity or exact final-commit parity/);
   assert.ok(report.includes('No worker session ID is asserted') === false);

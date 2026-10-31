@@ -1,5 +1,14 @@
 # Own-channel control wizard · Group 5A
 
+## Current review boundary · 31 October2026
+
+Private review-1031/runtimead48 is published at0%, but **real OAuth/control mutations are denied**. Enter only the owner-DM preview code, then inspect the read-only product; do not treat mock controls/captures as live setup or moderation proof. Connect-first `/oauth/keeper/start` validates provider-returned client/scopes/immutable account identity before selecting an existing admitted role; unknown accounts get an invitation, no admission/grant/session. Optional typed name is a manual OBS utility, not identity authority. Visible status polls5/30seconds, hidden reads stop; GET never renews grants/reconciles. Checklist age does not auto-expire after10seconds, and target-observation age/null is separate from status-read age. These behaviors passed the canonical R0 fixtures, not physical Twitch consent. [Current receipt](PANEL_RELEASE.json) · [Provenance](PROVENANCE.md).
+
+## Earlier design/setup notes · historical
+
+The following dated setup descriptions retain their original context. Old selector/ten-second expiry/pending-publication wording is superseded by the current boundary above; activated writable-runtime installation still requires owner admission, consent and independent permission. Nothing below instructs action on the read-only review.
+
+
 The authenticated control page presents four tasks: **Connect**, **Set up channel**, **Add overlay**, **Send Off**. A native disclosure shows the selected task; step links open it without a keyboard trap. Each action has one button. Setup/opt-in/connection check retain their existing explicit server actions. Advanced contains the Seeker choice, operator scopes/gates, private intent diagnostics, CANCEL and ended-window recovery. The three readiness lights stay visible, with factual cached-state explanations; a saved bot grant is not called verified moderator permission. `/mod raidrelicbot` is a copyable hint, not a moderator operation.
 
 ## Read-only status and bounded explicit setup

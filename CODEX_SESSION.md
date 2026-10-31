@@ -8,13 +8,13 @@
 
 | Metadata | Value |
 |---|---|
-| Cutoff | 2026-10-31T06:52:07.077Z |
-| Selected entries | 6395 |
-| CLI-log digests | 323 (run-000.jsonl–run-322.jsonl) |
-| Selected bytes | 20119022 |
+| Cutoff | 2026-10-31T08:33:36.015Z |
+| Selected entries | 6449 |
+| CLI-log digests | 326 (run-000.jsonl–run-325.jsonl) |
+| Selected bytes | 20308551 |
 | Ordered transcript components | 2; entry-aligned, each ≤16 MiB; index is not the transcript |
-| Selected SHA256 | `5a03eeeb4955275c700d7ca72169764d5ea816272566c594cc469f880c745f38` |
-| Secondary whole-entry omissions | 6 |
+| Selected SHA256 | `b82691eaedca0e9e68078a641ccc856997afd3226b5ffa8b1771ca0f7261ec04` |
+| Secondary whole-entry omissions | 8 |
 | Secondary rescan | zero-findings, bound to this exact selected SHA |
 
 These are fixed-snapshot metadata, not a claim that later runs or this generation command are already included. Refresh after the writer stops, sanitize every finding, rescan to zero, then regenerate this file. The manifest is authoritative; CI checks this summary against it.

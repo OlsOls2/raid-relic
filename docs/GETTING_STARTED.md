@@ -1,5 +1,14 @@
 # A two-minute Keeper setup checklist
 
+## Current review boundary · 31 October2026
+
+Private review-1031/runtimead48 is published at0%, but **real OAuth/control mutations are denied**. Enter only the owner-DM preview code, then inspect the read-only product; do not treat mock controls/captures as live setup or moderation proof. Connect-first `/oauth/keeper/start` validates provider-returned client/scopes/immutable account identity before selecting an existing admitted role; unknown accounts get an invitation, no admission/grant/session. Optional typed name is a manual OBS utility, not identity authority. Visible status polls5/30seconds, hidden reads stop; GET never renews grants/reconciles. Checklist age does not auto-expire after10seconds, and target-observation age/null is separate from status-read age. These behaviors passed the canonical R0 fixtures, not physical Twitch consent. [Current receipt](PANEL_RELEASE.json) · [Provenance](PROVENANCE.md).
+
+## Earlier design/setup notes · historical
+
+The following dated setup descriptions retain their original context. Old selector/ten-second expiry/pending-publication wording is superseded by the current boundary above; activated writable-runtime installation still requires owner admission, consent and independent permission. Nothing below instructs action on the read-only review.
+
+
 Source 212 adds **`/start`** and an own-account **Get started in two minutes** checklist inside the existing private controls. Native/browser review and the new read-only preview are pending. It is a target for someone who already has Twitch and OBS available, not a guarantee of OAuth, moderation or installation time. No action runs automatically.
 
 This remains a configured Keeper pilot, not arbitrary public enrollment. If your channel is not listed, contact the pilot owner through your existing private contact: they must verify and configure the account first. No passwords, stream keys or email are collected by the guide. The selector is populated by the existing validated public Keeper mapping; a query, cookie or form cannot expand admission.

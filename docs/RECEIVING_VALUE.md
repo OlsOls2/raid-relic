@@ -1,6 +1,6 @@
 # Receiving the relic: authorised Keeper pilot
 
-Part 3A source candidate, not yet natively verified or published. The operator reports Tier1 passed 738 tests with zero skips, 32 serial browser workflows / 103 checks, three reviewed simulated captures and CI before this increment. Those results do not validate this new source. Production remains the separately promoted livefix / source `5d76`; no traffic or grant changes were made here. Part 3B auto-wander and the third Keeper setup are separate later steps.
+Current review-1031/runtimead48 is private/read-only, not a live installation or action test. Parent R0 receipt binds1261native/0skip and46flows152checks/CI41180909135, with mock authority and native read-only browser proofs. Actual OAuth/control mutation is denied on this preview. Only raidrelichq/olsols2/olsols3 are creator test channels, not community adoption. Earlier Part3A738/32/103 and livefix5d76 were historical predecessors; no fresh source-author provider operation is claimed. [Current receipt](PANEL_RELEASE.json) · [Provenance](PROVENANCE.md).
 
 ## Seeker consent and admission
 
@@ -10,15 +10,15 @@ The public queue is an explicit channel-level opt-in. It includes only configure
 
 One shared, bounded observation attempt per minute batches at most four stream IDs. Moderator listing is bounded to three pages. There is no timer, polling loop, startup networking, grant refresh/save or new scope request. Read-only token validation checks the existing client, account and required scopes. The existing optional `user:read:moderated_channels` grant is required for moderator evidence: without it suggestions fail closed; this feature does not launch consent. Missing/expired evidence is unknown, not offline. Each Send Off still rechecks existing eligibility, grant validity, moderator capability and membership, with an atomic membership check at dispatch; a cached UI row is never authority. A queue departure after an actual dispatch does not erase a legitimate raid receipt or its claims.
 
-Only `raidrelichq` and `olsols2` are admitted today. `keeperNetwork()` validates an operator-owned, unique ID/login mapping bounded to four, and the lifecycle already supports a bounded mapping. Runtime OAuth/pilot admission remains the existing two-account allowlist. “Any channel” onboarding is not implemented: an additional channel needs a separately authorised operator admission, actual account consent, bot role and subscription setup. No third ID is invented here.
+The configured creator test channels are `raidrelichq`, `olsols2` and `olsols3`. `keeperNetwork()` validates an operator-owned, unique ID/login mapping bounded to four, and the lifecycle already supports a bounded mapping. Runtime OAuth/pilot admission uses the existing bounded operator mapping; Connect-first validates immutable identity before choosing an admitted role. “Any channel” onboarding is not implemented: an additional channel needs a separately authorised operator admission, actual account consent, bot role and subscription setup. No arbitrary account admission is inferred.
 
 ## Public receiving value
 
 Atlas shows the actual registry holder prominently above the ledger, its recorded hold start when a matching completion exists (otherwise “Time not recorded”), a normal Twitch watch link, and recent unique Keepers from actual retained stops. A one-minute Helix observation labels live/offline; absent valid evidence says unknown. No embeds, avatar trackers or remote artwork are added.
 
-`/keeper/raidrelichq` and `/keeper/olsols2` show retained received rings, approved community glyphs from the latest received stop, real from/to names and UTC completion dates. Profiles clear on failed refresh; opted-out/banned channels do not get a public profile. No held words, viewer associations, raw provider bodies or invented history are returned. Reads do not create score consent or membership.
+`/keeper/raidrelichq`, `/keeper/olsols2` and `/keeper/olsols3` show retained received rings, approved community glyphs from the latest received stop, real from/to names and UTC completion dates. Profiles clear on failed refresh; opted-out/banned channels do not get a public profile. No held words, viewer associations, raw provider bodies or invented history are returned. Reads do not create score consent or membership.
 
-Each recorded ring can be downloaded as an original-art **1200×675 (16:9)** or **720×1280 (9:16)** PNG, bounded to 512 KiB. These are separate orientation-specific Keeper exports: existing Atlas stop PNGs and demo filenames/aspects/holder gates are unchanged. Each click freshly reads the exact Keeper record and existing exact-stop API, rechecks matching destination/ring/time and cancels on removal, change or unavailability. No server renderer, upload, clipboard, disk cache or third-party image is used. Simulator exports retain an explicit permanent simulator caption; saved downloads cannot be recalled after erasure. A recorded card does not imply the destination still holds the relic.
+Each recorded ring can be downloaded as an original-art **1200×675 (16:9)** or **720×1280 (9:16)** PNG, bounded to 512 KiB. These are separate orientation-specific Keeper exports: existing Atlas stop PNGs and demo filenames/aspects/holder gates are unchanged. Each click freshly reads the exact Keeper record and existing exact-stop API, rechecks matching destination/ring/time and cancels on removal, change or unavailability. No server renderer, upload, disk cache or third-party image is used. Explicit Share-menu Copy uses the local clipboard; native OS WebShare delivery remains untested. Simulator exports retain an explicit permanent simulator caption; saved downloads cannot be recalled after erasure. A recorded card does not imply the destination still holds the relic.
 
 Completed stops expose **Twitch-reported raid audience**, taken from the signed raid receipt's existing retained `raidSize`. Missing historical counts remain unknown. It is not unique viewers sent, new chatters, conversion or retention. No cross-chat viewer tracking is added.
 
@@ -34,7 +34,7 @@ The operator reports a separate physical Home → OlsOls2 retest at 11:19 UK on 
 
 No new paid service, dependency, scope, IAM, grant, scheduler or J5/J6 operation is added. Clips remain double-OFF and unwired. Free-tier limits are not an invoice guarantee. No auto-wander, quests, markers or third-channel admission is implemented in 3A.
 
-## Source handoff
+## Historical Part3A source handoff
 
 New files: `src/receiving.js`, `public/receiving.js`, `public/keeper-card.js`,
 `public/keeper.html`, `test/receiving.test.js`, `scripts/browser-smoke-desirability.js`,
@@ -49,7 +49,7 @@ Existing positive copy contracts updated in `test/judge-track.test.js`,
 Scope/configuration documentation: `.env.example`, `AGENTS.md`, `README.md`,
 `ARCHITECTURE.md`, `docs/PRIVACY.md`.
 
-Author verification is source review and scoped `git diff --check` only. Native Node,
+Historical handoff status (superseded by R0 above): author verification was source review and scoped diff inspection only. Native Node,
 Chromium, formatting, the expanded serial browser matrix and any operator preview remain
 pending. No selected transcript, private evidence report or credentials were read.
 Renderer/demo modules, dependencies, OAuth scope lists and pinned operations were not

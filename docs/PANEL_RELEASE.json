@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "recordedBy": "parent release verifier; closed observed metadata, not source-author execution",
+  "observedAt": "2026-10-31T08:21:15.991Z",
+  "runtimeCommit": "ad48ec9ce346e2e577546a12305d329ba72e940f",
+  "sourceBranch": "feature/raid-relic-p9-stretch",
+  "revision": "raid-relic-review-1031",
+  "tag": "review-1031",
+  "url": "https://review-1031---raid-relic-vz4bhnskgq-uc.a.run.app",
+  "traffic": 0,
+  "production": {
+    "revision": "raid-relic-eventsub-fix-on-1027",
+    "percent": 100,
+    "allPriorAllocationsPreserved": true,
+    "iamChanged": false,
+    "flagsChanged": false
+  },
+  "ci": {
+    "conclusion": "success",
+    "headSha": "ad48ec9ce346e2e577546a12305d329ba72e940f",
+    "url": "https://github.com/OlsOls2/raid-relic/actions/runs/41180909135"
+  },
+  "imageDigest": "sha256:59db65a1bac03b6fbac286b8869949d434131bb6ecf724867c04106e493e3353",
+  "tests": {
+    "native": 1261,
+    "skipped": 0,
+    "browserFlows": 46,
+    "browserChecks": 152,
+    "localSandboxed": true
+  },
+  "servedAssetMatches": 63,
+  "generatedNetworkMetadataMatches": 1,
+  "generatedLandingHTMLMatches": 1,
+  "access": {
+    "authenticatedPreviewOnly": true,
+    "anonymousRootIsGate": true,
+    "anonymousHealthAndStaticDenied": true,
+    "codeDeliveredOnlyToVerifiedOwnerDM": true,
+    "credentialNeverInURLOrRepository": true,
+    "expiresAt": "2026-11-01T08:14:19.911Z",
+    "olderTagsNotRetroactivelyGated": true
+  },
+  "nativeFilm": {
+    "elapsedMs": 150037,
+    "hiddenMs": 60007,
+    "scenes": 8,
+    "inputs": 0,
+    "downloads": 0,
+    "browserClock": false,
+    "setupSeek": false
+  },
+  "nativeOBSRead": {
+    "idleMs": 3600273,
+    "hostMs": 3605600,
+    "checkpoints": 13,
+    "frames": 105151,
+    "sockets": 1,
+    "inputs": 0,
+    "errors": 0,
+    "forbidden": 0,
+    "physicalOBS": false,
+    "syntheticPostIdleArrival": true
+  },
+  "evidence": {
+    "primaryOnlyThroughRun": 322,
+    "parts": 2,
+    "selectedBytes": 20119022,
+    "wholeEntryOmissions": 6,
+    "secondaryFindings": 0,
+    "partLimitBytes": 16777216,
+    "totalLimitBytes": 33554432,
+    "workerPrivateTranscriptsIncluded": false
+  },
+  "limits": [
+    "Read-only review denies real OAuth/control/state-changing actions.",
+    "Physical Twitch/moderator/OBS delivery is not inferred from local fixtures.",
+    "Fresh scoped axe scans had zero violations, with landing incomplete2/1 still requiring manual review.",
+    "The12pxbackplate/central60geometry interpretation remains an owner review decision.",
+    "Retained-session compaction was not started; idle/privateverifiedbackup/approval are separate gates."
+  ],
+  "noPublicPostsOrOutreach": true,
+  "noProductionPromotion": true,
+  "documentationClosure": "This receipt identifies runtime source; later documentation-only commits must preserve every runtime file byte and must not trigger another deployment."
+}
