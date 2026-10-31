@@ -24,12 +24,22 @@ const safeHeaders = {
   'referrer-policy': 'no-referrer',
 };
 export function privatePreviewConfig(env, now = Date.now()) {
-  const flag = env.P5_PREVIEW_PRIVATE_ENABLED;
+  const judgeFlag = env.JUDGE_ADMISSION_ENABLED;
+  if (judgeFlag !== undefined && !['true', 'false'].includes(judgeFlag))
+    throw Error('Invalid judge admission configuration');
+  const judge = judgeFlag === 'true';
+  if (
+    judge &&
+    ((env.P5_PREVIEW_PRIVATE_ENABLED !== undefined && env.P5_PREVIEW_PRIVATE_ENABLED !== 'false') ||
+      env.P5_PREVIEW_READ_ONLY !== 'true')
+  )
+    throw Error('Judge admission requires isolated read-only configuration');
+  const flag = judge ? 'true' : env.P5_PREVIEW_PRIVATE_ENABLED;
   if (flag !== undefined && flag !== 'false' && flag !== 'true')
     throw Error('Invalid private preview configuration');
   if (flag !== 'true') return Object.freeze({ enabled: false });
-  const digest = env.P5_PREVIEW_ACCESS_SHA256;
-  const expiry = env.P5_PREVIEW_ACCESS_EXPIRES_AT;
+  const digest = judge ? env.JUDGE_ACCESS_SHA256 : env.P5_PREVIEW_ACCESS_SHA256;
+  const expiry = judge ? env.JUDGE_ACCESS_EXPIRES_AT : env.P5_PREVIEW_ACCESS_EXPIRES_AT;
   const expiresAt = typeof expiry === 'string' ? Date.parse(expiry) : NaN;
   if (
     // Admission is independent of application action permissions. Both modes
@@ -42,12 +52,27 @@ export function privatePreviewConfig(env, now = Date.now()) {
     !Number.isSafeInteger(now) ||
     !Number.isSafeInteger(expiresAt) ||
     expiresAt <= now ||
-    expiresAt - now > MAX_PRIVATE_TTL_MS ||
+    (judge
+      ? expiresAt !== Date.parse('2026-11-16T00:00:00.000Z')
+      : expiresAt - now > MAX_PRIVATE_TTL_MS) ||
     new Date(expiresAt).toISOString() !==
       (expiry.includes('.') ? expiry : expiry.replace('Z', '.000Z'))
   )
     throw Error('Invalid private preview configuration');
-  return Object.freeze({ enabled: true, digest: digest.toLowerCase(), expiresAt });
+  return Object.freeze({ enabled: true, judge, digest: digest.toLowerCase(), expiresAt });
+}
+// Closed public read surface; query strings cannot select an action route.
+export function judgeReadRequest(req) {
+  if (!target(req) || !['GET', 'HEAD'].includes(req.method)) return false;
+  const path = req.url.split('?')[0];
+  return (
+    /^(?:\/|\/health|\/atlas\/?|\/stops\/[a-f0-9]{64}|\/keeper\/[a-z0-9_]{1,25}|\/overlay(?:\/\d{1,32})?|\/demo(?:\/(?:judge|film))?\/?|\/api\/(?:atlas(?:\/stops\/[a-f0-9]{64})?|keeper\/[a-z0-9_]{1,25}|receiving|journey|journey-map|scores|recap))$/.test(
+      path,
+    ) ||
+    /^\/(?:[a-zA-Z0-9_-]+\.(?:js|css|svg|png|ico)|fonts\/Cinzel\.ttf|vendor\/three\.(?:module|core)\.js|edition-crystal\/[a-zA-Z0-9_.-]+\.svg)$/.test(
+      path,
+    )
+  );
 }
 function target(req) {
   const raw = req.url;
@@ -335,6 +360,20 @@ export function createPrivatePreview(env, { now = Date.now, bodyTimeoutMs = 2000
           send(req, res, 413);
           return;
         }
+        if (config.judge && req.url === '/start' && req.method === 'GET') {
+          send(
+            req,
+            res,
+            200,
+            '<!doctype html><html lang="en"><meta charset="utf-8"><title>Judge sandbox</title><main><h1>Read-only judge sandbox</h1><p>Connecting a stream and all live actions are unavailable here. No Twitch login is needed.</p><a href="/">Return to the story</a> · <a href="/demo/judge">Watch the demo</a></main></html>',
+          );
+          return;
+        }
+        // Judge admission never reaches action handlers, even with a valid code.
+        if (config.judge && !judgeReadRequest(req)) {
+          send(req, res, 403, 'Judge sandbox is read only');
+          return;
+        }
         removeCredential(req, info);
         // Preserve application CSP/auth headers, but never cache gated assets publicly.
         const writeHead = res.writeHead;
@@ -367,7 +406,10 @@ export function createPrivatePreview(env, { now = Date.now, bodyTimeoutMs = 2000
             throw Error('Private preview upgrade wiring rejected');
           const guarded = (req, socket, head) => {
             const info = admitted(req);
-            if (!info.ok) {
+            if (
+              !info.ok ||
+              (config.judge && (req.method !== 'GET' || !/^\/ws\/\d{1,32}$/.test(req.url)))
+            ) {
               const status = limited() ? 429 : 401;
               failures = Math.min(32, failures + 1);
               socket.end(

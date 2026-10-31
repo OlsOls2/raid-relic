@@ -617,3 +617,149 @@ test('bounded form timeout and four concurrent reads reject without dispatching 
   assert.equal(res.headers['set-cookie'], undefined);
   slow.destroy();
 });
+
+test('judge admission is default off, isolated, fixed-deadline and server read-only', async () => {
+  const judgeEnv = {
+    JUDGE_ADMISSION_ENABLED: 'true',
+    P5_PREVIEW_READ_ONLY: 'true',
+    JUDGE_ACCESS_SHA256: ENV.P5_PREVIEW_ACCESS_SHA256,
+    JUDGE_ACCESS_EXPIRES_AT: '2026-11-16T00:00:00.000Z',
+  };
+  assert.equal(privatePreviewConfig(judgeEnv, NOW).judge, true);
+  for (const change of [
+    { P5_PREVIEW_READ_ONLY: 'false' },
+    { P5_PREVIEW_READ_ONLY: undefined },
+    { P5_PREVIEW_PRIVATE_ENABLED: 'true' },
+    { P5_PREVIEW_PRIVATE_ENABLED: 'invalid' },
+    { JUDGE_ACCESS_SHA256: undefined },
+    { JUDGE_ACCESS_EXPIRES_AT: '2026-11-17T00:00:00.000Z' },
+    { JUDGE_ADMISSION_ENABLED: 'TRUE' },
+  ])
+    assert.throws(() => privatePreviewConfig({ ...judgeEnv, ...change }, NOW));
+  assert.throws(() => privatePreviewConfig(judgeEnv, Date.parse(judgeEnv.JUDGE_ACCESS_EXPIRES_AT)));
+  const g = createPrivatePreview(judgeEnv, { now: () => NOW });
+  for (const path of [
+    '/oauth/keeper/start',
+    '/auth/callback',
+    '/control/1',
+    '/eventsub',
+    '/internal/wander/tick',
+    '/api/forge',
+    '/api/my-marks',
+    '/%63ontrol/1',
+  ]) {
+    for (const method of ['GET', 'POST']) {
+      const result = await invoke(g, path, { method, headers: { 'x-preview-access': KEY } });
+      assert.equal(result.calls, 0);
+      assert.ok([400, 403].includes(result.res.status));
+    }
+  }
+  for (const path of [
+    '/',
+    '/health',
+    '/atlas/',
+    '/keeper/olsols3',
+    '/demo/judge',
+    '/overlay/1593561134',
+    '/api/atlas?offset=0',
+    '/atlas.js',
+  ]) {
+    assert.equal((await invoke(g, path, { headers: { 'x-preview-access': KEY } })).calls, 1);
+    assert.equal(
+      (await invoke(g, path, { method: 'POST', headers: { 'x-preview-access': KEY } })).calls,
+      0,
+    );
+  }
+  const server = new EventEmitter();
+  let upgrades = 0;
+  g.upgradeServer(server).on('upgrade', () => upgrades++);
+  for (const path of ['/control/1', '/ws/1?write=1', '/oauth/keeper/start']) {
+    const socket = new EventEmitter();
+    socket.end = () => {};
+    server.emit(
+      'upgrade',
+      request(path, { headers: { 'x-preview-access': KEY } }),
+      socket,
+      Buffer.alloc(0),
+    );
+  }
+  assert.equal(upgrades, 0);
+});
+
+test('judge static graph and stop detail are readable without enabling actions', async () => {
+  const { judgeReadRequest } = await import('../src/server.js');
+  for (const path of [
+    '/fonts/Cinzel.ttf',
+    '/vendor/three.module.js',
+    '/vendor/three.core.js',
+    '/stops/' + 'a'.repeat(64),
+    '/api/atlas/stops/' + 'a'.repeat(64),
+  ])
+    assert.equal(judgeReadRequest(request(path)), true);
+  for (const path of [
+    '/api/atlas/search',
+    '/oauth/start?x=/atlas',
+    '//atlas',
+    '/control/1?x=.js',
+    '/internal/wander/tick',
+    '/eventsub',
+    '/api/receiving/../control/1',
+  ])
+    assert.equal(judgeReadRequest(request(path)), false);
+});
+
+for (const durable of [false, true])
+  test(`judge admission blocks actual ${durable ? 'Firestore' : 'memory'} fixture action dispatch`, async () => {
+    const f = await pilotFixture({ durable });
+    const g = createPrivatePreview(
+      {
+        JUDGE_ADMISSION_ENABLED: 'true',
+        P5_PREVIEW_READ_ONLY: 'true',
+        JUDGE_ACCESS_SHA256: ENV.P5_PREVIEW_ACCESS_SHA256,
+        JUDGE_ACCESS_EXPIRES_AT: '2026-11-16T00:00:00.000Z',
+      },
+      { now: () => NOW },
+    );
+    const before = f.calls.length;
+    for (const path of [
+      '/control/' + HOME + '/send',
+      '/eventsub',
+      '/oauth/keeper/start',
+      '/internal/wander/tick',
+    ]) {
+      const result = await invoke(
+        g,
+        path,
+        { method: 'POST', headers: { 'x-preview-access': KEY } },
+        () => {
+          throw Error('Judge action reached runtime');
+        },
+      );
+      assert.equal(result.res.status, 403);
+      assert.equal(result.calls, 0);
+    }
+    assert.equal(f.calls.length, before);
+  });
+
+test('admitted judge start link explains sandbox without dispatching account connection', async () => {
+  const g = createPrivatePreview(
+    {
+      JUDGE_ADMISSION_ENABLED: 'true',
+      P5_PREVIEW_READ_ONLY: 'true',
+      JUDGE_ACCESS_SHA256: ENV.P5_PREVIEW_ACCESS_SHA256,
+      JUDGE_ACCESS_EXPIRES_AT: '2026-11-16T00:00:00.000Z',
+    },
+    { now: () => NOW },
+  );
+  const r = await invoke(g, '/start', { headers: { 'x-preview-access': KEY } });
+  assert.equal(r.res.status, 200);
+  assert.equal(r.calls, 0);
+  assert.match(r.res.body, /Read-only judge sandbox/);
+  assert.doesNotMatch(r.res.body, /oauth|<script|<form/i);
+  assert.equal(
+    (await invoke(g, '/start', { method: 'POST', headers: { 'x-preview-access': KEY } })).res
+      .status,
+    403,
+  );
+  assert.equal((await invoke(g, '/start')).res.status, 401);
+});

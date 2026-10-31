@@ -440,9 +440,15 @@ function leaked(req) {
     JSON.stringify(req.headers).includes(DUMMY) || JSON.stringify(req.rawHeaders).includes(DUMMY)
   );
 }
-export async function privatePreviewFixture({ enabled = true, expiryMs = 60000 } = {}) {
+export async function privatePreviewFixture({
+  enabled = true,
+  expiryMs = 60000,
+  judge = false,
+} = {}) {
   if (!Number.isInteger(expiryMs) || expiryMs < 100 || expiryMs > 86400000)
     throw Error('Fixture expiry bounds');
+  if (typeof judge !== 'boolean' || (judge && !enabled)) throw Error('Fixture judge bounds');
+  const fixtureKey = judge ? Buffer.alloc(32, 19).toString('base64url') : DUMMY;
   const directory = await mkdtemp(join(tmpdir(), 'raid-private-tls-'));
   let server,
     sockets,
@@ -494,16 +500,33 @@ export async function privatePreviewFixture({ enabled = true, expiryMs = 60000 }
       { timeout: 15000, maxBuffer: 16384 },
     );
     await chmod(keyPath, 0o600);
-    const expiresAt = Date.now() + expiryMs;
-    const gate = createPrivatePreview({
-      P5_PREVIEW_PRIVATE_ENABLED: String(enabled),
-      P5_PREVIEW_READ_ONLY: 'true',
-      P5_PREVIEW_ACCESS_SHA256: createHash('sha256').update(DUMMY).digest('hex'),
-      P5_PREVIEW_ACCESS_EXPIRES_AT: new Date(expiresAt).toISOString(),
-    });
+    const startedAt = Date.now();
+    const expiresAt = startedAt + expiryMs;
+    const deadline = Date.parse('2026-11-16T00:00:00.000Z');
+    const gate = createPrivatePreview(
+      judge
+        ? {
+            JUDGE_ADMISSION_ENABLED: 'true',
+            P5_PREVIEW_PRIVATE_ENABLED: 'false',
+            P5_PREVIEW_READ_ONLY: 'true',
+            JUDGE_ACCESS_SHA256: createHash('sha256').update(fixtureKey).digest('hex'),
+            JUDGE_ACCESS_EXPIRES_AT: new Date(deadline).toISOString(),
+          }
+        : {
+            P5_PREVIEW_PRIVATE_ENABLED: String(enabled),
+            P5_PREVIEW_READ_ONLY: 'true',
+            P5_PREVIEW_ACCESS_SHA256: createHash('sha256').update(fixtureKey).digest('hex'),
+            P5_PREVIEW_ACCESS_EXPIRES_AT: new Date(expiresAt).toISOString(),
+          },
+      judge ? { now: () => deadline - expiryMs + (Date.now() - startedAt) } : {},
+    );
+    const fixtureLeaked = (req) =>
+      leaked(req) ||
+      JSON.stringify(req.headers).includes(fixtureKey) ||
+      JSON.stringify(req.rawHeaders).includes(fixtureKey);
     const handler = (req, res) => {
       counts.app++;
-      if (leaked(req)) counts.credentialLeak++;
+      if (fixtureLeaked(req)) counts.credentialLeak++;
       const headers = {
         'cache-control': 'no-store',
         'x-content-type-options': 'nosniff',
@@ -523,6 +546,18 @@ export async function privatePreviewFixture({ enabled = true, expiryMs = 60000 }
       } else if (req.url === '/fixture.js') {
         res.writeHead(200, { ...headers, 'content-type': 'text/javascript; charset=utf-8' });
         res.end(JS);
+      } else if (
+        judge &&
+        [
+          '/fonts/Cinzel.ttf',
+          '/vendor/three.module.js',
+          '/vendor/three.core.js',
+          '/api/atlas/stops/' + 'a'.repeat(64),
+          '/stops/' + 'a'.repeat(64),
+        ].includes(req.url)
+      ) {
+        res.writeHead(200, headers);
+        res.end('LOCAL synthetic read resource');
       } else if (req.url === '/health' || req.url === '/snapshot') {
         if (req.url === '/snapshot') counts.httpSnapshot++;
         res.writeHead(200, { ...headers, 'content-type': 'application/json' });
@@ -576,7 +611,7 @@ export async function privatePreviewFixture({ enabled = true, expiryMs = 60000 }
     const inspected = {
       on(event, listener) {
         const wrapped = (req, ...args) => {
-          if (leaked(req)) counts.credentialLeak++;
+          if (fixtureLeaked(req)) counts.credentialLeak++;
           return listener(req, ...args);
         };
         wrappers.set(listener, wrapped);
@@ -618,7 +653,7 @@ export async function privatePreviewFixture({ enabled = true, expiryMs = 60000 }
     });
     return {
       origin: ORIGIN,
-      key: DUMMY,
+      key: fixtureKey,
       expiresAt,
       stats: () => ({ ...counts, clients: sockets.clients.size }),
       formMetadata: () => formMetadata && { ...formMetadata },
