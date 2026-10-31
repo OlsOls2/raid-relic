@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, stat } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-test('judge front door uses current gated GET-only walk and separates published review from planned production-policy preview', async () => {
+test('judge front door uses published private production-policy preview with GET-only walk and scoped historical proof', async () => {
   const s = await readFile('README.md', 'utf8');
   const guide = await readFile('docs/PROJECT_GUIDE.md', 'utf8');
   const quick = await readFile('docs/JUDGES_QUICKSTART.md', 'utf8');
@@ -21,7 +21,7 @@ test('judge front door uses current gated GET-only walk and separates published 
     'Unofficial fan project. Not affiliated with Twitch.',
   ])
     assert.ok(s.includes(term), term);
-  const origin = 'https://retained-marks-1031---raid-relic-vz4bhnskgq-uc.a.run.app';
+  const origin = 'https://judge-freeze-1031---raid-relic-vz4bhnskgq-uc.a.run.app';
   for (const route of [
     '',
     '/atlas/',
@@ -32,10 +32,12 @@ test('judge front door uses current gated GET-only walk and separates published 
     '/demo/',
   ])
     assert.ok(s.includes(origin + route), route);
-  assert.match(s, /access[- ]gated[^\n]*read-only preview/i);
+  assert.match(s, /access[- ]gated[^\n]*not a read-only preview/i);
   assert.match(s, /access code[^\n]*owner[^\n]*private DM/);
   assert.match(s, /no Twitch login/i);
-  assert.match(s, /real Twitch OAuth\/control mutations are blocked/);
+  assert.match(s, /GET-only: no OAuth, control, Setup, Send Off, chat or other Twitch actions/);
+  assert.match(s, /P5_PREVIEW_READ_ONLY=false/);
+  assert.doesNotMatch(s, /real Twitch OAuth\/control mutations are blocked/);
   assert.match(s, /Ring 12[^\n]*approved light|approved light[^\n]*Ring 12/);
   assert.match(s, /offline|stream closure/);
   assert.match(s, /under five minutes/i);
@@ -80,14 +82,41 @@ test('judge front door uses current gated GET-only walk and separates published 
   assert.match(guide, /client-only expiry/);
   for (const doc of [s, quick, demo]) {
     assert.match(doc, /judge-freeze-1031/);
-    assert.match(doc, /planned[^\n]*(?:not yet published|NOT YET CREATED\/PUBLISHED)/);
+    assert.doesNotMatch(
+      doc,
+      /NOT YET CREATED\/PUBLISHED|judge-freeze-1031[^\n]*planned|Final[^\n]*not yet published/,
+    );
     assert.match(doc, /P5_PREVIEW_READ_ONLY=false/);
     assert.match(doc, /GET-only/);
-    assert.match(
-      doc,
-      /not[^\n]*(?:promised blocked|promise OAuth\/control mutations are blocked)/i,
-    );
+    assert.match(doc, /not a read-only preview|production-environment permissions/);
+    assert.match(doc, /production[- ](?:mode|environment)|PRODENV/);
     assert.match(doc, /private access|accessprivate|access-gated/);
+  }
+  for (const doc of [quick, demo]) {
+    for (const value of [
+      '2b218b390210f709f031eac4b79b2606b1ff09e0',
+      'raid-relic-judge-freeze-fix-1031',
+      '15:43:10.690 UTC',
+      '15:43:20.341 UTC',
+      '41215789683',
+      '193e48eabeadb1def09806d3a1df94f7b8b517d20ac245639a7210094927565c',
+      '1271 native tests, zero skips; 46 browser flows /153 checks PASS',
+      'P5_PREVIEW_READ_ONLY=false',
+      'approvedCount1',
+      'detail exactly once',
+      '6775entries/343CLI digests',
+      '21,188,376selected bytes',
+      '6702prior headers',
+      'Later343–347',
+    ])
+      assert.ok(doc.includes(value), value);
+    assert.match(doc, /two image attempts, one failed startup and one ready grouped preview/);
+    assert.match(doc, /363313aee2fd32bb0f6e02a4db26414b9ff06a11/);
+    assert.match(doc, /not a published preview/);
+    assert.match(doc, /require no third image or redeploy/);
+    assert.match(doc, /production[^\n]*retained-marks-on-1031[^\n]*100%/i);
+    assert.match(doc, /no OAuth, control, Setup, Send Off, chat or other Twitch actions/);
+    assert.match(doc, /Worker transcripts|worker transcripts/);
   }
   assert.match(quick, /180d995dccd2d6550cee78f001a9b7d28d6842e1/);
   assert.match(quick, /12:46:33 UTC, 31 October 2026/);
@@ -97,7 +126,7 @@ test('judge front door uses current gated GET-only walk and separates published 
   assert.match(quick, /native1268zeroSkip and nine whole-plate native checks/);
   assert.match(quick, /e80b322[^\n]*native1270zeroSkip/);
   assert.match(quick, /maxima508\/404\/364\/364ms[^\n]*baseline428\/380\/356\/364ms/);
-  assert.match(quick, /not new final-candidate release proof/);
+  assert.match(quick, /earlier overlapping cohorts remain separate from the final release proof/);
   assert.match(quick, /no speedup, forced server-cold, p95 or SLA claim/);
   assert.match(demo, /2:45 shot list/);
   assert.match(demo, /Keep the edit below three minutes/);
@@ -310,7 +339,7 @@ test('provenance and private draft separate historical/published/local proof and
     ['SHIPPED', 'PARTLY DONE', 'NOT STARTED'].map(
       (state) => rows.filter((row) => row[2] === state).length,
     ),
-    [60, 12, 1],
+    [61, 11, 1],
   );
   assert.match(
     current,
@@ -326,7 +355,7 @@ test('provenance and private draft separate historical/published/local proof and
   );
   assert.match(
     current,
-    /G3\.05[^\n]*not physical OBS[^\n]*commit\/publication pending[^\n]*not geometry deployed in historical R0/,
+    /G3\.05[^\n]*not physical OBS[^\n]*final runtime2b218b are published[^\n]*Historical R0 had the earlier12px intrusion/,
   );
   const historical = panel.split('<!-- PANEL_CURRENT_END -->')[1];
   assert.match(
@@ -334,6 +363,14 @@ test('provenance and private draft separate historical/published/local proof and
     /G3\.05 \| PARTLY DONE[^\n]*Historical source304\/R0, before340[^\n]*12 logical px \/ 2,688 FHD square px[^\n]*960:672[^\n]*not satisfied/,
   );
   assert.match(panel, /R0 historical assessment remains59\/13\/1/);
+  assert.match(
+    current,
+    /G4\.04 \| SHIPPED[^\n]*404\/388\/344\/376ms[^\n]*408\/424\/388\/376ms[^\n]*below2500ms/,
+  );
+  assert.match(
+    current,
+    /G4\.04[^\n]*Original14:13 baseline[^\n]*428\/380\/356\/364ms[^\n]*matched public-production[^\n]*508\/404\/364\/364ms/,
+  );
   assert.match(current, /G6\.07 \| NOT STARTED/);
   assert.match(panel, /53 SHIPPED, 19 PARTLY DONE, 1 NOT STARTED/);
   assert.match(
@@ -378,10 +415,10 @@ test('provenance and private draft separate historical/published/local proof and
     '8ded729',
   ])
     assert.ok(draft.includes(value), value);
-  assert.match(draft, /original-only[^\n]*through337/);
-  assert.match(draft, /through342 refresh[^\n]*pending, not yet promoted/);
-  assert.match(draft, /not new final-candidate QA/);
-  assert.match(draft, /Worker transcripts are not covered or published/);
+  assert.match(draft, /original-only[^\n]*through342/i);
+  assert.match(draft, /evidence is now promoted \*\*through342\*\*/);
+  assert.match(draft, /Later343–347[^\n]*outside that fixed cutoff/);
+  assert.match(draft, /private worker transcripts are outside that fixed cutoff/);
 
   for (const [path, body] of Object.entries(text)) {
     assert.doesNotMatch(
@@ -539,7 +576,7 @@ test('authorized session registry separates original-only evidence from six actu
     'docs/DEMO_SCRIPT.md',
     'source STOPPED',
     'tests UNRUN by worker',
-    'parent QA/commit/history integration pending',
+    'worker documents integrated by the original lead into final published release source2b218b',
   ])
     assert.ok(docsWorker.includes(term), term);
   assert.match(docsWorker, /exit code \*\*0\*\*/);
@@ -549,12 +586,12 @@ test('authorized session registry separates original-only evidence from six actu
     /worker transcript remains private and excluded from the original-only selected export/,
   );
   const integration = registry.split('## Source343 integration update')[1];
-  assert.match(integration, /coverage is through337/);
-  assert.match(integration, /through342 export is UPCOMING and has not yet been promoted/);
-  assert.match(integration, /NOT YET CREATED\/PUBLISHED/);
+  assert.match(integration, /coverage is promoted through342/);
+  assert.match(integration, /Later343–347[^\n]*outside that fixed cutoff/);
+  assert.match(integration, /Published grouped preview[^\n]*15:43:10\.690 UTC/);
   assert.match(integration, /P5_PREVIEW_READ_ONLY=false/);
-  assert.match(integration, /no claim is made that OAuth\/control POSTs will be blocked/);
-  assert.match(integration, /not added together or relabelled as final-candidate QA/);
+  assert.match(integration, /private access, not a read-only preview/);
+  assert.match(integration, /two image attempts, one failed startup and one ready grouped preview/);
   assert.match(registry, /Actual commits\/merges above come from the parent receipt/);
   assert.match(registry, /Later323\/324probes and docs325 are not yet selected/);
   assert.match(registry, /only `docs\/RUNTIME_RELEASE_QA\.md`/);

@@ -58,7 +58,32 @@ cache/method scope, median/max and per-route baseline deltas. It is written to
 `artifacts/cold-navigation-browser-results.json` (≤64KiB), also emitted as
 `COLD_NAV_RESULT`. Any LCP maximum above2,500ms fails the budget check.
 
-Candidate harness execution/comparison is **pending parent QA**. Three samples
+Candidate harness execution/comparison **passed**, parent-reported31October2026 for published runtime2b218b390210f709f031eac4b79b2606b1ff09e0. Three samples
 are not p95, an SLA, a forced server-cold benchmark, physical OBS proof, or a
 claim of improvement. Record candidate runtime/source identity separately using
 parent release evidence; a documentation commit is not a deployed runtime.
+
+
+## Final candidate result · parent-reported, 31 October 2026
+
+| Route | Original baseline median/max ms | Matched repository harness public production median/max ms | Private candidate median/max ms |
+| --- | ---: | ---: | ---: |
+| `/` | 360/428 | 432/508 | 404/408 |
+| `/atlas/` | 352/380 | 400/404 | 388/424 |
+| `/keeper/olsols3` | 340/356 | 336/364 | 344/388 |
+| `/overlay/1593561134` | 360/364 | 356/364 | 376/376 |
+
+Parent's final candidate run used native Chromium156,1365×768,DPR1, fresh contexts,
+CDP HTTP cache disabled/clear, normal motion,8second observations,3samples×4routes,
+no CPU/network throttling or forced server-cold start. GET/HEAD only, WebSockets
+blocked,0trusted inputs/forbidden requests/downloads; gate detection false. All
+LCP maxima were below2500ms. Original baseline allowed WebSockets, whereas the
+matched repository production and candidate runs blocked them. Authentication
+also differs on the private candidate. With only three samples, these are scoped
+observations, not a speedup, p95, SLA or physical OBS proof; no needless runtime
+optimization was made. The source author executed none of these measurements.
+
+Successful private0 revisionraid-relic-judge-freeze-fix-1031/runtime2b218b has
+production-mode P5ROfalse permissions independent of private admission. The judge
+walk remains GET-only. A later docs-only commit does not change that runtime or
+justify another image/deployment.
