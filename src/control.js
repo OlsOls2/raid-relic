@@ -235,6 +235,13 @@ export function createControl({
             ...(pilot?.actions(id) ?? []),
           ]);
           if (!auth) return reply(403, 'Control authorization required');
+          if (auth.action === 'observe-targets') {
+            // Visible user-started read observation does not keep a session alive.
+            // authorizePost already checked exact own session/CSRF/origin/JSON.
+            const observed = await boundedCall(() => pilot.execute(id, auth.action));
+            if (!(await session(id, headers))) return reply(401, 'Control authorization required');
+            return reply(200, JSON.stringify(observed), 'application/json');
+          }
           if (auth.action !== 'logout') {
             await activity(
               await boundedCall(

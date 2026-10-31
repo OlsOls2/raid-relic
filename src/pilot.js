@@ -30,7 +30,7 @@ export function createPilot({
   const ids = Object.keys(keepers);
   const actions = (id) => [
     ...(chronicle ? ['chronicle'] : []),
-    ...(receiving?.enabled ? ['seek-on', 'seek-off', 'seek-status'] : []),
+    ...(receiving?.enabled ? ['seek-on', 'seek-off', 'seek-status', 'observe-targets'] : []),
     'bootstrap',
     'refresh-authorization',
     'keep',
@@ -288,6 +288,10 @@ export function createPilot({
     },
     async execute(id, action) {
       if (!ids.includes(id) || !actions(id).includes(action)) throw new Error('Action unavailable');
+      if (action === 'observe-targets') {
+        const observedAt = await receiving.observeTargets();
+        return { status: observedAt === null ? 'unavailable' : 'observed', observedAt };
+      }
       if (action === 'refresh-authorization') {
         try {
           await oauth.accessTokenForKeeper(id);

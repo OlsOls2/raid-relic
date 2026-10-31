@@ -1,23 +1,23 @@
 {
   "formatVersion": 2,
   "sessionID": "01a1705c-a87d-7143-80f6-021e47b78ced",
-  "inputLeaf": "rollout-release325-01a1705c-a87d-7143-80f6-021e47b78ced.jsonl",
-  "rawSnapshotSHA256": "2fd7ac9039110d9c6785d94257774b820f0f5fae070544f038afa76d19b58f4d",
-  "rawBytes": 125239423,
+  "inputLeaf": "rollout-release326-01a1705c-a87d-7143-80f6-021e47b78ced.jsonl",
+  "rawSnapshotSHA256": "bed8a05a92863523c28a20e57c23d7b6225c0d175f1dd0cc3712cce329e2bdeb",
+  "rawBytes": 126020886,
   "eventCounts": {
     "session_meta": 1,
-    "event_msg": 11286,
-    "response_item": 9728,
+    "event_msg": 11379,
+    "response_item": 9816,
     "world_state": 184,
-    "turn_context": 327,
-    "token_usage_record": 2903,
+    "turn_context": 328,
+    "token_usage_record": 2927,
     "compacted": 23
   },
-  "exportedEntries": 6449,
+  "exportedEntries": 6500,
   "omissions": {
     "private": 121,
     "media": 9,
-    "unselected": 18002,
+    "unselected": 18157,
     "truncated": 20,
     "credentialLookingItems": 76,
     "credentialReasons": {
@@ -26,10 +26,10 @@
     }
   },
   "firstTimestamp": "2026-10-25T00:01:23.357Z",
-  "cutoff": "2026-10-31T08:33:36.015Z",
-  "exportSHA256": "b82691eaedca0e9e68078a641ccc856997afd3226b5ffa8b1771ca0f7261ec04",
-  "exportBytes": 20308551,
-  "sourceRunLogCount": 326,
+  "cutoff": "2026-10-31T09:52:48.326Z",
+  "exportSHA256": "d733b125b19ed6b376b6188dd86f676aa161f756ef4ed15ba8a456cefd1c7334",
+  "exportBytes": 20507246,
+  "sourceRunLogCount": 327,
   "sourceRunLogs": [
     {
       "leaf": "run-000.jsonl",
@@ -1660,27 +1660,32 @@
       "leaf": "run-325.jsonl",
       "bytes": 237025,
       "sha256": "60a3dab9cea8f3ae14578f58d7e8e3f218d79e533b3b7077385bdd2490e1eb56"
+    },
+    {
+      "leaf": "run-326.jsonl",
+      "bytes": 186536,
+      "sha256": "8308c8ff82ebb48559b64b128ed2ca4b7363cfbbaa38cbe1497491d695f046f1"
     }
   ],
   "scope": "Selected sanitized native JSONL; private/internal/media omitted and per-item output bounded. Raw snapshot remains local ignored. Secondary scanner findings cause whole selected-entry omission, including public identifiers; zero-finding rescan required.",
   "parts": [
     {
       "order": 1,
-      "path": "EXPORTED_TRANSCRIPT.part-001-b82691eaedca0e9e68078a641ccc856997afd3226b5ffa8b1771ca0f7261ec04.md",
+      "path": "EXPORTED_TRANSCRIPT.part-001-d733b125b19ed6b376b6188dd86f676aa161f756ef4ed15ba8a456cefd1c7334.md",
       "bytes": 16770524,
-      "sha256": "33ab5cad7ac6160e3d7700a515af01edf0969150d0341c15830f1e0b17bfb361",
+      "sha256": "9e242471aaaf086a537d987b9659487650235d0075fd757feef74a34e484fc84",
       "entries": 5513
     },
     {
       "order": 2,
-      "path": "EXPORTED_TRANSCRIPT.part-002-b82691eaedca0e9e68078a641ccc856997afd3226b5ffa8b1771ca0f7261ec04.md",
-      "bytes": 3538027,
-      "sha256": "aa39fa9122552e1d43f0a168bbdccf6fa57b4bfc104a82e41af51b3f6aee406e",
-      "entries": 936
+      "path": "EXPORTED_TRANSCRIPT.part-002-d733b125b19ed6b376b6188dd86f676aa161f756ef4ed15ba8a456cefd1c7334.md",
+      "bytes": 3736722,
+      "sha256": "42d3990db7ab9296d93484a72a6f7e6772924372d16961c2ba40cde085abf935",
+      "entries": 987
     }
   ],
   "indexBytes": 861,
-  "indexSHA256": "9716fffb0d151b9aa372a3628e14d6d520f5325151eb4e65c5404fdc53ec5c50",
+  "indexSHA256": "bb9e1fc63bd18245a844967b42f271029bacfd445848ad33f85a8c5c4bc6abf9",
   "secondaryScan": {
     "status": "zero-findings",
     "findings": 8,
@@ -1689,9 +1694,9 @@
       "twitch-api-token": 4,
       "generic-api-key": 4
     },
-    "omissionReportSHA256": "6e998569831e48fc671ecae4c2620fafe63359f2c37b4d170889c74fb9ab50eb",
-    "reportSHA256": "6568239151c83db8e8db1e683a2edf8b4a71055b2dccd107f4d5ea1a33315849",
-    "scannedExportSHA256": "b82691eaedca0e9e68078a641ccc856997afd3226b5ffa8b1771ca0f7261ec04",
-    "scannedPartsSHA256": "98c0ae3a1348591d674448584887cd064639aa3642784c44776bb0bddaabbb82"
+    "omissionReportSHA256": "8e35ba5d893057993584bb5c381e281fa22b37f16cacbfafff99df9a6f6eb48e",
+    "reportSHA256": "78bf8e4b824138372296cabbbf9cf7b04d82427f5c6a566eef9b21393d17c670",
+    "scannedExportSHA256": "d733b125b19ed6b376b6188dd86f676aa161f756ef4ed15ba8a456cefd1c7334",
+    "scannedPartsSHA256": "d5b071b782daf9b90ddd7b0dfd53cb6c86f1ae9011e780c4715a77eeb2bdc00a"
   }
 }

@@ -120,8 +120,42 @@ test('control target selection is labelled, manual, canonical and keeps the name
     /Send Off requests a real Twitch raid to this observed Keeper\. The relic moves only after Twitch confirms the raid and both chats bind it; sending rechecks eligibility\./,
   );
   assert.match(html, /id="target-empty"/);
-  assert.ok(js.includes('Send Off to ${names[target.value]}'));
-  assert.ok(js.includes('run(`send:${target.value}`)'));
+  assert.ok(js.includes("Send Off to ${names[target.value] ?? 'an eligible Keeper'}"));
+  assert.match(
+    js,
+    /sendButton\.onpointerdown\s*=\s*\(\)\s*=>\s*\{\s*pressedTarget = target\.value;/,
+  );
+  assert.match(
+    js,
+    /const intended = pressedTarget \?\? target\.value;\s*pressedTarget = null;\s*if \(intended !== target\.value\) \{\s*sendResult\.textContent\s*=\s*'Targets changed during this click\. Review the selected Keeper; no request was sent\.';\s*return;\s*\}\s*return run\(`send:\$\{intended\}`\);/,
+  );
+  assert.equal(
+    (js.match(/const sendButton = document\.createElement\('button'\)/g) ?? []).length,
+    1,
+  );
+  assert.match(js, /function reconcileTargets\(rows, selected\)/);
+  assert.ok(
+    js.includes(
+      'const existing = new Map([...target.options].map((option) => [option.value, option]))',
+    ),
+  );
+  assert.ok(js.includes("existing.get(candidate.id) ?? document.createElement('option')"));
+  assert.ok(js.includes('if (option.textContent !== text) option.textContent = text;'));
+  assert.match(
+    js,
+    /if \(target\.options\[index\] !== option\)\s*target\.insertBefore\(option, target\.options\[index\] \?\? null\)/,
+  );
+  assert.ok(js.includes('for (const option of existing.values()) option.remove();'));
+  assert.ok(
+    js.includes(
+      'if (rows.some((candidate) => candidate.id === selected)) target.value = selected;',
+    ),
+  );
+  assert.match(
+    js,
+    /else if \(sendButton\.parentElement !== document\.getElementById\('raid'\)\)\s*document\.getElementById\('raid'\)\.append\(sendButton\)/,
+  );
+  assert.ok(js.includes('reconcileTargets(candidates, selectedTarget);'));
   assert.ok(js.includes('JSON.stringify({ action, csrf })'));
   assert.ok(!js.includes('setInterval'));
 });

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-31T10:10:27.685Z",
+  "sourceLead": "01a1705c-a87d-7143-80f6-021e47b78ced",
+  "applicationSourceRun": 326,
+  "fixtureCorrectionRuns": [
+    327,
+    328
+  ],
+  "qa": {
+    "nativeTests": 1264,
+    "nativeSkipped": 0,
+    "browserFlows": 46,
+    "browserChecks": 153,
+    "execution": "OS-isolated Node22/Chromium; mock provider endpoints only"
+  },
+  "regressions": [
+    "Trusted pointerdown on Send Off across actual status GET render, same connected/enabled node, then pointerup produces exactly one mocked Raid POST.",
+    "Status503 and expired-session401 clear initial reading state; new mocked consent recovers without retrying Raid POST.",
+    "Visible target-check toggle independently refreshes observations without subscription Setup; shared one-minute/one-flight/four-configured-channel budget.",
+    "Both stores reject forged/expired observation calls; observation action does not renew control session or mutate game/registry/jobs."
+  ],
+  "safety": {
+    "expiredSessionsNotExtended": true,
+    "offlineAndStaleTargetsRejected": true,
+    "unknownDispatchStillLocked": true,
+    "getRemainsReadOnly": true,
+    "csrfOriginOwnIdentityPreserved": true,
+    "realProviderCalls": false,
+    "productionSendValidated": false,
+    "productionTrafficChanged": false
+  },
+  "operatorInstructions": [
+    "After owner stages production env/promotes, hard reload both control pages: control modules have an existing one-hour cache policy.",
+    "Reconnect matching Keeper sessions if expired.",
+    "Start Keep eligible targets updated once on the visible control page; Setup need not be repeated.",
+    "Confirm target remains while checking beyond the observation TTL, click Send Off once and inspect adjacent pending/success/error plus exactly one POST.",
+    "Do not retry an unknown dispatch outcome."
+  ],
+  "publication": "A new0percent private/read-only preview is the authorized deliverable. Owner controls production-env staging/promotion/live validation."
+}

@@ -31,7 +31,51 @@ async function press(page, id, label, expected) {
   await page.evaluate(() => {
     window.__pilotPostProof = null;
   });
-  await page.getByRole('button', { name: label, exact: true }).click();
+  if (label.startsWith('Send Off to ')) {
+    phase = 'trusted-pointer-across-status-render';
+    const pattern = `**/control/${id}/status`;
+    let releaseRead;
+    const heldRead = new Promise((resolve) => {
+      releaseRead = resolve;
+    });
+    const routeRead = async (route) => {
+      await heldRead;
+      await route.continue();
+    };
+    await page.route(pattern, routeRead);
+    const nextRead = page.waitForRequest(
+      (request) => new URL(request.url()).pathname === ownPath + '/status',
+    );
+    const readResponse = page.waitForResponse(
+      (response) => new URL(response.url()).pathname === ownPath + '/status',
+    );
+    const generation = await page.locator('body').getAttribute('data-control-read-generation');
+    await page.locator('#refresh').click();
+    await nextRead;
+    const button = await page.getByRole('button', { name: label, exact: true }).elementHandle();
+    await button.scrollIntoViewIfNeeded();
+    const box = await button.boundingBox();
+    if (!box) throw Error('Send button unavailable');
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    releaseRead();
+    if ((await readResponse).status() !== 200) throw Error('Own status failed');
+    await page.waitForFunction(
+      (before) => Number(document.body.dataset.controlReadGeneration) > Number(before),
+      generation,
+    );
+    if (
+      !(await button.evaluate(
+        (node) =>
+          node === document.querySelector('#raid button.send-off') &&
+          node.isConnected &&
+          !node.disabled,
+      ))
+    )
+      throw Error('Polling replaced or disabled pressed Send Off');
+    await page.unroute(pattern, routeRead);
+    await page.mouse.up();
+  } else await page.getByRole('button', { name: label, exact: true }).click();
   phase = `${label}: own-response`;
   const response = await post;
   await page.waitForFunction(() => Boolean(window.__pilotPostProof));
@@ -252,6 +296,47 @@ try {
     throw new Error('Mock claim did not transfer');
   checks.push({
     name: 'Two mocked consents, own controls, single mocked raid, claim and both overlays',
+    passed: true,
+  });
+  phase = 'status-error-expiry-recovery';
+  await page.setViewportSize({ width: 1280, height: 900 });
+  const errorPattern = `**/control/${OTHER}/status`;
+  const unavailable = (route) =>
+    route.fulfill({ status: 503, json: { error: 'Status unavailable' } });
+  await page.route(errorPattern, unavailable);
+  await page.goto(`${origin}/control/${OTHER}`);
+  await page.locator('#result').filter({ hasText: 'Status unavailable or invalid' }).waitFor();
+  if (await page.locator('#first-keep').isEnabled()) throw Error('Failed status enabled action');
+  await page.unroute(errorPattern, unavailable);
+  await page.locator('#refresh').click();
+  await page.locator('#result').filter({ hasText: 'Session read.' }).waitFor();
+  const beforeExpiryPosts = f.calls.filter(
+    (call) => new URL(call.url).pathname === '/helix/raids',
+  ).length;
+  f.advance(12 * 3600000 + 1);
+  await page.locator('#refresh').click();
+  await page.locator('#result').filter({ hasText: 'expired or unauthorized' }).waitFor();
+  if (await page.locator('#first-keep').isEnabled()) throw Error('Expired session enabled action');
+  await f.login(OTHER);
+  await context.addCookies([
+    {
+      name: '__Host-rr_control_' + OTHER,
+      value: f.cookies[OTHER].split('=')[1],
+      url: origin,
+      secure: true,
+      httpOnly: true,
+      sameSite: 'Lax',
+    },
+  ]);
+  await page.locator('#refresh').click();
+  await page.locator('#result').filter({ hasText: 'Session read.' }).waitFor();
+  if (
+    f.calls.filter((call) => new URL(call.url).pathname === '/helix/raids').length !==
+    beforeExpiryPosts
+  )
+    throw Error('Recovery retried Raid POST');
+  checks.push({
+    name: 'Real status503 and expired-session401 clear reading state; fresh mocked consent recovers without repeating Raid POST',
     passed: true,
   });
 } catch (error) {

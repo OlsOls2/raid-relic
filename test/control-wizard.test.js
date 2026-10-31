@@ -338,3 +338,165 @@ test('wizard has four tasks, unique action controls, Advanced-only operator deta
   );
   assert.doesNotMatch(js, /10001|\/api\/|WebSocket|localStorage|sessionStorage/);
 });
+
+for (const kind of ['memory', 'firestore']) {
+  test(`${kind}: explicit target observations stay bounded and fresh without Setup, session renewal or game actions`, async () => {
+    const f = await pilotFixture(kind, {
+      extraBotScopes: ['user:read:moderated_channels'],
+      chronicleEnv: { SEEKERS_ENABLED: 'true' },
+    });
+    for (const id of [HOME, OTHER]) f.streams.set(id, { ...f.streams.get(id), viewer_count: 5 });
+    for (const id of [BOT, HOME, OTHER]) await f.login(id);
+    for (const id of [HOME, OTHER]) {
+      await f.control(id, 'bootstrap');
+      f.advance();
+      await f.control(id, 'keep');
+      f.advance();
+    }
+    const ownStatus = async () => {
+      const response = await f.request(`/control/${HOME}/status`, 'GET', {
+        cookie: f.cookies[HOME],
+      });
+      assert.equal(response.status, 200);
+      return JSON.parse(response.body);
+    };
+    const sessionHash = createHash('sha256').update(f.cookies[HOME].split('=')[1]).digest('hex');
+    const originalSession = await f.runtime.store.getControlSession(HOME, sessionHash, f.now());
+    const originalRegistry = await f.runtime.state.getKeeperRegistry();
+    const jobs = await Promise.all([HOME, OTHER].map((id) => f.runtime.store.getJob(id)));
+    f.advance(60001);
+    const stale = await ownStatus();
+    assert.deepEqual(stale.pilot.candidates, []);
+    assert.equal(stale.pilot.candidatesObservedAt, null);
+    const beforeDenied = f.calls.length;
+    assert.equal(
+      (await f.control(HOME, 'observe-targets', { origin: 'https://wrong.invalid' })).status,
+      403,
+    );
+    assert.equal((await f.control(HOME, 'observe-targets', {}, { csrf: 'forged' })).status, 403);
+    assert.equal(
+      (
+        await f.request(
+          `/control/${HOME}`,
+          'POST',
+          { origin: 'https://pilot.example', 'content-type': 'application/json' },
+          Buffer.from(JSON.stringify({ action: 'observe-targets', csrf: stale.csrf })),
+        )
+      ).status,
+      403,
+    );
+    assert.equal(f.calls.length, beforeDenied);
+    const streamCalls = () =>
+      f.calls.filter((call) => new URL(call.url).pathname === '/helix/streams').length;
+    const initialStreams = streamCalls();
+    const results = await Promise.all(
+      Array.from({ length: 4 }, () => f.control(HOME, 'observe-targets')),
+    );
+    for (const response of results) {
+      assert.equal(response.status, 200);
+      assert.equal(response.headers['set-cookie'], undefined);
+      assert.equal(JSON.parse(response.body).status, 'observed');
+    }
+    assert.equal(streamCalls(), initialStreams + 1);
+    const fresh = await ownStatus();
+    assert.deepEqual(
+      fresh.pilot.candidates.map((row) => row.id),
+      [OTHER],
+    );
+    assert.equal(fresh.pilot.candidatesObservedAt, f.now());
+    const activeStream = f.streams.get(OTHER);
+    f.advance(60001);
+    let releaseObservation, signalObservation;
+    const held = new Promise((resolve) => {
+      releaseObservation = resolve;
+    });
+    const started = new Promise((resolve) => {
+      signalObservation = resolve;
+    });
+    f.hook(async () => {
+      signalObservation();
+      await held;
+    });
+    const inFlightObservation = f.control(HOME, 'observe-targets');
+    await started;
+    const joinedStatus = ownStatus();
+    releaseObservation();
+    assert.equal((await inFlightObservation).status, 200);
+    assert.deepEqual(
+      (await joinedStatus).pilot.candidates.map((row) => row.id),
+      [OTHER],
+    );
+    f.hook(undefined);
+    for (let i = 0; i < 3; i++) {
+      f.advance(60001);
+      assert.equal((await f.control(HOME, 'observe-targets')).status, 200);
+      assert.deepEqual(
+        (await ownStatus()).pilot.candidates.map((row) => row.id),
+        [OTHER],
+      );
+    }
+    f.streams.delete(OTHER);
+    f.advance(60001);
+    await f.control(HOME, 'observe-targets');
+    assert.deepEqual(
+      (await ownStatus()).pilot.candidates,
+      [],
+      'provider-offline cannot survive an older live observation',
+    );
+    f.streams.set(OTHER, activeStream);
+    f.advance(60001);
+    await f.control(HOME, 'observe-targets');
+    assert.deepEqual(
+      (await ownStatus()).pilot.candidates.map((row) => row.id),
+      [OTHER],
+    );
+    assert.deepEqual(
+      await f.runtime.store.getControlSession(HOME, sessionHash, f.now()),
+      originalSession,
+    );
+    assert.deepEqual(await f.runtime.state.getKeeperRegistry(), originalRegistry);
+    assert.deepEqual(
+      await Promise.all([HOME, OTHER].map((id) => f.runtime.store.getJob(id))),
+      jobs,
+    );
+    assert.equal((await f.runtime.state.getPublicJourney()).rings, 0);
+    assert.equal(
+      f.calls.filter((call) =>
+        ['/helix/raids', '/helix/chat/messages'].includes(new URL(call.url).pathname),
+      ).length,
+      0,
+    );
+    const callsBeforeExpiry = f.calls.length;
+    f.advance(originalSession.expiresAt - f.now());
+    assert.equal((await f.control(HOME, 'observe-targets', {}, { csrf: fresh.csrf })).status, 403);
+    assert.equal(
+      (await f.request(`/control/${HOME}/status`, 'GET', { cookie: f.cookies[HOME] })).status,
+      401,
+    );
+    assert.equal(f.calls.length, callsBeforeExpiry);
+    await f.login(HOME);
+    assert.equal(
+      (await f.request(`/control/${HOME}/status`, 'GET', { cookie: f.cookies[HOME] })).status,
+      200,
+    );
+  });
+}
+
+test('background control refresh keeps keyed action nodes and reports initial read/action outcomes', async () => {
+  const source = await readFile('public/control.js', 'utf8');
+  const refresh = source.slice(
+    source.indexOf('async function refresh('),
+    source.indexOf('const poller ='),
+  );
+  assert.match(refresh, /if \(!csrf\) disable\(true\)/);
+  assert.doesNotMatch(
+    refresh,
+    /target\.replaceChildren|document\.getElementById\('raid'\)\.replaceChildren/,
+  );
+  assert.match(source, /const sendButton = document\.createElement\('button'\)/);
+  assert.match(refresh, /reconcileTargets\(candidates, selectedTarget\)/);
+  assert.match(refresh, /node\.dataset\.controlAction === action/);
+  assert.match(refresh, /status\.textContent === 'Reading your session…'/);
+  assert.match(source, /sendResult\.textContent = status\.textContent;\s*await poller\.pause\(\)/);
+  assert.match(refresh, /sessionRemaining = value\.expiresAt - serverNow/);
+});

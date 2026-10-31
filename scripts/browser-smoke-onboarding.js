@@ -714,6 +714,12 @@ try {
     (await f.request(`/control/${OTHER}/status`, 'GET', { cookie: f.cookies[OTHER] })).body,
   );
   const now = await page.evaluate(() => Date.now());
+  // Translate only this response's clock domain, preserving its remaining TTL.
+  // The underlying authenticated server session is neither renewed nor changed.
+  const remainingTTL = savedStatus.expiresAt - savedStatus.pilot.statusReadAt;
+  assert.ok(Number.isSafeInteger(remainingTTL) && remainingTTL > 0 && remainingTTL <= 43200000);
+  const mockExpiresAt = now + remainingTTL;
+  assert.ok(Number.isSafeInteger(mockExpiresAt));
   let observedAt = now - 30000;
   let offlineObservation = false;
   const statusPattern = `**/control/${OTHER}/status`;
@@ -724,6 +730,7 @@ try {
     routeHitCount++;
     const value = {
       ...savedStatus,
+      expiresAt: mockExpiresAt,
       pilot: {
         ...savedStatus.pilot,
         online: offlineObservation ? false : savedStatus.pilot.online,
@@ -941,6 +948,39 @@ try {
   await page.waitForFunction(() => !document.querySelector('#refresh').disabled);
   assert.equal(controlReads, idleReadCount + 1);
   assert.equal(f.calls.length, before, 'Idle GET cannot rotate grants or reconcile');
+  stage = 'explicit-visible-target-checks';
+  await page.getByRole('link', { name: 'Send Off', exact: true }).click();
+  const registryBeforeChecks = await f.runtime.state.getKeeperRegistry();
+  const observationPosts = [];
+  const inspectObservation = (request) => {
+    if (request.method() === 'POST' && new URL(request.url()).pathname === `/control/${OTHER}`) {
+      const body = request.postDataJSON();
+      if (body?.action === 'observe-targets') observationPosts.push(1);
+    }
+  };
+  page.on('request', inspectObservation);
+  const observedResponse = page.waitForResponse(
+    (response) =>
+      response.request().method() === 'POST' &&
+      new URL(response.url()).pathname === `/control/${OTHER}` &&
+      response.request().postDataJSON()?.action === 'observe-targets',
+  );
+  await page.getByRole('button', { name: 'Keep eligible targets updated', exact: true }).click();
+  await page.clock.runFor(1);
+  assert.equal((await observedResponse).status(), 200);
+  await page
+    .locator('#target-check-status')
+    .filter({ hasText: /Visible target checks are on|Target observation unavailable/ })
+    .waitFor();
+  assert.equal(observationPosts.length, 1);
+  assert.equal(await page.locator('#observe-targets').getAttribute('aria-pressed'), 'true');
+  assert.deepEqual(await f.runtime.state.getKeeperRegistry(), registryBeforeChecks);
+  // Stop via the same explicit control; later status reads cannot silently restart it.
+  await page.getByRole('button', { name: 'Keep eligible targets updated', exact: true }).click();
+  await page.clock.runFor(30001);
+  assert.equal(observationPosts.length, 1);
+  page.off('request', inspectObservation);
+  stage = 'expired-session';
   f.advance(12 * 3600000 + 1);
   await page.locator('#refresh').click();
   await page.waitForFunction(() =>

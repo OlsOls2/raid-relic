@@ -275,6 +275,12 @@ export function createReceiving({
   return {
     enabled,
     page,
+    // Explicit authenticated control observation only; shared one-minute,
+    // one-flight provider budget. No subscription, consent or game mutation.
+    async observeTargets() {
+      await observations();
+      return this.observedAt();
+    },
     async status(id) {
       if (!ids.includes(id)) return { member: false, reason: 'not-opted-in' };
       const raw = await state.getReceivingView(now());
@@ -295,7 +301,9 @@ export function createReceiving({
     async candidates(source, { cachedOnly = false } = {}) {
       if (!enabled) return state.getKeeperCandidates(source);
       const value = await state.getReceivingView(now());
-      const observation = cachedOnly ? cached : await observations();
+      // A read may join an already-authorized observation, but never starts one.
+      // This avoids a transient empty list while another control refreshes it.
+      const observation = cachedOnly ? (pending ? await pending : cached) : await observations();
       if (!observation || now() < observation.at || now() - observation.at >= 60000) return [];
       const eligible = await state.getKeeperCandidates(source);
       const seekers = new Set(value.seekers.map((row) => row.id));

@@ -5,7 +5,7 @@ import {
   setupRetryAllowed,
   readinessLights,
 } from './control-view.js';
-import { boundedResponse, createControlPoller } from './control-read.js';
+import { boundedResponse, createControlPoller, ControlReadError } from './control-read.js';
 import { mountFirstRun } from './first-run.js';
 const forgeLink = document.getElementById('forge-owner-link');
 if (forgeLink) forgeLink.href = `${location.pathname}/forge`;
@@ -68,9 +68,64 @@ document.getElementById('copy-mod').onclick = async () => {
 };
 let candidates = [];
 let readGeneration = 0,
-  readController;
+  readController,
+  sessionExpiryTimer,
+  observationArmed = false,
+  nextObservationAt = 0;
+let allowedActions = [];
 const target = document.getElementById('raid-target');
 const empty = document.getElementById('target-empty');
+// Stable identity across GET refreshes, including pointerdown -> response -> up.
+const sendButton = document.createElement('button');
+sendButton.className = 'send-off';
+sendButton.setAttribute('aria-describedby', 'send-disabled-reason target-help');
+let pressedTarget = null;
+sendButton.onpointerdown = () => {
+  pressedTarget = target.value;
+};
+sendButton.onpointercancel = () => {
+  pressedTarget = null;
+};
+sendButton.onkeydown = () => {
+  pressedTarget = null;
+};
+sendButton.onclick = () => {
+  const intended = pressedTarget ?? target.value;
+  pressedTarget = null;
+  if (intended !== target.value) {
+    sendResult.textContent =
+      'Targets changed during this click. Review the selected Keeper; no request was sent.';
+    return;
+  }
+  return run(`send:${intended}`);
+};
+document.getElementById('raid').append(sendButton);
+const labelTarget = () => {
+  sendButton.textContent = `Send Off to ${names[target.value] ?? 'an eligible Keeper'}`;
+};
+target.onchange = labelTarget;
+labelTarget();
+sendButton.hidden = true;
+function reconcileTargets(rows, selected) {
+  const existing = new Map([...target.options].map((option) => [option.value, option]));
+  rows.forEach((candidate, index) => {
+    const option = existing.get(candidate.id) ?? document.createElement('option');
+    option.value = candidate.id;
+    const text = `${candidate.login} · observed online${Number.isSafeInteger(candidate.viewers) && candidate.viewers >= 0 ? ' · ' + candidate.viewers + ' Twitch-reported viewers' : ''}`;
+    if (option.textContent !== text) option.textContent = text;
+    if (target.options[index] !== option)
+      target.insertBefore(option, target.options[index] ?? null);
+    existing.delete(candidate.id);
+  });
+  for (const option of existing.values()) option.remove();
+  if (rows.some((candidate) => candidate.id === selected)) target.value = selected;
+  if (!rows.length) sendButton.remove();
+  else if (sendButton.parentElement !== document.getElementById('raid'))
+    document.getElementById('raid').append(sendButton);
+  sendButton.hidden = rows.length === 0;
+  labelTarget();
+}
+
 const labels = {
   'mark-links': 'Send queued public mark-history link',
   'seek-on': 'Join public Seeker queue',
@@ -87,6 +142,7 @@ const labels = {
 };
 const status = document.getElementById('result');
 const sendResult = document.getElementById('send-result');
+let readMessage = true;
 function renderLights(pilot, actions = []) {
   for (const [key, value] of Object.entries(readinessLights(pilot, actions))) {
     const light = document.getElementById(`light-${key}`),
@@ -115,6 +171,9 @@ function disable(value) {
     b.disabled = value || !csrf;
   });
   document.getElementById('refresh').disabled = value;
+  document.getElementById('observe-targets').disabled =
+    value || !csrf || !allowedActions.includes('observe-targets');
+  document.getElementById('observe-targets').setAttribute('aria-pressed', String(observationArmed));
   document.getElementById('expire-handoff').disabled = value || !expiryRecovery?.canExpire;
   target.disabled = value || !csrf || !candidates.length;
   document.getElementById('cancel-queued').disabled = value || !recovery?.canCancel;
@@ -153,6 +212,12 @@ function disable(value) {
   document.getElementById('stop-setup').disabled = false;
 }
 function invalidate() {
+  readMessage = true;
+  clearTimeout(sessionExpiryTimer);
+  observationArmed = false;
+  allowedActions = [];
+  document.getElementById('target-check-status').textContent =
+    'Target checks stopped. Reconnect or read your own session before starting them again.';
   latestPilot = null;
   firstRun.clear();
   if (consentURL) {
@@ -176,26 +241,56 @@ async function refresh({ preserveResult = true, signal } = {}) {
   const generation = ++readGeneration;
   readController?.abort();
   const request = new AbortController();
+  let timedOut = false;
+  // Observation + GET share the existing eight-second read budget.
+  const readDeadline = setTimeout(() => {
+    timedOut = true;
+    request.abort();
+  }, 8000);
   readController = request;
+  const obsoleteRead = () => {
+    if (timedOut) throw new ControlReadError('timeout');
+    return generation !== readGeneration || request.signal.aborted;
+  };
   const abort = () => request.abort();
   signal?.addEventListener('abort', abort, { once: true });
   if (signal?.aborted) request.abort();
-  disable(true);
+  // Background reads never lock or tear down a usable action surface.
+  if (!csrf) disable(true);
   if (!preserveResult) status.textContent = 'Reading your session…';
-  document.getElementById('ledger').replaceChildren();
   const selectedTarget = target.value;
-  candidates = [];
-  target.replaceChildren();
-  target.disabled = true;
-  empty.hidden = false;
-  document.getElementById('raid').replaceChildren();
   try {
+    if (
+      observationArmed &&
+      csrf &&
+      allowedActions.includes('observe-targets') &&
+      Date.now() >= nextObservationAt
+    ) {
+      nextObservationAt = Date.now() + 30000;
+      const observation = await boundedResponse(
+        `/control/${id}`,
+        {
+          method: 'POST',
+          cache: 'no-store',
+          signal: request.signal,
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ action: 'observe-targets', csrf }),
+        },
+        { json: true },
+      );
+      if (obsoleteRead()) return;
+      if (observationArmed)
+        document.getElementById('target-check-status').textContent =
+          observation.value?.status === 'observed'
+            ? 'Visible target checks are on. Only fresh matching live observations are shown; this does not renew your session.'
+            : 'Target observation unavailable; no target is assumed live. Checks remain bounded; reconnect if authorization expired.';
+    }
     const response = await boundedResponse(
       `/control/${id}/status`,
       { cache: 'no-store', signal: request.signal },
       { json: true },
     );
-    if (generation !== readGeneration || request.signal.aborted) return;
+    if (obsoleteRead()) return;
     const value = response.value;
     if (
       !value ||
@@ -211,7 +306,26 @@ async function refresh({ preserveResult = true, signal } = {}) {
     document.getElementById('authorization-status').textContent =
       'Fresh Keeper authorization is not checked by status. If targets are missing, use Check my Twitch connection; reconnect this matching Keeper if it fails. Refresh status never renews tokens.';
     csrf = value.csrf;
+    allowedActions = value.actions;
+    clearTimeout(sessionExpiryTimer);
+    const serverNow = value.pilot.statusReadAt;
+    const sessionRemaining = value.expiresAt - serverNow;
+    if (
+      !Number.isSafeInteger(value.expiresAt) ||
+      !Number.isSafeInteger(serverNow) ||
+      sessionRemaining <= 0 ||
+      sessionRemaining > 43200000
+    )
+      throw Error('Expired status');
+    sessionExpiryTimer = setTimeout(() => {
+      invalidate();
+      stopSetup();
+      poller.stop();
+      status.textContent =
+        'Control session expired. Reconnect this matching Keeper; target checks and actions are stopped.';
+    }, sessionRemaining);
     latestPilot = value.pilot;
+    document.getElementById('ledger').replaceChildren();
     firstRun.observe(value.pilot, value.actions);
     document.getElementById('simulator').hidden = value.pilot.mode !== 'simulator';
     simulated = value.pilot.mode === 'simulator';
@@ -294,58 +408,53 @@ async function refresh({ preserveResult = true, signal } = {}) {
         dd.textContent = JSON.stringify(value.pilot[key], null, 2);
         document.getElementById('ledger').append(dt, dd);
       }
-    for (const group of ['setup', 'keeper', 'raid', 'advanced-send-actions'])
-      document.getElementById(group).replaceChildren();
     candidates = (value.pilot.candidates ?? []).filter(
       (c) => c.id !== id && names[c.id] && c.observedOnline && c.optedIn && c.eligible,
     );
-    for (const candidate of candidates) {
-      const option = document.createElement('option');
-      option.value = candidate.id;
-      option.textContent = `${candidate.login} · observed online${Number.isSafeInteger(candidate.viewers) && candidate.viewers >= 0 ? ' · ' + candidate.viewers + ' Twitch-reported viewers' : ''}`;
-      target.append(option);
-    }
-    if (candidates.some((c) => c.id === selectedTarget)) target.value = selectedTarget;
-    target.disabled = busy || !candidates.length;
+    reconcileTargets(candidates, selectedTarget);
+    target.disabled = actionInFlight || !candidates.length;
     empty.hidden = candidates.length > 0;
-    if (candidates.length) {
-      const send = document.createElement('button');
-      const label = () => {
-        send.className = 'send-off';
-        send.textContent = `Send Off to ${names[target.value]}`;
-      };
-      label();
-      target.onchange = label;
-      send.setAttribute('aria-describedby', 'send-disabled-reason target-help');
-      send.onclick = () => run(`send:${target.value}`);
-      document.getElementById('raid').append(send);
-    }
+    const retainedActions = new Set();
     for (const action of value.actions.filter(
       (a) =>
-        !['logout', 'bootstrap', 'keep', 'seek-on', 'refresh-authorization'].includes(a) &&
-        !a.startsWith('send:'),
+        ![
+          'logout',
+          'bootstrap',
+          'keep',
+          'seek-on',
+          'refresh-authorization',
+          'observe-targets',
+        ].includes(a) && !a.startsWith('send:'),
     )) {
-      const button = document.createElement('button');
+      retainedActions.add(action);
+      let button = [...document.querySelectorAll('button[data-control-action]')].find(
+        (node) => node.dataset.controlAction === action,
+      );
+      if (!button) {
+        button = document.createElement('button');
+        button.dataset.controlAction = action;
+        button.onclick = () => run(action);
+      }
       button.textContent = action.startsWith('send:')
         ? `Send Off to ${names[action.slice(5)]}`
         : labels[action];
       button.setAttribute('aria-describedby', 'first-action-reason');
-      button.onclick = () => run(action);
-      document
-        .getElementById(
-          action === 'bootstrap'
-            ? 'setup'
-            : action === 'process' || action.startsWith('send:')
-              ? 'advanced-send-actions'
-              : 'keeper',
-        )
-        .append(button);
+      const group = document.getElementById(
+        action === 'process' ? 'advanced-send-actions' : 'keeper',
+      );
+      if (button.parentElement !== group) group.append(button);
     }
-    if (!preserveResult)
-      status.textContent = 'Status refreshed. Review both channels before Send Off.';
+    for (const button of document.querySelectorAll('button[data-control-action]'))
+      if (!retainedActions.has(button.dataset.controlAction)) button.remove();
+    if (!preserveResult || readMessage || status.textContent === 'Reading your session…') {
+      status.textContent =
+        'Session read. Review current targets; enable visible target checks if observations are missing.';
+      readMessage = false;
+    }
+    document.body.dataset.controlReadGeneration = String(generation);
     return true;
   } catch (error) {
-    if (generation !== readGeneration || request.signal.aborted) return;
+    if (generation !== readGeneration || (request.signal.aborted && !timedOut)) return;
     invalidate();
     expiryRecovery = null;
     document.getElementById('expire-handoff').disabled = true;
@@ -360,13 +469,14 @@ async function refresh({ preserveResult = true, signal } = {}) {
     }
     if (!preserveResult || !sendLocked)
       status.textContent =
-        error?.code === 'timeout'
+        timedOut || error?.code === 'timeout'
           ? 'Status timed out. Retry Refresh status; reconnect only this matching Keeper if authorization expired.'
           : error?.code === 'authorization'
             ? 'Control session expired or unauthorized. Reconnect this matching Keeper, then Retry Refresh status.'
             : 'Status unavailable or invalid. Retry Refresh status; actions are disabled until a fresh authorized status is read.';
     return false;
   } finally {
+    clearTimeout(readDeadline);
     signal?.removeEventListener('abort', abort);
     if (generation === readGeneration) disable(actionInFlight);
   }
@@ -392,6 +502,13 @@ async function run(action, { continued = false } = {}) {
     await poller.pause();
   }
   if (busy || !csrf || document.hidden) {
+    if (!continued) {
+      const reason = !csrf
+        ? 'Sign in first: reconnect this matching Keeper, then refresh status.'
+        : 'Wait for the current action to finish; no request was sent.';
+      status.textContent = reason;
+      if (action.startsWith('send:')) sendResult.textContent = reason;
+    }
     if (continued) {
       stopSetup();
       poller.resume();
@@ -399,16 +516,26 @@ async function run(action, { continued = false } = {}) {
     return;
   }
   if (action.startsWith('send:')) {
+    if (sendLocked || (latestPilot?.intent && latestPilot.intent !== 'expired-handoff')) {
+      sendResult.textContent =
+        'An existing or uncertain request is locked. Review its saved status; no new request was sent.';
+      return;
+    }
     if (!candidates.some((c) => c.id === action.slice(5))) {
-      status.textContent = 'Refresh status to choose an observed eligible Keeper.';
+      status.textContent =
+        'Read status and start visible target checks to choose an observed eligible Keeper.';
+      sendResult.textContent = status.textContent;
       return;
     }
     if (
       !confirm(
         `Request a real Twitch raid to ${names[action.slice(5)]}? This can affect your live broadcast.`,
       )
-    )
+    ) {
+      sendResult.textContent =
+        'Confirmation cancelled or unavailable. No Send Off request was sent.';
       return;
+    }
   }
   if (action === 'bootstrap' && !continued) {
     stopSetup();
@@ -423,6 +550,11 @@ async function run(action, { continued = false } = {}) {
   dispatchInFlight = action.startsWith('send:') || action === 'process';
   if (dispatchInFlight) sendLocked = true;
   disable(true);
+  readMessage = false;
+  status.textContent = dispatchInFlight
+    ? 'Sending request… Wait; do not repeat.'
+    : 'Request pending…';
+  if (dispatchInFlight) sendResult.textContent = status.textContent;
   await poller.pause();
   let retrySetup = false;
   try {
@@ -434,6 +566,15 @@ async function run(action, { continued = false } = {}) {
     });
     if (action === 'logout' && response.ok) {
       location.assign(`/control/${id}`);
+      return;
+    }
+    if ([401, 403].includes(response.status)) {
+      invalidate();
+      stopSetup();
+      poller.stop();
+      status.textContent =
+        'Control session expired or unauthorized. Reconnect this matching Keeper; no new Send Off is authorized.';
+      if (dispatchInFlight) sendResult.textContent = status.textContent;
       return;
     }
     let value;
@@ -495,6 +636,16 @@ async function run(action, { continued = false } = {}) {
     } else if (action === 'bootstrap') stopSetup();
   }
 }
+document.getElementById('observe-targets').onclick = () => {
+  if (busy || !csrf || !allowedActions.includes('observe-targets')) return;
+  observationArmed = !observationArmed;
+  nextObservationAt = 0;
+  document.getElementById('target-check-status').textContent = observationArmed
+    ? 'Visible target checks requested; waiting for a fresh observation. Session expiry is unchanged.'
+    : 'Visible target checks stopped; saved observations still expire normally.';
+  disable(false);
+  poller.resume({ immediate: true });
+};
 document.getElementById('refresh').onclick = () => {
   if (!busy) {
     poller.start();

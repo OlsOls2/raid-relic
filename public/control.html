@@ -178,6 +178,19 @@
           <p id="target-observation-age" aria-live="off">
             Saved target-observation age unavailable; status read age is not provider freshness.
           </p>
+          <button
+            id="observe-targets"
+            type="button"
+            aria-pressed="false"
+            aria-describedby="target-check-status"
+            disabled
+          >
+            Keep eligible targets updated
+          </button>
+          <p id="target-check-status" role="status">
+            Start visible target checks explicitly. They pause while hidden, never set up a channel
+            or renew this session, and do not make stale/offline targets eligible.
+          </p>
           <p id="target-empty" role="status">
             No eligible recipient is currently observed. The three configured creator test channels
             are raidrelichq, olsols2 and olsols3, not evidence of adoption or open signup. Another
