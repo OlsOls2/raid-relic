@@ -274,9 +274,30 @@ test('provenance and private draft separate historical/published/local proof and
     ['SHIPPED', 'PARTLY DONE', 'NOT STARTED'].map(
       (state) => rows.filter((row) => row[2] === state).length,
     ),
-    [59, 13, 1],
+    [60, 12, 1],
   );
-  assert.match(current, /G3\.05 \| PARTLY DONE[^\n]*12 logical px/);
+  assert.match(
+    current,
+    /G3\.05 \| SHIPPED[^\n]*parent actual full-overlay native browser PASS9 checks/,
+  );
+  assert.match(
+    current,
+    /G3\.05[^\n]*Whole painted border-box overlap0[^\n]*FHD1920×1080 and960×540[^\n]*normal\/reduced idle, source\/host takeover and completion/,
+  );
+  assert.match(
+    current,
+    /G3\.05[^\n]*Default560×180 at32px safe gives4px FHD\/2px960 clearance[^\n]*Takeover336×720 left-band gives16px FHD\/8px960 clearance/,
+  );
+  assert.match(
+    current,
+    /G3\.05[^\n]*not physical OBS[^\n]*commit\/publication pending[^\n]*not geometry deployed in historical R0/,
+  );
+  const historical = panel.split('<!-- PANEL_CURRENT_END -->')[1];
+  assert.match(
+    historical,
+    /G3\.05 \| PARTLY DONE[^\n]*Historical source304\/R0, before340[^\n]*12 logical px \/ 2,688 FHD square px[^\n]*960:672[^\n]*not satisfied/,
+  );
+  assert.match(panel, /R0 historical assessment remains59\/13\/1/);
   assert.match(current, /G6\.07 \| NOT STARTED/);
   assert.match(panel, /53 SHIPPED, 19 PARTLY DONE, 1 NOT STARTED/);
   assert.match(

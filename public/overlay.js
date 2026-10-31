@@ -88,10 +88,24 @@ if (options.layout === 'full' && new URLSearchParams(location.search).has('pos')
   document.body.dataset.fullPosition = 'true';
 const fitOverlay = () => {
   const fit = Math.min(innerWidth / 1920, innerHeight / 1080);
-  document.body.style.setProperty('--overlay-scale', String(options.scale * fit));
+  const safe = (options.layout === 'card' ? 32 : 48) * fit;
+  // Responsive fit honours the requested scale until the whole plate would
+  // enter the central 60%. Keep default card in the bottom/top band and the
+  // taller verified-arrival column in the left band; never crop content.
+  const cardScale = Math.min(options.scale * fit, (innerHeight * 0.2 - safe - fit) / 180);
+  const arrivalScale = Math.min(
+    options.scale * fit,
+    (innerWidth * 0.2 - safe - fit) / 336,
+    (innerHeight - 2 * safe) / 720,
+  );
+  document.body.style.setProperty(
+    '--overlay-scale',
+    String(options.layout === 'card' ? cardScale : options.scale * fit),
+  );
+  document.body.style.setProperty('--overlay-arrival-scale', String(arrivalScale));
   // Full mode uses its original responsive CSS, without FHD fitting or safe-area shrink.
   document.body.style.setProperty('--overlay-requested-scale', String(options.scale));
-  document.body.style.setProperty('--overlay-safe', `${48 * fit}px`);
+  document.body.style.setProperty('--overlay-safe', `${safe}px`);
   document.body.style.setProperty(
     '--corner-safe',
     `${Math.min(innerWidth, innerHeight) <= 256 ? 0 : 48 * fit}px`,

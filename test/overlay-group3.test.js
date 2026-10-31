@@ -13,6 +13,30 @@ import { BOT_COPY, claimVoteCopy } from '../public/ritual-copy.js';
 import { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';
 import { overlaySoakOptions } from '../test-support/overlay-soak.js';
 
+test('whole card plate geometry clears central60 without reducing logical text or cropping', async () => {
+  const css = await readFile(new URL('../public/overlay.css', import.meta.url), 'utf8');
+  const js = await readFile(new URL('../public/overlay.js', import.meta.url), 'utf8');
+  assert.match(js, /options\.layout === 'card' \? 32 : 48/);
+  assert.match(
+    js,
+    /Math\.min\(\s*options\.scale \* fit,\s*\(innerHeight \* 0\.2 - safe - fit\) \/ 180\s*,?\s*\)/,
+  );
+  assert.match(
+    css,
+    /body\.layout-card\.arrival-takeover \.relic-overlay\s*\{\s*position: fixed;\s*width: 336px;\s*height: 720px;/,
+  );
+  for (const size of [44, 72, 32, 28])
+    assert.match(css, new RegExp(`(?:font:|font-size:)[^;]*\\b${size}px`));
+  for (const fit of [1, 0.5]) {
+    const central = { left: 384 * fit, top: 216 * fit, right: 1536 * fit, bottom: 864 * fit };
+    const area = (r) =>
+      Math.max(0, Math.min(r.right, central.right) - Math.max(r.left, central.left)) *
+      Math.max(0, Math.min(r.bottom, central.bottom) - Math.max(r.top, central.top));
+    assert.equal(area({ left: 32 * fit, right: 592 * fit, top: 868 * fit, bottom: 1048 * fit }), 0);
+    assert.equal(area({ left: 32 * fit, right: 368 * fit, top: 328 * fit, bottom: 1048 * fit }), 0);
+  }
+});
+
 test('closed overlay layouts, scale, positions, OBS admission and local preview do not widen server authority', () => {
   assert.deepEqual(overlayOptions(), {
     layout: 'card',

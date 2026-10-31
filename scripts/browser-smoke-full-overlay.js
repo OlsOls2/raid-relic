@@ -214,9 +214,11 @@ try {
       document.body.dataset.connection === 'connected' &&
       Number(document.querySelector('canvas.relic3d')?.dataset.frames) > 0,
   );
-  const geometry = async () =>
-    card.evaluate(() => {
-      const plate = document.querySelector('.relic-overlay').getBoundingClientRect();
+  const geometry = async (target = card) =>
+    target.evaluate(() => {
+      const plateNode = document.querySelector('.relic-overlay');
+      const plate = plateNode.getBoundingClientRect();
+      const plateStyle = getComputedStyle(plateNode);
       const central = {
         left: innerWidth * 0.2,
         right: innerWidth * 0.8,
@@ -226,9 +228,20 @@ try {
       const area = (a, b) =>
         Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) *
         Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
-      const critical = ['.archive', 'h1', '#status', '#count'].map((q) =>
-        document.querySelector(q).getBoundingClientRect(),
-      );
+      const critical = [
+        '.archive',
+        'h1',
+        '#status',
+        '#count',
+        '#arrival-title',
+        '#arrival-countdown',
+        '#arrival-action',
+        '#arrival-counts',
+        '#arrival-progress',
+      ]
+        .map((q) => document.querySelector(q))
+        .filter((n) => n && n.getClientRects().length)
+        .map((n) => n.getBoundingClientRect());
       return {
         x: plate.x,
         y: plate.y,
@@ -236,14 +249,31 @@ try {
         height: plate.height,
         criticalOverlap: critical.reduce((n, r) => n + area(r, central), 0),
         plateOverlap: area(plate, central),
+        // getBoundingClientRect includes the transformed outer border box.
+        // Reject outside shadow/filter/outline paint instead of ignoring it.
+        noOuterPaint:
+          plateStyle.boxShadow === 'none' &&
+          plateStyle.filter === 'none' &&
+          (plateStyle.outlineStyle === 'none' || parseFloat(plateStyle.outlineWidth) === 0),
+        unmaskedPlate:
+          plateStyle.clipPath === 'none' &&
+          plateStyle.overflowX !== 'hidden' &&
+          plateStyle.overflowY !== 'hidden',
+        criticalInside: critical.every(
+          (r) =>
+            r.left >= plate.left &&
+            r.right <= plate.right &&
+            r.top >= plate.top &&
+            r.bottom <= plate.bottom,
+        ),
         heading: parseFloat(getComputedStyle(document.querySelector('h1')).fontSize),
         body: parseFloat(getComputedStyle(document.querySelector('#status')).fontSize),
         artSlotWidth: document.querySelector('.archive').getBoundingClientRect().width,
         artSlotHeight: document.querySelector('.archive').getBoundingClientRect().height,
         svgElementWidth: document.querySelector('.crystal').getBoundingClientRect().width,
         svgElementHeight: document.querySelector('.crystal').getBoundingClientRect().height,
-        rasterWidth: document.querySelector('canvas.relic3d').width,
-        rasterHeight: document.querySelector('canvas.relic3d').height,
+        rasterWidth: document.querySelector('canvas.relic3d')?.width ?? 0,
+        rasterHeight: document.querySelector('canvas.relic3d')?.height ?? 0,
       };
     });
   const settleCard = async (expected, phaseCode) => {
@@ -293,6 +323,23 @@ try {
       throw error;
     }
   };
+  const assertWholePlate = async (target, phaseCode) => {
+    const measured = await geometry(target);
+    layoutMeasurements.push({
+      viewportWidth: target.viewportSize().width,
+      viewportHeight: target.viewportSize().height,
+      phaseCode,
+      ...measured,
+    });
+    if (
+      measured.plateOverlap !== 0 ||
+      measured.criticalOverlap !== 0 ||
+      !measured.noOuterPaint ||
+      !measured.unmaskedPlate ||
+      !measured.criticalInside
+    )
+      throw Error('whole painted plate exclusion');
+  };
   const fhd = await geometry();
   layoutMeasurements.push({
     viewportWidth: 1920,
@@ -304,20 +351,26 @@ try {
   if (
     fhd.width !== 560 ||
     fhd.height !== 180 ||
-    fhd.x !== 48 ||
-    fhd.y !== 852 ||
+    fhd.x !== 32 ||
+    fhd.y !== 868 ||
     fhd.criticalOverlap !== 0 ||
-    fhd.plateOverlap !== 224 * 12 ||
+    fhd.plateOverlap !== 0 ||
+    !fhd.noOuterPaint ||
+    !fhd.unmaskedPlate ||
+    !fhd.criticalInside ||
     fhd.heading !== 36 ||
     fhd.body !== 28 ||
     fhd.rasterWidth > 480 ||
     fhd.rasterHeight > 480
   )
     throw Error('logical card geometry');
+  await card.emulateMedia({ reducedMotion: 'reduce' });
+  await assertWholePlate(card, 10);
+  await card.emulateMedia({ reducedMotion: 'no-preference' });
   await captureOverlay(card, 'overlay-card-fhd.png');
   stage = 'compressed-card-resize';
   await card.setViewportSize({ width: 960, height: 540 });
-  await settleCard([960, 540, 24, 426, 280, 90], 1);
+  await settleCard([960, 540, 16, 434, 280, 90], 1);
   const half = await geometry();
   layoutMeasurements.push({
     viewportWidth: 960,
@@ -329,20 +382,26 @@ try {
   if (
     half.width !== 280 ||
     half.height !== 90 ||
-    half.x !== 24 ||
-    half.y !== 426 ||
+    half.x !== 16 ||
+    half.y !== 434 ||
     half.criticalOverlap !== 0 ||
-    half.plateOverlap !== 56 * 12
+    half.plateOverlap !== 0 ||
+    !half.noOuterPaint ||
+    !half.unmaskedPlate ||
+    !half.criticalInside
   )
     throw Error('compressed card geometry');
+  await card.emulateMedia({ reducedMotion: 'reduce' });
+  await assertWholePlate(card, 11);
+  await card.emulateMedia({ reducedMotion: 'no-preference' });
   await captureOverlay(card, 'overlay-card-960.png');
   checks.push({
-    name: 'Logical560x180 at48safe; original FHD and half-scale viewport, honest 12px plate-only central intrusion',
+    name: 'Logical560x180 at32safe; original FHD and half-scale viewport, whole painted plate outside central60',
     passed: true,
   });
   stage = 'restored-fhd-resize';
   await card.setViewportSize({ width: 1920, height: 1080 });
-  await settleCard([1920, 1080, 48, 852, 560, 180], 2);
+  await settleCard([1920, 1080, 32, 868, 560, 180], 2);
   stage = 'verified-takeover';
   await f.control(OTHER, `send:${HOME}`);
   f.advance();
@@ -351,7 +410,7 @@ try {
   if ((await card.locator('#arrival-action').innerText()) !== 'Sending chat: !offer')
     throw Error('source role');
   const takeover = await card.locator('.relic-overlay').boundingBox();
-  if (takeover.width !== 900 || takeover.height !== 300) throw Error('takeover geometry');
+  if (takeover.width !== 336 || takeover.height !== 720) throw Error('takeover geometry');
   const before = Number(await card.locator('#arrival-countdown').innerText());
   if (before > 180 || before < 175) throw Error('landing deadline');
   await captureOverlay(card, 'overlay-arrival-source.png');
@@ -361,10 +420,38 @@ try {
   if ((await receiver.locator('#arrival-action').innerText()) !== 'Receiving chat: !accept')
     throw Error('receiver role');
   await captureOverlay(receiver, 'overlay-arrival-host.png');
+  for (const target of [card, receiver]) {
+    for (const reducedMotion of ['no-preference', 'reduce']) {
+      await target.emulateMedia({ reducedMotion });
+      for (const [width, height] of [
+        [1920, 1080],
+        [960, 540],
+      ]) {
+        await target.setViewportSize({ width, height });
+        await target.waitForFunction((w) => {
+          const r = document.querySelector('.relic-overlay').getBoundingClientRect();
+          return innerWidth === w && r.width === (w === 1920 ? 336 : 168);
+        }, width);
+        await assertWholePlate(target, reducedMotion === 'reduce' ? 13 : 12);
+      }
+    }
+    await target.setViewportSize({ width: 1920, height: 1080 });
+    await target.emulateMedia({ reducedMotion: 'no-preference' });
+  }
   await f.chat(OTHER, OTHER, '!offer');
   await f.chat(HOME, HOME, '!accept');
   await card.waitForFunction(() => !document.body.classList.contains('arrival-takeover'));
   if ((await f.runtime.state.getPublicJourney()).rings !== 2) throw Error('actual ring');
+  await settleCard([1920, 1080, 32, 868, 560, 180], 14);
+  await assertWholePlate(card, 14);
+  await card.emulateMedia({ reducedMotion: 'reduce' });
+  await assertWholePlate(card, 16);
+  await card.emulateMedia({ reducedMotion: 'no-preference' });
+  await card.setViewportSize({ width: 960, height: 540 });
+  await settleCard([960, 540, 16, 434, 280, 90], 15);
+  await assertWholePlate(card, 15);
+  await card.emulateMedia({ reducedMotion: 'reduce' });
+  await assertWholePlate(card, 17);
   await receiver.close();
   await card.close();
   checks.push({
