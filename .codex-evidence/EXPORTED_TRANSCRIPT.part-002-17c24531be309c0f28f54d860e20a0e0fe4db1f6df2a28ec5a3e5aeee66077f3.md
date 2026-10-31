@@ -15831,3 +15831,1322 @@
   }
 ]
 ````
+
+### 6501. 2026-10-31T09:55:46.597Z — user (source line 24665)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "Original327 BROWSERFIXTURECLOCKONLY. Actualcanonical326SourceCodePREFORMATTED5filesparent3.9.10. FirstfocusedbrowserONBOARDINGFAILEDstagecontrol-saved-observation-and-recovery-reasons line794 (waitnumericage)after4checks. Exactsource: savedStatus=f.request/control/OTHER/status realfixtureclock(Oct25); mockStatusspreads.savedStatus (expiresAt inFIXTUREclock) butoverridespilot.statusReadAt=pageDateNow(actualOct31) forindependentObservationAge30s. Newclientcorrectlyrequires0<value.expiresAt-pilot.statusReadAt<=43200000, soMOCKnowinvalidcrossdomain,andneverrendersage. FixONLYvalidmockstatusmetadata bypreservingremainingTTL fromsavedStatus.expiresAt-savedStatus.pilot.statusReadAt thenalignmockexpiresAtwithmocknow; no sessionextensionofactualserverrecord, no client/serverexpiryguardloosening. Keepabsolute30sobservationvsfreshstatusasserts/no providerGET/no privacychanges. Inspectother existingmockstatus overrides ifsameproblem, minimumfixtureonly. Add/retain explicit invalid/nonpositive/>12h rejection test existingtest ifneedednotnewmodule. Source/public/backend326MUSTremainBYTEIDENTICAL; thisisprovablefixturebugnotpermissionrelax. Nativefull326stillrunningparentcollect, pilotnewtrustedpointernotrunyetbecauseonboardchainstopped; parentwillrunpilotindependent. No tests/app/browser/format/Git/cloud/rawCody/session/CLI/selected/provision/secret/execbyyou,no newfirstpartyfile160, no cap changes. Writeexistingbrowserprobeonly(+existingunitifneeded), finalexplainclockbindingSTOP. Deadline11actualnow09:55; prioritizequicknarrowfix."
+  }
+]
+````
+
+### 6502. 2026-10-31T09:55:50.488Z — assistant (source line 24668)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll align the mocked expiry with the browser-clock metadata while preserving the fixture’s original remaining TTL. Server session records and expiry guards will stay unchanged.\n",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6503. 2026-10-31T09:55:51.118Z — tool call (source line 24669)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_87b6935d08f3428e9e9c33ec011cbe97",
+  "input": "text(await tools.exec_command({cmd:\"sed -n '710,751p' scripts/browser-smoke-onboarding.js\\nrg -n 'statusReadAt:|expiresAt:|savedStatus' scripts/browser-smoke-onboarding.js\",\"max_output_tokens\":1000}));\n"
+}
+````
+
+### 6504. 2026-10-31T09:55:51.286Z — tool result (source line 24672)
+
+````text
+{
+  "call_id": "call_87b6935d08f3428e9e9c33ec011cbe97",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "012d3c",
+        "wall_time_seconds": 0.00000716,
+        "exit_code": 0,
+        "original_token_count": 458,
+        "output": "  });\n  stage = 'control-saved-observation-and-recovery-reasons';\n  // Mock only this authenticated read response; no provider fetch or real target lookup.\n  const savedStatus = JSON.parse(\n    (await f.request(`/control/${OTHER}/status`, 'GET', { cookie: f.cookies[OTHER] })).body,\n  );\n  const now = await page.evaluate(() => Date.now());\n  let observedAt = now - 30000;\n  let offlineObservation = false;\n  const statusPattern = `**/control/${OTHER}/status`;\n  let routeHitCount = 0;\n  let pilotHasObservation = false;\n  let controlRoomMatches = false;\n  const mockStatus = async (route) => {\n    routeHitCount++;\n    const value = {\n      ...savedStatus,\n      pilot: {\n        ...savedStatus.pilot,\n        online: offlineObservation ? false : savedStatus.pilot.online,\n        candidates: [],\n        candidatesObservedAt: observedAt,\n        statusReadAt: now,\n      },\n    };\n    pilotHasObservation = Number.isSafeInteger(value.pilot.candidatesObservedAt);\n    controlRoomMatches =\n      value.keeperId === OTHER &&\n      new URL(route.request().url()).pathname === `/control/${OTHER}/status`;\n    await route.fulfill({\n      status: 200,\n      headers: { 'x-local-observation-fixture': 'saved' },\n      json: value,\n    });\n  };\n  async function recordObservationDiagnostic() {\n    const labels = await page.evaluate(() => {\n      const target = document.querySelector('#target-observation-age').textContent;\n      const read = document.querySelector('#first-freshness').textContent;\n      const age = (text, pattern) => {\n        const match = pattern.exec(text);\n        const value = match ? Number(match[1]) : -1;\n713:  const savedStatus = JSON.parse(\n726:      ...savedStatus,\n728:        ...savedStatus.pilot,\n729:        online: offlineObservation ? false : savedStatus.pilot.online,\n732:        statusReadAt: now,\n"
+      }
+    }
+  ]
+}
+````
+
+### 6505. 2026-10-31T09:55:56.764Z — tool call (source line 24674)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_c9182d4dd4424be485a033b7b885bafa",
+  "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\nfrom pathlib import Path\\np=Path('scripts/browser-smoke-onboarding.js');s=p.read_text();needle=\\\"  const now = await page.evaluate(() => Date.now());\\\\n  let observedAt = now - 30000;\\\";assert needle in s;s=s.replace(needle,\\\"\\\"\\\"  const now = await page.evaluate(() => Date.now());\\n  // Translate only this response's clock domain, preserving its remaining TTL.\\n  // The underlying authenticated server session is neither renewed nor changed.\\n  const remainingTTL = savedStatus.expiresAt - savedStatus.pilot.statusReadAt;\\n  assert.ok(Number.isSafeInteger(remainingTTL) && remainingTTL > 0 && remainingTTL <= 43200000);\\n  const mockExpiresAt = now + remainingTTL;\\n  assert.ok(Number.isSafeInteger(mockExpiresAt));\\n  let observedAt = now - 30000;\\\"\\\"\\\",1);s=s.replace(\\\"      ...savedStatus,\\\\n      pilot:\\\", \\\"      ...savedStatus,\\\\n      expiresAt: mockExpiresAt,\\\\n      pilot:\\\",1);p.write_text(s)\\nPY\",\"max_output_tokens\":100}));\n"
+}
+````
+
+### 6506. 2026-10-31T09:55:56.890Z — tool result (source line 24677)
+
+````text
+{
+  "call_id": "call_c9182d4dd4424be485a033b7b885bafa",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {
+        "chunk_id": "5e88f1",
+        "wall_time_seconds": 0.0000034,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    }
+  ]
+}
+````
+
+### 6507. 2026-10-31T09:56:01.776Z — assistant (source line 24680)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Changed only `scripts/browser-smoke-onboarding.js`.\n\nThe mocked response now sets expiry to browser `now + original remaining TTL`, with strict `0 < TTL ≤12h` validation. Observation age remains 30 seconds. Actual server records and all expiry guards are untouched.\n\nNo other status-clock overrides found in that probe. No execution. Stopped.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6508. 2026-10-31T09:58:50.302Z — user (source line 24694)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "Original328 ONLYtest/keeper-candidates.test.js stale SOURCE ASSERTION FIX. Canonical326 fullNative ACTUAL1264tests1263PASS1FAIL0skip: test114 control target selection is labelled/manual/canonical named one-target button, line123 old js.includes names target exacttext nowfalse because326label adds canonical fallback an eligible Keeper; next oldrun(send:target.value) shape alsofalse because pressedTarget→intended safety. NewTRUSTEDPILOTbrowser ACTUALLY PASSED9checks mouseDOWN held across GETresponse→same node connected enabled→mouseUP→EXACToneRaidPOST and503/expired401/relogin no duplicate. NO runtimefixneeded. Update assertions to EXACTnew canonical names+explicit eligible fallback and captured intended target mismatch rejection+run send:intended, singlecreated stablebutton/diff reconcile. PreserveHTMLlabel/manualwarning/CSRFJSON/nointerval; do not delete checks or acceptanylabel. Same existing testname/count. ONLY existing test/keeper-candidates.test.js. No app/probe/newmodule/Git/cloud/format/tests/rawCody/session/log/execution byyou. 327clockfixturedone. Parent runs allQA. Emit changedfile STOP."
+  }
+]
+````
+
+### 6509. 2026-10-31T09:58:53.325Z — assistant (source line 24697)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll update only the stale assertions to check the canonical label, captured-target safety, and stable button reconciliation.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6510. 2026-10-31T09:58:54.328Z — tool call (source line 24698)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_57fe2e7f92934c838f3b0476ea5347e5",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '85,155p' test/keeper-candidates.test.js\\nrg -n 'eligible Keeper|pressedTarget|intended|sendButton|reconcileTargets|target.value|names\\\\[' public/control.js\",\"max_output_tokens\":5000})).output)\n"
+}
+````
+
+### 6511. 2026-10-31T09:58:54.447Z — tool result (source line 24701)
+
+````text
+{
+  "call_id": "call_57fe2e7f92934c838f3b0476ea5347e5",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "      assert.equal(f.calls.length, before);\n      assert.ok(!(await status(f, OTHER)).candidates.some((candidate) => candidate.id === OTHER));\n    }\n  });\n  test(`${kind}: stale selection cannot reserve or dispatch a now-ineligible target`, async () => {\n    const f = await pilotFixture(kind);\n    await ready(f);\n    assert.equal((await status(f, HOME)).candidates[0].id, OTHER);\n    await f.signed('stream.offline', { broadcaster_user_id: OTHER }, OTHER);\n    await f.control(HOME, `send:${OTHER}`);\n    assert.equal((await f.runtime.state.getKeeperRegistry()).send, undefined);\n    assert.equal(f.calls.filter((c) => c.url.includes('/raids')).length, 0);\n    const g = await pilotFixture(kind);\n    await ready(g);\n    assert.equal((await status(g, HOME)).candidates[0].id, OTHER);\n    g.hook(async () => {\n      g.hook(null);\n      await g.runtime.state.controlMarks(\n        OTHER,\n        { broadcasterId: OTHER, chatterId: OTHER },\n        { type: 'pause', paused: true },\n        g.now(),\n      );\n    });\n    await g.control(HOME, `send:${OTHER}`);\n    assert.equal(g.calls.filter((c) => c.url.includes('/raids')).length, 0);\n    assert.equal((await g.runtime.state.getKeeperRegistry()).send.status, 'rejected');\n  });\n}\ntest('control target selection is labelled, manual, canonical and keeps the named one-target button', async () => {\n  const html = (await readFile('public/control.html', 'utf8')).replace(/\\s+/g, ' '),\n    js = await readFile('public/control.js', 'utf8');\n  assert.match(html, /label for=\"raid-target\"/);\n  assert.match(\n    html,\n    /Send Off requests a real Twitch raid to this observed Keeper\\. The relic moves only after Twitch confirms the raid and both chats bind it; sending rechecks eligibility\\./,\n  );\n  assert.match(html, /id=\"target-empty\"/);\n  assert.ok(js.includes('Send Off to ${names[target.value]}'));\n  assert.ok(js.includes('run(`send:${target.value}`)'));\n  assert.ok(js.includes('JSON.stringify({ action, csrf })'));\n  assert.ok(!js.includes('setInterval'));\n});\n79:const sendButton = document.createElement('button');\n80:sendButton.className = 'send-off';\n81:sendButton.setAttribute('aria-describedby', 'send-disabled-reason target-help');\n82:let pressedTarget = null;\n83:sendButton.onpointerdown = () => {\n84:  pressedTarget = target.value;\n86:sendButton.onpointercancel = () => {\n87:  pressedTarget = null;\n89:sendButton.onkeydown = () => {\n90:  pressedTarget = null;\n92:sendButton.onclick = () => {\n93:  const intended = pressedTarget ?? target.value;\n94:  pressedTarget = null;\n95:  if (intended !== target.value) {\n100:  return run(`send:${intended}`);\n102:document.getElementById('raid').append(sendButton);\n104:  sendButton.textContent = `Send Off to ${names[target.value] ?? 'an eligible Keeper'}`;\n108:sendButton.hidden = true;\n109:function reconcileTargets(rows, selected) {\n121:  if (rows.some((candidate) => candidate.id === selected)) target.value = selected;\n122:  if (!rows.length) sendButton.remove();\n123:  else if (sendButton.parentElement !== document.getElementById('raid'))\n124:    document.getElementById('raid').append(sendButton);\n125:  sendButton.hidden = rows.length === 0;\n261:  const selectedTarget = target.value;\n365:      `${value.pilot.seekers?.enabled ? 'Public Seeker queue: ' + (value.pilot.seekers.joined ? 'joined.' : 'not joined.') + ' ' : ''}Relic Keeper: @${names[value.pilot.holder] ?? 'unplaced'}. Your stream: ${value.pilot.online ? 'live' : 'offline'}. ${value.pilot.optedIn ? 'Opted in' : 'Not opted in'}. ${value.pilot.paused ? 'Paused.' : ''} ${Object.values(value.pilot.bothReadiness ?? {}).length >= 2 && Object.values(value.pilot.bothReadiness).every((v) => v === true) ? 'Configured channels are ready.' : 'Reconcile channels used for this hand-off until ready.'} ${value.pilot.claimProgress ? `Offer ${value.pilot.claimProgress.offers ?? 0}/${value.pilot.claimProgress.threshold} · Accept ${value.pilot.claimProgress.accepts ?? 0}/${value.pilot.claimProgress.threshold}${value.pilot.claimProgress.finalized ? ' · Bound by two chats' : ''}` : ''}`;\n387:    document.getElementById('account').textContent = `${names[id]} · Keeper control`;\n412:      (c) => c.id !== id && names[c.id] && c.observedOnline && c.optedIn && c.eligible,\n414:    reconcileTargets(candidates, selectedTarget);\n439:        ? `Send Off to ${names[action.slice(5)]}`\n526:        'Read status and start visible target checks to choose an observed eligible Keeper.';\n532:        `Request a real Twitch raid to ${names[action.slice(5)]}? This can affect your live broadcast.`,\n585:      simulated && response.ok ? response.text : actionMessage(value, names[target.value]);\n"
+    }
+  ]
+}
+````
+
+### 6512. 2026-10-31T09:58:57.026Z — tool call (source line 24703)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_2dbb9925d2aa46289266bfdf966dc64e",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '75,140p' public/control.js\\nsed -n '250,280p' public/control.js\",\"max_output_tokens\":2500})).output)\n"
+}
+````
+
+### 6513. 2026-10-31T09:58:57.153Z — tool result (source line 24706)
+
+````text
+{
+  "call_id": "call_2dbb9925d2aa46289266bfdf966dc64e",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "let allowedActions = [];\nconst target = document.getElementById('raid-target');\nconst empty = document.getElementById('target-empty');\n// Stable identity across GET refreshes, including pointerdown -> response -> up.\nconst sendButton = document.createElement('button');\nsendButton.className = 'send-off';\nsendButton.setAttribute('aria-describedby', 'send-disabled-reason target-help');\nlet pressedTarget = null;\nsendButton.onpointerdown = () => {\n  pressedTarget = target.value;\n};\nsendButton.onpointercancel = () => {\n  pressedTarget = null;\n};\nsendButton.onkeydown = () => {\n  pressedTarget = null;\n};\nsendButton.onclick = () => {\n  const intended = pressedTarget ?? target.value;\n  pressedTarget = null;\n  if (intended !== target.value) {\n    sendResult.textContent =\n      'Targets changed during this click. Review the selected Keeper; no request was sent.';\n    return;\n  }\n  return run(`send:${intended}`);\n};\ndocument.getElementById('raid').append(sendButton);\nconst labelTarget = () => {\n  sendButton.textContent = `Send Off to ${names[target.value] ?? 'an eligible Keeper'}`;\n};\ntarget.onchange = labelTarget;\nlabelTarget();\nsendButton.hidden = true;\nfunction reconcileTargets(rows, selected) {\n  const existing = new Map([...target.options].map((option) => [option.value, option]));\n  rows.forEach((candidate, index) => {\n    const option = existing.get(candidate.id) ?? document.createElement('option');\n    option.value = candidate.id;\n    const text = `${candidate.login} · observed online${Number.isSafeInteger(candidate.viewers) && candidate.viewers >= 0 ? ' · ' + candidate.viewers + ' Twitch-reported viewers' : ''}`;\n    if (option.textContent !== text) option.textContent = text;\n    if (target.options[index] !== option)\n      target.insertBefore(option, target.options[index] ?? null);\n    existing.delete(candidate.id);\n  });\n  for (const option of existing.values()) option.remove();\n  if (rows.some((candidate) => candidate.id === selected)) target.value = selected;\n  if (!rows.length) sendButton.remove();\n  else if (sendButton.parentElement !== document.getElementById('raid'))\n    document.getElementById('raid').append(sendButton);\n  sendButton.hidden = rows.length === 0;\n  labelTarget();\n}\n\nconst labels = {\n  'mark-links': 'Send queued public mark-history link',\n  'seek-on': 'Join public Seeker queue',\n  'seek-off': 'Leave Seeker queue',\n  'seek-status': 'Read Seeker choice',\n  chronicle: 'Write Chronicle for latest received stop',\n  bootstrap: 'Bootstrap / reconcile this channel',\n  'refresh-authorization': 'Check / refresh my Keeper authorization',\n  keep: 'Opt in / Keep',\n  pause: 'Pause',\n  resume: 'Resume',\n  'opt-out': 'Opt out',\n  readController = request;\n  const obsoleteRead = () => {\n    if (timedOut) throw new ControlReadError('timeout');\n    return generation !== readGeneration || request.signal.aborted;\n  };\n  const abort = () => request.abort();\n  signal?.addEventListener('abort', abort, { once: true });\n  if (signal?.aborted) request.abort();\n  // Background reads never lock or tear down a usable action surface.\n  if (!csrf) disable(true);\n  if (!preserveResult) status.textContent = 'Reading your session…';\n  const selectedTarget = target.value;\n  try {\n    if (\n      observationArmed &&\n      csrf &&\n      allowedActions.includes('observe-targets') &&\n      Date.now() >= nextObservationAt\n    ) {\n      nextObservationAt = Date.now() + 30000;\n      const observation = await boundedResponse(\n        `/control/${id}`,\n        {\n          method: 'POST',\n          cache: 'no-store',\n          signal: request.signal,\n          headers: { 'content-type': 'application/json' },\n          body: JSON.stringify({ action: 'observe-targets', csrf }),\n        },\n        { json: true },\n      );\n"
+    }
+  ]
+}
+````
+
+### 6514. 2026-10-31T09:59:06.467Z — tool call (source line 24708)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_1f3bb372b1354692be326346c8c7a784",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/test/keeper-candidates.test.js\\n@@\\n-  assert.ok(js.includes('Send Off to ${names[target.value]}'));\\n-  assert.ok(js.includes('run(`send:${target.value}`)'));\\n+  assert.ok(js.includes(\\\"Send Off to ${names[target.value] ?? 'an eligible Keeper'}\\\"));\\n+  assert.match(js, /sendButton\\\\.onpointerdown\\\\s*=\\\\s*\\\\(\\\\)\\\\s*=>\\\\s*\\\\{\\\\s*pressedTarget = target\\\\.value;/);\\n+  assert.match(\\n+    js,\\n+    /const intended = pressedTarget \\\\?\\\\? target\\\\.value;\\\\s*pressedTarget = null;\\\\s*if \\\\(intended !== target\\\\.value\\\\) \\\\{\\\\s*sendResult\\\\.textContent\\\\s*=\\\\s*'Targets changed during this click\\\\. Review the selected Keeper; no request was sent\\\\.';\\\\s*return;\\\\s*\\\\}\\\\s*return run\\\\(`send:\\\\$\\\\{intended\\\\}`\\\\);/,\\n+  );\\n+  assert.equal((js.match(/const sendButton = document\\\\.createElement\\\\('button'\\\\)/g) ?? []).length, 1);\\n+  assert.match(js, /function reconcileTargets\\\\(rows, selected\\\\)/);\\n+  assert.ok(js.includes('const existing = new Map([...target.options].map((option) => [option.value, option]))'));\\n+  assert.ok(js.includes(\\\"existing.get(candidate.id) ?? document.createElement('option')\\\"));\\n+  assert.ok(js.includes('if (option.textContent !== text) option.textContent = text;'));\\n+  assert.match(js, /if \\\\(target\\\\.options\\\\[index\\\\] !== option\\\\)\\\\s*target\\\\.insertBefore\\\\(option, target\\\\.options\\\\[index\\\\] \\\\?\\\\? null\\\\)/);\\n+  assert.ok(js.includes('for (const option of existing.values()) option.remove();'));\\n+  assert.ok(js.includes('if (rows.some((candidate) => candidate.id === selected)) target.value = selected;'));\\n+  assert.match(js, /else if \\\\(sendButton\\\\.parentElement !== document\\\\.getElementById\\\\('raid'\\\\)\\\\)\\\\s*document\\\\.getElementById\\\\('raid'\\\\)\\\\.append\\\\(sendButton\\\\)/);\\n+  assert.ok(js.includes('reconcileTargets(candidates, selectedTarget);'));\\n*** End Patch\"));\n"
+}
+````
+
+### 6515. 2026-10-31T09:59:06.527Z — tool result (source line 24711)
+
+````text
+{
+  "call_id": "call_1f3bb372b1354692be326346c8c7a784",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 6516. 2026-10-31T09:59:12.419Z — assistant (source line 24714)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Changed only `test/keeper-candidates.test.js`, preserving the test name/count and existing checks. Assertions now cover the exact canonical label/fallback, captured-target mismatch rejection, `send:intended`, single stable button, and differential reconciliation.\n\nNo execution performed. Stopped.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6517. 2026-10-31T11:18:03.608Z — user (source line 24724)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "Original329 NEW11:17owner-relayedlivefollowups. Repo clean6f1ae8dfa283fc13a3fff142992e963623493d51. OwnerREPORTSendOfflivePASSED11:12–11:15on sendoff-fix-on-1031:olsols2→olsols3accepted/arrival/offeraccept/claim/Ring12/AtlasOTHERholding. Parentwillverifycurrentprodmetadata. DO NOTclaimyourliveexecution. Smallestsafechangesbefore18freeze,newPRIVATEreadonly0previewonly;NOprodtrafficbyparent. Five: (1)!mark light botackpublicbutnotvisibleAtlas/keeper/olsols3; checksourceacceptedmark storage→currentring12/holder1593561134 projection→atlas/keeper/overlay rendering. ParentindependentlyreadsONLYtargetedprodpublicmarkmetadata(no writes), donotreadcredentials/proddata/rawsessionsyourself. Fixactualprojection/renderbugifconfirmed; doNOTautoapprove/recreate/migratehistoricalmarks/quota bypass or makepending/rejected/IDspublic. Accepted≠publishedwhenheld; ensureacktruthful. Publicapprovedmarks only/160cap/boundedvisibility/lineage/forgetquotas/currentring/sharedholderscorrect, bothstores regression andbrowserassert currentholdersRing andatlas/keeper/overlay. (2)/overlay?channel=olsols2 currently404: acceptcanonicalconfiguredlogin→relative307/302 /overlay/1591806023 orcanonicalidonly; rejectunknown,duplicatequery,arbitraryurl/pathinjection. NoOAuth/controlredirect/openredirect/privacyexpansion. Testserverandbrowser. (3)!mark first light rejectonewordintendedkeepgrammar, rejectionhelp one word,e.g.!mark light; no grammarbroaden/no extraquota/chatbudget. (4)OTHERSetupRequestpendingnooutcome: inspect326runbootstrap + refresh, setupstatus/result overwrite/timeouts/continued lifecycle; ensureeveryexplicitSetupclearspendingintosuccess/retry/timeout/error, no autooptin/consent/sessionrenew beyondexistingexplicitactions, atmost3setupretries45sec, no ambiguousraidretry. Addbrowserbounded slow/errorSetup w pollingactive regression. (5)overlaywaitingTwitchconfirm~90sec, softerprogresshint ifpossible, never implyarrival/completion/claimeligibilitybeforeverifiedevent/no newtimingauthority/180sclaim unchanged; simple truthfulcopyexistingphase, localtests. NOredesign/refactors/newfirstpartyJS(160cap)/deps/paidflags/prodAPI/Git/testexecutionbyyou. SourceONLYminimalapp+existingtest/probes+shortdocsincidentnote. No raw/selected/CLI/privateStage/secret/SM reads. ParentownsOSVMQAformatter/evidenceGitCIbuildnew0. KeepYOU01a1705conlylead,no newthread/delegation. No needtoucholdpanelmanualproofwork. Implementandtestdefinitionsinoneboundedturn,rootcauses/scopes/storedmarkvsack caveat explicit, finishSTOP. Parentwillnotfabricateprodmarkfinding. All328priorfixturesmergedsameHEAD, doNOTundoassertions/auth/expiry/oneSend stability. Important currentstaticmodulescache1hourtelloperatorhardreloadafterpromote. Returnchangedfiles+safety+unrunstatus."
+  }
+]
+````
+
+### 6518. 2026-10-31T11:18:07.762Z — assistant (source line 24727)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll trace the mark publication path and Setup lifecycle, then make the smallest supported changes with regression tests. I’ll keep the owner’s live report separate from source findings and leave production inspection to the parent.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6519. 2026-10-31T11:18:09.798Z — tool call (source line 24728)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_2d1bc00e16d74f00b206a3d3dc991c8d",
+  "input": "text((await tools.exec_command({cmd:\"rg -n 'mark|waiting|confirm' src/bot.js src/ritual-copy.js | head -65\\nrg -n 'overlay/|overlay\\\\?' src/app.js\\nrg -n 'bootstrap|setup|preserveResult|pending' public/control.js | tail -65\",\"max_output_tokens\":5000})).output)\n"
+}
+````
+
+### 6520. 2026-10-31T11:18:09.982Z — tool result (source line 24731)
+
+````text
+{
+  "call_id": "call_2d1bc00e16d74f00b206a3d3dc991c8d",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "rg: src/ritual-copy.js: No such file or directory (os error 2)\nsrc/bot.js:10:import { normalizeMark, parseMarkCommand } from './marks.js';\nsrc/bot.js:19:    chat.markAction === proof.action &&\nsrc/bot.js:131:      chat.markAction = action;\n5:  setupRetryAllowed,\n43:  setupTimer = null,\n44:  setupLeft = 0,\n45:  setupDeadline = 0,\n49:  clearTimeout(setupTimer);\n50:  setupTimer = null;\n51:  setupLeft = 0;\n52:  document.getElementById('stop-setup').hidden = true;\n54:document.getElementById('stop-setup').onclick = () => {\n56:  document.getElementById('setup-flow-status').textContent =\n135:  bootstrap: 'Bootstrap / reconcile this channel',\n212:  document.getElementById('stop-setup').disabled = false;\n236:  for (const group of ['setup', 'keeper', 'raid', 'advanced-send-actions'])\n240:async function refresh({ preserveResult = true, signal } = {}) {\n260:  if (!preserveResult) status.textContent = 'Reading your session…';\n422:          'bootstrap',\n449:    if (!preserveResult || readMessage || status.textContent === 'Reading your session…') {\n470:    if (!preserveResult || !sendLocked)\n486:  pending: () =>\n487:    firstRun.pending() ||\n494:  read: (signal) => refresh({ preserveResult: true, signal }),\n498:    if (actionInFlight || document.hidden || Date.now() >= setupDeadline) {\n540:  if (action === 'bootstrap' && !continued) {\n542:    setupLeft = 3;\n543:    setupDeadline = Date.now() + 45000;\n545:  if (action === 'bootstrap') {\n546:    setupLeft--;\n547:    document.getElementById('stop-setup').hidden = false;\n556:    : 'Request pending…';\n603:      action === 'bootstrap' &&\n604:      setupRetryAllowed(value, {\n605:        remaining: setupLeft,\n606:        deadline: setupDeadline,\n609:    if (action === 'bootstrap')\n610:      document.getElementById('setup-flow-status').textContent =\n614:            ? 'Waiting for enabled callbacks; this explicit setup flow checks at most three times.'\n616:    if (!document.hidden) await refresh({ preserveResult: true });\n619:      firstRun.focusStep('setup-step');\n630:    if (action === 'bootstrap' && !retrySetup) firstRun.focusCurrent('setup');\n632:    if (retrySetup && setupLeft > 0 && !document.hidden && Date.now() < setupDeadline) {\n633:      setupTimer = setTimeout(() => {\n634:        void run('bootstrap', { continued: true });\n636:    } else if (action === 'bootstrap') stopSetup();\n705:    if (!document.hidden) await refresh({ preserveResult: true });\n742:    if (!document.hidden) await refresh({ preserveResult: true });\n"
+    }
+  ]
+}
+````
+
+### 6521. 2026-10-31T11:18:15.329Z — tool call (source line 24733)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_b2c04d7528b54c189fac1dd6622b9565",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '510,655p' public/control.js\\nrg -n 'overlay|static' src/app.js | head -40\\nrg -n 'mark.*(pending|approved|word)|one word|markAccepted|markInvalid|awaiting|Waiting for Twitch' public/ritual-copy.js src/marks.js public/overlay.js src/public-view.js src/mark* src/runtime.js\",\"max_output_tokens\":6000})).output)\n"
+}
+````
+
+### 6522. 2026-10-31T11:18:15.566Z — tool result (source line 24736)
+
+````text
+{
+  "call_id": "call_b2c04d7528b54c189fac1dd6622b9565",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.2 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "      if (action.startsWith('send:')) sendResult.textContent = reason;\n    }\n    if (continued) {\n      stopSetup();\n      poller.resume();\n    }\n    return;\n  }\n  if (action.startsWith('send:')) {\n    if (sendLocked || (latestPilot?.intent && latestPilot.intent !== 'expired-handoff')) {\n      sendResult.textContent =\n        'An existing or uncertain request is locked. Review its saved status; no new request was sent.';\n      return;\n    }\n    if (!candidates.some((c) => c.id === action.slice(5))) {\n      status.textContent =\n        'Read status and start visible target checks to choose an observed eligible Keeper.';\n      sendResult.textContent = status.textContent;\n      return;\n    }\n    if (\n      !confirm(\n        `Request a real Twitch raid to ${names[action.slice(5)]}? This can affect your live broadcast.`,\n      )\n    ) {\n      sendResult.textContent =\n        'Confirmation cancelled or unavailable. No Send Off request was sent.';\n      return;\n    }\n  }\n  if (action === 'bootstrap' && !continued) {\n    stopSetup();\n    setupLeft = 3;\n    setupDeadline = Date.now() + 45000;\n  }\n  if (action === 'bootstrap') {\n    setupLeft--;\n    document.getElementById('stop-setup').hidden = false;\n  }\n  actionInFlight = true;\n  dispatchInFlight = action.startsWith('send:') || action === 'process';\n  if (dispatchInFlight) sendLocked = true;\n  disable(true);\n  readMessage = false;\n  status.textContent = dispatchInFlight\n    ? 'Sending request… Wait; do not repeat.'\n    : 'Request pending…';\n  if (dispatchInFlight) sendResult.textContent = status.textContent;\n  await poller.pause();\n  let retrySetup = false;\n  try {\n    const response = await boundedResponse(`/control/${id}`, {\n      method: 'POST',\n      cache: 'no-store',\n      headers: { 'content-type': 'application/json' },\n      body: JSON.stringify({ action, csrf }),\n    });\n    if (action === 'logout' && response.ok) {\n      location.assign(`/control/${id}`);\n      return;\n    }\n    if ([401, 403].includes(response.status)) {\n      invalidate();\n      stopSetup();\n      poller.stop();\n      status.textContent =\n        'Control session expired or unauthorized. Reconnect this matching Keeper; no new Send Off is authorized.';\n      if (dispatchInFlight) sendResult.textContent = status.textContent;\n      return;\n    }\n    let value;\n    try {\n      value = JSON.parse(response.text);\n    } catch {}\n    status.textContent =\n      simulated && response.ok ? response.text : actionMessage(value, names[target.value]);\n    if (dispatchInFlight) sendResult.textContent = status.textContent;\n    if (\n      dispatchInFlight &&\n      value?.status === 'blocked' &&\n      [\n        'subscriptions-not-ready',\n        'grants-unavailable',\n        'source-offline',\n        'target-offline',\n        'not-holder',\n        'reservation-unavailable',\n        'preflight-rejected',\n        'dispatch-rejected',\n      ].includes(value.reason)\n    )\n      sendLocked = false;\n    retrySetup =\n      action === 'bootstrap' &&\n      setupRetryAllowed(value, {\n        remaining: setupLeft,\n        deadline: setupDeadline,\n        visible: !document.hidden,\n      });\n    if (action === 'bootstrap')\n      document.getElementById('setup-flow-status').textContent =\n        value?.status === 'reconciled' && value.ready\n          ? 'Setup observed all five subscriptions enabled; opt in only when you choose.'\n          : retrySetup\n            ? 'Waiting for enabled callbacks; this explicit setup flow checks at most three times.'\n            : 'Setup stopped. Check your connection and try explicitly again.';\n    if (!document.hidden) await refresh({ preserveResult: true });\n    if (action === 'keep' && response.ok) firstRun.focusStep('overlay-step');\n    if (action === 'refresh-authorization' && value?.authorization === 'ready')\n      firstRun.focusStep('setup-step');\n  } catch {\n    invalidate();\n    status.textContent =\n      'Request outcome unavailable. Refresh status; never blindly repeat a raid request.';\n    if (dispatchInFlight) sendResult.textContent = status.textContent;\n  } finally {\n    actionInFlight = false;\n    dispatchInFlight = false;\n    disable(false);\n    poller.resume();\n    if (action === 'bootstrap' && !retrySetup) firstRun.focusCurrent('setup');\n    if (action === 'keep') firstRun.focusCurrent('overlay');\n    if (retrySetup && setupLeft > 0 && !document.hidden && Date.now() < setupDeadline) {\n      setupTimer = setTimeout(() => {\n        void run('bootstrap', { continued: true });\n      }, 5000);\n    } else if (action === 'bootstrap') stopSetup();\n  }\n}\ndocument.getElementById('observe-targets').onclick = () => {\n  if (busy || !csrf || !allowedActions.includes('observe-targets')) return;\n  observationArmed = !observationArmed;\n  nextObservationAt = 0;\n  document.getElementById('target-check-status').textContent = observationArmed\n    ? 'Visible target checks requested; waiting for a fresh observation. Session expiry is unchanged.'\n    : 'Visible target checks stopped; saved observations still expire normally.';\n  disable(false);\n  poller.resume({ immediate: true });\n};\ndocument.getElementById('refresh').onclick = () => {\n  if (!busy) {\n    poller.start();\n  }\n};\ndocument.getElementById('logout').onclick = () => run('logout');\ndisable(true);\n1:import { overlayOptions } from '../public/overlay-client.js';\n57:  ['/overlay-audio.js', ['overlay-audio.js', 'text/javascript; charset=utf-8']],\n59:  ['/overlay', ['overlay.html', 'text/html; charset=utf-8']],\n62:  ['/overlay.css', ['overlay.css', 'text/css; charset=utf-8']],\n63:  ['/overlay.js', ['overlay.js', 'text/javascript; charset=utf-8']],\n64:  ['/overlay-client.js', ['overlay-client.js', 'text/javascript; charset=utf-8']],\n114:  overlayFeed,\n115:  overlayFeeds,\n149:    return overlayFeed?.simulator\n230:        return result(400, 'Invalid static asset query');\n252:          mode: overlayFeed?.simulator ? 'simulator' : 'live',\n301:          mode: overlayFeed?.simulator ? 'simulator' : 'live',\n333:          mode: overlayFeed?.simulator ? 'simulator' : 'live',\n374:              mode: overlayFeed?.simulator ? 'simulator' : 'live',\n431:              mode: overlayFeed?.simulator ? 'simulator' : 'live',\n467:              overlayFeed?.simulator === true,\n492:        const simulator = overlayFeed?.simulator === true;\n552:            mode: overlayFeed?.simulator ? 'simulator' : 'live',\n588:                mode: overlayFeed?.simulator ? 'simulator' : 'live',\n613:    const feedPath = /^(\\/api)?\\/overlay\\/(\\d{1,32})(?:\\?(.*))?$/.exec(path);\n615:      const selected = (overlayFeeds ??\n616:        (overlayFeed ? { [overlayFeed.channel]: overlayFeed } : {}))[feedPath[2]];\n623:        presentation = overlayOptions(params.toString());\n629:      let overlayHTML = await publicHTML('overlay-live.html');\n631:        overlayHTML = overlayHTML\n639:        ...result(200, overlayHTML, 'text/html; charset=utf-8'),\n688:      // Only this static local-preview parent may embed same-origin content.\n690:      if (path === '/overlay')\nsrc/marks.js:330:        mark.status = 'approved';\nsrc/marks.js:396:          mark.status === 'approved' &&\nsrc/marks.js:330:        mark.status = 'approved';\nsrc/marks.js:396:          mark.status === 'approved' &&\nsrc/public-view.js:132:        mark.status === 'approved' &&\nsrc/public-view.js:211:    awaitingRaid: hop.policy === 'preclaim-v1' && !hop.verified,\npublic/overlay.js:345:      : 'The relic stirs… awaiting a Keeper',\npublic/overlay.js:361:  state.textContent = snapshot.claimMeter?.awaitingRaid\npublic/overlay.js:364:  if (options.layout === 'card' && !snapshot.claimMeter?.awaitingRaid)\npublic/overlay.js:416:    ? `${snapshot.approvedCount} approved marks · charge ${snapshot.approvedCount}/160`\npublic/overlay.js:571:      `${meter.awaitingRaid ? (current.mode === 'simulator' ? 'Awaiting verified raid · gathering light' : 'Waiting for Twitch to confirm the raid') : current.mode === 'simulator' ? 'The raid arrived · claim the relic' : 'Bind the relic · two chats'} · ${progress.seconds}s · Offer ${meter.offers}/${meter.threshold} · Accept ${meter.accepts}/${meter.threshold}`,\npublic/ritual-copy.js:19:  return `The relic wandered here to @${login}; no raid or audience transfer occurred. Leave !mark word to add a community rune.`;\npublic/ritual-copy.js:67:    'Waiting for moderator approval. Your mark is private and is not visible on the relic. Moderators can use !relic pending.',\npublic/ritual-copy.js:71:    'No mark was added. Use one allowed word or emoji, wait 30 seconds between marks, and use at most five marks per stream. Private review text is never public.',\npublic/ritual-copy.js:86:  help: 'Raid Relic: !mark word leaves a rune for review; !offer sends, !accept welcomes. !where finds the Keeper; !seek is the broadcaster’s Seeker choice. !relic mymarks, top, badges, scores, scores on/off, forgetme. Moderators: !relic veto. Keeper setup and Send Off stay in private controls.',\npublic/ritual-copy.js:104:  return `${side === 'offers' ? 'Offers' : 'Accepts'} ${hop[side].length}/${hop.threshold}. ${hop.verified ? '' : 'Waiting for Twitch to confirm the raid. '}${missing.length ? 'Waiting for ' + missing.join(' and ') + '.' : hop.verified ? 'Both chats reached the threshold.' : 'Both chats reached the threshold; waiting for Twitch to confirm the raid.'}`;\n"
+    }
+  ]
+}
+````
+
+### 6523. 2026-10-31T11:18:20.651Z — tool call (source line 24740)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_9f9919fea3d54d2ab4e953aca3645bcf",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '115,175p' src/app.js\\nsed -n '200,240p' src/app.js\\nsed -n '610,650p' src/app.js\\nsed -n '1,180p' src/public-view.js\\nsed -n '50,85p' public/ritual-copy.js\\nrg -n 'markInvalid|markPending|markApproved|normalizeMark|markAdded' src public/ritual-copy.js\\nrg -n 'approved|marks' src/atlas.js src/keeper-pages.js public/atlas.js public/keeper.js | head -65\",\"max_output_tokens\":6500})).output)\n"
+}
+````
+
+### 6524. 2026-10-31T11:18:20.755Z — tool result (source line 24743)
+
+````text
+{
+  "call_id": "call_9f9919fea3d54d2ab4e953aca3645bcf",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "  overlayFeeds,\n  raidPilot = false,\n  previewReadOnly = false,\n  releaseCommit,\n  shares,\n  replies,\n  banAuthorized,\n  publicBudget = { burst: 60, perSecond: 1 },\n} = {}) {\n  const keepers = chatContext?.keeperIds ?? (chatContext ? [chatContext.streamerId] : []);\n  if (\n    !Array.isArray(keepers) ||\n    keepers.length > 4 ||\n    (chatContext && !keepers.length) ||\n    !keepers.every((id) => typeof id === 'string' && /^\\d{1,32}$/.test(id)) ||\n    (chatContext && !keepers.includes(chatContext.streamerId))\n  )\n    throw new Error('Configured Keeper allowlist required');\n  let credits = publicBudget.burst;\n  let budgetAt = now();\n  const spend = () => {\n    const time = now();\n    credits = Math.min(\n      publicBudget.burst,\n      credits + (Math.max(0, time - budgetAt) / 1000) * publicBudget.perSecond,\n    );\n    budgetAt = time;\n    if (credits < 1) return false;\n    credits--;\n    return true;\n  };\n  const release = validateReleaseCommit(releaseCommit);\n  const publicHTML = async (file) => {\n    const bytes = await readFile(new URL(`../public/${file}`, import.meta.url));\n    return overlayFeed?.simulator\n      ? bytes\n          .toString()\n          .replace(\n            /<p([^>]*\\bid=\"simulator\"[^>]*)><\\/p>/,\n            (_, attrs) => `<p${attrs.replace(/\\s+hidden\\b/, '')}>SIMULATOR · local test data</p>`,\n          )\n      : bytes;\n  };\n  // Pure request boundary for tests: rawBody is never reserialized before HMAC.\n  async function dispatch({ method, path, headers = {}, rawBody = Buffer.alloc(0) }) {\n    if (path === '/internal/wander/tick') {\n      if (method !== 'POST' || previewReadOnly || !wander?.enabled)\n        return result(403, 'Trusted Wander tick unavailable');\n      if (!spend()) return result(429, 'Tick budget reached');\n      if (headers['content-type'] !== 'application/json')\n        return result(403, 'Trusted Wander JSON required');\n      const request = wander.verify(rawBody, headers['x-rr-wander-signature']);\n      if (!request) return result(403, 'Trusted Wander signature required');\n      const outcome = await wander.tick(request);\n      return result(\n        outcome.status === 'duplicate' ? 409 : 200,\n        JSON.stringify({ status: outcome.status }),\n        'application/json',\n      );\n    }\n    if (['/receiving.js', '/keeper-card.js'].includes(path)) {\n          'image/svg+xml',\n        ),\n        headers: {\n          'cache-control': 'public, max-age=3600',\n          'content-security-policy': \"default-src 'none'\",\n        },\n      };\n    }\n    // Explicit same-origin generated art route before any OAuth/store property access.\n    if (path.startsWith('/edition-crystal/')) {\n      if (method !== 'GET') return result(previewReadOnly ? 403 : 405, 'Read only');\n      const match = /^\\/edition-crystal\\/([a-z0-9-]{1,40})\\.svg$/.exec(path),\n        edition =\n          match && validEditions(EDITION_CONFIG) && EDITION_CONFIG.find((e) => e.id === match[1]);\n      if (!edition) return result(404, 'Unknown edition art');\n      return {\n        ...result(200, editionSVG(edition), 'image/svg+xml'),\n        headers: { 'cache-control': 'no-store', 'content-security-policy': \"default-src 'none'\" },\n      };\n    }\n    const demoPath = path.split('?')[0];\n    if (demoAssets.has(demoPath)) {\n      if (method !== 'GET') return result(previewReadOnly ? 403 : 405, 'Static demo is read only');\n      const file = demoAssets.get(demoPath),\n        type = file.endsWith('.html')\n          ? 'text/html; charset=utf-8'\n          : file.endsWith('.js')\n            ? 'text/javascript; charset=utf-8'\n            : 'text/css; charset=utf-8';\n      if (path.includes('?') && !file.endsWith('.html'))\n        return result(400, 'Invalid static asset query');\n      return {\n        ...result(200, await readFile(new URL(`../public/${file}`, import.meta.url)), type),\n        headers: {\n          'cache-control': 'public, max-age=3600',\n          'content-security-policy':\n            \"default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'self'\",\n        },\n      };\n    }\n    if (method === 'GET' && path === '/health') {\n        return result(503, 'Atlas unavailable');\n      }\n    }\n    const feedPath = /^(\\/api)?\\/overlay\\/(\\d{1,32})(?:\\?(.*))?$/.exec(path);\n    if (feedPath) {\n      const selected = (overlayFeeds ??\n        (overlayFeed ? { [overlayFeed.channel]: overlayFeed } : {}))[feedPath[2]];\n      if (!selected) return result(404, 'Not found');\n      if (method !== 'GET') return result(404, 'Read only');\n      const params = new URLSearchParams(feedPath[3] ?? '');\n      if (feedPath[1] && feedPath[3] !== undefined) return result(400, 'Invalid query');\n      let presentation;\n      try {\n        presentation = overlayOptions(params.toString());\n      } catch {\n        return result(400, 'Invalid query');\n      }\n      if (feedPath[1])\n        return result(200, JSON.stringify(await selected.snapshot()), 'application/json');\n      let overlayHTML = await publicHTML('overlay-live.html');\n      if (presentation.preview)\n        overlayHTML = overlayHTML\n          .toString()\n          .replace(\n            /<p([^>]*\\bid=\"simulator\"[^>]*)>[\\s\\S]*?<\\/p>/,\n            (_, attrs) =>\n              `<p${attrs.replace(/\\s+hidden\\b/, '')}>LOCAL TEST · fictional arrival · no live connection</p>`,\n          );\n      return {\n        ...result(200, overlayHTML, 'text/html; charset=utf-8'),\n        ...(presentation.preview\n          ? {\n              headers: {\n                'cache-control': 'no-store',\n                'x-frame-options': 'SAMEORIGIN',\n                'content-security-policy':\n                  \"default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'self'\",\n              },\n            }\n          : {}),\n      };\nimport { RECEIVING_KEEPERS } from './receiving.js';\nimport { stopStreak } from './streaks.js';\nimport { chronicleView } from './chronicle.js';\nimport { eligible } from './send-state.js';\nimport { runeSvg } from './marks.js';\nimport { carriedApprovedCount } from './claim-ack.js';\n\nconst stopSummary = (stop) => ({\n  stopId: stop.stopId,\n  from: stop.from,\n  to: stop.to,\n  claimedAt: stop.claimedAt,\n  raidSize: stop.raidSize,\n  ...(stop.kind === 'wander' ? { kind: 'wander' } : {}),\n  ringIndex: stop.ringIndex,\n  ...stopStreak(stop),\n  chronicle: chronicleView(stop),\n  approvedCount: stop.marks.length,\n});\nexport function atlasPage(lineage, { stopId, offset = 0, limit = 8 } = {}) {\n  const stops = lineage?.stops ?? [];\n  if (stopId) {\n    const stop = stops.find((item) => item.stopId === stopId);\n    if (!stop) return null;\n    return {\n      rings: stops.length,\n      ...(stops.some((s) => s.kind === 'wander')\n        ? { wanderStops: stops.filter((s) => s.kind === 'wander').length }\n        : {}),\n      stop: stopSummary(stop),\n      offset,\n      total: stop.marks.length,\n      nextOffset: offset + limit < stop.marks.length ? offset + limit : null,\n      marks: stop.marks\n        .slice(offset, offset + limit)\n        .map((mark) => ({ id: mark.id, text: mark.text, runeSvg: runeSvg(mark.text) })),\n    };\n  }\n  return {\n    rings: stops.length,\n    ...(stops.some((s) => s.kind === 'wander')\n      ? { wanderStops: stops.filter((s) => s.kind === 'wander').length }\n      : {}),\n    offset,\n    total: stops.length,\n    nextOffset: offset + limit < stops.length ? offset + limit : null,\n    stops: stops.slice(offset, offset + limit).map(stopSummary),\n  };\n}\nexport function handoffView(registry, channel, now, lineage, names = RECEIVING_KEEPERS) {\n  const hop = registry?.pendingHop;\n  if (\n    !hop ||\n    (hop.policy === 'preclaim-v1' && !hop.verified) ||\n    hop.cancelled ||\n    now >= hop.endsAt ||\n    ![hop.from, hop.to].includes(channel)\n  )\n    return null;\n  const stop =\n    hop.finalized &&\n    lineage?.stops?.find(\n      (s) => s.eventId === hop.eventId && s.from === hop.from && s.to === hop.to,\n    );\n  const sourceLogin = names[hop.from];\n  const carried = carriedApprovedCount(hop, lineage);\n  return {\n    ...(carried !== undefined ? { carriedApprovedCount: carried } : {}),\n    ...(sourceLogin ? { sourceLogin } : {}),\n    ...(stop && Number.isFinite(stop.claimedAt) ? { completedAt: stop.claimedAt } : {}),\n    role: hop.to === channel ? 'host' : 'source',\n    startedAt: hop.startedAt,\n    endsAt: hop.endsAt,\n    ...(hop.policy === 'preclaim-v1'\n      ? {\n          clockPolicy: hop.claimClock === 'landing-v2' ? hop.claimClock : hop.policy,\n          claimStartedAt: hop.claimStartedAt,\n        }\n      : {}),\n    threshold: hop.threshold,\n    offers: Math.min(hop.threshold, hop.offers?.length ?? hop.threshold),\n    accepts: Math.min(hop.threshold, hop.accepts?.length ?? hop.threshold),\n    completed: hop.finalized === true,\n  };\n}\n\nexport function withCarriedMarks(view, lineage, registry, host) {\n  if (registry?.holderId !== host || !['ready', 'paused'].includes(view.status)) return view;\n  const last = lineage?.stops?.at(-1);\n  const carried =\n    last?.to === host\n      ? last.marks.map(({ id, text }) => ({\n          id,\n          runeSvg: runeSvg(text),\n          flightText: text,\n          ...(registry.carriedClosures === 3 ? { faded: true } : {}),\n        }))\n      : [];\n  return { ...view, marks: [...carried, ...view.marks].slice(-160) };\n}\n\nexport function withIncomingPreview(view, registry, host, channels, docs, now) {\n  const hop = registry?.pendingHop;\n  if (\n    !hop ||\n    (hop.policy === 'preclaim-v1' && !hop.verified) ||\n    hop.to !== host ||\n    hop.cancelled ||\n    hop.finalized ||\n    now >= hop.endsAt\n  )\n    return view;\n  const source = channels[hop.from],\n    target = channels[host],\n    doc = docs[hop.from];\n  const retired =\n    !source?.online &&\n    source?.streamId === null &&\n    source?.retiredStream?.streamId === hop.sourceStreamId &&\n    hop.raidSentAt >= source.retiredStream.startedAt &&\n    hop.raidSentAt <= source.retiredStream.offlineAt;\n  if (\n    !eligible(registry, channels, docs, hop.from, host, retired) ||\n    (retired ? source.retiredStream.streamId : source.streamId) !== hop.sourceStreamId ||\n    target.streamId !== hop.targetStreamId\n  )\n    return view;\n  const session = doc.sessions.find((item) => item.streamId === hop.sourceStreamId);\n  const marks = (session?.marks ?? [])\n    .filter(\n      (mark) =>\n        mark.status === 'approved' &&\n        !doc.blocked.includes(mark.userId) &&\n        !source.blockedUserIds.includes(mark.userId) &&\n        !doc.context.blockedUserIds.includes(mark.userId),\n    )\n    .slice(-160)\n    .map(({ id, text }) => ({ id, runeSvg: runeSvg(text), flightText: text }));\n  return { ...view, marks };\n}\n\n// Store-owned, consistent snapshot; never a provider lookup or live authority.\nexport function keeperCandidates(registry, channels, docs, config, host) {\n  if (!config?.channels.includes(host)) return [];\n  return config.channels\n    .filter((id) => eligible(registry ?? {}, channels, docs, host, id))\n    .map((id) => ({\n      id,\n      login: Object.entries(config.logins).find(([, value]) => value === id)?.[0] ?? id,\n      observedOnline: true,\n      optedIn: true,\n      eligible: true,\n    }));\n}\n\n// Only the bounded completed public archive is searched; no identity lookup.\nexport function atlasSearch(lineage, { query, offset = 0, limit = 20 }) {\n  if (\n    !query ||\n    !Number.isInteger(offset) ||\n    offset < 0 ||\n    offset > 2560 ||\n    !Number.isInteger(limit) ||\n    limit < 1 ||\n    limit > 20\n  )\n    throw new Error('Invalid search');\n  const stops = lineage?.stops ?? [];\n  if (stops.length > 16 || stops.some((stop) => stop.marks.length > 160))\n    throw new Error('Archive capacity exceeded');\n  const matches = [];\n  for (const stop of stops)\n    for (const mark of stop.marks) if (mark.text.includes(query)) matches.push({ stop, mark });\n  return {\n    total: matches.length,\n    offset,\n    nextOffset: offset + limit < matches.length ? offset + limit : null,\n    matches: matches.slice(offset, offset + limit).map(({ stop, mark }) => ({\n      stopId: stop.stopId,\n      from: stop.from,\n  theAuthorisedKeeperSeekerPilot: 'The authorised Keeper Seeker pilot is off.',\n  youHoldTheRelicSeeker: 'You hold the relic. Seeker queue off; pass it on before joining again.',\n  seekerQueueOnYourConfigured:\n    'Seeker queue on. Your configured channel may be suggested while live and eligible. !seek off to leave.',\n  seekerQueueOffTypeSeek: 'Seeker queue off. Type !seek to rejoin.',\n  theCurrentRelicHolderIs: 'The current relic holder is not recorded.',\n  thatVoteWasNotCounted: 'That vote was not counted. Check the ritual, chat role and deadline.',\n  yourRetainedMarksSharedLinks:\n    'Your retained marks, shared links and public scores were erased. Stream quota and cooldown are not refunded.',\n  markHistoryLinkNotQueued:\n    'Mark-history link not queued. Use your own verified login and wait one minute between requests. Shared links are public to anyone who receives them.',\n  onlyThisBroadcasterOrAn: 'Only this broadcaster or an authorized moderator can use that command.',\n  nothingIsRetainedToVeto:\n    'Nothing is retained to veto in this channel. Moderators can remove the latest approved or pending mark; veto never refunds the five-mark allowance or waiting time.',\n  vetoUnavailableAnEligibleRetained:\n    'Veto unavailable: an eligible retained mark and authorized same-channel moderator are required.',\n  waitingForModeratorApprovalYour:\n    'Waiting for moderator approval. Your mark is private and is not visible on the relic. Moderators can use !relic pending.',\n  marksAreOpenOnlyWhile:\n    'Marks are open only while this channel is live, unpaused and holding the relic. No mark was added.',\n  noMarkWasAddedUse:\n    'No mark was added. Use one allowed word or emoji, wait 30 seconds between marks, and use at most five marks per stream. Private review text is never public.',\n  markRequestCheckedUnderQuota:\n    'Mark request checked under quota and cooldown. Clean valid marks become public automatically; held marks stay private until moderator approval.',\n  markRequestProcessedUnderThe:\n    'Mark request processed under the stream quota and cooldown. Only moderator-approved marks become public.',\n  sendOffRequestCheckedThe:\n    'Send Off request checked. The Keeper uses private control to process an eligible queued request; never repeat an unknown dispatch.',\n  keeperCommandCheckedRefreshYour:\n    'Keeper command checked. Refresh your private control for the authoritative result; role and stream safety rules still apply.',\n  retainedCompletedArchiveOnlyInitial:\n    'Retained completed archive only. Initial home hold start is unknown; historical raider participation is not available. Raider counts start after explicit score opt-in, never retroactively.',\n  scoresAreOffForYou: 'Scores are off for you. !relic scores on to join; off to leave.',\n\n  arrival:\n    'The relic has arrived! Receiving chat: type !accept. Sending chat: type !offer. Both chats claim it before the local timer ends.',\nsrc/bot.js:10:import { normalizeMark, parseMarkCommand } from './marks.js';\nsrc/bot.js:115:      const text = normalizeMark(event.message.text);\nsrc/recap.js:2:import { normalizeMark, runeGeometry } from './marks.js';\nsrc/recap.js:32:        normalizeMark(mark.text) !== mark.text ||\nsrc/marks.js:21:export function normalizeMark(input) {\nsrc/marks.js:49:    const terms = values.map(normalizeMark);\nsrc/marks.js:83:  const normalized = normalizeMark(input);\nsrc/marks.js:117:  if (mark) return { type: 'mark', text: normalizeMark(mark[1]) };\nsrc/marks.js:349:  const text = normalizeMark(action.text);\nsrc/app.js:15:import { createMarkService, normalizeMark } from './marks.js';\nsrc/app.js:534:      const query = normalizeMark(body.query),\nrg: src/atlas.js: No such file or directory (os error 2)\nrg: src/keeper-pages.js: No such file or directory (os error 2)\nrg: public/keeper.js: No such file or directory (os error 2)\npublic/atlas.js:47:  $('marks').replaceChildren();\npublic/atlas.js:79:      ? `Showing ${offset + 1}–${Math.min(offset + (stopId ? data.marks.length : data.stops.length), data.total)} of ${data.total}`\npublic/atlas.js:81:        ? 'No approved marks retained at this stop.'\npublic/atlas.js:89:      for (const mark of data.marks) {\npublic/atlas.js:92:        img.alt = 'Original approved rune';\npublic/atlas.js:95:        $('marks').append(item);\npublic/atlas.js:115:          ...(stop.approvedCount\npublic/atlas.js:116:            ? [node('p', `${stop.approvedCount} approved marks retained`)]\npublic/atlas.js:179:    $('search-status').textContent = 'Enter one word or emoji to search shared approved text.';\npublic/atlas.js:203:        : 'No approved shared-text matches at completed stops.';\npublic/atlas.js:236:  $('search-status').textContent = 'Submit to search shared approved text.';\n"
+    }
+  ]
+}
+````
+
+### 6525. 2026-10-31T11:18:29.031Z — tool call (source line 24747)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_73e51fabd2ee409286f0d3f3fc51818a",
+  "input": "text((await tools.exec_command({cmd:\"cat public/control-read.js | head -150\\nsed -n '680,710p' src/app.js\\nsed -n '1,38p' src/app.js\\nrg -n 'keeperNames|names|logins|keeperConfig' src/app.js | head -25\\nsed -n '1,90p' test/overlay-group3.test.js\\nhead -65 test/control-wizard.test.js\\nrg -n 'markRequest|noMarkWas|waitingForModerator' src/bot.js src/*reply* src/app.js test/*copy*\",\"max_output_tokens\":4500})).output)\n"
+}
+````
+
+### 6526. 2026-10-31T11:18:29.130Z — tool result (source line 24750)
+
+````text
+{
+  "call_id": "call_73e51fabd2ee409286f0d3f3fc51818a",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "// Bounded private-page I/O. Never retries any request or logs bodies/errors.\nexport class ControlReadError extends Error {\n  constructor(code, status = null) {\n    super(code);\n    this.code = code;\n    this.status = status;\n  }\n}\nexport async function boundedResponse(\n  url,\n  options = {},\n  {\n    fetchImpl = globalThis.fetch,\n    timeoutMs = 8000,\n    maxBytes = 65536,\n    json = false,\n    setTimer = setTimeout,\n    clearTimer = clearTimeout,\n  } = {},\n) {\n  const controller = new AbortController();\n  let timer, abort;\n  try {\n    if (options.signal?.aborted) throw new ControlReadError('aborted');\n    const cancelled = new Promise((_, reject) => {\n      abort = () => {\n        controller.abort();\n        reject(new ControlReadError('aborted'));\n      };\n      options.signal?.addEventListener('abort', abort, { once: true });\n    });\n    const timeout = new Promise((_, reject) => {\n      timer = setTimer(() => {\n        controller.abort();\n        reject(new ControlReadError('timeout'));\n      }, timeoutMs);\n    });\n    const operation = (async () => {\n      let response;\n      try {\n        response = await fetchImpl(url, { ...options, signal: controller.signal });\n      } catch {\n        throw new ControlReadError('network');\n      }\n      let text = '';\n      if (response.body?.getReader) {\n        const reader = response.body.getReader();\n        let size = 0;\n        const chunks = [];\n        try {\n          while (true) {\n            const { done, value } = await reader.read();\n            if (done) break;\n            size += value.byteLength;\n            if (size > maxBytes) {\n              controller.abort();\n              void reader.cancel().catch(() => {});\n              throw new ControlReadError('oversize');\n            }\n            chunks.push(value);\n          }\n          const bytes = new Uint8Array(size);\n          let offset = 0;\n          for (const c of chunks) {\n            bytes.set(c, offset);\n            offset += c.byteLength;\n          }\n          text = new TextDecoder('utf-8', { fatal: true }).decode(bytes);\n        } finally {\n          reader.releaseLock();\n        }\n      } else {\n        text = await response.text();\n        if (new TextEncoder().encode(text).byteLength > maxBytes)\n          throw new ControlReadError('oversize');\n      }\n      let value;\n      if (json) {\n        if ([401, 403].includes(response.status))\n          throw new ControlReadError('authorization', response.status);\n        if (response.status < 200 || response.status >= 300)\n          throw new ControlReadError('http', response.status);\n        try {\n          value = JSON.parse(text);\n        } catch {\n          throw new ControlReadError('malformed');\n        }\n      }\n      return {\n        status: response.status,\n        ok: response.status >= 200 && response.status < 300,\n        text,\n        value,\n      };\n    })();\n    return await Promise.race([operation, timeout, cancelled]);\n  } finally {\n    clearTimer(timer);\n    options.signal?.removeEventListener('abort', abort);\n  }\n}\n\n// Visible-only, one-flight GET scheduling. It never performs or retries an action.\nexport function controlPollDelay(pending, failures = 0) {\n  return Math.min(60000, (pending ? 5000 : 30000) * 2 ** Math.min(4, Math.max(0, failures)));\n}\nexport function createControlPoller({\n  read,\n  pending = () => true,\n  hidden = () => false,\n  setTimer = setTimeout,\n  clearTimer = clearTimeout,\n}) {\n  let timer = null,\n    flight = null,\n    epoch = 0,\n    failures = 0,\n    stopped = true,\n    held = false;\n  const clear = () => {\n    clearTimer(timer);\n    timer = null;\n  };\n  const schedule = (delay) => {\n    clear();\n    if (stopped || held || hidden() || flight) return;\n    timer = setTimer(() => {\n      timer = null;\n      void request();\n    }, delay);\n  };\n  async function request() {\n    clear();\n    if (stopped || held || hidden()) return;\n    if (flight) return flight.promise;\n    const own = epoch,\n      controller = new AbortController();\n    const task = { controller, promise: null };\n    flight = task;\n    task.promise = Promise.resolve()\n      .then(() => read(controller.signal))\n      .then(\n        (ok) => {\n          if (own === epoch && !controller.signal.aborted)\n            failures = ok === false ? failures + 1 : 0;\n        },\n        () => {\n          if (own === epoch && !controller.signal.aborted) failures++;\n        },\n      )\n            '<details class=\"landing-archive\"><summary>Explore the recorded journey</summary><section id=\"journey-map\"',\n          )\n          .replace('      <p class=\"note\">', '      </details><p class=\"note\">')\n          .replace(\n            '</main>',\n            '</main><nav class=\"mobile-cta\" aria-label=\"Quick start\"><a href=\"/demo/judge\">▶ Watch demo</a><a href=\"/start\">Add to my stream</a></nav>',\n          );\n      }\n      // Only this static local-preview parent may embed same-origin content.\n      // No application script, connection or form capability is introduced.\n      if (path === '/overlay')\n        return {\n          ...result(200, bytes, type),\n          headers: {\n            'x-frame-options': 'DENY',\n            'content-security-policy':\n              \"default-src 'none'; script-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'; frame-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'\",\n          },\n        };\n      return result(200, bytes, type);\n    }\n    if (path !== '/eventsub') return result(404, 'Not found');\n    if (method !== 'POST') return result(405, 'Method not allowed');\n    if (!secret) return result(503, 'Webhook secret not configured');\n    if (!Buffer.isBuffer(rawBody)) return result(400, 'Expected raw bytes');\n    if (rawBody.length > MAX_BODY_BYTES) return result(413, 'Body too large');\n    const id = header(headers, 'twitch-eventsub-message-id');\n    const timestamp = header(headers, 'twitch-eventsub-message-timestamp');\n    const signature = header(headers, 'twitch-eventsub-message-signature');\n    const type = header(headers, 'twitch-eventsub-message-type');\n    if (!id || id.length > 256 || !/^sha256=[a-f0-9]{64}$/.test(signature))\nimport { overlayOptions } from '../public/overlay-client.js';\nimport { RECEIVING_KEEPERS } from './receiving.js';\nimport { boundedCall } from './bounded.js';\nimport { EDITION_CONFIG, validEditions, editionSVG } from '../public/editions.js';\nimport { canonicalLogin, shareRequestHash } from './my-marks.js';\nimport { parseBan } from './bans.js';\nimport { ackKey } from './claim-ack.js';\nimport { matchesSubscriptionCondition } from './subscriptions.js';\nimport { strictJSON, templateDesign, forgeResult } from './forge.js';\nimport { recapSVG } from './recap.js';\nimport { createHmac, timingSafeEqual } from 'node:crypto';\nimport { readFile } from 'node:fs/promises';\nimport { createMemoryState } from './state.js';\nimport { parseChat } from './bot.js';\nimport { createMarkService, normalizeMark } from './marks.js';\nimport { validateReleaseCommit } from './release.js';\nimport { parseLifecycle } from './lifecycle.js';\n\nexport const MAX_BODY_BYTES = 65536;\nexport const REPLAY_WINDOW_MS = 10 * 60 * 1000;\nconst assets = new Map([\n  ['/keeper-network.js', ['keeper-network.js', 'text/javascript; charset=utf-8']],\n  ['/growth.js', ['growth.js', 'text/javascript; charset=utf-8']],\n  ['/streak-view.js', ['streak-view.js', 'text/javascript; charset=utf-8']],\n  ['/ring-card.js', ['ring-card.js', 'text/javascript; charset=utf-8']],\n  ['/ring-card-client.js', ['ring-card-client.js', 'text/javascript; charset=utf-8']],\n  ['/editions.js', ['editions.js', 'text/javascript; charset=utf-8']],\n  ['/edition-view.js', ['edition-view.js', 'text/javascript; charset=utf-8']],\n  ['/journey-map.js', ['journey-map.js', 'text/javascript; charset=utf-8']],\n  ['/journey-map.css', ['journey-map.css', 'text/css; charset=utf-8']],\n  ['/scoreboard.js', ['scoreboard.js', 'text/javascript; charset=utf-8']],\n  ['/fonts.css', ['fonts.css', 'text/css; charset=utf-8']],\n  ['/fonts/Cinzel.ttf', ['fonts/Cinzel.ttf', 'font/ttf']],\n  ['/fonts/OFL-Cinzel.txt', ['fonts/OFL-Cinzel.txt', 'text/plain; charset=utf-8']],\n  ['/control-view.js', ['control-view.js', 'text/javascript; charset=utf-8']],\n  ['/control-read.js', ['control-read.js', 'text/javascript; charset=utf-8']],\n  ['/cinematic.js', ['cinematic.js', 'text/javascript; charset=utf-8']],\n  ['/relic3d.js', ['relic3d.js', 'text/javascript; charset=utf-8']],\n104:  keeperNames = RECEIVING_KEEPERS,\n188:          `export const keeperNames = Object.freeze(${JSON.stringify(keeperNames)});`,\n287:      if (login && !Object.values(keeperNames).includes(login))\n314:      if (!Object.values(keeperNames).includes(path.slice(8)))\n493:        const svg = recapSVG(projection, { simulator, names: keeperNames });\nimport test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { readFile } from 'node:fs/promises';\nimport {\n  overlayOptions,\n  overlayArrival,\n  localOverlayArrival,\n  acceptedOverlayPreview,\n  validSnapshot,\n  connectOverlay,\n} from '../public/overlay-client.js';\nimport { BOT_COPY, claimVoteCopy } from '../public/ritual-copy.js';\nimport { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\nimport { overlaySoakOptions } from '../test-support/overlay-soak.js';\n\ntest('closed overlay layouts, scale, positions, OBS admission and local preview do not widen server authority', () => {\n  assert.deepEqual(overlayOptions(), {\n    layout: 'card',\n    pos: 'bl',\n    scale: 1,\n    obs: false,\n    preview: false,\n  });\n  assert.equal(overlayOptions('?corner=1').layout, 'corner');\n  for (const layout of ['card', 'full', 'corner'])\n    for (const pos of ['bl', 'br', 'tl', 'tr'])\n      for (const scale of ['0.75', '1', '1.5'])\n        assert.equal(\n          overlayOptions(`?layout=${layout}&pos=${pos}&scale=${scale}`).scale,\n          Number(scale),\n        );\n  assert.equal(overlayOptions('', 'OBSStudio/30.0').obs, true);\n  assert.equal(overlayOptions('?obs=1').obs, true);\n  for (const query of [\n    '?layout=no',\n    '?scale=.75',\n    '?scale=0.749',\n    '?scale=1.501',\n    '?layout=full&corner=1',\n    '?pos=bl&pos=tr',\n    '?obs=0',\n    '?preview=live',\n    '?url=https://other.invalid',\n  ])\n    assert.throws(() => overlayOptions(query));\n  const snapshot = localOverlayArrival('host', 1000);\n  assert.ok(validSnapshot(snapshot));\n  assert.equal(overlayArrival(snapshot, 1000).command, '!accept');\n  assert.equal(\n    overlayArrival({ ...snapshot, handoff: { ...snapshot.handoff, role: 'source' } }, 1000).command,\n    '!offer',\n  );\n  assert.equal(overlayArrival(snapshot, 61000).seconds, 120);\n  assert.equal(overlayArrival(snapshot, 181000), null);\n  assert.equal(\n    overlayArrival({ ...snapshot, handoff: { ...snapshot.handoff, completed: true } }, 2000),\n    null,\n  );\n  assert.equal(overlayArrival({ ...snapshot, claimMeter: { awaitingRaid: true } }, 2000), null);\n  assert.equal(\n    overlayArrival(\n      { ...snapshot, handoff: { ...snapshot.handoff, clockPolicy: 'preclaim-v1' } },\n      2000,\n    ),\n    null,\n  );\n  const parent = {},\n    value = {\n      origin: 'https://local.invalid',\n      source: parent,\n      data: { type: 'raid-relic-preview-arrival', role: 'host' },\n    };\n  assert.ok(acceptedOverlayPreview(value, parent, value.origin));\n  for (const bad of [\n    { ...value, source: {} },\n    { ...value, origin: 'https://other.invalid' },\n    { ...value, data: { ...value.data, offers: 99 } },\n    { ...value, data: { ...value.data, role: 'admin' } },\n  ])\n    assert.ok(!acceptedOverlayPreview(bad, parent, value.origin));\n});\ntest('OBS read persistence keeps default human-idle suspension separate and cleans every owned timer', () => {\n  for (const persistentRead of [false, true]) {\n    const timers = new Map(),\n      handlers = {},\n      sockets = [];\n    let next = 0;\n    const events = {\n      hidden: false,\n      addEventListener: (n, f) => {\nimport test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { readFile } from 'node:fs/promises';\nimport { createHash } from 'node:crypto';\nimport { createControlPoller, controlPollDelay } from '../public/control-read.js';\nimport {\n  setupRetryAllowed,\n  readinessLights,\n  targetObservationText,\n} from '../public/control-view.js';\nimport { setupReadiness, wizardPrimary } from '../public/onboarding.js';\nimport { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\nconst settle = async () => {\n  for (let i = 0; i < 12; i++) await Promise.resolve();\n};\n\ntest('current primary transitions keep subscription setup, explicit opt-in and manual OBS confirmation independent', () => {\n  const initial = { subscriptions: { ready: false }, optedIn: false };\n  const saved = structuredClone(initial);\n  assert.deepEqual(wizardPrimary(null), { setup: 'first-bootstrap', overlay: 'first-obs-copy' });\n  assert.equal(wizardPrimary(initial).setup, 'first-bootstrap');\n  const reconciled = { ...initial, subscriptions: { ready: true } };\n  assert.equal(wizardPrimary(reconciled).setup, 'first-keep');\n  assert.equal(reconciled.optedIn, false, 'Choosing the next control cannot opt in');\n  assert.equal(wizardPrimary(reconciled, { copied: true }).overlay, 'first-obs-check');\n  assert.equal(wizardPrimary(reconciled, { copied: false, obs: false }).overlay, 'first-obs-copy');\n  assert.equal(wizardPrimary(reconciled, { copied: true, obs: true }).overlay, 'first-obs-copy');\n  const opted = { ...reconciled, optedIn: true };\n  assert.equal(\n    wizardPrimary(opted).setup,\n    'first-bootstrap',\n    'Already opted in offers only an observation recheck',\n  );\n  assert.equal(\n    wizardPrimary({ ...opted, subscriptions: { ready: false } }).setup,\n    'first-bootstrap',\n  );\n  assert.deepEqual(initial, saved);\n  assert.equal(reconciled.optedIn, false);\n});\n\ntest('readiness fixes map to existing controls with one reason and no invented moderator authority', () => {\n  const unknown = readinessLights(null);\n  for (const value of Object.values(unknown)) {\n    assert.equal(value.fix, 'reconnect');\n    assert.match(value.reason, /Sign in first/);\n  }\n  const pilot = { botGrantStored: false, subscriptions: { ready: false }, online: false };\n  const before = structuredClone(pilot);\n  const missing = readinessLights(pilot, ['bootstrap']);\n  assert.equal(missing.bot.fix, null, 'Missing bot grant needs owner, not extra optional scopes');\n  assert.match(missing.bot.reason, /owner.*raidrelicbot/);\n  assert.equal(missing.subscriptions.fix, 'first-bootstrap');\n  assert.equal(missing.live.fix, 'first-bootstrap');\n  assert.match(missing.live.reason, /offline.*requires a live stream/);\n  for (const value of Object.values(readinessLights(pilot, []))) assert.equal(value.fix, null);\n  const ready = readinessLights(\n    { botGrantStored: true, subscriptions: { ready: true }, online: true },\n    ['bootstrap'],\n  );\n  for (const value of Object.values(ready)) {\n    assert.equal(value.state, 'ready');\n    assert.equal(value.fix, null);\n    assert.equal(typeof value.reason, 'string');\n  }\nrg: src/*reply*: No such file or directory (os error 2)\nrg: test/*copy*: No such file or directory (os error 2)\n"
+    }
+  ]
+}
+````
+
+### 6527. 2026-10-31T11:18:34.499Z — tool call (source line 24754)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_1b2a637dc3fd4304b4ad6656aaf5eb1a",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '155,205p' public/control-read.js\\nrg -n 'first-bootstrap|bootstrap|pending|result' public/first-run.js | head -45\\nrg -n 'markRequest|noMarkWas|waitingForModerator' src\\nsed -n '270,330p' src/app.js\\nrg -n 'mark|approve|snapshot' test/receiving.test.js | head -40\\nhead -70 test/marks.test.js\\nsed -n '350,370p' public/overlay.js\",\"max_output_tokens\":4000})).output)\n"
+}
+````
+
+### 6528. 2026-10-31T11:18:34.639Z — tool result (source line 24757)
+
+````text
+{
+  "call_id": "call_1b2a637dc3fd4304b4ad6656aaf5eb1a",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "    return task.promise;\n  }\n  return {\n    start() {\n      stopped = false;\n      held = false;\n      schedule(0);\n    },\n    request,\n    async pause() {\n      held = true;\n      epoch++;\n      clear();\n      flight?.controller.abort();\n      await flight?.promise;\n    },\n    resume({ immediate = false } = {}) {\n      if (stopped) return;\n      held = false;\n      schedule(immediate ? 0 : controlPollDelay(pending(), failures));\n    },\n    visibility() {\n      epoch++;\n      clear();\n      flight?.controller.abort();\n      // Join the aborted generation before a visible read; never overlap it.\n      const done = flight?.promise ?? Promise.resolve();\n      void done.then(() => {\n        if (!stopped && !held && !hidden()) schedule(0);\n      });\n    },\n    stop() {\n      stopped = true;\n      epoch++;\n      clear();\n      flight?.controller.abort();\n    },\n  };\n}\n51:      ? `Status read ${r.ageSeconds} s ago; these are saved observations, not fresh Twitch authorization. ${document.hidden ? 'Updates paused while hidden.' : 'Visible pending steps update every 5 seconds; idle every 30 seconds.'}`\n68:      ['setup', ['first-bootstrap', 'first-keep']],\n131:      ['first-bootstrap', 'bootstrap'],\n145:          : action === 'bootstrap' || action === 'keep'\n160:    ['first-bootstrap', 'bootstrap'],\n252:    pending() {\nsrc/scoreboard.js:244:              : BOT_COPY.waitingForModeratorApprovalYour;\nsrc/scoreboard.js:249:              : BOT_COPY.noMarkWasAddedUse;\nsrc/scoreboard.js:254:                ? BOT_COPY.markRequestCheckedUnderQuota\nsrc/scoreboard.js:255:                : BOT_COPY.markRequestProcessedUnderThe\n          'P5 read-only preview. Live chat commands are not enabled on canonical yet.',\n        ),\n        headers: { 'cache-control': 'no-store' },\n      };\n    if (\n      (path.startsWith('/control/') ||\n        path.startsWith('/api/') ||\n        path.split('?')[0] === '/auth/callback' ||\n        path.startsWith('/oauth/')) &&\n      !spend()\n    )\n      return result(429, 'Public request budget reached; retry later');\n    if (path === '/api/receiving' || /^\\/api\\/keeper\\/[a-z0-9_]{1,25}$/.test(path)) {\n      if (method !== 'GET') return result(405, 'Read only');\n      if (rawBody.length) return result(400, 'Invalid receiving request');\n      if (!receiving) return result(503, 'Receiving view unavailable');\n      const login = path.startsWith('/api/keeper/') ? path.slice(12) : null;\n      if (login && !Object.values(keeperNames).includes(login))\n        return result(404, 'Keeper not configured');\n      try {\n        const value = await boundedCall(() => receiving.page(), 8000);\n        const profile = login ? value.profiles.find((p) => p.login === login) : null;\n        if (login && !profile) return result(404, 'Keeper not available');\n        const body = JSON.stringify({\n          ...(login\n            ? {\n                profile,\n                holder: value.holder,\n                live: value.holder?.login === login ? value.live : null,\n              }\n            : value),\n          mode: overlayFeed?.simulator ? 'simulator' : 'live',\n        });\n        if (Buffer.byteLength(body) > 131072) throw Error('Receiving capacity');\n        return {\n          ...result(200, body, 'application/json'),\n          headers: { 'cache-control': 'no-store' },\n        };\n      } catch {\n        return result(503, 'Receiving view unavailable; clear previous content and refresh');\n      }\n    }\n    if (/^\\/keeper\\/[a-z0-9_]{1,25}$/.test(path)) {\n      if (method !== 'GET') return result(405, 'Read only');\n      if (!Object.values(keeperNames).includes(path.slice(8)))\n        return result(404, 'Keeper not configured');\n      return result(200, await publicHTML('keeper.html'), 'text/html; charset=utf-8');\n    }\n    if (path.startsWith('/control/')) {\n      if (!oauth?.control) return result(503, 'Control not configured');\n      return oauth.control.route({ path, method, headers, rawBody });\n    }\n    if (path.startsWith('/oauth/') || (oauth && path.split('?')[0] === oauth.callbackPath)) {\n      if (!oauth) return result(503, 'OAuth not configured');\n      return oauth.route({ method, path, headers });\n    }\n    if (path.startsWith('/api/journey-map')) {\n      if (path !== '/api/journey-map' || rawBody.length)\n        return result(400, 'Invalid journey request');\n      if (method !== 'GET') return result(405, 'Read only');\n      try {\n6:import { parseMarkCommand } from '../src/marks.js';\n93:  test(`${kind}: exact registry spotlight, completed audience/approved glyphs, erasure and own where reply`, async () => {\n98:    await f.chat(HOME, '7101', '!mark moon');\n99:    assert.match(posts(f).at(-1).message, /Your mark is public/);\n101:    await f.chat(HOME, '7102', '!mark spoiler');\nimport test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { createHmac } from 'node:crypto';\nimport { createApp } from '../src/app.js';\nimport { createMemoryState } from '../src/state.js';\nimport { createFirestoreStore } from '../src/store.js';\nimport { MARK_LIMITS, normalizeMark, runeSvg } from '../src/marks.js';\nimport { fakeFirestore } from '../test-support/fake-firestore.js';\n\nconst host = '111';\nconst bot = '222';\nconst user = '987654321';\nconst admin = { broadcasterId: host, chatterId: host };\nconst viewer = { broadcasterId: host, chatterId: user };\nconst context = {\n  streamId: 'trusted-stream-1',\n  keeperId: host,\n  optedIn: true,\n  holdsRelic: true,\n  blockedUserIds: [],\n};\nconst secret = 'synthetic-test-webhook-secret';\nfunction fixture(kind) {\n  const db = kind === 'firestore' ? fakeFirestore() : null;\n  const store = db ? createFirestoreStore(db) : createMemoryState();\n  let time = Date.parse('2026-10-25T12:00:00Z');\n  let sequence = 0;\n  const instance = createApp({\n    secret,\n    state: store,\n    chatContext: { streamerId: host, botId: bot },\n    now: () => time,\n  });\n  function request(text, { userId = user, badges = [], id = `chat-${++sequence}` } = {}) {\n    const timestamp = new Date(time).toISOString();\n    const payload = {\n      subscription: {\n        type: 'channel.chat.message',\n        version: '1',\n        condition: { broadcaster_user_id: host, user_id: bot },\n      },\n      event: {\n        broadcaster_user_id: host,\n        chatter_user_id: userId,\n        message_id: id,\n        badges,\n        message: { text, fragments: [{ type: 'text', text }] },\n      },\n    };\n    const rawBody = Buffer.from(JSON.stringify(payload));\n    const digest = createHmac('sha256', secret)\n      .update(id)\n      .update(timestamp)\n      .update(rawBody)\n      .digest('hex');\n    return {\n      method: 'POST',\n      path: '/eventsub',\n      rawBody,\n      headers: {\n        'twitch-eventsub-message-id': id,\n        'twitch-eventsub-message-timestamp': timestamp,\n        'twitch-eventsub-message-signature': `sha256=${digest}`,\n        'twitch-eventsub-message-type': 'notification',\n      },\n    };\n  }\n  return {\n    instance,\n    db,\n    snapshot.holderLogin &&\n    !snapshot.handoff &&\n    !snapshot.claimMeter &&\n    ['ready', 'waiting'].includes(snapshot.status);\n  if (idleHolder)\n    messages[snapshot.status] =\n      snapshot.holderLogin === ownLogin\n        ? `@${snapshot.holderLogin} holds the relic · Ring ${snapshot.lineageRings} · raid to pass it on`\n        : snapshot.movedToLogin\n          ? `The relic has moved on to @${snapshot.holderLogin} · waiting for its next raid`\n          : `The relic is with @${snapshot.holderLogin} · waiting for its next raid`;\n  state.textContent = snapshot.claimMeter?.awaitingRaid\n    ? 'The relic stirs… waiting for Twitch to confirm the raid'\n    : messages[snapshot.status];\n  if (options.layout === 'card' && !snapshot.claimMeter?.awaitingRaid)\n    state.textContent = snapshot.holderLogin\n      ? `With @${snapshot.holderLogin}`\n      : {\n          ready: 'The relic is here',\n          incoming: 'Claim the relic',\n          waiting: 'Waiting for a Keeper',\n"
+    }
+  ]
+}
+````
+
+### 6529. 2026-10-31T11:18:41.508Z — tool call (source line 24761)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_73545902621743a0b0f19df5eb39f7d1",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '225,260p' src/scoreboard.js\\nsed -n '90,150p' test/receiving.test.js\\nsed -n '125,155p' public/first-run.js\\nrg -n 'actionMessage|setupRetryAllowed' public/control-view.js\\nsed -n '100,140p' public/control-view.js\\nrg -n 'overlay|createApp' test/overlay-group3.test.js | tail -15\\nsed -n '1,70p' test/receiving.test.js\",\"max_output_tokens\":3500})).output)\n"
+}
+````
+
+### 6530. 2026-10-31T11:18:41.605Z — tool result (source line 24764)
+
+````text
+{
+  "call_id": "call_73545902621743a0b0f19df5eb39f7d1",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "                  ? BOT_COPY.reviewRejected\n                  : markOutcome === 'review-empty'\n                    ? BOT_COPY.reviewEmpty\n                    : markOutcome === 'login-blocked'\n                      ? BOT_COPY.reviewBlocked\n                      : markOutcome === 'login-unresolved'\n                        ? BOT_COPY.reviewUnknownLogin\n                        : null;\n        } else if (action === 'veto-last')\n          message =\n            markOutcome === 'vetoed'\n              ? 'Vetoed latest mark.'\n              : markOutcome === 'empty'\n                ? BOT_COPY.nothingIsRetainedToVeto\n                : BOT_COPY.vetoUnavailableAnEligibleRetained;\n        else if (action === 'mark' && ['approved', 'pending'].includes(markOutcome))\n          message =\n            markOutcome === 'approved'\n              ? 'Your mark is public on the relic.'\n              : BOT_COPY.waitingForModeratorApprovalYour;\n        else if (action === 'mark' && markOutcome === 'not-added')\n          message =\n            !channels[host]?.online || channels[host]?.paused || !marks[host]?.context?.holdsRelic\n              ? BOT_COPY.marksAreOpenOnlyWhile\n              : BOT_COPY.noMarkWasAddedUse;\n        else if (action === 'mark')\n          message =\n            channels[host].online && !channels[host].paused && marks[host]?.context?.holdsRelic\n              ? autoApprove\n                ? BOT_COPY.markRequestCheckedUnderQuota\n                : BOT_COPY.markRequestProcessedUnderThe\n              : BOT_COPY.marksAreOpenOnlyWhile;\n        else if (action === 'send') message = BOT_COPY.sendOffRequestCheckedThe;\n        else if (action === 'help') message = BOT_COPY.help;\n        else message = BOT_COPY.keeperCommandCheckedRefreshYour;\n      }\n    await f.control(HOME, 'opt-out');\n    assert.equal((await f.runtime.state.getStreamStatus(HOME)).seeking, false);\n  });\n  test(`${kind}: exact registry spotlight, completed audience/approved glyphs, erasure and own where reply`, async () => {\n    const f = await setup(kind, false);\n    let v = await f.runtime.state.getReceivingView(f.now());\n    assert.equal(v.holder.login, 'raidrelichq');\n    assert.equal(v.holder.heldSince, null);\n    await f.chat(HOME, '7101', '!mark moon');\n    assert.match(posts(f).at(-1).message, /Your mark is public/);\n    f.advance(30001);\n    await f.chat(HOME, '7102', '!mark spoiler');\n    assert.match(posts(f).at(-1).message, /Waiting for moderator approval.*private/);\n    assert.doesNotMatch(posts(f).at(-1).message, /spoiler/);\n    await f.control(HOME, 'send:' + OTHER);\n    f.advance();\n    await f.raid(HOME, OTHER, 1);\n    await f.chat(HOME, '7201', '!offer');\n    await f.chat(OTHER, '7202', '!accept');\n    v = await f.runtime.state.getReceivingView(f.now());\n    assert.equal(v.holder.login, 'olsols2');\n    assert.equal(v.holder.ringCount, 1);\n    assert.ok(Number.isSafeInteger(v.holder.heldSince));\n    const p = v.profiles.find((r) => r.login === 'olsols2');\n    assert.equal(p.received[0].raidAudience, 1);\n    assert.deepEqual(\n      p.glyphs.map((m) => m.text),\n      ['moon'],\n    );\n    assert.ok(!JSON.stringify(v).includes('spoiler'));\n    assert.ok(!JSON.stringify(v).includes('7101'));\n    await f.chat(OTHER, '7301', '!where');\n    assert.match(\n      posts(f).at(-1).message,\n      /@olsols2 holds.*Held since: \\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} UTC.*keeper\\/olsols2/,\n    );\n    assert.doesNotMatch(posts(f).at(-1).message, /\\.\\d{3}Z/);\n    await f.chat(HOME, '7101', '!relic forgetme');\n    const writes = f.db?.writes.length;\n    v = await f.runtime.state.getReceivingView(f.now());\n    if (f.db) assert.equal(f.db.writes.length, writes);\n    assert.ok(!JSON.stringify(v).includes('moon'));\n    assert.equal((await f.request('/keeper/unknown')).status, 404);\n    assert.equal((await f.request('/api/keeper/unknown')).status, 404);\n    const calls = f.calls.length;\n    await f.runtime.receiving.page();\n    assert.equal(f.calls.length, calls, 'gate off has no provider operations');\n  });\n}\n\ntest('one-minute batched observations, deterministic low-viewer ordering, no stale or revoked/modless suggestions', async () => {\n  let now = 100000,\n    streamGets = 0,\n    blocked = false,\n    mods = true;\n  const raw = {\n    enabled: true,\n    holder: { login: 'raidrelichq' },\n    profiles: [],\n    recent: [],\n    seekers: [\n      'opt-in-first': 'Queue off. Opt in first, then choose Become a Seeker.',\n      disabled: 'Seeker queue is disabled by the operator.',\n      joined: 'Explicit Seeker membership observed; live eligibility is checked separately.',\n      off: 'Queue off. Become a Seeker only if you want to receive the relic.',\n    }[r.queue];\n    for (const [node, action] of [\n      ['first-bootstrap', 'bootstrap'],\n      ['first-keep', 'keep'],\n      ['first-seek', 'seek-on'],\n      ['first-authorize', 'refresh-authorization'],\n    ]) {\n      $(node).disabled =\n        busy ||\n        !r.fresh ||\n        !actions.includes(action) ||\n        (action === 'seek-on' && ['holding', 'opt-in-first', 'disabled'].includes(r.queue));\n      $(node).setAttribute(\n        'aria-describedby',\n        action === 'seek-on'\n          ? 'first-queue'\n          : action === 'bootstrap' || action === 'keep'\n            ? 'first-action-reason setup-current-reason'\n            : 'first-action-reason',\n      );\n    }\n    $('first-obs-copy').disabled = busy || !links || !r.fresh;\n    $('first-obs-confirm').disabled = busy || !links || !r.fresh;\n    $('preview-arrival').disabled = busy || !links;\n    $('first-action-reason').textContent = !r.fresh\n      ? 'Sign in first; actions need your matching private session.'\n      : busy\n67:export function actionMessage(value, targetLogin) {\n157:export function setupRetryAllowed(\n      ? 'Channel reconciled. All five subscriptions are enabled. Refresh the source after reconciling both Keepers.'\n      : 'Channel setup is waiting for Twitch callbacks. Reconcile again explicitly once they are enabled.';\n  if (value?.status === 'busy') return 'Setup is already in progress. Wait, then refresh status.';\n  if (value?.status === 'processed') return 'Keeper choice saved. Refresh shows the current state.';\n  if (value?.status === 'expired-handoff')\n    return 'The ended ritual is retired. The relic has not moved and no Twitch raid was cancelled.';\n  if (value?.status === 'cancelled-queued')\n    return 'The never-dispatched queue was cancelled. No Twitch raid was cancelled.';\n  if (value?.status === 'blocked') {\n    const reasons = {\n      'subscriptions-not-ready': 'Reconcile both Keepers until both readiness lights are ready.',\n      'grants-unavailable': 'Reconnect the affected Keeper or bot account before sending.',\n      'source-offline': 'The source stream must be live. Start it, then reconcile.',\n      'target-offline':\n        'The target stream must be live. Ask the owner to start it, then reconcile.',\n      'not-holder': 'Only the current relic Keeper can Send Off.',\n      'existing-intent':\n        'There is an existing Send Off. Refresh and review it; never repeat accepted or unknown requests.',\n      'intent-reconcile-only': 'This Send Off cannot be retried. Stop for operator review.',\n    };\n    return (\n      reasons[value.reason] ??\n      'Send Off is blocked. Refresh both Keepers and review the current state before any new request.'\n    );\n  }\n  return 'The request did not complete. Refresh and review the current state; never blindly repeat a raid request.';\n}\n\n// Only trusted server configuration; HTTP is exclusively a local Simulator convenience.\nexport function botConsentStartURL(value, mode, pageOrigin) {\n  try {\n    const u = new URL(value);\n    const https =\n      u.protocol === 'https:' &&\n      (u.origin === 'https://raid-relic-760724762396.us-central1.run.app' ||\n        u.origin === pageOrigin);\n    const local =\n      mode === 'simulator' &&\n      u.protocol === 'http:' &&\n      u.origin === pageOrigin &&\n      u.port === '5191' &&\n322:    const parent = await f.request('/overlay', 'GET');\n342:    const live = await f.request(`/overlay/${HOME}`, 'GET');\n357:    assert.equal((await f.request('/overlay?preview=arrival', 'GET')).status, 404);\n358:    assert.equal((await f.request(`/overlay/${HOME}?scale=9`, 'GET')).status, 400);\n359:    assert.equal((await f.request(`/api/overlay/${HOME}?obs=1`, 'GET')).status, 400);\n365:  const source = await readFile(new URL('../public/overlay.js', import.meta.url), 'utf8');\n383:  const source = await readFile(new URL('../public/overlay.js', import.meta.url), 'utf8');\n384:  const css = await readFile(new URL('../public/overlay.css', import.meta.url), 'utf8');\n387:    /const\\s+takeover\\s*=\\s*options\\.layout\\s*===\\s*'card'\\s*\\?\\s*overlayArrival\\(\\s*current,\\s*time\\s*\\)\\s*:\\s*null/,\n391:    /setProperty\\(\\s*'--overlay-requested-scale',\\s*String\\(options\\.scale\\)\\s*,?\\s*\\)/,\n400:  assert.match(css, /body\\.layout-card\\.arrival-takeover\\s+\\.relic-overlay/);\n410:    /body\\.layout-corner\\s+\\.relic-overlay\\s*\\{\\s*position:\\s*fixed;\\s*scale:\\s*var\\(--corner-scale,\\s*1\\)/,\n417:    assert.equal(overlayOptions(`?layout=${layout}`).scale, 1);\n418:    assert.equal(overlayArrival(verified, 2000).seconds, 179);\n419:    assert.equal(overlayArrival({ ...verified, claimMeter: { awaitingRaid: true } }, 2000), null);\nimport test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\nimport { createReceiving, keeperNetwork } from '../src/receiving.js';\nimport { keeperCardFilename } from '../public/keeper-card.js';\nimport { parseMarkCommand } from '../src/marks.js';\n\nconst posts = (f) =>\n  f.calls.filter((c) => c.url.endsWith('/chat/messages')).map((c) => JSON.parse(c.body));\nasync function setup(kind, enabled = true) {\n  const f = await pilotFixture(kind, {\n    extraBotScopes: ['user:read:moderated_channels'],\n    chronicleEnv: {\n      SEEKERS_ENABLED: String(enabled),\n      MARK_AUTO_APPROVE_ENABLED: 'true',\n      MARK_REVIEW_BLOCKLIST: '[\"spoiler\"]',\n    },\n  });\n  for (const id of [BOT, HOME, OTHER]) await f.login(id);\n  for (const id of [HOME, OTHER]) f.streams.get(id).viewer_count = 1;\n  for (const id of [HOME, OTHER]) {\n    await f.control(id, 'bootstrap');\n    f.advance();\n    await f.control(id, 'keep');\n    f.advance();\n  }\n  return f;\n}\ntest('bounded operator Keeper mapping and commands do not admit arbitrary callers', () => {\n  assert.equal(Object.keys(keeperNetwork()).length, 2);\n  assert.throws(() => keeperNetwork({ 1: 'same', 2: 'same' }));\n  assert.throws(() => keeperNetwork({ x: 'bad' }));\n  assert.throws(() =>\n    keeperNetwork(Object.fromEntries([1, 2, 3, 4, 5].map((x) => [String(x), 'k' + x]))),\n  );\n  for (const text of ['!seek', '!relic seek', '!seek on'])\n    assert.deepEqual(parseMarkCommand(text), { type: 'seek-on' });\n  assert.deepEqual(parseMarkCommand('!seek off'), { type: 'seek-off' });\n  assert.deepEqual(parseMarkCommand('!relic where'), { type: 'where' });\n  assert.equal(parseMarkCommand('!seek @someone'), null);\n  assert.equal(\n    keeperCardFilename(2, 'olsols2', 'vertical'),\n    'raid-relic-keeper-olsols2-ring-2-vertical.png',\n  );\n  for (const v of [\n    [0, 'olsols2', 'vertical'],\n    [17, 'olsols2', 'vertical'],\n    [1, '../bad', 'vertical'],\n    [1, 'olsols2', 'square'],\n  ])\n    assert.throws(() => keeperCardFilename(...v));\n});\nfor (const kind of ['memory', 'firestore']) {\n  test(`${kind}: broadcaster-only Seeker consent, CSRF/room isolation, status and duplicate safety`, async () => {\n    const f = await setup(kind);\n    await f.signed(\n      'channel.chat.message',\n      {\n        broadcaster_user_id: OTHER,\n        chatter_user_id: '7001',\n        message_id: 'mod-seek',\n        badges: [{ set_id: 'moderator', id: '1' }],\n        message: { text: '!seek', fragments: [] },\n      },\n      OTHER,\n      { broadcaster_user_id: OTHER, user_id: BOT },\n    );\n    assert.notEqual((await f.runtime.state.getStreamStatus(OTHER)).seeking, true);\n    await f.chat(OTHER, OTHER, '!seek', { messageId: 'seek-own' });\n    assert.equal((await f.runtime.state.getStreamStatus(OTHER)).seeking, true);\n"
+    }
+  ]
+}
+````
+
+### 6531. 2026-10-31T11:18:47.771Z — tool call (source line 24768)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_5ccce865177e420ea956ab81d09c36c3",
+  "input": "text((await tools.exec_command({cmd:\"rg -n 'live:|live =|glyphs|approvedCount' src/receiving.js\\nsed -n '200,260p' src/receiving.js\\nsed -n '155,180p' public/control-view.js\\nhead -45 scripts/browser-smoke-onboarding.js\\nrg -n 'setup-flow|bootstrap|route\\\\(' scripts/browser-smoke-onboarding.js | tail -22\",\"max_output_tokens\":3000})).output)\n"
+}
+````
+
+### 6532. 2026-10-31T11:18:47.863Z — tool result (source line 24771)
+
+````text
+{
+  "call_id": "call_5ccce865177e420ea956ab81d09c36c3",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "103:          glyphs: (latest?.marks ?? [])\n256:    if (!enabled) return { ...value, enabled: false, seekers: [], live: null };\n272:    const live = fresh && holderId ? Boolean(observation.streams[holderId]) : null;\n        const m = await transport(`https://api.twitch.tv/helix/moderation/channels?${query}`, {\n          headers,\n          signal,\n        });\n        if (m.status !== 200) throw Error('Moderator unavailable');\n        failure = 'moderation-shape';\n        if (!Array.isArray(m.data?.data) || m.data.data.length > 100 || !m.data.pagination)\n          throw Error('Moderator unavailable');\n        for (const row of m.data.data)\n          if (ids.includes(row.broadcaster_id)) moderators.add(row.broadcaster_id);\n        after = m.data.pagination.cursor;\n        if (!after) break;\n        failure = 'moderation-capacity';\n        if (typeof after !== 'string' || after.length > 512 || cursors.has(after) || page === 2)\n          throw Error('Moderator capacity');\n        cursors.add(after);\n      }\n      if (signal.aborted) throw Error('Observation expired');\n      return { at: t, streams, moderators };\n    }, 8000).catch(() => {\n      warn(failure);\n      return null;\n    });\n    try {\n      cached = await pending;\n      return cached;\n    } finally {\n      pending = null;\n    }\n  }\n  async function grants(id) {\n    const role = id === streamerId ? 'streamer' : `keeper:${id}`;\n    const warnGrant = (reason) => {\n      const t = now(),\n        previous = warnedGrants.get(role);\n      if (previous === undefined || t < previous || t - previous >= 60000) {\n        warnedGrants.set(role, t);\n        warn(reason, 'keeper-grant');\n      }\n    };\n    if (!(await store.getToken(role)) || (await store.getJob(id))?.ready !== true) {\n      warnGrant('keeper-grant-or-bootstrap-unavailable');\n      return false;\n    }\n    try {\n      await oauth.readAccessToken(role);\n      return true;\n    } catch (error) {\n      warnGrant(\n        error?.code === 'reconsent-required' ? 'reconsent-required' : 'keeper-grant-unavailable',\n      );\n      return false;\n    }\n  }\n  async function page() {\n    const { queueStates, ...value } = await state.getReceivingView(now());\n    if (!enabled) return { ...value, enabled: false, seekers: [], live: null };\n    const observation = await observations();\n    const fresh = observation && now() >= observation.at && now() - observation.at < 60000;\n    const seekers = [];\n    if (fresh)\n// Only a user-started setup flow may repeat the existing idempotent reconcile.\n// It cannot retry a raid, failed/unknown request, or continue after hide/deadline.\nexport function setupRetryAllowed(\n  value,\n  { remaining, deadline, now = Date.now(), visible = true } = {},\n) {\n  return (\n    visible === true &&\n    Number.isInteger(remaining) &&\n    remaining > 0 &&\n    remaining <= 2 &&\n    Number.isFinite(deadline) &&\n    Number.isFinite(now) &&\n    now < deadline &&\n    deadline - now <= 45000 &&\n    (value?.status === 'busy' || (value?.status === 'reconciled' && value.ready === false))\n  );\n}\n// Local signed/mock OAuth only. Never follows a real login or control URL.\nimport assert from 'node:assert/strict';\nimport { mkdir, writeFile, open } from 'node:fs/promises';\nimport { constants } from 'node:fs';\nimport { createHash } from 'node:crypto';\nimport { visualReview } from '../test-support/visual-review.js';\nimport { BOT, OTHER, HOME } from '../test-support/pilot-fixture.js';\nimport { capturePage } from '../test-support/capture-page.js';\nlet review,\n  stage = 'setup',\n  passed = false,\n  failureCategory = null;\nconst checks = [],\n  diagnostic = {},\n  captures = new Map(),\n  captureCoverage = [];\nconst axeResults = {\n  status: process.env.FRONTDOOR_AXE === '1' ? 'pending' : 'not-run',\n  version: null,\n  scans: [],\n};\nlet axeSource;\nasync function scanFrontdoor(page, name) {\n  if (process.env.FRONTDOOR_AXE !== '1') return;\n  stage = 'frontdoor-axe-' + name;\n  if (axeSource === undefined) {\n    // Trusted parent-mounted public tool only; never search the host or fetch an engine.\n    const file = await open('/qa-tools/axe.min.js', constants.O_RDONLY | constants.O_NOFOLLOW);\n    try {\n      const meta = await file.stat();\n      assert.ok(meta.isFile() && meta.size === 652140);\n      const bytes = await file.readFile();\n      assert.equal(bytes.length, 652140);\n      assert.equal(\n        createHash('sha256').update(bytes).digest('hex'),\n        '20c09fe157a8a34a30e241aaa1fcdade657734f08ab379ecfbeb7d45cc46e878',\n      );\n      axeSource = bytes.toString('utf8');\n    } finally {\n      await file.close();\n    }\n  }\n  const session = await page.context().newCDPSession(page);\n  try {\n    const injected = await session.send('Runtime.evaluate', {\n391:  assert.equal((await f.control(HOME, 'bootstrap')).status, 200);\n441:  assert.equal(await page.locator('#setup-primary > button').getAttribute('id'), 'first-bootstrap');\n449:    '#first-bootstrap',\n457:    await page.locator('#first-bootstrap').evaluate((n) => n === document.activeElement),\n490:      'first-bootstrap': 'bootstrap',\n498:  await action('first-bootstrap');\n506:  assert.equal(await page.locator('#first-bootstrap').isVisible(), false);\n518:  assert.equal(await page.locator('#setup-primary > button').getAttribute('id'), 'first-bootstrap');\n610:          '#first-bootstrap',\n796:  await page.route(statusPattern, mockStatus);\n892:  assert.equal(await page.locator('#light-live-fix').getAttribute('href'), '#first-bootstrap');\n896:    await page.locator('#first-bootstrap').evaluate((n) => document.activeElement === n),\n904:  await page.unroute(statusPattern, mockStatus);\n"
+    }
+  ]
+}
+````
+
+### 6533. 2026-10-31T11:18:52.242Z — tool call (source line 24775)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_364df3e5ddf740789ffb21b39a9e50a7",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '35,120p' src/receiving.js\\nrg -n 'getReceivingView|receivingView' src/state.js src/store.js\\nsed -n '470,520p' scripts/browser-smoke-onboarding.js\\nsed -n '1,70p' public/receiving.js\\nrg -n 'marks|glyphs' public/receiving.js\",\"max_output_tokens\":3500})).output)\n"
+}
+````
+
+### 6534. 2026-10-31T11:18:52.337Z — tool result (source line 24778)
+
+````text
+{
+  "call_id": "call_364df3e5ddf740789ffb21b39a9e50a7",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "  const stops = lineage?.stops ?? [];\n  if (ids.length > 4 || stops.length > 16) throw Error('Receiving capacity');\n  const safe = (id) =>\n    channels[id]?.optedIn === true &&\n    !channels[id]?.banned &&\n    !channels[id]?.blockedUserIds?.includes(id) &&\n    !marks[id]?.blocked?.includes(id);\n  const stop = (s) => ({\n    stopId: s.stopId,\n    from: names[s.from] ?? null,\n    to: names[s.to] ?? null,\n    ringIndex: s.ringIndex,\n    claimedAt: s.claimedAt,\n    ...(s.kind === 'wander'\n      ? { kind: 'wander' }\n      : count(s.raidSize)\n        ? { raidAudience: s.raidSize }\n        : {}),\n  });\n  const last = stops.at(-1);\n  const holder = ids.includes(registry?.holderId) ? names[registry.holderId] : null;\n  return {\n    enabled: config?.seekersEnabled === true,\n    observedAt: now,\n    holder: holder\n      ? {\n          login: holder,\n          heldSince: last?.to === registry.holderId && time(last.claimedAt) ? last.claimedAt : null,\n          ringCount: stops.length,\n        }\n      : null,\n    recent: [\n      ...new Set(\n        [...stops]\n          .reverse()\n          .map((s) => names[s.to])\n          .filter(Boolean),\n      ),\n    ].slice(0, 4),\n    ...(config?.seekersEnabled\n      ? {\n          queueStates: Object.fromEntries(\n            ids.map((id) => [names[id], seekerState(registry, lineage, channels, marks, id)]),\n          ),\n        }\n      : {}),\n    seekers: config?.seekersEnabled\n      ? ids\n          .filter(\n            (id) =>\n              safe(id) &&\n              seekerState(registry, lineage, channels, marks, id).member &&\n              channels[id]?.online &&\n              !channels[id]?.paused &&\n              !marks[id]?.paused &&\n              marks[id]?.context?.optedIn &&\n              marks[id]?.context?.streamId === channels[id]?.streamId,\n          )\n          .map((id) => ({ id, login: names[id], streamId: channels[id].streamId }))\n      : [],\n    profiles: ids\n      .filter((id) => safe(id) && names[id])\n      .map((id) => {\n        const received = stops.filter((s) => s.to === id);\n        const latest = received.at(-1);\n        return {\n          login: names[id],\n          received: received.map(stop),\n          glyphs: (latest?.marks ?? [])\n            .slice(0, 20)\n            .map((m) => ({ text: m.text, runeSvg: runeSvg(m.text) })),\n          glyphTotal: latest?.marks?.length ?? 0,\n        };\n      }),\n  };\n}\n\n// Explicit local injection; no timer or startup networking. Existing OAuth grants\n// may be maintained on readiness reads; no gameplay mutation or consent is added.\nexport function createReceiving({\n  enabled = false,\n  state,\n  store,\n  oauth,\n  clientId,\n  botId,\nsrc/store.js:3:import { receivingView } from './receiving.js';\nsrc/store.js:904:    async getReceivingView(now) {\nsrc/store.js:914:        return receivingView(registry, channels, marks, lineage, config, now);\nsrc/state.js:3:import { receivingView } from './receiving.js';\nsrc/state.js:631:    getReceivingView(now) {\nsrc/state.js:632:      return receivingView(\n  const pendingReadCount = controlReads,\n    callsBeforePending = f.calls.length;\n  const pendingPoll = page.waitForResponse(\n    (r) =>\n      new URL(r.url()).pathname === `/control/${OTHER}/status` && r.request().method() === 'GET',\n  );\n  await page.clock.runFor(5001);\n  await pendingPoll;\n  await page.waitForFunction(() => !document.querySelector('#refresh').disabled);\n  assert.equal(controlReads, pendingReadCount + 1);\n  assert.equal(f.calls.length, callsBeforePending, 'Pending GET cannot call the provider');\n  async function action(id) {\n    const [response] = await Promise.all([\n      page.waitForResponse(\n        (r) => new URL(r.url()).pathname === '/control/' + OTHER && r.request().method() === 'POST',\n      ),\n      page.locator('#' + id).click(),\n    ]);\n    assert.equal(response.status(), 200);\n    const expected = {\n      'first-bootstrap': 'bootstrap',\n      'first-keep': 'keep',\n      'first-seek': 'seek-on',\n    };\n    assert.equal(response.request().postDataJSON().action, expected[id]);\n    await page.waitForFunction(() => !document.querySelector('#refresh').disabled);\n  }\n  stage = 'explicit-setup';\n  await action('first-bootstrap');\n  await page.waitForFunction(\n    () => document.querySelector('#first-subscriptions').dataset.state === 'ready',\n  );\n  assert.equal(f.subscriptions.length, baselineSubscriptions + 5);\n  assert.equal(f.subscriptions.filter((s) => Object.values(s.condition).includes(OTHER)).length, 5);\n  assert.equal((await f.runtime.state.getStreamStatus(OTHER)).optedIn, false);\n  assert.equal(await page.locator('#setup-primary > button').getAttribute('id'), 'first-keep');\n  assert.equal(await page.locator('#first-bootstrap').isVisible(), false);\n  assert.equal(\n    await page.locator('#first-keep').evaluate((n) => document.activeElement === n),\n    true,\n  );\n  assert.equal(await page.locator('#light-subscriptions-fix').isVisible(), false);\n  stage = 'explicit-opt-in';\n  await action('first-keep');\n  await page.waitForFunction(\n    () => document.querySelector('#first-optin').dataset.state === 'ready',\n  );\n  assert.notEqual((await f.runtime.state.getStreamStatus(OTHER)).seeking, true);\n  assert.equal(await page.locator('#setup-primary > button').getAttribute('id'), 'first-bootstrap');\n  assert.equal(await page.locator('#first-keep').isVisible(), false);\n  await page.getByRole('link', { name: 'Add overlay', exact: true }).click();\nimport { keeperNames } from './keeper-network.js';\nimport { downloadKeeperCard, keeperCardThumbnail } from './keeper-card.js';\nconst root = document.getElementById('receiving');\nconst configured = new Set(Object.values(keeperNames));\nimport { publicDate as utc } from './streak-view.js';\nconst node = (tag, text) => {\n  const n = document.createElement(tag);\n  if (text !== undefined) n.textContent = text;\n  return n;\n};\nfunction link(text, href) {\n  const n = node('a', text);\n  n.href = href;\n  return n;\n}\nfunction valid(v) {\n  return (\n    v &&\n    ['live', 'simulator'].includes(v.mode) &&\n    (!v.holder ||\n      (configured.has(v.holder.login) &&\n        Number.isInteger(v.holder.ringCount) &&\n        v.holder.ringCount >= 0 &&\n        v.holder.ringCount <= 16)) &&\n    (!v.seekers ||\n      (Array.isArray(v.seekers) &&\n        v.seekers.length <= 4 &&\n        v.seekers.every(\n          (s) =>\n            configured.has(s.login) &&\n            Number.isInteger(s.viewers) &&\n            s.viewers >= 0 &&\n            s.viewers <= 1000000,\n        )))\n  );\n}\nif (root) {\n  const content = document.getElementById('receiving-content'),\n    status = document.getElementById('receiving-status');\n  const login = /^\\/keeper\\/([a-z0-9_]{1,25})$/.exec(location.pathname)?.[1];\n  let generation = 0,\n    controller,\n    busy = false;\n  const previewURLs = new Set();\n  let previewBytes = 0;\n  const clearPreviews = () => {\n    for (const url of previewURLs) URL.revokeObjectURL(url);\n    previewURLs.clear();\n    previewBytes = 0;\n  };\n  async function refresh() {\n    const own = ++generation;\n    controller?.abort();\n    controller = new AbortController();\n    const active = controller;\n    const timer = setTimeout(() => active.abort(), 8000);\n    clearPreviews();\n    content.replaceChildren();\n    status.textContent = 'Reading the current public record…';\n    try {\n      const r = await fetch(login ? '/api/keeper/' + login : '/api/receiving', {\n        signal: active.signal,\n        credentials: 'omit',\n        cache: 'no-store',\n      });\n      if (!r.ok) throw Error('Unavailable');\n      const raw = await r.text();\n      if (raw.length > 131072) throw Error('Bounded record');\n      const v = JSON.parse(raw);\n      if (!valid(v) || active.signal.aborted || own !== generation) throw Error('Invalid record');\n142:          !Array.isArray(p.glyphs) ||\n143:          p.glyphs.length > 20\n155:        if (p.glyphs.length)\n156:          content.append(node('p', 'Approved community glyphs on the latest received ring:'));\n157:        const glyphs = node('div');\n158:        glyphs.className = 'keeper-glyphs';\n159:        for (const g of p.glyphs) {\n174:          glyphs.append(figure);\n176:        content.append(glyphs);\n"
+    }
+  ]
+}
+````
+
+### 6535. 2026-10-31T11:19:01.015Z — assistant (source line 24783)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "The source distinguishes approved marks from private marks awaiting review. Keeper glyphs and Atlas stop pages currently show completed-stop archives, so a mark added during the current hold is outside that historical record. I won’t alter Ring12 or approval policy without the parent’s targeted metadata. I’ll add coverage for that distinction, the overlay alias, and explicit Setup failure outcomes.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6536. 2026-10-31T11:19:11.135Z — tool call (source line 24784)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_c0c1b64668f345809816ad1c9f57ed48",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/src/app.js\\n@@\\n-    const feedPath = /^(\\\\/api)?\\\\/overlay\\\\/(\\\\d{1,32})(?:\\\\?(.*))?$/.exec(path);\\n+    if (path.startsWith('/overlay?channel=')) {\\n+      if (method !== 'GET') return result(405, 'Read only');\\n+      const match = /^\\\\/overlay\\\\?channel=([a-z0-9_]{1,32})$/.exec(path);\\n+      const channel = match && Object.entries(keeperNames).find(\\n+        ([id, login]) => match[1] === login || match[1] === id,\\n+      )?.[0];\\n+      const feeds = overlayFeeds ?? (overlayFeed ? { [overlayFeed.channel]: overlayFeed } : {});\\n+      if (!channel || !Object.hasOwn(feeds, channel)) return result(404, 'Keeper not configured');\\n+      return { ...result(307, ''), headers: { location: `/overlay/${channel}`, 'cache-control': 'no-store' } };\\n+    }\\n+    const feedPath = /^(\\\\/api)?\\\\/overlay\\\\/(\\\\d{1,32})(?:\\\\?(.*))?$/.exec(path);\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/public/ritual-copy.js\\n@@\\n-    'No mark was added. Use one allowed word or emoji, wait 30 seconds between marks, and use at most five marks per stream. Private review text is never public.',\\n+    'No mark was added. Use one allowed word or emoji, for example !mark light; not !mark first light. Wait 30 seconds between marks and use at most five marks per stream. Private review text is never public.',\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/public/overlay.js\\n@@\\n-    ? 'The relic stirs… waiting for Twitch to confirm the raid'\\n+    ? 'Request received · waiting for Twitch confirmation; delivery can take time. Claiming opens only after verified arrival.'\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/public/control.js\\n@@\\n   if (action === 'bootstrap') {\\n     setupLeft--;\\n     document.getElementById('stop-setup').hidden = false;\\n+    document.getElementById('setup-flow-status').textContent =\\n+      'Setup request pending; waiting for the bounded server response.';\\n@@\\n-  } catch {\\n+  } catch (error) {\\n     invalidate();\\n     status.textContent =\\n       'Request outcome unavailable. Refresh status; never blindly repeat a raid request.';\\n+    if (action === 'bootstrap') {\\n+      stopSetup();\\n+      document.getElementById('setup-flow-status').textContent =\\n+        error instanceof ControlReadError && error.code === 'timeout'\\n+          ? 'Setup timed out. Read status, then explicitly retry Setup if needed; no automatic retry was made.'\\n+          : 'Setup outcome unavailable. Read status and reconnect if needed before explicitly trying again.';\\n+      status.textContent = document.getElementById('setup-flow-status').textContent;\\n+    }\\n*** End Patch\"));\n"
+}
+````
+
+### 6537. 2026-10-31T11:19:11.301Z — tool result (source line 24787)
+
+````text
+{
+  "call_id": "call_c0c1b64668f345809816ad1c9f57ed48",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.2 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 6538. 2026-10-31T11:19:31.730Z — tool call (source line 24791)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_7fe254b0f90a452b86046dbcd4a1a1ed",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/scripts/browser-smoke-onboarding.js\\n@@\\n   assert.equal(await page.locator('#first-keep').isVisible(), false);\\n+  stage = 'setup-slow-error-recovery';\\n+  const setupPath = '**/control/' + OTHER;\\n+  let releaseSetup;\\n+  const heldSetup = new Promise((resolve) => { releaseSetup = resolve; });\\n+  const slowSetup = async (route) => {\\n+    if (route.request().method() !== 'POST' || route.request().postDataJSON()?.action !== 'bootstrap')\\n+      return route.continue();\\n+    await heldSetup;\\n+    await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ status: 'unavailable' }) });\\n+  };\\n+  await page.route(setupPath, slowSetup);\\n+  const setupRequest = page.waitForRequest((r) => new URL(r.url()).pathname === '/control/' + OTHER && r.method() === 'POST' && r.postDataJSON()?.action === 'bootstrap');\\n+  await page.locator('#first-bootstrap').click();\\n+  await setupRequest;\\n+  await page.clock.runFor(1001);\\n+  assert.match(await page.locator('#setup-flow-status').textContent(), /Setup request pending/);\\n+  assert.equal(await page.locator('#first-bootstrap').isDisabled(), true);\\n+  releaseSetup();\\n+  await page.waitForFunction(() => document.querySelector('#setup-flow-status').textContent.includes('Setup stopped.'));\\n+  assert.doesNotMatch(await page.locator('#result').textContent(), /Request pending/);\\n+  await page.unroute(setupPath, slowSetup);\\n+  await action('first-bootstrap');\\n+  await page.waitForFunction(() => document.querySelector('#setup-flow-status').textContent.includes('all five subscriptions enabled'));\\n   await page.getByRole('link', { name: 'Add overlay', exact: true }).click();\\n*** End Patch\"));\n"
+}
+````
+
+### 6539. 2026-10-31T11:19:31.784Z — tool result (source line 24794)
+
+````text
+{
+  "call_id": "call_7fe254b0f90a452b86046dbcd4a1a1ed",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 6540. 2026-10-31T11:19:36.671Z — tool call (source line 24798)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_633e448d96604a5cac4511e377813319",
+  "input": "text((await tools.exec_command({cmd:\"rg -n 'snapshot\\\\(|api/overlay|api/atlas|api/lineage' test/receiving.test.js test/overlay-group3.test.js src/app.js | head -28\\nrg -n 'request:|async function request|return \\\\{' test-support/pilot-fixture.js | tail -12\\nsed -n '300,325p' test/overlay-group3.test.js\\nhead -50 scripts/browser-smoke-pilot.js\\nrg -n 'origin|page.goto' scripts/browser-smoke-pilot.js | head -12\\nsed -n '625,665p' src/state.js\",\"max_output_tokens\":2000})).output)\n"
+}
+````
+
+### 6541. 2026-10-31T11:19:36.777Z — tool result (source line 24801)
+
+````text
+{
+  "call_id": "call_633e448d96604a5cac4511e377813319",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "src/app.js:511:    if (path.startsWith('/api/atlas/search')) {\nsrc/app.js:512:      if (path !== '/api/atlas/search') return result(400, 'Invalid search path');\nsrc/app.js:560:    if (path.startsWith('/api/atlas')) {\nsrc/app.js:638:        return result(200, JSON.stringify(await selected.snapshot()), 'application/json');\ntest/overlay-group3.test.js:359:    assert.equal((await f.request(`/api/overlay/${HOME}?obs=1`, 'GET')).status, 400);\n86:      return {\n106:          return { status: 409, data: {} };\n108:        return { status: 202, data: { data: [{ id: String(subscriptions.length) }] } };\n110:      return { status: 200, data: { data: subscriptions, pagination: {} } };\n114:      return {\n125:      return {\n131:      return { status: 200, data: { data: [{ id, login: u.searchParams.get('login') }] } };\n147:        return { status: 401, data: { message: 'synthetic-sensitive-body' } };\n149:        return {\n163:      return {\n170:      return { status: 200, data: { data: [{}] } };\n273:  return {\n      .reduce((n, c, i) => n + c * [0.2126, 0.7152, 0.0722][i], 0);\n  const worst = [16, 29, 48].map((c) => c * 0.86 + 255 * 0.14);\n  assert.ok((lum([227, 232, 239]) + 0.05) / (lum(worst) + 0.05) >= 7);\n});\nfor (const kind of ['memory', 'firestore'])\n  test(`${kind}: preview HTML has no connection capability, query failures stay closed, API queries remain forbidden`, async () => {\n    const f = await pilotFixture(kind);\n    const before = await f.runtime.state.getKeeperRegistry();\n    const response = await f.request(\n      `/overlay/${HOME}?preview=arrival&layout=card&scale=0.75`,\n      'GET',\n    );\n    assert.equal(response.status, 200);\n    assert.match(\n      response.body.toString(),\n      /<p[^>]*id=\"simulator\"[^>]*>LOCAL TEST · fictional arrival · no live connection<\\/p>/,\n    );\n    assert.doesNotMatch(response.body.toString(), /SIMULATOR · local test data/);\n    assert.doesNotMatch(response.body.toString(), /data-local-preview-ready/);\n    assert.match(response.headers['content-security-policy'], /connect-src 'none'/);\n    assert.match(response.headers['content-security-policy'], /frame-ancestors 'self'/);\n    assert.equal(response.headers['x-frame-options'], 'SAMEORIGIN');\n    const parent = await f.request('/overlay', 'GET');\n    assert.equal(parent.status, 200);\n    const parentPolicy = parent.headers['content-security-policy'];\n    assert.equal(\nimport { capturePage } from '../test-support/capture-page.js';\n// Optional host QA: local mocked OAuth/Helix only; never follows Twitch URLs.\nimport { createServer } from 'node:https';\nimport { mkdir, writeFile } from 'node:fs/promises';\nimport { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\nimport { createLocalTLS } from '../test-support/local-tls.js';\nimport { attachOverlaySockets } from '../src/overlay-sockets.js';\nconst origin = 'https://localhost:5191';\nconst f = await pilotFixture('memory', { origin });\nlet server, sockets, localTLS;\nconst captures = new Map();\nconst captureCoverage = [];\nconst capture = (page, name) => capturePage(page, name, captures, captureCoverage);\nlet browser, failure, activePage;\nlet frontendPageErrorCount = 0;\nlet diagnostic = null;\nlet phase = 'local startup';\nlet diagnostics;\nlet lastPostStatus;\nasync function press(page, id, label, expected) {\n  phase = label;\n  const ownPath = `/control/${id}`;\n  const post = page.waitForResponse(\n    (r) => new URL(r.url()).pathname === ownPath && r.request().method() === 'POST',\n  );\n  const refreshed = page\n    .waitForResponse(\n      (r) => new URL(r.url()).pathname === `${ownPath}/status` && r.request().method() === 'GET',\n    )\n    .catch(() => null);\n  await page.evaluate(() => {\n    window.__pilotPostProof = null;\n  });\n  if (label.startsWith('Send Off to ')) {\n    phase = 'trusted-pointer-across-status-render';\n    const pattern = `**/control/${id}/status`;\n    let releaseRead;\n    const heldRead = new Promise((resolve) => {\n      releaseRead = resolve;\n    });\n    const routeRead = async (route) => {\n      await heldRead;\n      await route.continue();\n    };\n    await page.route(pattern, routeRead);\n    const nextRead = page.waitForRequest(\n      (request) => new URL(request.url()).pathname === ownPath + '/status',\n    );\n    const readResponse = page.waitForResponse(\n      (response) => new URL(response.url()).pathname === ownPath + '/status',\n8:const origin = 'https://localhost:5191';\n9:const f = await pilotFixture('memory', { origin });\n136:    origins: [origin],\n196:    const original = HTMLCanvasElement.prototype.getContext;\n198:      return /^webgl/.test(type) ? null : original.call(this, type, ...args);\n202:    new URL(route.request().url()).origin === origin ? route.continue() : route.abort(),\n207:    if (new URL(route.url()).origin === 'wss://localhost:5191') route.connectToServer();\n212:      `${origin}${id === BOT ? '/oauth/bot/start' : `/oauth/keeper/${id}/start`}`,\n216:    const result = await context.request.get(`${origin}/auth/callback?state=${state}&code=${id}`, {\n221:  const cookies = await context.cookies(origin);\n240:    await page.goto(`${origin}/control/${id}`);\n252:  await page.goto(`${origin}/control/${HOME}`);\n      if (next.result.status === 'wandered') {\n        const target = next.registry.holderId;\n        channels.set(target, next.channels[target]);\n      }\n      return next.result;\n    },\n    getReceivingView(now) {\n      return receivingView(\n        registry,\n        Object.fromEntries(channels),\n        Object.fromEntries(markDocs),\n        lineage,\n        config,\n        now,\n      );\n    },\n    getKeeperCandidates(host) {\n      return keeperCandidates(\n        registry,\n        Object.fromEntries(channels),\n        Object.fromEntries(markDocs),\n        config,\n        host,\n      );\n    },\n    scoreAckStep(host, op, now) {\n      if (!config?.channels.includes(host)) throw Error('Unconfigured score ACK');\n      const next = scoreAckMutation(\n        scoreAckDocs.get(host),\n        op,\n        channels.get(host),\n        markDocs.get(host),\n        now,\n        scores,\n        lineage,\n        registry,\n        config,\n        host,\n      );\n      scoreAckDocs.set(host, next.doc);\n      return next.result;\n"
+    }
+  ]
+}
+````
+
+### 6542. 2026-10-31T11:19:42.915Z — tool call (source line 24805)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_d43e3414fcfe456b942cfe7c1c6fda35",
+  "input": "text((await tools.exec_command({cmd:\"rg -n '^export function|public' src/marks.js | tail -15\\nsed -n '380,435p' src/marks.js\\nsed -n '270,296p' test-support/pilot-fixture.js\\nsed -n '560,610p' src/app.js\\nrg -n 'glyphTotal' public/receiving.js\",\"max_output_tokens\":2000})).output)\n"
+}
+````
+
+### 6543. 2026-10-31T11:19:43.027Z — tool result (source line 24808)
+
+````text
+{
+  "call_id": "call_d43e3414fcfe456b942cfe7c1c6fda35",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "61:export function markPrivacyChange(previous, next, actor, host, action) {\n82:export function runeGeometry(input) {\n93:export function runeSvg(input) {\n98:export function parseMarkCommand(text) {\n144:export function isModerator(actor, host) {\n163:export function setMarkContext(previous, host, context) {\n224:// These commands never resolve a login through public score names or another room.\n246:export function reduceMark(previous, host, actor, action, now, reviewPolicy) {\n389:export function publicMarks(doc, host) {\n403:export function publicOverlayState(doc, host) {\n406:    ...publicMarks(doc, host),\n409:export function privateMarks(doc, host, actor) {\n415:export function createMarkService(store, { now = Date.now } = {}) {\n425:    publicProjection: (host) => store.getPublicMarks(host),\n431:export function markCommandOutcome(previous, next, host, actor, action) {\n      !trustedReviewPolicy(reviewPolicy).terms.some((term) => text.includes(term))\n        ? 'approved'\n        : 'pending',\n    createdAt: now,\n  });\n  doc.cooldowns.push({ userId: actor.chatterId, at: now });\n  return bounded(doc);\n}\n\nexport function publicMarks(doc, host) {\n  if (!doc || !active(doc, host)) return { marks: [] };\n  const session = doc.sessions.find((item) => item.streamId === doc.context.streamId);\n  return {\n    marks: (session?.marks ?? [])\n      .filter(\n        (mark) =>\n          mark.status === 'approved' &&\n          !doc.blocked.includes(mark.userId) &&\n          !doc.context.blockedUserIds.includes(mark.userId),\n      )\n      .map((mark) => ({ id: mark.id, runeSvg: runeSvg(mark.text) })),\n  };\n}\nexport function publicOverlayState(doc, host) {\n  return {\n    status: !doc || !active(doc, host) ? 'waiting' : doc.paused ? 'paused' : 'ready',\n    ...publicMarks(doc, host),\n  };\n}\nexport function privateMarks(doc, host, actor) {\n  if (!isModerator(actor, host)) throw new Error('Moderator identity required');\n  return structuredClone(doc ?? empty());\n}\n\n// Internal trusted services only; never construct actor from an HTTP body.\nexport function createMarkService(store, { now = Date.now } = {}) {\n  const control = (host, actor, action) => store.controlMarks(host, actor, action, now());\n  return {\n    setKeeperContext: (host, context) => store.setKeeperContext(host, context),\n    approve: (host, actor, markId) => control(host, actor, { type: 'approve', markId }),\n    vetoLast: (host, actor) => control(host, actor, { type: 'veto-last' }),\n    pause: (host, actor, paused = true) => control(host, actor, { type: 'pause', paused }),\n    blockUser: (host, actor, userId) => control(host, actor, { type: 'block', userId }),\n    optOut: (host, actor) => control(host, actor, { type: 'opt-out' }),\n    forgetMe: (host, actor) => control(host, actor, { type: 'forgetme' }),\n    publicProjection: (host) => store.getPublicMarks(host),\n    moderationView: (host, actor) => store.getPrivateMarks(host, actor),\n  };\n}\n\n// Derived from the same transaction's before/after documents, never an external pre-read.\nexport function markCommandOutcome(previous, next, host, actor, action) {\n  if (isReviewCommand(action?.type)) {\n    if (!previous || !next || !reviewAllowed(previous, host, actor)) return 'review-denied';\n    const pending = pendingReview(previous),\n      last = pending.at(-1);\n      from,\n      { from_broadcaster_user_id: from },\n    );\n  return {\n    get runtime() {\n      return runtime;\n    },\n    async restart() {\n      if (kind !== 'firestore') throw Error('Memory fixtures are not durable across processes');\n      runtime = await createRuntime(runtimeEnv, runtimeOptions);\n      return runtime;\n    },\n    refreshFailure(status) {\n      if (status !== null && ![400, 401, 429, 503].includes(status))\n        throw Error('Closed refresh fault');\n      refreshFailure = status;\n    },\n    db,\n    request,\n    control,\n    login,\n    cookies,\n    calls,\n    subscriptions,\n    streams,\n    chat,\n    raid,\n    if (path.startsWith('/api/atlas')) {\n      if (method !== 'GET') return result(405, 'Read only');\n      const match = /^\\/api\\/atlas(?:\\/stops\\/([a-f0-9]{64}))?(?:\\?([^#]*))?$/.exec(path);\n      if (!match) return result(400, 'Invalid Atlas path');\n      const params = new URLSearchParams(match[2] ?? '');\n      if (\n        [...params.keys()].some((key) => !['offset', 'limit'].includes(key)) ||\n        [...params.keys()].some((key) => params.getAll(key).length !== 1)\n      )\n        return result(400, 'Invalid paging');\n      const number = (key, fallback, max) => {\n        const v = params.get(key);\n        if (v === null) return fallback;\n        return /^(0|[1-9]\\d{0,2})$/.test(v) && Number(v) <= max ? Number(v) : NaN;\n      };\n      const offset = number('offset', 0, match[1] ? 160 : 16);\n      const limit = number('limit', match[1] ? 20 : 8, match[1] ? 20 : 8);\n      if (!Number.isInteger(offset) || !Number.isInteger(limit) || limit < 1)\n        return result(400, 'Invalid paging');\n      try {\n        const page = await state.getAtlasPage({ stopId: match[1], offset, limit });\n        return page\n          ? result(\n              200,\n              JSON.stringify({\n                ...page,\n                pilotEnabled: raidPilot,\n                ...(previewReadOnly ? { previewReadOnly: true } : {}),\n                mode: overlayFeed?.simulator ? 'simulator' : 'live',\n              }),\n              'application/json',\n            )\n          : result(404, 'Stop not found');\n      } catch {\n        return result(503, 'Atlas unavailable; clear previous data and refresh later');\n      }\n    }\n    if (/^\\/stops\\/[a-f0-9]{64}$/.test(path)) {\n      if (method !== 'GET') return result(405, 'Read only');\n      return result(200, await publicHTML('atlas.html'), 'text/html; charset=utf-8');\n    }\n    if (path === '/api/journey') {\n      if (method !== 'GET') return result(404, 'Read only');\n      try {\n        return result(\n          200,\n          JSON.stringify(await state.getAtlasPage({ offset: 0, limit: 8 })),\n          'application/json',\n        );\n      } catch {\n        return result(503, 'Atlas unavailable');\n"
+    }
+  ]
+}
+````
+
+### 6544. 2026-10-31T11:19:54.094Z — tool call (source line 24812)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_8a7b9653af854a5bbbf16c41cd1889c3",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/test/overlay-group3.test.js\\n@@\\n     const f = await pilotFixture(kind);\\n+    for (const channel of ['raidrelichq', HOME]) {\\n+      const alias = await f.request(`/overlay?channel=${channel}`, 'GET');\\n+      assert.equal(alias.status, 307);\\n+      assert.equal(alias.headers.location, `/overlay/${HOME}`);\\n+      assert.equal(alias.headers['cache-control'], 'no-store');\\n+    }\\n+    for (const channel of ['unknown', 'https://other.invalid', '../control', `${HOME}&channel=${HOME}`, '%72aidrelichq', `${HOME}&layout=full`])\\n+      assert.equal((await f.request(`/overlay?channel=${channel}`, 'GET')).status, 404);\\n+    assert.equal((await f.request('/overlay?channel=raidrelichq', 'POST')).status, 405);\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/test/receiving.test.js\\n@@\\n     assert.ok(!JSON.stringify(v).includes('7101'));\\n+    // Current-hold approval is public on the live overlay, not a rewrite of the\\n+    // immutable completed ring's source-mark archive.\\n+    await f.chat(OTHER, '7401', '!mark light');\\n+    assert.equal(posts(f).at(-1).message, 'Your mark is public on the relic.');\\n+    const current = JSON.parse((await f.request(`/api/overlay/${OTHER}`)).body.toString());\\n+    assert.equal(current.lineageRings, 1);\\n+    assert.ok(current.marks.some((m) => m.id && m.runeSvg));\\n+    const currentIds = current.marks.map((m) => m.id);\\n+    f.advance(30001);\\n+    await f.chat(OTHER, '7402', '!mark spoiler');\\n+    assert.match(posts(f).at(-1).message, /Waiting for moderator approval.*private/);\\n+    const held = JSON.parse((await f.request(`/api/overlay/${OTHER}`)).body.toString());\\n+    assert.deepEqual(held.marks.map((m) => m.id), currentIds);\\n+    assert.ok(!JSON.stringify(held).includes('spoiler'));\\n+    const archive = JSON.parse((await f.request('/api/atlas')).body.toString());\\n+    assert.equal(archive.rings, 1);\\n+    assert.equal(archive.stops[0].approvedCount, 1);\\n+    await f.chat(OTHER, '7403', '!mark first light');\\n+    assert.match(posts(f).at(-1).message, /one allowed word or emoji.*!mark light/);\\n+    assert.deepEqual(\\n+      JSON.parse((await f.request(`/api/overlay/${OTHER}`)).body.toString()).marks.map((m) => m.id),\\n+      currentIds,\\n+    );\\n*** End Patch\"));\n"
+}
+````
+
+### 6545. 2026-10-31T11:19:54.196Z — tool result (source line 24815)
+
+````text
+{
+  "call_id": "call_8a7b9653af854a5bbbf16c41cd1889c3",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 6546. 2026-10-31T11:20:05.852Z — tool call (source line 24819)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_ba7889e2ac81435b805a4c39b2112ba2",
+  "input": "text((await tools.exec_command({cmd:\"rg -n 'const.*page|page =|review =|origin =' scripts/browser-smoke-onboarding.js | head -15\\nsed -n '105,125p' scripts/browser-smoke-onboarding.js\\nsed -n '315,345p' test/overlay-group3.test.js\\nsed -n '95,110p' src/receiving.js\\nsed -n '55,68p' public/control.js\",\"max_output_tokens\":1200})).output)\n"
+}
+````
+
+### 6547. 2026-10-31T11:20:05.956Z — tool result (source line 24822)
+
+````text
+{
+  "call_id": "call_ba7889e2ac81435b805a4c39b2112ba2",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "43:  const session = await page.context().newCDPSession(page);\n53:  const result = await page.evaluate(async () => {\n137:    const bytes = await page.screenshot({ fullPage: false, ...(clip ? { clip } : {}) });\n164:  const savedViewport = page.viewportSize();\n171:  const saved = await page.evaluate(() => ({\n214:        const bytes = await page.screenshot({ fullPage: false, ...(clip ? { clip } : {}) });\n249:  review = await visualReview({ seekers: true });\n250:  const { page, context, fixture: f, origin } = review;\n276:    const proof = await page.evaluate(() => {\n472:  const pendingPoll = page.waitForResponse(\n531:  const setupRequest = page.waitForRequest((r) => new URL(r.url()).pathname === '/control/' + OTHER && r.method() === 'POST' && r.postDataJSON()?.action === 'bootstrap');\n585:    const wizardGeometry = await page.locator('.wizard-steps > li').evaluateAll((items) => {\n716:  const beforePreview = await f.runtime.state.getKeeperRegistry(),\n717:    callsBeforePreview = f.calls.length;\n723:  const child = page.frameLocator('#local-overlay-preview');\n          Number(getComputedStyle(image).opacity) === 0)\n    );\n  });\n  const read = () =>\n    page.evaluate(() => {\n      const r = document.querySelector('#atlas-relic').getBoundingClientRect();\n      return {\n        width: innerWidth,\n        height: innerHeight,\n        scrollX,\n        scrollY,\n        heroX: r.x,\n        heroY: r.y,\n        heroWidth: r.width,\n        heroHeight: r.height,\n      };\n    });\n  const before = await read();\n  assert.equal(before.width, viewport.width);\n  assert.equal(before.height, viewport.height);\n  const names =\n    const f = await pilotFixture(kind);\n    const before = await f.runtime.state.getKeeperRegistry();\n    const response = await f.request(\n      `/overlay/${HOME}?preview=arrival&layout=card&scale=0.75`,\n      'GET',\n    );\n    assert.equal(response.status, 200);\n    assert.match(\n      response.body.toString(),\n      /<p[^>]*id=\"simulator\"[^>]*>LOCAL TEST · fictional arrival · no live connection<\\/p>/,\n    );\n    assert.doesNotMatch(response.body.toString(), /SIMULATOR · local test data/);\n    assert.doesNotMatch(response.body.toString(), /data-local-preview-ready/);\n    assert.match(response.headers['content-security-policy'], /connect-src 'none'/);\n    assert.match(response.headers['content-security-policy'], /frame-ancestors 'self'/);\n    assert.equal(response.headers['x-frame-options'], 'SAMEORIGIN');\n    const parent = await f.request('/overlay', 'GET');\n    assert.equal(parent.status, 200);\n    const parentPolicy = parent.headers['content-security-policy'];\n    assert.equal(\n      parentPolicy\n        .split(';')\n        .map((s) => s.trim())\n        .find((s) => s.startsWith('frame-src ')),\n      \"frame-src 'self'\",\n    );\n    assert.match(parentPolicy, /default-src 'none'/);\n    assert.match(parentPolicy, /script-src 'none'/);\n    assert.match(parentPolicy, /connect-src 'none'/);\n    assert.equal(parent.headers['x-frame-options'], 'DENY');\n    for (const path of ['/demo/film', '/demo/judge']) {\n    profiles: ids\n      .filter((id) => safe(id) && names[id])\n      .map((id) => {\n        const received = stops.filter((s) => s.to === id);\n        const latest = received.at(-1);\n        return {\n          login: names[id],\n          received: received.map(stop),\n          glyphs: (latest?.marks ?? [])\n            .slice(0, 20)\n            .map((m) => ({ text: m.text, runeSvg: runeSvg(m.text) })),\n          glyphTotal: latest?.marks?.length ?? 0,\n        };\n      }),\n  };\n}\n  stopSetup();\n  document.getElementById('setup-flow-status').textContent =\n    'Setup checks stopped; no new action will run.';\n};\ndocument.getElementById('copy-mod').onclick = async () => {\n  try {\n    await navigator.clipboard.writeText('/mod raidrelicbot');\n    document.getElementById('mod-copy-status').textContent =\n      'Command copied; paste it in your own chat. Moderator permission is not verified here.';\n  } catch {\n    document.getElementById('mod-copy-status').textContent =\n      'Copy unavailable. Type /mod raidrelicbot in your own chat.';\n  }\n};\n"
+    }
+  ]
+}
+````
+
+### 6548. 2026-10-31T11:20:09.214Z — tool call (source line 24826)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_aa7eff5e5e01471f92b788b560ce3c7f",
+  "input": "text((await tools.exec_command({cmd:\"rg -n 'for \\\\(const channel' test/overlay-group3.test.js\\nsed -n '245,265p' scripts/browser-smoke-onboarding.js\\nrg -n 'body|text' src/marks.js | head -10\\nrg -n 'return.*request|function request' test-support/pilot-fixture.js\",\"max_output_tokens\":900})).output)\n"
+}
+````
+
+### 6549. 2026-10-31T11:20:09.301Z — tool result (source line 24829)
+
+````text
+{
+  "call_id": "call_aa7eff5e5e01471f92b788b560ce3c7f",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "154:    for (const channel of ['raidrelichq', HOME]) {\n160:    for (const channel of ['unknown', 'https://other.invalid', '../control', `${HOME}&channel=${HOME}`, '%72aidrelichq', `${HOME}&layout=full`])\n  }\n}\n\ntry {\n  review = await visualReview({ seekers: true });\n  const { page, context, fixture: f, origin } = review;\n  await context.addInitScript(() => {\n    window.__onboardCopies = [];\n    window.__copyDenied = false;\n    Object.defineProperty(navigator, 'clipboard', {\n      configurable: true,\n      value: {\n        writeText: async (value) => {\n          if (window.__copyDenied) throw Error('denied');\n          window.__onboardCopies.push(value);\n        },\n      },\n    });\n  });\n  stage = 'frontdoor-layout';\n  for (const viewport of [\n28:  const text = input.normalize('NFKC').toLowerCase().replaceAll('ß', 'ss').replaceAll('ς', 'σ');\n29:  if (!text || Buffer.byteLength(text) > 128 || [...text].length > 32) return null;\n30:  const word = /^\\p{L}[\\p{L}\\p{M}]*$/u.test(text);\n33:  if (word && !blockedWords.includes(text)) return text;\n34:  if (emoji.test(text) && [...segmenter.segment(text)].length === 1) return text;\n67:    previous?.context?.blockedUserIds?.includes(actor.chatterId)\n75:    return removed || (previous?.context?.optedIn === true && next?.context?.optedIn === false);\n81:// Original numeric geometry only. Input text never appears in SVG markup.\n98:export function parseMarkCommand(text) {\n99:  if (['!seek', '!relic seek', '!seek on', '!relic seek on'].includes(text))\n223:    return request(\n239:    return request(\n"
+    }
+  ]
+}
+````
+
+### 6550. 2026-10-31T11:20:31.458Z — tool call (source line 24833)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_2e23a3dbb8b3479e848041c0583d0acd",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/test/receiving.test.js\\n@@\\n-import { parseMarkCommand } from '../src/marks.js';\\n+import { parseMarkCommand, runeSvg } from '../src/marks.js';\\n@@\\n     assert.equal(current.lineageRings, 1);\\n-    assert.ok(current.marks.some((m) => m.id && m.runeSvg));\\n+    assert.ok(current.marks.some((m) => m.id && m.runeSvg === runeSvg('light')));\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/scripts/browser-smoke-onboarding.js\\n@@\\n   const { page, context, fixture: f, origin } = review;\\n+  const overlayAlias = await context.request.get(origin + '/overlay?channel=raidrelichq', { maxRedirects: 0 });\\n+  assert.equal(overlayAlias.status(), 307);\\n+  assert.equal(overlayAlias.headers().location, '/overlay/' + HOME);\\n+  assert.equal((await context.request.get(origin + '/overlay?channel=unknown', { maxRedirects: 0 })).status(), 404);\\n*** End Patch\"));\ntext(await tools.apply_patch(\"*** Begin Patch\\n*** Add File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/docs/CONTROL_FOLLOWUPS_1031.md\\n+# 31 October follow-ups — local source candidate\\n+\\n+The owner reported a successful olsols2 → olsols3 hand-off and Ring 12 at\\n+11:12–11:15 UTC. This is an owner report, not source-author live execution.\\n+The parent must independently verify deployment and targeted public mark metadata.\\n+\\n+Mark acknowledgements are transaction-derived: approved means public on the live\\n+relic; pending means private until approval. Current-hold marks are not retroactive\\n+edits to completed-stop archives. Keeper glyphs currently describe the latest\\n+received ring's archived source marks; Atlas stop marks are also historical.\\n+No production storage/projection defect is established without the parent's\\n+approved/pending/context metadata. This candidate deliberately does not approve,\\n+migrate, reconstruct or rewrite marks or Ring 12. Local both-store regression\\n+definitions distinguish current approved overlay glyphs, held private marks and\\n+unchanged completed archives. A broader current-hold Atlas/Keeper presentation\\n+change remains outside this unconfirmed bug fix.\\n+\\n+The bounded `/overlay?channel=...` alias accepts only an exact configured login or\\n+ID with an existing feed and redirects relatively to the numeric overlay route.\\n+Extra/duplicate parameters, encoded names and arbitrary destinations fail closed.\\n+Invalid multiword mark guidance now gives `!mark light` as the one-word example.\\n+Waiting copy explicitly distinguishes a received request from verified arrival;\\n+neither claim eligibility nor the verified 180-second clock changes.\\n+\\n+Setup already uses bounded I/O. Its dedicated status now records pending, terminal\\n+failure or timeout rather than leaving a pending label on transport failure.\\n+Only the existing explicit setup flow may retry (three attempts / 45 seconds);\\n+unknown raid outcomes are never retried. A slow/error response with polling and\\n+subsequent explicit Setup recovery is defined in the onboarding browser probe.\\n+\\n+All new tests are unrun by the source author. Parent QA, formatting, evidence and\\n+any new private read-only zero-traffic preview remain required. No production\\n+traffic change is part of this candidate. Static modules currently cache for one\\n+hour: after an owner-authorized promotion, hard-reload the control/overlay pages\\n+before checking the new UI; an old open tab is not proof of new runtime behavior.\\n*** End Patch\"));\n"
+}
+````
+
+### 6551. 2026-10-31T11:20:31.602Z — tool result (source line 24837)
+
+````text
+{
+  "call_id": "call_2e23a3dbb8b3479e848041c0583d0acd",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 6552. 2026-10-31T11:20:53.211Z — assistant (source line 24842)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Changed 8 files: `src/app.js`; `public/control.js`, `overlay.js`, `ritual-copy.js`; `test/overlay-group3.test.js`, `receiving.test.js`; `scripts/browser-smoke-onboarding.js`; and `docs/CONTROL_FOLLOWUPS_1031.md`.\n\nAdded the strict overlay alias, one-word mark guidance, truthful confirmation-wait copy, and explicit Setup failure/timeout status. Regression definitions cover alias rejection, approved versus pending marks, and slow/error Setup recovery.\n\n**Mark visibility remains qualified:** source shows Atlas/Keeper glyphs use completed archives. No production defect is confirmed; no marks were approved, migrated or rewritten.\n\nTests are unrun. Parent must verify targeted metadata and run QA. Static modules cache for one hour; hard-reload after promotion. No Git, deployment or traffic actions performed. Stopped.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6553. 2026-10-31T11:25:44.994Z — user (source line 24850)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "Original330 CONTINUE5FOLLOWUPS—MARKGAP NOWPARENTVERIFIED. ParentREADONLY11:19:19 targetedFirestore markChannels SHA(1593561134) foundlightAPPROVED/currentContexttrue/sessionclosedfalse/currentmarks1,optedIntrue/holdsRelictrue,createdAt1793445350022,registryholder1593561134,lineage12stops. PublicHTTP11:20 /api/atlas?offset=8&limit=8 ring12approvedCount0; /api/keeper/olsols3 glyphTotal0,currentHolderMatchestrue. NOwrites/rawprivatecontentpersisted. Safe .openclaw/tmp/raid-relic-followup329-mark-proof.json and public-mark-proof.json containNOcredentials/pendingtext/privateuserIDs. OverlayWSparentconnectionfailedsoNOTliveverified. Userrequirescurrentapprovedmarkshowncurrentholderring/Keeper/overlay. Thisisarchive-onlyVIEWGAP,notmissingstoredrecord. Preserve truthfularchive semantics: addminimalread-onlyLIVEcurrent-markprojection CURRENTactualholder/validsession/approvedunblockedonly, bothstores. Distinctcurrent/liveglyphs+honestcounts preferred, renderatcurrentholderring/Keepercurrentsection; doNOTrewrite historicstoporclaimlightwasinRing12arrival snapshot(archive0). Existingnextconfirmedhandoff capturescarriedmarks asbefore. No migration/approval/quota reset/chat/provideractions/newcollection/mutatingGET. Preserveforget/block/reject/pause/offlinevisibility/no pendingtext/userID leaks/duplicateglyphs,160/4/16caps. Existingpublic-view/receiving/marks/store/state+existingatlas/keeperJS asneeded(no newfirstpartyJSfile160). PRESERVE329fourfixes. Addbothstoresregressions: currentholderclaim→approvedmarkAFTERclaim→AtlascurrentLIVE/KeeperLIVE/overlay1; archivedcountsimmutable; pendinghidden;forget/blockhidden;formerholdernotcurrentlive;nextmove/replay/privacybounded. Addexistingbrowserprobe actualsingleapprovedmarkrenderAtlasKeeperOverlayglyphvisible/APIcounts—notjustsourceasserts. SourceONLY,no execution/Git/cloud/format/rawCody/selected/CLI/secret/prodAPI/credentials. ParentQA+fresh0only. Finishallfivewithinboundedphase; explainLIVEvsarchiveandno falseprodvalidation,STOP."
+  }
+]
+````
+
+### 6554. 2026-10-31T11:25:49.039Z — assistant (source line 24853)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "The parent’s metadata confirms a read-only view gap: `light` is approved in the current holder’s active session, while Atlas and Keeper show only archived arrival marks. I’ll add a distinct live projection and leave Ring12’s archive unchanged, preserving the other four fixes.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6555. 2026-10-31T11:25:50.283Z — tool call (source line 24854)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_53b64fffb487482db6d3d35d33d22bca",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '1,45p' src/receiving.js\\nsed -n '850,925p' src/store.js\\nrg -n 'getAtlasPage|getPublicOverlay' src/state.js src/store.js\\nsed -n '1,140p' public/atlas.js\\nsed -n '120,185p' public/receiving.js\",\"max_output_tokens\":6000})).output)\n"
+}
+````
+
+### 6556. 2026-10-31T11:25:50.408Z — tool result (source line 24857)
+
+````text
+{
+  "call_id": "call_53b64fffb487482db6d3d35d33d22bca",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "import { seekerState } from './seeker-state.js';\nimport { boundedCall } from './bounded.js';\nimport { runeSvg } from './marks.js';\n\nexport const RECEIVING_KEEPERS = Object.freeze({\n  1591805230: 'raidrelichq',\n  1591806023: 'olsols2',\n});\n// Operator-owned mapping. No request parameter can expand this admission boundary.\nexport function keeperNetwork(value = RECEIVING_KEEPERS) {\n  if (\n    !value ||\n    typeof value !== 'object' ||\n    Array.isArray(value) ||\n    ![Object.prototype, null].includes(Object.getPrototypeOf(value))\n  )\n    throw Error('Keeper mapping');\n  const pairs = Object.entries(value);\n  if (Object.getOwnPropertySymbols(value).length) throw Error('Keeper mapping');\n  if (\n    !pairs.length ||\n    pairs.length > 4 ||\n    !pairs.every(([id, login]) => /^[1-9]\\d{0,31}$/.test(id) && /^[a-z0-9_]{1,25}$/.test(login)) ||\n    new Set(pairs.map(([, login]) => login)).size !== pairs.length\n  )\n    throw Error('Keeper mapping');\n  return Object.freeze(Object.fromEntries(pairs));\n}\nconst time = (v) => Number.isSafeInteger(v) && v >= 0;\nconst count = (v) => Number.isSafeInteger(v) && v >= 0 && v <= 1000000;\n// Called from the existing store read transaction. No viewer associations escape.\nexport function receivingView(registry, channels, marks, lineage, config, now) {\n  const names = Object.fromEntries(Object.entries(config?.logins ?? {}).map(([n, id]) => [id, n]));\n  const ids = config?.channels ?? [];\n  const stops = lineage?.stops ?? [];\n  if (ids.length > 4 || stops.length > 16) throw Error('Receiving capacity');\n  const safe = (id) =>\n    channels[id]?.optedIn === true &&\n    !channels[id]?.banned &&\n    !channels[id]?.blockedUserIds?.includes(id) &&\n    !marks[id]?.blocked?.includes(id);\n  const stop = (s) => ({\n    stopId: s.stopId,\n    from: names[s.from] ?? null,\n    to: names[s.to] ?? null,\n        const doc = ref('markChannels', host);\n        const previous = (await tx.get(doc)).data();\n        const next = shareStep(previous, op, now);\n        if (next.doc) tx.set(doc, next.doc);\n        return next.result;\n      });\n    },\n    async getWanderInput() {\n      if (!wander?.enabled) return null;\n      return db.runTransaction(async (tx) => {\n        const registry = (await tx.get(ref('keeperRegistry', 'single'))).data() ?? {\n          holderId: null,\n          originated: false,\n        };\n        const lineage = (await tx.get(ref('lineage', 'single'))).data() ?? { stops: [] };\n        const channels = {},\n          marks = {};\n        for (const id of config.channels) {\n          channels[id] = (await tx.get(ref('streamChannels', id))).data();\n          marks[id] = (await tx.get(ref('markChannels', id))).data();\n        }\n        return { registry, lineage, channels, marks };\n      });\n    },\n    async wanderStep(op, now) {\n      if (!wander?.enabled) return { status: 'disabled' };\n      return db.runTransaction(async (tx) => {\n        const registry = (await tx.get(ref('keeperRegistry', 'single'))).data() ?? {\n          holderId: null,\n          originated: false,\n        };\n        const lineage = (await tx.get(ref('lineage', 'single'))).data() ?? { stops: [] };\n        const channels = {},\n          marks = {};\n        for (const id of config.channels) {\n          channels[id] = (await tx.get(ref('streamChannels', id))).data();\n          marks[id] = (await tx.get(ref('markChannels', id))).data();\n        }\n        const input = { registry, lineage, channels, marks };\n        const next = wanderMutation(input, config, wander, op, now);\n        if (next.result.status === 'wandered') {\n          const target = next.registry.holderId;\n          tx.set(ref('streamChannels', target), next.channels[target]);\n        }\n        if (JSON.stringify(next.registry) !== JSON.stringify(registry))\n          tx.set(ref('keeperRegistry', 'single'), next.registry);\n        if (JSON.stringify(next.lineage) !== JSON.stringify(lineage))\n          tx.set(ref('lineage', 'single'), next.lineage);\n        for (const [id, doc] of Object.entries(next.marks))\n          if (doc && JSON.stringify(doc) !== JSON.stringify(marks[id]))\n            tx.set(ref('markChannels', id), doc);\n        return next.result;\n      });\n    },\n    async getReceivingView(now) {\n      return db.runTransaction(async (tx) => {\n        const registry = (await tx.get(ref('keeperRegistry', 'single'))).data();\n        const lineage = (await tx.get(ref('lineage', 'single'))).data();\n        const channels = {},\n          marks = {};\n        for (const id of config?.channels ?? []) {\n          channels[id] = (await tx.get(ref('streamChannels', id))).data();\n          marks[id] = (await tx.get(ref('markChannels', id))).data();\n        }\n        return receivingView(registry, channels, marks, lineage, config, now);\n      });\n    },\n    async getKeeperCandidates(host) {\n      if (!config?.channels.includes(host)) return [];\n      return db.runTransaction(async (tx) => {\n        const registry = (await tx.get(ref('keeperRegistry', 'single'))).data();\n        const channels = {},\n          docs = {};\n        for (const id of config.channels) {\n          channels[id] = (await tx.get(ref('streamChannels', id))).data();\n          docs[id] = (await tx.get(ref('markChannels', id))).data();\nsrc/store.js:1082:    async getAtlasPage(options) {\nsrc/state.js:841:    getAtlasPage(options) {\nimport { keeperNames } from './keeper-network.js';\nconst keeperName = (id) => (keeperNames[id] ? '@' + keeperNames[id] : 'Unknown Keeper');\nimport { publicDate as utcDate } from './streak-view.js';\nimport { createAtlasHero, atlasRings } from './atlas-hero.js';\nconst $ = (id) => document.getElementById(id);\nconst ledgerDetails = $('ledger-details'),\n  ledgerWidth = matchMedia('(max-width: 599px)');\nconst fitLedger = () => {\n  if (ledgerDetails) ledgerDetails.open = !ledgerWidth.matches;\n};\nfitLedger();\nledgerWidth.addEventListener('change', fitLedger);\nconst hero = createAtlasHero({ archive: $('atlas-relic') });\nconst stopId = /^\\/stops\\/([a-f0-9]{64})$/.exec(location.pathname)?.[1];\nlet offset = 0;\nlet next = null;\nlet generation = 0;\nlet controller;\nconst node = (tag, text, className) => {\n  const n = document.createElement(tag);\n  if (text !== undefined) n.textContent = text;\n  if (className) n.className = className;\n  return n;\n};\n// Optional captions must never prevent the independently valid mark gallery.\nfunction chronicleCaption(value) {\n  const fallback =\n    'Fiction · template: Beneath quiet stars, the relic gathered another ring of shared light.';\n  if (\n    !value ||\n    typeof value !== 'object' ||\n    !['template', 'model'].includes(value.source) ||\n    value.fiction !== true ||\n    typeof value.line !== 'string' ||\n    value.line.length > 320 ||\n    !value.line.trim() ||\n    [...value.line].length > 160 ||\n    /[\\p{Cc}\\p{Cf}]/u.test(value.line)\n  )\n    return fallback;\n  return `Fiction · ${value.source}: ${value.line}`;\n}\nfunction clear() {\n  hero.clear();\n  $('status').classList.remove('empty-state');\n  $('journey').replaceChildren();\n  $('marks').replaceChildren();\n  $('rings').textContent = 'No current state';\n  $('next').hidden = true;\n}\nasync function load() {\n  const current = ++generation;\n  controller?.abort();\n  controller = new AbortController();\n  const activeController = controller;\n  // Clear immediately: no cache or old page may retain purged public content.\n  clear();\n  $('status').textContent = 'Reading the archive…';\n  $('refresh').disabled = true;\n  const timer = setTimeout(() => activeController.abort(), 8000);\n  try {\n    const response = await fetch(\n      `/api/atlas${stopId ? `/stops/${stopId}` : ''}?offset=${offset}&limit=${stopId ? 20 : 8}`,\n      { cache: 'no-store', signal: activeController.signal },\n    );\n    if (!response.ok) throw new Error('Unavailable');\n    const data = await response.json();\n    if (current !== generation) return;\n    if (atlasRings(data.rings) === null) throw Error('Invalid rings');\n    hero.update(data.rings);\n    $('simulator').textContent = data.mode === 'simulator' ? 'SIMULATOR · local test journey' : '';\n    $('simulator').hidden = data.mode !== 'simulator';\n    if (data.pilotEnabled)\n      document.querySelector('.note').textContent =\n        'Raid stops require verified arrivals and two-chat binding. Dotted Wander stops are idle transfers, not raids.';\n    $('rings').textContent =\n      `${data.rings ? data.rings + ' completed growth rings' : 'First journey begins'}${data.wanderStops ? ' · ' + data.wanderStops + ' Wandered (no raid) · ' + (data.rings - data.wanderStops) + ' raid/legacy stops' : ''}`;\n    $('status').textContent = data.total\n      ? `Showing ${offset + 1}–${Math.min(offset + (stopId ? data.marks.length : data.stops.length), data.total)} of ${data.total}`\n      : stopId\n        ? 'No approved marks retained at this stop.'\n        : 'First journey begins with a completed two-chat claim. No completed hops yet.';\n    if (stopId) {\n      $('title').textContent = `Stop ${data.stop.ringIndex}`;\n      $('description').textContent =\n        `${keeperName(data.stop.from)} to ${keeperName(data.stop.to)}. ${data.stop.kind === 'wander' ? 'Wandered at' : 'Claimed'} ${utcDate(data.stop.claimedAt)}. ${data.stop.kind === 'wander' ? 'Wandered — no raid or audience transfer.' : data.stop.raidSize + ' reported raid viewers.'}`;\n      $('detail').hidden = false;\n      $('journey').append(node('p', chronicleCaption(data.stop.chronicle)));\n      for (const mark of data.marks) {\n        const item = node('li');\n        const img = node('img');\n        img.alt = 'Original approved rune';\n        img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(mark.runeSvg)}`;\n        item.append(img, node('span', mark.text));\n        $('marks').append(item);\n      }\n    } else\n      for (const stop of data.stops) {\n        const item = node('li', undefined, 'stop');\n        const link = node('a', 'Open this stop');\n        link.href = `/stops/${stop.stopId}`;\n        item.append(\n          node('h2', `${stop.kind === 'wander' ? 'Wandered · ' : ''}Ring ${stop.ringIndex}`),\n          node('p', chronicleCaption(stop.chronicle)),\n          node('p', `${keeperName(stop.from)} to ${keeperName(stop.to)}`),\n          node('p', utcDate(stop.claimedAt)),\n          node(\n            'p',\n            stop.kind === 'wander'\n              ? 'Wandered — no raid or audience transfer'\n              : Number.isInteger(stop.raidSize) && stop.raidSize >= 0\n                ? `${stop.raidSize} Twitch-reported raiders`\n                : 'Raid audience not recorded',\n          ),\n          ...(stop.approvedCount\n            ? [node('p', `${stop.approvedCount} approved marks retained`)]\n            : []),\n          link,\n        );\n        $('journey').append(item);\n      }\n    $('status').classList.toggle('empty-state', data.total === 0);\n    next = data.nextOffset;\n    $('next').hidden = next === null;\n  } catch {\n    if (current !== generation) return;\n    clear();\n    $('status').textContent = 'Archive unavailable. Previous content hidden. Refresh to try again.';\n  } finally {\n    clearTimeout(timer);\n    if (current === generation) $('refresh').disabled = false;\n  }\n}\n$('refresh').onclick = () => {\n  clearSearch();\n  $('search-status').textContent = 'Previous matches cleared. Submit a fresh shared-text search.';\n  offset = 0;\n  load();\n};\n$('next').onclick = () => {\n          li.append(\n            link('@' + s.login, '/keeper/' + s.login),\n            document.createTextNode(' · ' + s.viewers + ' Twitch-reported viewers'),\n          );\n          list.append(li);\n        }\n        content.append(list);\n        if (v.enabled && !list.childElementCount)\n          content.append(node('p', 'No live eligible Seekers are currently confirmed.'));\n        const recent = node('p', 'Recent recorded Keepers: ');\n        for (const name of v.recent ?? [])\n          if (configured.has(name))\n            recent.append(link('@' + name, '/keeper/' + name), document.createTextNode(' '));\n        content.append(recent);\n      } else {\n        const p = v.profile;\n        if (\n          !p ||\n          p.login !== login ||\n          !configured.has(login) ||\n          !Array.isArray(p.received) ||\n          p.received.length > 16 ||\n          !Array.isArray(p.glyphs) ||\n          p.glyphs.length > 20\n        )\n          throw Error('Invalid Keeper');\n        document.getElementById('keeper-title').textContent = '@' + login + ' · received rings';\n        content.append(\n          node(\n            'h3',\n            p.received.length\n              ? p.received.length + ' retained received rings'\n              : 'First journey begins',\n          ),\n        );\n        if (p.glyphs.length)\n          content.append(node('p', 'Approved community glyphs on the latest received ring:'));\n        const glyphs = node('div');\n        glyphs.className = 'keeper-glyphs';\n        for (const g of p.glyphs) {\n          if (\n            typeof g.text !== 'string' ||\n            g.text.length > 128 ||\n            typeof g.runeSvg !== 'string' ||\n            g.runeSvg.length > 4096 ||\n            !g.runeSvg.startsWith('<svg xmlns=\"http://www.w3.org/2000/svg\"')\n          )\n            throw Error('Invalid glyph');\n          const figure = node('figure'),\n            image = document.createElement('img');\n          image.src = 'data:image/svg+xml,' + encodeURIComponent(g.runeSvg);\n          image.width = image.height = 48;\n          image.alt = 'Approved rune: ' + g.text;\n          figure.append(image, node('figcaption', g.text));\n          glyphs.append(figure);\n        }\n        content.append(glyphs);\n        const more = node('details'),\n          moreBody = node('div');\n        more.className = 'keeper-more';\n        more.append(\n          node('summary', '+' + Math.max(0, p.received.length - 3) + ' more received rings'),\n          moreBody,\n        );\n        const previews = [];\n        for (const [index, s] of p.received.entries()) {\n"
+    }
+  ]
+}
+````
+
+### 6557. 2026-10-31T11:25:57.991Z — tool call (source line 24861)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_df19bc468c104ca1acf114a781b3d8fd",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '835,855p' src/state.js\\nsed -n '1075,1110p' src/store.js\\nhead -30 src/state.js\\nhead -25 src/store.js\\nrg -n 'function active' src/marks.js\\nsed -n '145,164p' src/marks.js\\nsed -n '1,38p' scripts/browser-smoke-receiving.js\",\"max_output_tokens\":2200})).output)\n"
+}
+````
+
+### 6558. 2026-10-31T11:25:58.091Z — tool result (source line 24864)
+
+````text
+{
+  "call_id": "call_df19bc468c104ca1acf114a781b3d8fd",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "    searchPublicMarks(options) {\n      return atlasSearch(lineage, options);\n    },\n    getJourneyMap(now) {\n      return journeyMap(lineage, config, now);\n    },\n    getAtlasPage(options) {\n      return atlasPage(lineage, options);\n    },\n    getPublicPresentation(host, now) {\n      return {\n        ...(holderLoginView(registry, keeperNames)\n          ? { holderLogin: holderLoginView(registry, keeperNames) }\n          : {}),\n        ...(wanderArrivalView(registry, lineage, host)\n          ? { wanderArrival: wanderArrivalView(registry, lineage, host) }\n          : {}),\n        rings: lineage.stops.length,\n        ...(config?.streakEnabled ? { streak: streakView(registry, now) } : {}),\n        ...(movedToView(registry, lineage, host, channels.get(host), keeperNames)\n          ? { movedToLogin: movedToView(registry, lineage, host, channels.get(host), keeperNames) }\n    },\n    async searchPublicMarks(options) {\n      return atlasSearch((await ref('lineage', 'single').get()).data(), options);\n    },\n    async getJourneyMap(now) {\n      return journeyMap((await ref('lineage', 'single').get()).data(), config, now);\n    },\n    async getAtlasPage(options) {\n      return atlasPage((await ref('lineage', 'single').get()).data(), options);\n    },\n    async getPublicPresentation(host, now) {\n      return db.runTransaction(async (tx) => {\n        const registry = (await tx.get(ref('keeperRegistry', 'single'))).data();\n        const lineage = (await tx.get(ref('lineage', 'single'))).data();\n        const channel = (await tx.get(ref('streamChannels', host))).data();\n        return {\n          ...(holderLoginView(registry, keeperNames)\n            ? { holderLogin: holderLoginView(registry, keeperNames) }\n            : {}),\n          ...(wanderArrivalView(registry, lineage, host)\n            ? { wanderArrival: wanderArrivalView(registry, lineage, host) }\n            : {}),\n          rings: lineage?.stops?.length ?? 0,\n          ...(config?.streakEnabled ? { streak: streakView(registry, now) } : {}),\n          ...(movedToView(registry, lineage, host, channel, keeperNames)\n            ? { movedToLogin: movedToView(registry, lineage, host, channel, keeperNames) }\n            : {}),\n          handoff: handoffView(registry, host, now, lineage, keeperNames),\n          claimMeter: claimMeterView(registry, host, now),\n          ...(echoView(registry, host, now) ? { resonance: echoView(registry, host, now) } : {}),\n        };\n      });\n    },\n    async getPublicJourney() {\n      return publicJourney((await ref('lineage', 'single').get()).data());\n    },\nimport { publicKeeperProfiles } from './scoreboard.js';\nimport { wanderMutation, wanderActivity } from './wander-state.js';\nimport { receivingView } from './receiving.js';\nimport { streakView } from './streaks.js';\nimport { enqueueP7, p7Mutation, cancelP7 } from './p7.js';\nimport { journeyMap } from './journey-map.js';\nimport {\n  reduceScores,\n  retainedScores,\n  scoreboard,\n  scoreMessage,\n  isScoreCommand,\n  isReplyCommand,\n  scoreAckDocument,\n  scoreAckMutation,\n} from './scoreboard.js';\nimport { updatePresence, presenceKey, revokePresenceActor } from './presence.js';\nimport { reserveShare, sharePage, shareStep } from './my-marks.js';\nimport { echoCandidate, reduceEcho, echoView } from './resonance.js';\nimport { forgeMutation } from './forge.js';\nimport { recapProjection } from './recap.js';\nimport { chronicleMutation } from './chronicle.js';\nimport {\n  ackDocument,\n  ackSeen,\n  ackStep,\n  completionAck,\n  attachOfferProof,\n  arrivalNotice,\n  completionEligible,\nimport { publicKeeperProfiles } from './scoreboard.js';\nimport { wanderMutation, wanderActivity } from './wander-state.js';\nimport { receivingView } from './receiving.js';\nimport { streakView } from './streaks.js';\nimport { enqueueP7, p7Mutation, cancelP7 } from './p7.js';\nimport { journeyMap } from './journey-map.js';\nimport {\n  reduceScores,\n  retainedScores,\n  scoreboard,\n  scoreMessage,\n  isScoreCommand,\n  isReplyCommand,\n  scoreAckDocument,\n  scoreAckMutation,\n} from './scoreboard.js';\nimport { updatePresence, presenceKey, revokePresenceActor } from './presence.js';\nimport { reserveShare, sharePage, shareStep } from './my-marks.js';\nimport { echoCandidate, reduceEcho, echoView } from './resonance.js';\nimport { forgeMutation } from './forge.js';\nimport { recapProjection } from './recap.js';\nimport { chronicleMutation } from './chronicle.js';\nimport {\n  ackDocument,\n  ackSeen,\n  return isChatIdentity(actor, host) && (actor.chatterId === host || actor.isModerator === true);\n}\nexport const isChatIdentity = (actor, host) =>\n  userId(host) && actor?.broadcasterId === host && userId(actor.chatterId);\nconst empty = () => ({\n  context: null,\n  paused: false,\n  blocked: [],\n  sessions: [],\n  cooldowns: [],\n  serial: 0,\n});\nexport const emptyMarkDocument = empty;\nfunction bounded(doc) {\n  if (Buffer.byteLength(JSON.stringify(doc)) > MARK_LIMITS.bytes)\n    throw new Error('Mark storage capacity reached');\n  return doc;\n}\nexport function setMarkContext(previous, host, context) {\n  if (\nsed: can't read scripts/browser-smoke-receiving.js: No such file or directory\n"
+    }
+  ]
+}
+````
+
+### 6559. 2026-10-31T11:26:02.638Z — tool call (source line 24866)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_f1510d8393be462781ae7776bd979dee",
+  "input": "text((await tools.exec_command({cmd:\"rg -n 'active =' src/marks.js\\nrg -n 'receiving|glyphs' scripts/browser-smoke-*.js | head -20\\nrg -n 'atlasPage|runeSvg' src/state.js src/store.js | head -15\\nsed -n '128,144p' src/marks.js\",\"max_output_tokens\":1200})).output)\n"
+}
+````
+
+### 6560. 2026-10-31T11:26:02.736Z — tool result (source line 24869)
+
+````text
+{
+  "call_id": "call_f1510d8393be462781ae7776bd979dee",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "220:const active = (doc, host) =>\nscripts/browser-smoke-atlas-hero.js:105:        keeperY: document.querySelector('#receiving').getBoundingClientRect().y,\nscripts/browser-smoke-atlas-hero.js:543:      () => !document.querySelector('#receiving-status').textContent.startsWith('Reading'),\nscripts/browser-smoke-atlas-hero.js:600:            document.querySelector('#receiving-content').childElementCount > 0 &&\nscripts/browser-smoke-atlas-hero.js:602:              .querySelector('#receiving-status')\nscripts/browser-smoke-desirability.js:211:    assert.ok(await page.locator('#receiving').isVisible());\nscripts/browser-smoke-desirability.js:220:    await page.locator('#receiving-content').innerText(),\nscripts/browser-smoke-desirability.js:223:  assert.doesNotMatch(await page.locator('#receiving-content').innerText(), /spoiler|8101/);\nscripts/browser-smoke-desirability.js:224:  assert.equal(await page.locator('.keeper-glyphs img').count(), 1);\nscripts/browser-smoke-desirability.js:258:    await page.locator('#receiving-content').innerText(),\nscripts/browser-smoke-desirability.js:290:  await page.locator('#receiving-refresh').click();\nscripts/browser-smoke-desirability.js:294:  await page.locator('#receiving-refresh').click();\nscripts/browser-smoke-desirability.js:295:  stage = 'erasure-glyphs';\nscripts/browser-smoke-desirability.js:297:    () => document.querySelector('.keeper-glyphs')?.childElementCount === 0,\nscripts/browser-smoke-desirability.js:307:  await page.locator('#receiving-status').filter({ hasText: 'Card unavailable' }).waitFor();\nscripts/browser-smoke-desirability.js:378:        receivingCount: document.querySelectorAll('#receiving').length,\nscripts/browser-smoke-desirability.js:382:          document.querySelector('#receiving-status')?.textContent.startsWith('Card unavailable'),\nscripts/browser-smoke-share-card.js:172:  await page.locator('#receiving-status').filter({ hasText: 'Card unavailable' }).waitFor();\nscripts/browser-smoke-accessibility.js:145:          : ['h1', '#receiving-status', '#receiving-refresh'],\nscripts/browser-smoke-judge-track.js:397:        glyphs = [...document.querySelectorAll('.p31-decorative:not([hidden])')].filter(visible);\nscripts/browser-smoke-judge-track.js:400:          (glyphs.length === 6 && visible(c) && r.top >= 0 && r.bottom <= innerHeight)) &&\nsrc/store.js:36:  atlasPage,\nsrc/store.js:1083:      return atlasPage((await ref('lineage', 'single').get()).data(), options);\nsrc/state.js:36:  atlasPage,\nsrc/state.js:842:      return atlasPage(lineage, options);\n  if (text === '!relic pending') return { type: 'pending' };\n  if (text === '!relic approve last') return { type: 'approve-last' };\n  if (text === '!relic reject last') return { type: 'reject-last' };\n  const namedBlock = /^!relic block @([a-zA-Z0-9_]{1,25})$/.exec(text);\n  if (namedBlock && namedBlock[0] === text)\n    return { type: 'block-login', login: namedBlock[1].toLowerCase() };\n  const approve = /^!relic approve (m[1-9]\\d{0,8})$/.exec(text);\n  if (approve) return { type: 'approve', markId: approve[1] };\n  const block = /^!relic block (\\d{1,32})$/.exec(text);\n  return block\n    ? { type: 'block', userId: block[1] }\n    : /^!relic(?:\\s|$)/.test(text)\n      ? { type: 'help' }\n      : null;\n}\n\nexport function isModerator(actor, host) {\n"
+    }
+  ]
+}
+````
+
+### 6561. 2026-10-31T11:26:21.179Z — tool call (source line 24873)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_530121fd507e45e09f6928295990626c",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/src/receiving.js\\n@@\\n-import { runeSvg } from './marks.js';\\n+import { runeSvg, publicMarks } from './marks.js';\\n@@\\n const count = (v) => Number.isSafeInteger(v) && v >= 0 && v <= 1000000;\\n+// Current-session content is separate from immutable completed arrival archives.\\n+export function currentApprovedView(registry, channels, docs, lineage, config) {\\n+  const host = registry?.holderId;\\n+  if (!config?.channels.includes(host)) return null;\\n+  const channel = channels[host], doc = docs[host];\\n+  const session = doc?.sessions?.find((s) => s.streamId === channel?.streamId);\\n+  if (!channel?.online || !channel.optedIn || channel.paused || channel.banned ||\\n+      channel.blockedUserIds?.includes(host) || !doc || doc.paused ||\\n+      !doc.context?.holdsRelic || !doc.context.optedIn || doc.context.keeperId !== host ||\\n+      doc.context.streamId !== channel.streamId || !session || session.closed ||\\n+      session.marks.length > 160 || (lineage?.stops?.length ?? 0) > 16) return null;\\n+  const visible = new Set(publicMarks(doc, host).marks.map((m) => m.id));\\n+  const marks = session.marks.filter((m) => visible.has(m.id) &&\\n+    !channel.blockedUserIds?.includes(m.userId)).map(({ id, text }) => ({ id, text, runeSvg: runeSvg(text) }));\\n+  const login = Object.entries(config.logins).find(([, id]) => id === host)?.[0];\\n+  if (!login) return null;\\n+  return { login, ringCount: lineage?.stops?.length ?? 0, approvedCount: marks.length, marks };\\n+}\\n@@\\n export function receivingView(registry, channels, marks, lineage, config, now) {\\n+  const current = currentApprovedView(registry, channels, marks, lineage, config);\\n@@\\n           glyphTotal: latest?.marks?.length ?? 0,\\n+          ...(current?.login === names[id] ? { current } : {}),\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/src/state.js\\n@@\\n-import { receivingView } from './receiving.js';\\n+import { receivingView, currentApprovedView } from './receiving.js';\\n@@\\n     getAtlasPage(options) {\\n-      return atlasPage(lineage, options);\\n+      const page = atlasPage(lineage, options);\\n+      return page && !options?.stopId ? { ...page, current: currentApprovedView(registry,\\n+        Object.fromEntries(channels), Object.fromEntries(markDocs), lineage, config) } : page;\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/src/store.js\\n@@\\n-import { receivingView } from './receiving.js';\\n+import { receivingView, currentApprovedView } from './receiving.js';\\n@@\\n     async getAtlasPage(options) {\\n-      return atlasPage((await ref('lineage', 'single').get()).data(), options);\\n+      if (options?.stopId) return atlasPage((await ref('lineage', 'single').get()).data(), options);\\n+      return db.runTransaction(async (tx) => {\\n+        const registry = (await tx.get(ref('keeperRegistry', 'single'))).data();\\n+        const lineage = (await tx.get(ref('lineage', 'single'))).data();\\n+        const channels = {}, docs = {};\\n+        // Only the configured immutable holder is read; no public identity lookup.\\n+        if (config?.channels.includes(registry?.holderId)) {\\n+          const host = registry.holderId;\\n+          channels[host] = (await tx.get(ref('streamChannels', host))).data();\\n+          docs[host] = (await tx.get(ref('markChannels', host))).data();\\n+        }\\n+        return { ...atlasPage(lineage, options), current: currentApprovedView(registry, channels, docs, lineage, config) };\\n+      });\\n*** End Patch\"));\n"
+}
+````
+
+### 6562. 2026-10-31T11:26:21.302Z — tool result (source line 24876)
+
+````text
+{
+  "call_id": "call_530121fd507e45e09f6928295990626c",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 6563. 2026-10-31T11:26:25.819Z — tool call (source line 24880)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_5a87904cc1494dd2bcb61296da7a5716",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '215,225p' src/marks.js\\nsed -n '180,232p' scripts/browser-smoke-desirability.js\\nsed -n '250,270p' scripts/browser-smoke-desirability.js\\nrg -n 'getReceivingView' src/receiving.js\",\"max_output_tokens\":1800})).output)\n"
+}
+````
+
+### 6564. 2026-10-31T11:26:25.905Z — tool result (source line 24883)
+
+````text
+{
+  "call_id": "call_5a87904cc1494dd2bcb61296da7a5716",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "    holdsRelic: context.holdsRelic,\n    blockedUserIds: [...new Set(context.blockedUserIds)],\n  };\n  return bounded(doc);\n}\nconst active = (doc, host) =>\n  doc.context?.optedIn === true && doc.context.holdsRelic === true && doc.context.keeperId === host;\n\n// Pure reducer shared by memory and Firestore; invoke only with trusted identities.\n// These commands never resolve a login through public score names or another room.\nexport const isReviewCommand = (type) =>\n  await page.locator('#atlas-relic').scrollIntoViewIfNeeded();\n  await page.waitForFunction(\n    () => Number(document.querySelector('#atlas-relic canvas')?.dataset.frames) > 0,\n  );\n  stage = 'atlas-gl-pixels';\n  assert.ok(\n    await page.locator('#atlas-relic canvas').evaluate(\n      (canvas) =>\n        new Promise((resolve) => {\n          const timer = setTimeout(() => resolve(false), 5000);\n          canvas.setAttribute('data-pixel-probe', '');\n          canvas.addEventListener(\n            'relic3d-frame',\n            () => {\n              clearTimeout(timer);\n              canvas.removeAttribute('data-pixel-probe');\n              const gl = canvas.getContext('webgl2');\n              const pixels = new Uint8Array(canvas.width * canvas.height * 4);\n              gl.readPixels(0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);\n              resolve(pixels.some((v, i) => i % 4 === 3 && v > 0));\n            },\n            { once: true },\n          );\n        }),\n    ),\n  );\n  stage = 'atlas-widths';\n  for (const width of [320, 390, 1280]) {\n    await page.setViewportSize({ width, height: 844 });\n    await page.evaluate(() => document.fonts.ready);\n    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));\n    assert.ok(await page.locator('#receiving').isVisible());\n  }\n  stage = 'keeper-profile';\n  await page.goto(origin + '/keeper/olsols2');\n  assert.equal(errors, 0);\n  await page\n    .getByRole('button', { name: 'Download landscape card · Ring 1', exact: true })\n    .waitFor();\n  assert.match(\n    await page.locator('#receiving-content').innerText(),\n    /Twitch-reported raid audience: 1/,\n  );\n  assert.doesNotMatch(await page.locator('#receiving-content').innerText(), /spoiler|8101/);\n  assert.equal(await page.locator('.keeper-glyphs img').count(), 1);\n  await page.locator('.keeper-card-preview').first().waitFor({ state: 'visible' });\n  const thumbnail = await page\n    .locator('.keeper-card-preview')\n    .first()\n    .evaluate(async (img) => {\n      await img.decode();\n      const canvas = document.createElement('canvas');\n      canvas.width = 320;\n        canvas.width = canvas.height = 0;\n      }\n    });\n  assert.equal(thumbnail.width, 320);\n  assert.equal(thumbnail.height, 180);\n  assert.ok(thumbnail.lit > 100);\n  assert.equal(await page.locator('.keeper-arrival').first().locator('button').count(), 2);\n  assert.doesNotMatch(\n    await page.locator('#receiving-content').innerText(),\n    /\\d{4}-\\d{2}-\\d{2}T\\d{2}:/,\n  );\n  for (const width of [1280, 390]) {\n    await page.setViewportSize({ width, height: 844 });\n    const bounds = await page.locator('.keeper-card-preview').first().boundingBox();\n    assert.ok(bounds.width <= 320 && Math.abs(bounds.width / bounds.height - 16 / 9) < 0.01);\n    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));\n  }\n\n  for (const [orientation, w, h] of [\n    ['landscape', 1200, 675],\n    ['vertical', 720, 1280],\n275:    const { queueStates, ...value } = await state.getReceivingView(now());\n306:      const raw = await state.getReceivingView(now());\n310:      const latest = (await state.getReceivingView(now())).queueStates?.[keepers[id]];\n323:      const value = await state.getReceivingView(now());\n"
+    }
+  ]
+}
+````
+
+### 6565. 2026-10-31T11:26:45.932Z — tool call (source line 24887)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_f5c13635f53442b0a7e6b751318ce402",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/public/atlas.js\\n@@\\n const hero = createAtlasHero({ archive: $('atlas-relic') });\\n+const liveSection = document.createElement('section');\\n+liveSection.id = 'atlas-current-live';\\n+liveSection.hidden = true;\\n+(ledgerDetails ?? $('journey')).before(liveSection);\\n@@\\n function clear() {\\n+  liveSection.replaceChildren();\\n+  liveSection.hidden = true;\\n@@\\n     hero.update(data.rings);\\n+    if (!stopId && data.current) {\\n+      const live = data.current;\\n+      if (!Object.values(keeperNames).includes(live.login) || live.ringCount !== data.rings ||\\n+          !Array.isArray(live.marks) || live.marks.length > 160 || live.approvedCount !== live.marks.length)\\n+        throw Error('Invalid live marks');\\n+      liveSection.append(node('h2', `Current hold · Ring ${live.ringCount} · @${live.login}`),\\n+        node('p', `${live.approvedCount} live approved marks. Added during this hold; not the archived arrival snapshot.`));\\n+      const list = node('ul');\\n+      for (const mark of live.marks) {\\n+        if (typeof mark.text !== 'string' || mark.text.length > 128 || typeof mark.runeSvg !== 'string' ||\\n+            mark.runeSvg.length > 4096 || !mark.runeSvg.startsWith('<svg xmlns=\\\"http://www.w3.org/2000/svg\\\"')) throw Error('Invalid live glyph');\\n+        const image = node('img');\\n+        image.src = `data:image/svg+xml,${encodeURIComponent(mark.runeSvg)}`;\\n+        image.width = image.height = 48;\\n+        image.alt = 'Live approved rune: ' + mark.text;\\n+        const item = node('li');\\n+        item.append(image, node('span', mark.text));\\n+        list.append(item);\\n+      }\\n+      liveSection.append(list);\\n+      liveSection.hidden = false;\\n+    }\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/public/receiving.js\\n@@\\n         content.append(glyphs);\\n+        if (p.current) {\\n+          const live = p.current;\\n+          if (v.holder?.login !== login || live.login !== login || live.ringCount !== v.holder.ringCount ||\\n+              !Array.isArray(live.marks) || live.marks.length > 160 || live.approvedCount !== live.marks.length)\\n+            throw Error('Invalid current hold');\\n+          const section = node('section');\\n+          section.id = 'keeper-current-live';\\n+          section.append(node('h3', `Current hold · Ring ${live.ringCount}`),\\n+            node('p', `${live.approvedCount} live approved marks. Separate from archived arrival glyphs.`));\\n+          for (const mark of live.marks) {\\n+            if (typeof mark.text !== 'string' || mark.text.length > 128 || typeof mark.runeSvg !== 'string' ||\\n+                mark.runeSvg.length > 4096 || !mark.runeSvg.startsWith('<svg xmlns=\\\"http://www.w3.org/2000/svg\\\"')) throw Error('Invalid live glyph');\\n+            const figure = node('figure'), image = node('img');\\n+            image.src = 'data:image/svg+xml,' + encodeURIComponent(mark.runeSvg);\\n+            image.width = image.height = 48;\\n+            image.alt = 'Live approved rune: ' + mark.text;\\n+            figure.append(image, node('figcaption', mark.text));\\n+            section.append(figure);\\n+          }\\n+          content.append(section);\\n+        }\\n*** End Patch\"));\n"
+}
+````
+
+### 6566. 2026-10-31T11:26:46.016Z — tool result (source line 24890)
+
+````text
+{
+  "call_id": "call_f5c13635f53442b0a7e6b751318ce402",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 6567. 2026-10-31T11:27:11.027Z — tool call (source line 24894)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_bec530c05ed54988b5823ac9ee826b87",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '82,98p' src/marks.js\\nsed -n '140,180p' scripts/browser-smoke-desirability.js\\nsed -n '285,305p' scripts/browser-smoke-desirability.js\\nsed -n '120,185p' test/receiving.test.js\",\"max_output_tokens\":2700})).output)\n"
+}
+````
+
+### 6568. 2026-10-31T11:27:11.143Z — tool result (source line 24897)
+
+````text
+{
+  "call_id": "call_bec530c05ed54988b5823ac9ee826b87",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "export function runeGeometry(input) {\n  const normalized = normalizeMark(input);\n  if (!normalized) throw new Error('Invalid mark');\n  const digest = hash(`raid-relic-rune-v1:${normalized}`);\n  const points = Array.from({ length: 8 }, (_, i) => [\n    16 + (parseInt(digest.slice(i * 2, i * 2 + 2), 16) % 5) * 16,\n    16 + (parseInt(digest.slice(16 + i * 2, 18 + i * 2), 16) % 5) * 16,\n  ]);\n  const color = ['#e6bb70', '#9e87ed', '#70c9bd', '#dd93b3'][parseInt(digest[32], 16) % 4];\n  return { points, color };\n}\nexport function runeSvg(input) {\n  const { points, color } = runeGeometry(input);\n  return `<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 96 96\"><path d=\"M48 6 90 48 48 90 6 48Z\" fill=\"none\" stroke=\"${color}\" stroke-width=\"3\"/><polyline points=\"${points.map((point) => point.join(',')).join(' ')}\" fill=\"none\" stroke=\"${color}\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>`;\n}\n\nexport function parseMarkCommand(text) {\n  await page.getByRole('link', { name: 'Send Off', exact: true }).click();\n  assert.equal(await page.locator('#send-step').evaluate((n) => n.open), true);\n  await page\n    .locator('#keeper-summary')\n    .filter({ hasText: 'Public Seeker queue: joined.' })\n    .waitFor();\n  const own = await f.runtime.state.getStreamStatus(OTHER);\n  assert.equal(\n    (\n      await f.request(\n        '/control/' + OTHER,\n        'POST',\n        { cookie: f.cookies[HOME], origin, 'content-type': 'application/json' },\n        Buffer.from(JSON.stringify({ action: 'seek-off', csrf: 'wrong' })),\n      )\n    ).status,\n    403,\n  );\n  assert.deepEqual(await f.runtime.state.getStreamStatus(OTHER), own);\n  checks.push({\n    name: 'Real private control/CSRF: own queue join, cross-room denial',\n    passed: true,\n  });\n  stage = 'verified-binding-and-profile';\n  await f.chat(HOME, '8101', '!mark moon');\n  await f.chat(HOME, '8102', '!mark spoiler');\n  assert.equal((await f.control(HOME, 'send:' + OTHER)).status, 200);\n  f.advance();\n  await f.raid(HOME, OTHER, 1);\n  await f.chat(HOME, '8201', '!offer');\n  await f.chat(OTHER, '8202', '!accept');\n  assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);\n  stage = 'atlas-holder';\n  await page.goto(origin + '/atlas/');\n  assert.equal(errors, 0);\n  await page\n    .locator('.holder-spotlight h3')\n    .filter({ hasText: '@olsols2 holds the relic' })\n    .waitFor();\n  stage = 'atlas-gl-frames';\n  await page.locator('#atlas-relic').scrollIntoViewIfNeeded();\n    passed: true,\n  });\n  stage = 'stale-live-unknown';\n  f.streams.get(OTHER).viewer_count = 'invalid';\n  f.advance(60001);\n  await page.locator('#receiving-refresh').click();\n  await page.locator('.holder-spotlight').filter({ hasText: 'Live status unknown' }).waitFor();\n  stage = 'erase-and-unavailable';\n  await f.chat(HOME, '8101', '!relic forgetme');\n  await page.locator('#receiving-refresh').click();\n  stage = 'erasure-glyphs';\n  await page.waitForFunction(\n    () => document.querySelector('.keeper-glyphs')?.childElementCount === 0,\n  );\n  await page.route('**/api/atlas/stops/*', (r) => r.fulfill({ status: 404, body: 'Unavailable' }));\n  let downloads = 0;\n  page.on('download', () => downloads++);\n  // Refresh resets the menu; choose the same vertical format through the new Share UI.\n  await page.getByRole('button', { name: 'Share · Ring 1', exact: true }).click();\n  await page.getByLabel('Share format · Ring 1', { exact: true }).selectOption('vertical');\n  await page.getByRole('button', { name: 'Download vertical card · Ring 1', exact: true }).click();\n    assert.ok(!JSON.stringify(v).includes('7101'));\n    // Current-hold approval is public on the live overlay, not a rewrite of the\n    // immutable completed ring's source-mark archive.\n    await f.chat(OTHER, '7401', '!mark light');\n    assert.equal(posts(f).at(-1).message, 'Your mark is public on the relic.');\n    const current = JSON.parse((await f.request(`/api/overlay/${OTHER}`)).body.toString());\n    assert.equal(current.lineageRings, 1);\n    assert.ok(current.marks.some((m) => m.id && m.runeSvg === runeSvg('light')));\n    const currentIds = current.marks.map((m) => m.id);\n    f.advance(30001);\n    await f.chat(OTHER, '7402', '!mark spoiler');\n    assert.match(posts(f).at(-1).message, /Waiting for moderator approval.*private/);\n    const held = JSON.parse((await f.request(`/api/overlay/${OTHER}`)).body.toString());\n    assert.deepEqual(held.marks.map((m) => m.id), currentIds);\n    assert.ok(!JSON.stringify(held).includes('spoiler'));\n    const archive = JSON.parse((await f.request('/api/atlas')).body.toString());\n    assert.equal(archive.rings, 1);\n    assert.equal(archive.stops[0].approvedCount, 1);\n    await f.chat(OTHER, '7403', '!mark first light');\n    assert.match(posts(f).at(-1).message, /one allowed word or emoji.*!mark light/);\n    assert.deepEqual(\n      JSON.parse((await f.request(`/api/overlay/${OTHER}`)).body.toString()).marks.map((m) => m.id),\n      currentIds,\n    );\n    await f.chat(OTHER, '7301', '!where');\n    assert.match(\n      posts(f).at(-1).message,\n      /@olsols2 holds.*Held since: \\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} UTC.*keeper\\/olsols2/,\n    );\n    assert.doesNotMatch(posts(f).at(-1).message, /\\.\\d{3}Z/);\n    await f.chat(HOME, '7101', '!relic forgetme');\n    const writes = f.db?.writes.length;\n    v = await f.runtime.state.getReceivingView(f.now());\n    if (f.db) assert.equal(f.db.writes.length, writes);\n    assert.ok(!JSON.stringify(v).includes('moon'));\n    assert.equal((await f.request('/keeper/unknown')).status, 404);\n    assert.equal((await f.request('/api/keeper/unknown')).status, 404);\n    const calls = f.calls.length;\n    await f.runtime.receiving.page();\n    assert.equal(f.calls.length, calls, 'gate off has no provider operations');\n  });\n}\n\ntest('one-minute batched observations, deterministic low-viewer ordering, no stale or revoked/modless suggestions', async () => {\n  let now = 100000,\n    streamGets = 0,\n    blocked = false,\n    mods = true;\n  const raw = {\n    enabled: true,\n    holder: { login: 'raidrelichq' },\n    profiles: [],\n    recent: [],\n    seekers: [\n      { id: OTHER, login: 'olsols2', streamId: '2' },\n      { id: HOME, login: 'raidrelichq', streamId: '1' },\n    ],\n  };\n  const state = {\n    getReceivingView: () => structuredClone(raw),\n    getKeeperCandidates: () => raw.seekers.map((r) => ({ ...r, eligible: true })),\n    getStreamStatus: (id) => ({ streamId: id === HOME ? '1' : '2' }),\n  };\n  const service = createReceiving({\n    enabled: true,\n    state,\n"
+    }
+  ]
+}
+````
+
+### 6569. 2026-10-31T11:27:26.020Z — tool call (source line 24901)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_3473841e831f47fda5d8c3a7ed421e62",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/test/receiving.test.js\\n@@\\n     assert.equal(archive.stops[0].approvedCount, 1);\\n+    assert.equal(archive.current.login, 'olsols2');\\n+    assert.equal(archive.current.ringCount, 1);\\n+    assert.equal(archive.current.approvedCount, 1);\\n+    assert.deepEqual(archive.current.marks.map((m) => m.text), ['light']);\\n+    const profile = JSON.parse((await f.request('/api/keeper/olsols2')).body.toString()).profile;\\n+    assert.deepEqual(profile.current, archive.current);\\n+    assert.equal(profile.glyphTotal, 1, 'Arrival archive remains moon only');\\n+    assert.equal(JSON.parse((await f.request('/api/keeper/raidrelichq')).body.toString()).profile.current, undefined);\\n+    assert.doesNotMatch(JSON.stringify(archive.current), /spoiler|7401|7402|userId|streamId/);\\n@@\\n     await f.runtime.receiving.page();\\n     assert.equal(f.calls.length, calls, 'gate off has no provider operations');\\n+    await f.chat(OTHER, '7401', '!relic forgetme');\\n+    assert.equal(JSON.parse((await f.request('/api/atlas')).body.toString()).current.approvedCount, 0);\\n+    await f.chat(OTHER, '7404', '!mark star');\\n+    f.advance(10001);\\n+    await f.chat(OTHER, OTHER, '!relic block 7404');\\n+    assert.equal(JSON.parse((await f.request('/api/atlas')).body.toString()).current.approvedCount, 0);\\n+    await f.chat(OTHER, '7405', '!mark dawn');\\n+    await f.control(OTHER, 'pause');\\n+    assert.equal(JSON.parse((await f.request('/api/atlas')).body.toString()).current, null);\\n+    await f.control(OTHER, 'resume');\\n+    assert.deepEqual(JSON.parse((await f.request('/api/atlas')).body.toString()).current.marks.map((m) => m.text), ['dawn']);\\n+    await f.control(OTHER, 'send:' + HOME);\\n+    f.advance();\\n+    await f.raid(OTHER, HOME, 1);\\n+    await f.chat(OTHER, '7501', '!offer');\\n+    await f.chat(HOME, '7502', '!accept', { messageId: 'return-accept' });\\n+    const moved = JSON.parse((await f.request('/api/atlas')).body.toString());\\n+    assert.equal(moved.rings, 2);\\n+    assert.equal(moved.current.login, 'raidrelichq');\\n+    assert.ok(!moved.current.marks.some((m) => m.text === 'dawn'));\\n+    assert.equal(moved.stops.at(-1).approvedCount, 1);\\n+    assert.equal(JSON.parse((await f.request('/api/keeper/olsols2')).body.toString()).profile.current, undefined);\\n+    await f.chat(HOME, '7502', '!accept', { messageId: 'return-accept' });\\n+    assert.deepEqual(JSON.parse((await f.request('/api/atlas')).body.toString()), moved);\\n+    await f.chat(OTHER, '7405', '!relic forgetme');\\n+    assert.equal(JSON.parse((await f.request('/api/atlas')).body.toString()).stops.at(-1).approvedCount, 0);\\n+    await f.signed('stream.offline', { broadcaster_user_id: HOME }, HOME);\\n+    assert.equal(JSON.parse((await f.request('/api/atlas')).body.toString()).current, null);\\n*** End Patch\"));\n"
+}
+````
+
+### 6570. 2026-10-31T11:27:26.091Z — tool result (source line 24904)
+
+````text
+{
+  "call_id": "call_3473841e831f47fda5d8c3a7ed421e62",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 6571. 2026-10-31T11:27:34.665Z — tool call (source line 24908)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_0064b4eb5021407d9602d240b82cc0cf",
+  "input": "text((await tools.exec_command({cmd:\"head -105 scripts/browser-smoke-desirability.js\\nrg -n 'sockets|requests|frames|marks|approvedCount' scripts/browser-smoke-desirability.js public/overlay.js | head -35\\nrg -n 'rune|marks' public/overlay-live.html | head -20\\nsed -n '405,445p' public/overlay.js\",\"max_output_tokens\":2200})).output)\n"
+}
+````
+
+### 6572. 2026-10-31T11:27:34.774Z — tool result (source line 24911)
+
+````text
+{
+  "call_id": "call_0064b4eb5021407d9602d240b82cc0cf",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "// Signed local kernel and synthetic Helix only; no production activity.\nimport assert from 'node:assert/strict';\nimport { createServer } from 'node:https';\nimport { mkdir, writeFile } from 'node:fs/promises';\nimport { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';\nimport { createLocalTLS } from '../test-support/local-tls.js';\nconst origin = 'https://localhost:5191';\nlet page,\n  browser,\n  server,\n  tls,\n  stage = 'setup',\n  failureCategory = null,\n  passed = false;\nlet errors = 0,\n  external = 0,\n  lastAPIStatus = 0,\n  downloadCount = 0;\nlet diagnostic = {};\nconst checks = [];\nasync function png(download, name, width, height, page) {\n  assert.equal(download.suggestedFilename(), name);\n  let size = 0;\n  const chunks = [];\n  for await (const chunk of await download.createReadStream()) {\n    size += chunk.length;\n    assert.ok(size <= 524288);\n    chunks.push(chunk);\n  }\n  const bytes = Buffer.concat(chunks);\n  assert.deepEqual([...bytes.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);\n  assert.equal(bytes.readUInt32BE(16), width);\n  assert.equal(bytes.readUInt32BE(20), height);\n  const proof = await page.evaluate(\n    async (input) => {\n      const image = await createImageBitmap(\n        new Blob([Uint8Array.from(input)], { type: 'image/png' }),\n      );\n      const canvas = document.createElement('canvas');\n      canvas.width = image.width;\n      canvas.height = image.height;\n      const c = canvas.getContext('2d');\n      c.drawImage(image, 0, 0);\n      const data = c.getImageData(0, 0, canvas.width, canvas.height).data;\n      let colored = 0;\n      for (let i = 0; i < data.length; i += 4)\n        if (data[i + 3] && Math.max(data[i], data[i + 1], data[i + 2]) > 80) colored++;\n      image.close();\n      canvas.width = canvas.height = 0;\n      return colored;\n    },\n    [...bytes],\n  );\n  assert.ok(proof > 1000);\n  await download.delete();\n}\ntry {\n  const f = await pilotFixture('memory', {\n    origin,\n    extraBotScopes: ['user:read:moderated_channels'],\n    chronicleEnv: {\n      SEEKERS_ENABLED: 'true',\n      MARK_AUTO_APPROVE_ENABLED: 'true',\n      MARK_REVIEW_BLOCKLIST: '[\"spoiler\"]',\n    },\n  });\n  for (const id of [BOT, HOME, OTHER]) await f.login(id);\n  for (const id of [HOME, OTHER]) f.streams.get(id).viewer_count = 1;\n  for (const id of [HOME, OTHER]) {\n    await f.control(id, 'bootstrap');\n    f.advance();\n    await f.control(id, 'keep');\n    f.advance();\n  }\n  tls = await createLocalTLS();\n  server = createServer(tls.options, f.runtime.handler);\n  await new Promise((resolve, reject) => {\n    server.once('error', reject);\n    server.listen(5191, '127.0.0.1', resolve);\n  });\n  const { chromium } = await import('playwright');\n  browser = await chromium.launch({\n    executablePath: '/snap/bin/chromium',\n    headless: true,\n    chromiumSandbox: true,\n  });\n  const c = await browser.newContext({\n    ignoreHTTPSErrors: true,\n    viewport: { width: 1280, height: 800 },\n    acceptDownloads: true,\n    serviceWorkers: 'block',\n  });\n  // Exercise the explicit fallback menu; no OS share sheet in this local fixture.\n  await c.addInitScript(() =>\n    Object.defineProperty(navigator, 'share', { configurable: true, value: undefined }),\n  );\n  await c.route('**/*', (r) => {\n    if (new URL(r.request().url()).origin !== origin) {\n      external++;\n      return r.abort();\n    }\n    return r.continue();\n  });\n  // The synthetic OAuth callback has issued these same signed control sessions.\n  await c.addCookies(\npublic/overlay.js:29:// Optional public completed-stop projection only. Current stream marks are not\npublic/overlay.js:256:    ? `${snapshot.status}:${snapshot.approvedCount}:${snapshot.lineageRings}:${snapshot.handoff?.startedAt ?? ''}:${snapshot.handoff?.offers ?? ''}:${snapshot.handoff?.accepts ?? ''}`\npublic/overlay.js:393:    ? `Charge ${snapshot.approvedCount}/160 · Rings ${snapshot.lineageRings}`\npublic/overlay.js:394:    : `Ring ${snapshot.lineageRings} · ${snapshot.approvedCount} runes`;\npublic/overlay.js:397:    compact.textContent = `Ring ${snapshot.lineageRings} · S${snapshot.streak.known ? snapshot.streak.current : '?'} · ${snapshot.approvedCount} runes`;\npublic/overlay.js:405:        `. Ring ${snapshot.lineageRings}; ${snapshot.approvedCount} approved runes.`,\npublic/overlay.js:416:    ? `${snapshot.approvedCount} approved marks · charge ${snapshot.approvedCount}/160`\npublic/overlay.js:417:    : `${snapshot.approvedCount} approved runes`;\npublic/overlay.js:418:  if (options.layout === 'card') count.textContent = `${snapshot.approvedCount} approved runes`;\npublic/overlay.js:424:  document.querySelector('#charge').style.width = `${(snapshot.approvedCount / 160) * 100}%`;\npublic/overlay.js:426:  snapshot.marks.forEach((mark, index) => {\npublic/overlay.js:648:  const batch = wordBatch(current?.marks ?? [], cinematic, motion.matches);\npublic/overlay.js:660:      current.marks.length,\npublic/overlay.js:694:        current?.marks.length ?? 0,\nscripts/browser-smoke-desirability.js:179:  stage = 'atlas-gl-frames';\nscripts/browser-smoke-desirability.js:182:    () => Number(document.querySelector('#atlas-relic canvas')?.dataset.frames) > 0,\nscripts/browser-smoke-desirability.js:380:        frames: Number(document.querySelector('#atlas-relic canvas')?.dataset.frames || 0),\n29:        <div id=\"runes\" class=\"runes\" aria-label=\"Approved mark runes\"></div>\n49:      <p id=\"command-coach\" hidden>Leave a rune with !mark word</p>\n56:        No active relic state for this channel. No arrival is shown until a verified raid; marks\n        `. Ring ${snapshot.lineageRings}; ${snapshot.approvedCount} approved runes.`,\n    );\n  } else {\n    document.querySelector('#compact-count').removeAttribute('title');\n    document.querySelector('#compact-count').removeAttribute('aria-label');\n  }\n  if (!simulated)\n    document.querySelector('#waiting-note').textContent = snapshot.movedToLogin\n      ? `The relic has moved on to @${snapshot.movedToLogin}`\n      : 'The relic stirs… a confirmed raid will light the way here.';\n  count.textContent = simulated\n    ? `${snapshot.approvedCount} approved marks · charge ${snapshot.approvedCount}/160`\n    : `${snapshot.approvedCount} approved runes`;\n  if (options.layout === 'card') count.textContent = `${snapshot.approvedCount} approved runes`;\n  presentCarriedSummary(\n    carriedSummary,\n    [count, document.querySelector('#compact-count')],\n    carriedRuneLabel(snapshot.handoff),\n  );\n  document.querySelector('#charge').style.width = `${(snapshot.approvedCount / 160) * 100}%`;\n  document.querySelector('.charge-track').hidden = !simulated;\n  snapshot.marks.forEach((mark, index) => {\n    const image = document.createElement('img');\n    image.className = 'rune';\n    image.alt = mark.faded\n      ? 'Approved carried rune, dimmed after three holder stream closures; retained, not deleted'\n      : 'Approved community rune';\n    if (mark.faded) image.classList.add('faded');\n    image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(mark.runeSvg)}`;\n    const angle = index * 2.399963;\n    const radius = 30 + (index % 3) * 5;\n    image.style.setProperty('--x', `${Math.cos(angle) * radius}%`);\n    image.style.setProperty('--y', `${Math.sin(angle) * radius}%`);\n    runes.append(image);\n  });\n  if (options.layout === 'full') fitOverlay();\n}\nlet frameId = null;\nif (channel && !options.preview)\n  disconnectOverlay = connectOverlay({\n    persistentRead: options.obs,\n"
+    }
+  ]
+}
+````
+
+### 6573. 2026-10-31T11:27:40.694Z — tool call (source line 24915)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_1e8b4d2c41294d68b88af1a7e359dc63",
+  "input": "text((await tools.exec_command({cmd:\"tail -40 scripts/browser-smoke-desirability.js\\nsed -n '118,145p' scripts/browser-smoke-pilot.js\\nsed -n '35,65p' src/overlay-sockets.js\\nrg -n 'channel|snapshot' test-support/pilot-fixture.js | tail -10\",\"max_output_tokens\":1500})).output)\n"
+}
+````
+
+### 6574. 2026-10-31T11:27:40.782Z — tool result (source line 24918)
+
+````text
+{
+  "call_id": "call_1e8b4d2c41294d68b88af1a7e359dc63",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "        frames: Number(document.querySelector('#atlas-relic canvas')?.dataset.frames || 0),\n        cardUnavailable: Boolean(\n          document.querySelector('#receiving-status')?.textContent.startsWith('Card unavailable'),\n        ),\n      }));\n      for (const [key, value] of Object.entries(values))\n        if (\n          typeof value === 'boolean' ||\n          (Number.isFinite(value) && value >= 0 && value <= 1000000000)\n        )\n          diagnostic[key] = value;\n    } catch {\n      /* Preserve the original failure without publishing messages. */\n    }\n  }\n  failureCategory = ['AssertionError', 'TimeoutError', 'TypeError'].includes(e?.name)\n    ? e.name\n    : 'browser-or-fixture';\n} finally {\n  await browser?.close().catch(() => {});\n  if (server)\n    await new Promise((r) => {\n      server.closeAllConnections();\n      server.close(r);\n    });\n  await tls?.cleanup();\n  await mkdir('artifacts', { recursive: true });\n  const report = JSON.stringify({\n    passed,\n    stage,\n    failureCategory,\n    checks,\n    browserErrors: errors,\n    diagnostic,\n    external,\n  });\n  assert.ok(Buffer.byteLength(report) <= 65536);\n  await writeFile('artifacts/desirability-browser-results.json', report + '\\n');\n}\nif (!passed) process.exitCode = 1;\n  if (expected === 'accepted') {\n    if (\n      !(await page.locator('#send-result').isVisible()) ||\n      (await page.locator('#send-result').textContent()) !==\n        (await page.locator('#result').textContent())\n    )\n      throw new Error('Adjacent dispatch result mismatch');\n  }\n  if (expected === 'reconciled' && result.ready !== true)\n    throw new Error('Mocked subscriptions not enabled');\n  checks.push({ name: label, status: result.status, passed: true });\n}\nconst checks = [];\ntry {\n  phase = 'ephemeral local HTTPS fixture';\n  localTLS = await createLocalTLS();\n  server = createServer(localTLS.options, f.runtime.handler);\n  sockets = attachOverlaySockets(server, f.runtime.overlayFeeds, {\n    origins: [origin],\n    allowRead: f.runtime.allowPublicRead,\n  });\n  await new Promise((resolve, reject) => {\n    server.once('error', reject);\n    server.listen(5191, '127.0.0.1', resolve);\n  });\n  const { chromium } = await import('playwright');\n  browser = await chromium.launch({\n    executablePath: '/snap/bin/chromium',\n  };\n  server.on('upgrade', upgrade);\n  wss.on('connection', (ws, selected) => {\n    ws.alive = true;\n    let lastRevision = -1;\n    const send = (snapshot) => {\n      if (ws.readyState !== WebSocket.OPEN || snapshot.revision <= lastRevision) return;\n      const data = JSON.stringify(snapshot);\n      if (Buffer.byteLength(data) > 131072 || ws.bufferedAmount > 262144) {\n        ws.terminate();\n        return;\n      }\n      lastRevision = snapshot.revision;\n      ws.send(data);\n    };\n    const unsubscribe = selected.subscribe(send);\n    ws.on('close', unsubscribe);\n    ws.on('error', () => {});\n    ws.on('pong', () => {\n      ws.alive = true;\n    });\n    ws.on('message', () => ws.close(1008, 'Read-only connection'));\n    selected\n      .snapshot()\n      .then(send)\n      .catch(() => ws.terminate());\n  });\n  const timer = setInterval(() => {\n    for (const ws of wss.clients) {\n      if (!ws.alive) {\n        ws.terminate();\n95:              : ['channel:bot', 'channel:manage:raids', ...extraKeeperScopes],\n124:    if (u.pathname === '/helix/moderation/channels' && chronicleEnv.SEEKERS_ENABLED === 'true')\n253:      'channel.chat.message',\n268:      'channel.raid',\n"
+    }
+  ]
+}
+````
+
+### 6575. 2026-10-31T11:27:48.108Z — assistant (source line 24923)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Atlas’s overview and the current Keeper page now have separate “Current hold” sections. Both use the same read-only projection, require the actual holder’s active matching session, and expose only approved, unblocked marks. Archived counts stay unchanged. I’m adding coverage for erasure, blocking, pause/offline visibility, holder changes, and rendered glyphs.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6576. 2026-10-31T11:27:55.850Z — tool call (source line 24924)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_a330226a7096458a92cec98369f03203",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/scripts/browser-smoke-desirability.js\\n@@\\n import { createLocalTLS } from '../test-support/local-tls.js';\\n+import { attachOverlaySockets } from '../src/overlay-sockets.js';\\n+import { runeSvg } from '../src/marks.js';\\n@@\\n   tls,\\n+  sockets,\\n@@\\n   server = createServer(tls.options, f.runtime.handler);\\n+  sockets = attachOverlaySockets(server, f.runtime.overlayFeeds, { origins: [origin], allowRead: f.runtime.allowPublicRead });\\n@@\\n   assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);\\n+  await f.chat(OTHER, '8301', '!mark light');\\n+  await f.chat(OTHER, '8302', '!mark spoiler');\\n+  const liveAtlas = JSON.parse((await f.request('/api/atlas')).body.toString());\\n+  assert.equal(liveAtlas.current.approvedCount, 1);\\n+  assert.deepEqual(liveAtlas.current.marks.map((m) => m.text), ['light']);\\n+  assert.equal(liveAtlas.stops[0].approvedCount, 1);\\n+  stage = 'current-holder-overlay-glyph';\\n+  await page.goto(origin + '/overlay/' + OTHER);\\n+  await page.waitForFunction((svg) => [...document.querySelectorAll('#runes img')].filter((img) => decodeURIComponent(img.src.split(',')[1] ?? '') === svg).length === 1, runeSvg('light'));\\n+  assert.equal(await page.locator('#runes img').count(), 2, 'One archived carried moon plus one current light');\\n+  assert.doesNotMatch(await page.locator('body').innerText(), /spoiler|8301|8302/);\\n   stage = 'atlas-holder';\\n   await page.goto(origin + '/atlas/');\\n+  await page.locator('#atlas-current-live img[alt=\\\"Live approved rune: light\\\"]').waitFor();\\n+  assert.match(await page.locator('#atlas-current-live').innerText(), /Current hold · Ring 1.*@olsols2/s);\\n+  assert.doesNotMatch(await page.locator('#atlas-current-live').innerText(), /spoiler|8301|8302/);\\n@@\\n   assert.equal(await page.locator('.keeper-glyphs img').count(), 1);\\n+  await page.locator('#keeper-current-live img[alt=\\\"Live approved rune: light\\\"]').waitFor();\\n+  assert.equal(await page.locator('#keeper-current-live img').count(), 1);\\n+  assert.match(await page.locator('#keeper-current-live').innerText(), /1 live approved marks/);\\n@@\\n } finally {\\n   await browser?.close().catch(() => {});\\n+  sockets?.close();\\n*** End Patch\"));\n"
+}
+````
+
+### 6577. 2026-10-31T11:27:55.992Z — tool result (source line 24927)
+
+````text
+{
+  "call_id": "call_a330226a7096458a92cec98369f03203",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 6578. 2026-10-31T11:28:24.457Z — tool call (source line 24931)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_aa8b66dc572b40448067a5d28f7f690a",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/src/receiving.js\\n@@\\n-      channel.blockedUserIds?.includes(host) || !doc || doc.paused ||\\n+      channel.blockedUserIds?.includes(host) || !doc || doc.paused || doc.blocked?.includes(host) ||\\n+      doc.context?.blockedUserIds?.includes(host) ||\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/test/receiving.test.js\\n@@\\n-import { createReceiving, keeperNetwork } from '../src/receiving.js';\\n+import { createReceiving, keeperNetwork, currentApprovedView } from '../src/receiving.js';\\n@@\\n const posts = (f) =>\\n@@\\n   f.calls.filter((c) => c.url.endsWith('/chat/messages')).map((c) => JSON.parse(c.body));\\n+test('current hold projection is bounded, distinct and fails closed for revoked or inactive contexts', () => {\\n+  const registry = { holderId: HOME }, lineage = { stops: [{}] };\\n+  const config = { channels: [HOME, OTHER], logins: { raidrelichq: HOME, olsols2: OTHER } };\\n+  const channel = { online: true, optedIn: true, paused: false, streamId: 'stream-one', blockedUserIds: [] };\\n+  const doc = { context: { streamId: 'stream-one', keeperId: HOME, holdsRelic: true, optedIn: true, blockedUserIds: [] }, paused: false, blocked: [], sessions: [{ streamId: 'stream-one', closed: false, marks: Array.from({ length: 160 }, (_, i) => ({ id: 'm' + (i + 1), text: 'light', userId: String(9000 + i), status: 'approved' })) }] };\\n+  const project = (c = channel, d = doc, r = registry) => currentApprovedView(r, { [HOME]: c }, { [HOME]: d }, lineage, config);\\n+  assert.equal(project().approvedCount, 160);\\n+  assert.equal(new Set(project().marks.map((m) => m.id)).size, 160);\\n+  assert.doesNotMatch(JSON.stringify(project()), /userId|9000|stream-one/);\\n+  for (const patch of [{ online: false }, { optedIn: false }, { paused: true }, { banned: true }, { streamId: 'another' }, { blockedUserIds: [HOME] }]) assert.equal(project({ ...channel, ...patch }), null);\\n+  for (const patch of [{ paused: true }, { blocked: [HOME] }, { context: { ...doc.context, holdsRelic: false } }, { context: { ...doc.context, optedIn: false } }, { context: { ...doc.context, keeperId: OTHER } }]) assert.equal(project(channel, { ...doc, ...patch }), null);\\n+  const closed = structuredClone(doc);\\n+  closed.sessions[0].closed = true;\\n+  assert.equal(project(channel, closed), null);\\n+  const over = structuredClone(doc);\\n+  over.sessions[0].marks.push({ ...over.sessions[0].marks[0], id: 'm161' });\\n+  assert.equal(project(channel, over), null);\\n+  const privateDoc = structuredClone(doc);\\n+  privateDoc.sessions[0].marks[0].status = 'pending';\\n+  privateDoc.sessions[0].marks[1].status = 'rejected';\\n+  privateDoc.blocked.push('9002');\\n+  privateDoc.context.blockedUserIds.push('9003');\\n+  assert.equal(project({ ...channel, blockedUserIds: ['9004'] }, privateDoc).approvedCount, 155);\\n+  assert.equal(project(channel, doc, { holderId: OTHER }), null);\\n+});\\n*** End Patch\"));\n"
+}
+````
+
+### 6579. 2026-10-31T11:28:24.563Z — tool result (source line 24934)
+
+````text
+{
+  "call_id": "call_aa8b66dc572b40448067a5d28f7f690a",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 6580. 2026-10-31T11:28:37.649Z — tool call (source line 24938)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_9f580d6e46fc48348789f2c16fed1999",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/docs/CONTROL_FOLLOWUPS_1031.md\\n@@\\n-The parent must independently verify deployment and targeted public mark metadata.\\n+Deployment verification belongs to the parent. At 11:19–11:20 UTC the parent\\n+confirmed an approved `light` mark in the active actual holder session, while\\n+the public Ring 12 arrival archive and Keeper archived glyph count were zero.\\n+This confirms an archive-only view gap, not a missing stored mark. The source\\n+author did not read production data or independently verify the live overlay.\\n@@\\n-No production storage/projection defect is established without the parent's\\n-approved/pending/context metadata. This candidate deliberately does not approve,\\n-migrate, reconstruct or rewrite marks or Ring 12. Local both-store regression\\n-definitions distinguish current approved overlay glyphs, held private marks and\\n-unchanged completed archives. A broader current-hold Atlas/Keeper presentation\\n-change remains outside this unconfirmed bug fix.\\n+The candidate adds a distinct read-only current-hold projection to Atlas overview\\n+and the current Keeper page. It requires the actual configured holder, matching\\n+active open session, online/opted-in/unpaused/unbanned channel and approved,\\n+unblocked marks. It exposes no author IDs or pending text and caps marks at 160.\\n+Both stores derive it from consistent reads; GET performs no writes or provider\\n+actions. Stop detail/arrival counts remain immutable. Current-hold marks enter\\n+the next completed archive only through the existing verified hand-off path.\\n+This candidate does not approve, migrate, reconstruct or rewrite marks or Ring 12.\\n+Forget/block and inactive context remove the live projection on the next read.\\n+Local both-store regression definitions cover privacy, holder changes and replay;\\n+the browser probe checks actual Atlas/Keeper images and the existing WSS overlay\\n+render, with archived and current glyphs counted separately.\\n*** End Patch\"));\n"
+}
+````
+
+### 6581. 2026-10-31T11:28:37.712Z — tool result (source line 24941)
+
+````text
+{
+  "call_id": "call_9f580d6e46fc48348789f2c16fed1999",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 6582. 2026-10-31T11:28:42.890Z — tool call (source line 24945)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_093b43d7dd7e41bb8b5aec197eb55cf5",
+  "input": "text((await tools.exec_command({cmd:\"rg -n 'runes|rune' public/overlay.css | head -30\\nrg -n 'glyph|rune' public/overlay.js | head -15\\nrg -n 'closed =' src/marks.js\\nsed -n '125,142p' src/marks.js\\nsed -n '150,172p' test/overlay-group3.test.js\\nrg -n 'async function request|const request' test-support/pilot-fixture.js\",\"max_output_tokens\":1600})).output)\n"
+}
+````
+
+### 6583. 2026-10-31T11:28:42.980Z — tool result (source line 24948)
+
+````text
+{
+  "call_id": "call_093b43d7dd7e41bb8b5aec197eb55cf5",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "63:.runes {\n67:.rune {\n102:.disconnected .runes,\n129:.corner .rune {\n178:.archive[data-phase='unfurl'] .runes,\n183:.archive[data-phase='streak'] .runes,\n184:.archive[data-phase='impact'] .runes {\n192:  .archive .runes,\n265:.corner .rune {\n300:.rune.faded {\n524:.webgl-relic > .runes {\n543:  .webgl-relic > .runes {\n684:.archive[data-phase='unfurl'] .runes {\n688:.rune[hidden] {\n951:/* Caption is a separate row below the complete orbit, never over a rune. */\n7:  runePose,\n46:    ? 'No approved runes carried'\n47:    : `${handoff.carriedApprovedCount} approved runes carried`;\n69:const runes = document.querySelector('#runes');\n325:  runes.replaceChildren();\n394:    : `Ring ${snapshot.lineageRings} · ${snapshot.approvedCount} runes`;\n397:    compact.textContent = `Ring ${snapshot.lineageRings} · S${snapshot.streak.known ? snapshot.streak.current : '?'} · ${snapshot.approvedCount} runes`;\n405:        `. Ring ${snapshot.lineageRings}; ${snapshot.approvedCount} approved runes.`,\n417:    : `${snapshot.approvedCount} approved runes`;\n418:  if (options.layout === 'card') count.textContent = `${snapshot.approvedCount} approved runes`;\n428:    image.className = 'rune';\n430:      ? 'Approved carried rune, dimmed after three holder stream closures; retained, not deleted'\n431:      : 'Approved community rune';\n433:    image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(mark.runeSvg)}`;\n438:    runes.append(image);\n186:          session.closed === true &&\n207:      ended.closed = true;\n  if (text === '!relic resume') return { type: 'pause', paused: false };\n  if (text === '!relic opt-out') return { type: 'opt-out' };\n  if (text === '!relic keep' || text === '!relic opt-in') return { type: 'keep' };\n  if (text === '!relic pending') return { type: 'pending' };\n  if (text === '!relic approve last') return { type: 'approve-last' };\n  if (text === '!relic reject last') return { type: 'reject-last' };\n  const namedBlock = /^!relic block @([a-zA-Z0-9_]{1,25})$/.exec(text);\n  if (namedBlock && namedBlock[0] === text)\n    return { type: 'block-login', login: namedBlock[1].toLowerCase() };\n  const approve = /^!relic approve (m[1-9]\\d{0,8})$/.exec(text);\n  if (approve) return { type: 'approve', markId: approve[1] };\n  const block = /^!relic block (\\d{1,32})$/.exec(text);\n  return block\n    ? { type: 'block', userId: block[1] }\n    : /^!relic(?:\\s|$)/.test(text)\n      ? { type: 'help' }\n      : null;\n}\n});\nfor (const kind of ['memory', 'firestore'])\n  test(`${kind}: verified arrival plus successfully delivered sender ACK prompts receiver exactly once through replay/concurrency`, async () => {\n    const f = await pilotFixture(kind);\n    for (const channel of ['raidrelichq', HOME]) {\n      const alias = await f.request(`/overlay?channel=${channel}`, 'GET');\n      assert.equal(alias.status, 307);\n      assert.equal(alias.headers.location, `/overlay/${HOME}`);\n      assert.equal(alias.headers['cache-control'], 'no-store');\n    }\n    for (const channel of ['unknown', 'https://other.invalid', '../control', `${HOME}&channel=${HOME}`, '%72aidrelichq', `${HOME}&layout=full`])\n      assert.equal((await f.request(`/overlay?channel=${channel}`, 'GET')).status, 404);\n    assert.equal((await f.request('/overlay?channel=raidrelichq', 'POST')).status, 405);\n    for (const id of [BOT, HOME, OTHER]) await f.login(id);\n    for (const id of [HOME, OTHER]) {\n      f.streams.get(id).viewer_count = 1;\n      await f.control(id, 'bootstrap');\n      f.advance();\n      await f.control(id, 'keep');\n      f.advance();\n    }\n    await f.control(HOME, `send:${OTHER}`);\n    const replies = () =>\n204:  const request = (path, method = 'GET', headers = {}, rawBody = Buffer.alloc(0)) =>\n"
+    }
+  ]
+}
+````
+
+### 6584. 2026-10-31T11:29:00.587Z — tool call (source line 24952)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_c2750fd181ea4b4b8331e4cfd02fa279",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '60,78p' public/overlay.css\\nsed -n '515,530p' public/overlay.css\\nsed -n '640,675p' public/overlay.js\\nrg -n 'close\\\\(' scripts/browser-smoke-pilot.js | tail -4\\nrg -n 'data-phase|phase' public/cinematic.js | head -15\\nrg -n 'runePose' public/cinematic.js\",\"max_output_tokens\":1400})).output)\n"
+}
+````
+
+### 6585. 2026-10-31T11:29:00.687Z — tool result (source line 24955)
+
+````text
+{
+  "call_id": "call_c2750fd181ea4b4b8331e4cfd02fa279",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "  inset: 23%;\n  border-color: #d5aa6229;\n}\n.runes {\n  position: absolute;\n  inset: 0;\n}\n.rune {\n  position: absolute;\n  width: 28px;\n  height: 28px;\n  left: calc(50% + var(--x));\n  top: calc(50% + var(--y));\n  transform: translate(-50%, -50%);\n}\n.charge-track {\n  height: 3px;\n  max-width: 180px;\n  margin: 18px auto 8px;\n  width: 100%;\n  height: 100%;\n  pointer-events: none;\n}\n.relic3d[hidden] {\n  display: none;\n}\n.webgl-relic > .crystal,\n.webgl-relic > .growth-rings,\n.webgl-relic > .runes {\n  visibility: hidden;\n}\n.webgl-relic > #claim-arcs {\n  z-index: 1;\n}\n.archive[data-phase='streak'] > .relic3d {\n  const fuse = cinematic.fusion ?? 0;\n  archiveNode.style.setProperty('--fusion-glow', String(cinematic.fusionGlow));\n  fusionArcs[0].style.transform = `translateX(${-(1 - fuse) * 18}px)`;\n  fusionArcs[1].style.transform = `translateX(${(1 - fuse) * 18}px)`;\n  fusionArcs[0].style.opacity = fusionArcs[1].style.opacity = String(1 - fuse);\n  fusionArcs[2].style.opacity = String(fuse);\n  const ringInset = archiveNode.classList.contains('webgl-relic') ? relic3d?.ringInset?.() : null;\n  effects.fusion.style.inset = `${ringInset ?? 4 + Math.max(0, Math.min(16, current?.lineageRings ?? 0) - 1) * 1.8}%`;\n  const batch = wordBatch(current?.marks ?? [], cinematic, motion.matches);\n  for (let i = 0; i < words.length; i++) {\n    const item = batch[i],\n      node = words[i];\n    node.hidden = !item || document.hidden;\n    if (!item) {\n      node.textContent = '';\n      continue;\n    }\n    if (node.textContent !== item.mark.flightText) node.textContent = item.mark.flightText;\n    const pose = runePose(\n      item.index,\n      current.marks.length,\n      motion.matches ? 0 : performance.now(),\n      cinematic.unfurl ?? 1,\n    );\n    node.dataset.orbitIndex = String(item.index);\n    node.style.left = `${pose.x}%`;\n    node.style.top = `${pose.y}%`;\n    // Place a readable caption immediately below its real projected glyph.\n    const bounds = archiveNode.getBoundingClientRect(),\n      label = node.getBoundingClientRect();\n    const x = Math.max(\n      label.width / 2 + 3,\n      Math.min(bounds.width - label.width / 2 - 3, (pose.x / 100) * bounds.width),\n    );\n    const y = Math.max(\n      3,\n208:    else route.close();\n461:      await browser?.close();\n464:        sockets?.close();\n466:        if (server?.listening) await new Promise((resolve) => server.close(resolve));\n86:export function wordBatch(marks, phase, reduced = false) {\n91:  if (!phase.host) return [];\n93:  if (phase.unfurl === null || !approved.length) return [];\n95:    step = phase.unfurl * batches;\n158:      const phase = cinematicPhase(snapshot, now, { reduced, fresh });\n160:      phase.fusion = completedPhase.fusion;\n161:      phase.fusionGlow = completedPhase.fusionGlow;\n163:      if (!played && phase.fusionAt !== null && now >= phase.fusionAt) {\n165:        chord = !reduced && !hidden && now - phase.fusionAt < 500;\n168:      if (!departurePlayed && phase.release !== null) {\n177:        ...phase,\n181:          phase.fusionAt !== null &&\n182:          now < phase.fusionAt + FUSION_TIMING.duration,\n204:export function ambientSigils(snapshot, phase, reduced = false) {\n206:    phase.host &&\n192:export function runePose(index, count, time, unfurl = 1) {\n"
+    }
+  ]
+}
+````
+
+### 6586. 2026-10-31T11:29:13.821Z — tool call (source line 24959)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_0336af2cbb30445286ec7a5a0bd16352",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/scripts/browser-smoke-desirability.js\\n@@\\n   assert.equal(liveAtlas.stops[0].approvedCount, 1);\\n   stage = 'current-holder-overlay-glyph';\\n+  // Real reduced-motion SVG output makes the approved glyph itself observable;\\n+  // normal WebGL/resource coverage remains in the existing overlay workflows.\\n+  await page.emulateMedia({ reducedMotion: 'reduce' });\\n   await page.goto(origin + '/overlay/' + OTHER);\\n-  await page.waitForFunction((svg) => [...document.querySelectorAll('#runes img')].filter((img) => decodeURIComponent(img.src.split(',')[1] ?? '') === svg).length === 1, runeSvg('light'));\\n+  await page.waitForFunction((svg) => [...document.querySelectorAll('#runes img')].filter((img) => decodeURIComponent(img.src.split(',')[1] ?? '') === svg && img.complete && img.naturalWidth > 0 && img.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })).length === 1, runeSvg('light'));\\n@@\\n   stage = 'atlas-holder';\\n   await page.goto(origin + '/atlas/');\\n+  await page.emulateMedia({ reducedMotion: 'no-preference' });\\n*** End Patch\"));\n"
+}
+````
+
+### 6587. 2026-10-31T11:29:13.922Z — tool result (source line 24962)
+
+````text
+{
+  "call_id": "call_0336af2cbb30445286ec7a5a0bd16352",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 6588. 2026-10-31T11:29:39.293Z — assistant (source line 24967)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Added distinct **current-hold LIVE marks** to Atlas and Keeper, preserving archived arrival counts. Projection requires the actual holder’s active session and exposes only approved, unblocked marks.\n\nChanged: `src/{receiving,state,store}.js`, `public/{atlas,receiving}.js`, `test/receiving.test.js`, `scripts/browser-smoke-desirability.js`, and the follow-up incident note.\n\nAdded both-store privacy/lifecycle regressions and browser glyph checks. Preserved329 fixes; no migration, approval, quota changes or mutating GETs.\n\nTests remain unrun. No production execution or validation claimed. Stopped for parent QA.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6589. 2026-10-31T11:30:06.240Z — user (source line 24977)
+
+````text
+[
+  {
+    "type": "input_text",
+    "text": "Original331 VERYNARROWSETUPFEEDBACKGUARD beforeQA. Parentread329 public/control.js: bootstrapsetssetup-flow-status pending, catchclearsitbut early[401,403] branchinvalidate/stopSetup/poller.stop/statusExpired/return BEFOREsetup-flow-statusoutcomeassignment. Thus adjacentSetupsurfacecanstillshowpendingafterexpiredsessionwhileglobaltopshowscorrectexpired—theuser'sreportednooutcomeedge. Reviewthisexactpathandanyexplicitnonokresponse earlyreturnforbootstrap;ensureadjacentsetup-flow-statusclearsintospecificunauthorized/reconnect(orappropriateerror), globalconsistent, no retry/authrefresh, live/CSRF/sessionunchanged. Keep329/330allfixesandLIVEvsarchiveprivacyexact. Addexistingbrowser-smoke-onboarding regression realmockbootstrap401 whilepollingactive→bothglobalandadjacentNO pending, noSetupretry/provideraction orautooptin; keepbounded slow/errorcase existing. Couldexistingunit asserttoo but no countfixturewaiver. ONLY control.js +existingprobe/testneeded; no otherapp/refactor/newmodule(160)/Git/cloud/format/testexecution/rawCody/privatefiles/secret/provider. Thisisreadilyconfirmedsourceearlyreturn—notpermissionrelax. FinishminimalSTOP."
+  }
+]
+````
+
+### 6590. 2026-10-31T11:30:10.938Z — assistant (source line 24980)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "I’ll set the adjacent Setup status in the confirmed authorization-error return path and add a browser regression for both status surfaces, with no retry or provider action.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````
+
+### 6591. 2026-10-31T11:30:11.841Z — tool call (source line 24981)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_544f9de976b143708d2eb004bf82c36b",
+  "input": "text((await tools.exec_command({cmd:\"sed -n '565,590p' public/control.js\\nsed -n '510,565p' scripts/browser-smoke-onboarding.js\\nsed -n '655,678p' public/control.js\",\"max_output_tokens\":2500})).output)\n"
+}
+````
+
+### 6592. 2026-10-31T11:30:11.958Z — tool result (source line 24984)
+
+````text
+{
+  "call_id": "call_544f9de976b143708d2eb004bf82c36b",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": "      cache: 'no-store',\n      headers: { 'content-type': 'application/json' },\n      body: JSON.stringify({ action, csrf }),\n    });\n    if (action === 'logout' && response.ok) {\n      location.assign(`/control/${id}`);\n      return;\n    }\n    if ([401, 403].includes(response.status)) {\n      invalidate();\n      stopSetup();\n      poller.stop();\n      status.textContent =\n        'Control session expired or unauthorized. Reconnect this matching Keeper; no new Send Off is authorized.';\n      if (dispatchInFlight) sendResult.textContent = status.textContent;\n      return;\n    }\n    let value;\n    try {\n      value = JSON.parse(response.text);\n    } catch {}\n    status.textContent =\n      simulated && response.ok ? response.text : actionMessage(value, names[target.value]);\n    if (dispatchInFlight) sendResult.textContent = status.textContent;\n    if (\n      dispatchInFlight &&\n  assert.equal(await page.locator('#first-bootstrap').isVisible(), false);\n  assert.equal(\n    await page.locator('#first-keep').evaluate((n) => document.activeElement === n),\n    true,\n  );\n  assert.equal(await page.locator('#light-subscriptions-fix').isVisible(), false);\n  stage = 'explicit-opt-in';\n  await action('first-keep');\n  await page.waitForFunction(\n    () => document.querySelector('#first-optin').dataset.state === 'ready',\n  );\n  assert.notEqual((await f.runtime.state.getStreamStatus(OTHER)).seeking, true);\n  assert.equal(await page.locator('#setup-primary > button').getAttribute('id'), 'first-bootstrap');\n  assert.equal(await page.locator('#first-keep').isVisible(), false);\n  stage = 'setup-slow-error-recovery';\n  const setupPath = '**/control/' + OTHER;\n  let releaseSetup;\n  const heldSetup = new Promise((resolve) => { releaseSetup = resolve; });\n  const slowSetup = async (route) => {\n    if (route.request().method() !== 'POST' || route.request().postDataJSON()?.action !== 'bootstrap')\n      return route.continue();\n    await heldSetup;\n    await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ status: 'unavailable' }) });\n  };\n  await page.route(setupPath, slowSetup);\n  const setupRequest = page.waitForRequest((r) => new URL(r.url()).pathname === '/control/' + OTHER && r.method() === 'POST' && r.postDataJSON()?.action === 'bootstrap');\n  await page.locator('#first-bootstrap').click();\n  await setupRequest;\n  await page.clock.runFor(1001);\n  assert.match(await page.locator('#setup-flow-status').textContent(), /Setup request pending/);\n  assert.equal(await page.locator('#first-bootstrap').isDisabled(), true);\n  releaseSetup();\n  await page.waitForFunction(() => document.querySelector('#setup-flow-status').textContent.includes('Setup stopped.'));\n  assert.doesNotMatch(await page.locator('#result').textContent(), /Request pending/);\n  await page.unroute(setupPath, slowSetup);\n  await action('first-bootstrap');\n  await page.waitForFunction(() => document.querySelector('#setup-flow-status').textContent.includes('all five subscriptions enabled'));\n  await page.getByRole('link', { name: 'Add overlay', exact: true }).click();\n  assert.equal(\n    await page.locator('#overlay-primary > button').getAttribute('id'),\n    'first-obs-copy',\n  );\n  assert.equal(await page.locator('#overlay-utilities').evaluate((n) => n.open), false);\n  assert.equal(await page.locator('#first-obs-confirm').isVisible(), false);\n  const beforeOverlay = f.calls.length;\n  const beforeOverlayChannel = await f.runtime.state.getStreamStatus(OTHER);\n  await page.locator('#first-obs-copy').click();\n  assert.match(await page.locator('#first-copy-status').innerText(), /URL copied/);\n  assert.equal(await page.locator('#first-obs').getAttribute('data-state'), 'unknown');\n  assert.equal(\n    await page.locator('#overlay-primary > label').getAttribute('id'),\n    'first-obs-check',\n  );\n  assert.equal(await page.locator('#first-obs-copy').isVisible(), false);\n  assert.equal(await page.locator('#first-obs-confirm').isChecked(), false);\n  assert.equal(\n    : 'Visible target checks stopped; saved observations still expire normally.';\n  disable(false);\n  poller.resume({ immediate: true });\n};\ndocument.getElementById('refresh').onclick = () => {\n  if (!busy) {\n    poller.start();\n  }\n};\ndocument.getElementById('logout').onclick = () => run('logout');\ndisable(true);\npoller.start();\nconst visibility = () => {\n  if (document.hidden) {\n    stopSetup();\n    readController?.abort();\n  }\n  firstRun.age();\n  poller.visibility();\n};\ndocument.addEventListener('visibilitychange', visibility);\naddEventListener('pageshow', (event) => {\n  if (event.persisted) {\n    document.addEventListener('visibilitychange', visibility);\n"
+    }
+  ]
+}
+````
+
+### 6593. 2026-10-31T11:30:33.896Z — tool call (source line 24988)
+
+````text
+{
+  "name": "exec",
+  "call_id": "call_1b2d782b132b49cda98bcb99e2801ec2",
+  "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/public/control.js\\n@@\\n       status.textContent =\\n         'Control session expired or unauthorized. Reconnect this matching Keeper; no new Send Off is authorized.';\\n+      if (action === 'bootstrap')\\n+        document.getElementById('setup-flow-status').textContent = status.textContent;\\n       if (dispatchInFlight) sendResult.textContent = status.textContent;\\n*** Update File: /home/ubuntu/.openclaw/workspace/apps/raid-relic/scripts/browser-smoke-onboarding.js\\n@@\\n   await action('first-bootstrap');\\n   await page.waitForFunction(() => document.querySelector('#setup-flow-status').textContent.includes('all five subscriptions enabled'));\\n+  stage = 'setup-unauthorized-feedback';\\n+  const callsBeforeUnauthorizedSetup = f.calls.length;\\n+  const channelBeforeUnauthorizedSetup = await f.runtime.state.getStreamStatus(OTHER);\\n+  const registryBeforeUnauthorizedSetup = await f.runtime.state.getKeeperRegistry();\\n+  let unauthorizedSetupPosts = 0;\\n+  const unauthorizedSetup = async (route) => {\\n+    if (route.request().method() !== 'POST' || route.request().postDataJSON()?.action !== 'bootstrap')\\n+      return route.continue();\\n+    unauthorizedSetupPosts++;\\n+    await route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ status: 'unauthorized' }) });\\n+  };\\n+  await page.route(setupPath, unauthorizedSetup);\\n+  const unauthorizedResponse = page.waitForResponse((r) => new URL(r.url()).pathname === '/control/' + OTHER && r.request().method() === 'POST');\\n+  // Existing visible polling is active; a real click must terminate both surfaces.\\n+  await page.locator('#first-bootstrap').click();\\n+  assert.equal((await unauthorizedResponse).status(), 401);\\n+  await page.waitForFunction(() => document.querySelector('#setup-flow-status').textContent.includes('Control session expired or unauthorized.'));\\n+  const unauthorizedMessage = 'Control session expired or unauthorized. Reconnect this matching Keeper; no new Send Off is authorized.';\\n+  assert.equal(await page.locator('#setup-flow-status').textContent(), unauthorizedMessage);\\n+  assert.equal(await page.locator('#result').textContent(), unauthorizedMessage);\\n+  assert.equal(await page.locator('#stop-setup').isHidden(), true);\\n+  assert.equal(await page.locator('#first-bootstrap').isDisabled(), true);\\n+  await page.clock.runFor(45001);\\n+  assert.equal(unauthorizedSetupPosts, 1, 'Unauthorized Setup never retries');\\n+  assert.equal(f.calls.length, callsBeforeUnauthorizedSetup, 'Denied mock never reaches provider or authorization refresh');\\n+  assert.deepEqual(await f.runtime.state.getStreamStatus(OTHER), channelBeforeUnauthorizedSetup);\\n+  assert.deepEqual(await f.runtime.state.getKeeperRegistry(), registryBeforeUnauthorizedSetup);\\n+  await page.unroute(setupPath, unauthorizedSetup);\\n+  // The response above was an intercepted failure, not extension of a real session.\\n+  // Explicit read recovers this still-valid local fixture for the remaining checks.\\n+  const recoveryRead = page.waitForResponse((r) => new URL(r.url()).pathname === '/control/' + OTHER + '/status' && r.request().method() === 'GET');\\n+  await page.locator('#refresh').click();\\n+  assert.equal((await recoveryRead).status(), 200);\\n+  await page.waitForFunction(() => document.querySelector('#result').textContent.startsWith('Session read.') && !document.querySelector('#first-bootstrap').disabled);\\n   await page.getByRole('link', { name: 'Add overlay', exact: true }).click();\\n*** End Patch\"));\n"
+}
+````
+
+### 6594. 2026-10-31T11:30:33.994Z — tool result (source line 24991)
+
+````text
+{
+  "call_id": "call_1b2d782b132b49cda98bcb99e2801ec2",
+  "output": [
+    {
+      "type": "input_text",
+      "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+    },
+    {
+      "type": "input_text",
+      "text": {}
+    }
+  ]
+}
+````
+
+### 6595. 2026-10-31T11:30:39.833Z — assistant (source line 24996)
+
+````text
+[
+  {
+    "type": "output_text",
+    "text": "Changed only `public/control.js` and `scripts/browser-smoke-onboarding.js`.\n\nBootstrap401/403 now clears adjacent Setup status with the same explicit reconnect message as global status. Added a browser regression asserting one POST, no retries/provider actions/state changes, and explicit-read recovery.\n\n329/330 fixes preserved. Tests unrun; no execution performed. Stopped.",
+    "annotations": [],
+    "logprobs": []
+  }
+]
+````

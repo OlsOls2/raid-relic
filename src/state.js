@@ -1,6 +1,6 @@
 import { publicKeeperProfiles } from './scoreboard.js';
 import { wanderMutation, wanderActivity } from './wander-state.js';
-import { receivingView } from './receiving.js';
+import { receivingView, currentApprovedView } from './receiving.js';
 import { streakView } from './streaks.js';
 import { enqueueP7, p7Mutation, cancelP7 } from './p7.js';
 import { journeyMap } from './journey-map.js';
@@ -839,7 +839,19 @@ export function createMemoryState({
       return journeyMap(lineage, config, now);
     },
     getAtlasPage(options) {
-      return atlasPage(lineage, options);
+      const page = atlasPage(lineage, options);
+      return page && !options?.stopId
+        ? {
+            ...page,
+            current: currentApprovedView(
+              registry,
+              Object.fromEntries(channels),
+              Object.fromEntries(markDocs),
+              lineage,
+              config,
+            ),
+          }
+        : page;
     },
     getPublicPresentation(host, now) {
       return {

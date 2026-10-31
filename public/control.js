@@ -545,6 +545,8 @@ async function run(action, { continued = false } = {}) {
   if (action === 'bootstrap') {
     setupLeft--;
     document.getElementById('stop-setup').hidden = false;
+    document.getElementById('setup-flow-status').textContent =
+      'Setup request pending; waiting for the bounded server response.';
   }
   actionInFlight = true;
   dispatchInFlight = action.startsWith('send:') || action === 'process';
@@ -574,6 +576,8 @@ async function run(action, { continued = false } = {}) {
       poller.stop();
       status.textContent =
         'Control session expired or unauthorized. Reconnect this matching Keeper; no new Send Off is authorized.';
+      if (action === 'bootstrap')
+        document.getElementById('setup-flow-status').textContent = status.textContent;
       if (dispatchInFlight) sendResult.textContent = status.textContent;
       return;
     }
@@ -617,10 +621,18 @@ async function run(action, { continued = false } = {}) {
     if (action === 'keep' && response.ok) firstRun.focusStep('overlay-step');
     if (action === 'refresh-authorization' && value?.authorization === 'ready')
       firstRun.focusStep('setup-step');
-  } catch {
+  } catch (error) {
     invalidate();
     status.textContent =
       'Request outcome unavailable. Refresh status; never blindly repeat a raid request.';
+    if (action === 'bootstrap') {
+      stopSetup();
+      document.getElementById('setup-flow-status').textContent =
+        error instanceof ControlReadError && error.code === 'timeout'
+          ? 'Setup timed out. Read status, then explicitly retry Setup if needed; no automatic retry was made.'
+          : 'Setup outcome unavailable. Read status and reconnect if needed before explicitly trying again.';
+      status.textContent = document.getElementById('setup-flow-status').textContent;
+    }
     if (dispatchInFlight) sendResult.textContent = status.textContent;
   } finally {
     actionInFlight = false;

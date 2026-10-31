@@ -359,7 +359,7 @@ function render(snapshot) {
           ? `The relic has moved on to @${snapshot.holderLogin} · waiting for its next raid`
           : `The relic is with @${snapshot.holderLogin} · waiting for its next raid`;
   state.textContent = snapshot.claimMeter?.awaitingRaid
-    ? 'The relic stirs… waiting for Twitch to confirm the raid'
+    ? 'Request received · waiting for Twitch confirmation; delivery can take time. Claiming opens only after verified arrival.'
     : messages[snapshot.status];
   if (options.layout === 'card' && !snapshot.claimMeter?.awaitingRaid)
     state.textContent = snapshot.holderLogin

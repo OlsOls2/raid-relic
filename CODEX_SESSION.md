@@ -8,12 +8,12 @@
 
 | Metadata | Value |
 |---|---|
-| Cutoff | 2026-10-31T09:52:48.326Z |
-| Selected entries | 6500 |
-| CLI-log digests | 327 (run-000.jsonl–run-326.jsonl) |
-| Selected bytes | 20507246 |
+| Cutoff | 2026-10-31T11:30:39.876Z |
+| Selected entries | 6595 |
+| CLI-log digests | 332 (run-000.jsonl–run-331.jsonl) |
+| Selected bytes | 20752512 |
 | Ordered transcript components | 2; entry-aligned, each ≤16 MiB; index is not the transcript |
-| Selected SHA256 | `d733b125b19ed6b376b6188dd86f676aa161f756ef4ed15ba8a456cefd1c7334` |
+| Selected SHA256 | `17c24531be309c0f28f54d860e20a0e0fe4db1f6df2a28ec5a3e5aeee66077f3` |
 | Secondary whole-entry omissions | 8 |
 | Secondary rescan | zero-findings, bound to this exact selected SHA |
 

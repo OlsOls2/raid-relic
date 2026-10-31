@@ -134,10 +134,13 @@ test('OBS read persistence keeps default human-idle suspension separate and clea
   );
 });
 test('fixed friendly replies have an explicit complete catalog snapshot; vote counts remain truthful', async () => {
-  assert.deepEqual(
-    BOT_COPY,
-    JSON.parse(await readFile(new URL('fixtures/bot-copy.snapshot.json', import.meta.url), 'utf8')),
+  const expected = JSON.parse(
+    await readFile(new URL('fixtures/bot-copy.snapshot.json', import.meta.url), 'utf8'),
   );
+  assert.ok(Object.hasOwn(expected, 'noMarkWasAddedUse'));
+  expected.noMarkWasAddedUse =
+    'No mark was added. Use one allowed word or emoji, for example !mark light; not !mark first light. Wait 30 seconds between marks and use at most five marks per stream. Private review text is never public.';
+  assert.deepEqual(BOT_COPY, expected);
   assert.ok(Object.values(BOT_COPY).every((text) => text.length <= 500));
   assert.equal(
     claimVoteCopy(
@@ -151,6 +154,22 @@ test('fixed friendly replies have an explicit complete catalog snapshot; vote co
 for (const kind of ['memory', 'firestore'])
   test(`${kind}: verified arrival plus successfully delivered sender ACK prompts receiver exactly once through replay/concurrency`, async () => {
     const f = await pilotFixture(kind);
+    for (const channel of ['raidrelichq', HOME]) {
+      const alias = await f.request(`/overlay?channel=${channel}`, 'GET');
+      assert.equal(alias.status, 307);
+      assert.equal(alias.headers.location, `/overlay/${HOME}`);
+      assert.equal(alias.headers['cache-control'], 'no-store');
+    }
+    for (const channel of [
+      'unknown',
+      'https://other.invalid',
+      '../control',
+      `${HOME}&channel=${HOME}`,
+      '%72aidrelichq',
+      `${HOME}&layout=full`,
+    ])
+      assert.equal((await f.request(`/overlay?channel=${channel}`, 'GET')).status, 404);
+    assert.equal((await f.request('/overlay?channel=raidrelichq', 'POST')).status, 405);
     for (const id of [BOT, HOME, OTHER]) await f.login(id);
     for (const id of [HOME, OTHER]) {
       f.streams.get(id).viewer_count = 1;

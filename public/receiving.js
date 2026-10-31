@@ -174,6 +174,45 @@ if (root) {
           glyphs.append(figure);
         }
         content.append(glyphs);
+        if (p.current) {
+          const live = p.current;
+          if (
+            v.holder?.login !== login ||
+            live.login !== login ||
+            live.ringCount !== v.holder.ringCount ||
+            !Array.isArray(live.marks) ||
+            live.marks.length > 160 ||
+            live.approvedCount !== live.marks.length
+          )
+            throw Error('Invalid current hold');
+          const section = node('section');
+          section.id = 'keeper-current-live';
+          section.append(
+            node('h3', `Current hold · Ring ${live.ringCount}`),
+            node(
+              'p',
+              `${live.approvedCount} live approved marks. Separate from archived arrival glyphs.`,
+            ),
+          );
+          for (const mark of live.marks) {
+            if (
+              typeof mark.text !== 'string' ||
+              mark.text.length > 128 ||
+              typeof mark.runeSvg !== 'string' ||
+              mark.runeSvg.length > 4096 ||
+              !mark.runeSvg.startsWith('<svg xmlns="http://www.w3.org/2000/svg"')
+            )
+              throw Error('Invalid live glyph');
+            const figure = node('figure'),
+              image = node('img');
+            image.src = 'data:image/svg+xml,' + encodeURIComponent(mark.runeSvg);
+            image.width = image.height = 48;
+            image.alt = 'Live approved rune: ' + mark.text;
+            figure.append(image, node('figcaption', mark.text));
+            section.append(figure);
+          }
+          content.append(section);
+        }
         const more = node('details'),
           moreBody = node('div');
         more.className = 'keeper-more';

@@ -1,23 +1,23 @@
 {
   "formatVersion": 2,
   "sessionID": "01a1705c-a87d-7143-80f6-021e47b78ced",
-  "inputLeaf": "rollout-release326-01a1705c-a87d-7143-80f6-021e47b78ced.jsonl",
-  "rawSnapshotSHA256": "bed8a05a92863523c28a20e57c23d7b6225c0d175f1dd0cc3712cce329e2bdeb",
-  "rawBytes": 126020886,
+  "inputLeaf": "rollout-release331-01a1705c-a87d-7143-80f6-021e47b78ced.jsonl",
+  "rawSnapshotSHA256": "a02df3d6ccf7b47818b83ca77822f5ad7047ad61a066d79d69670a6829a93fd6",
+  "rawBytes": 128567433,
   "eventCounts": {
     "session_meta": 1,
-    "event_msg": 11379,
-    "response_item": 9816,
-    "world_state": 184,
-    "turn_context": 328,
-    "token_usage_record": 2927,
-    "compacted": 23
+    "event_msg": 11535,
+    "response_item": 9946,
+    "world_state": 188,
+    "turn_context": 333,
+    "token_usage_record": 2972,
+    "compacted": 24
   },
-  "exportedEntries": 6500,
+  "exportedEntries": 6595,
   "omissions": {
     "private": 121,
     "media": 9,
-    "unselected": 18157,
+    "unselected": 18403,
     "truncated": 20,
     "credentialLookingItems": 76,
     "credentialReasons": {
@@ -26,10 +26,10 @@
     }
   },
   "firstTimestamp": "2026-10-25T00:01:23.357Z",
-  "cutoff": "2026-10-31T09:52:48.326Z",
-  "exportSHA256": "d733b125b19ed6b376b6188dd86f676aa161f756ef4ed15ba8a456cefd1c7334",
-  "exportBytes": 20507246,
-  "sourceRunLogCount": 327,
+  "cutoff": "2026-10-31T11:30:39.876Z",
+  "exportSHA256": "17c24531be309c0f28f54d860e20a0e0fe4db1f6df2a28ec5a3e5aeee66077f3",
+  "exportBytes": 20752512,
+  "sourceRunLogCount": 332,
   "sourceRunLogs": [
     {
       "leaf": "run-000.jsonl",
@@ -1665,27 +1665,52 @@
       "leaf": "run-326.jsonl",
       "bytes": 186536,
       "sha256": "8308c8ff82ebb48559b64b128ed2ca4b7363cfbbaa38cbe1497491d695f046f1"
+    },
+    {
+      "leaf": "run-327.jsonl",
+      "bytes": 5828,
+      "sha256": "b93c454515f9edff247f371092bbe95b95ae585f12ae3e6ae0c1ac616b965834"
+    },
+    {
+      "leaf": "run-328.jsonl",
+      "bytes": 13432,
+      "sha256": "1e587e20d94063f7081a11dd086a31cd1a24b75e32ea4a72348274f120f4efb2"
+    },
+    {
+      "leaf": "run-329.jsonl",
+      "bytes": 151181,
+      "sha256": "f098cba06f580978c1fcddca207b98ed670e629c5874a2d84c8814030c2d6646"
+    },
+    {
+      "leaf": "run-330.jsonl",
+      "bytes": 166936,
+      "sha256": "406075749cf65916b07a0efe2f366ac0c7ddc1b578f90825dd59aa368e6a66ef"
+    },
+    {
+      "leaf": "run-331.jsonl",
+      "bytes": 11477,
+      "sha256": "a1e4cc27d26c260709ad99575cd3350ea5147588c1e36758ab78be58208b294c"
     }
   ],
   "scope": "Selected sanitized native JSONL; private/internal/media omitted and per-item output bounded. Raw snapshot remains local ignored. Secondary scanner findings cause whole selected-entry omission, including public identifiers; zero-finding rescan required.",
   "parts": [
     {
       "order": 1,
-      "path": "EXPORTED_TRANSCRIPT.part-001-d733b125b19ed6b376b6188dd86f676aa161f756ef4ed15ba8a456cefd1c7334.md",
+      "path": "EXPORTED_TRANSCRIPT.part-001-17c24531be309c0f28f54d860e20a0e0fe4db1f6df2a28ec5a3e5aeee66077f3.md",
       "bytes": 16770524,
-      "sha256": "9e242471aaaf086a537d987b9659487650235d0075fd757feef74a34e484fc84",
+      "sha256": "023c4f01e958ab0de527101bbbdaa02fe35f4f39b3e33257539425fae8b7f6f6",
       "entries": 5513
     },
     {
       "order": 2,
-      "path": "EXPORTED_TRANSCRIPT.part-002-d733b125b19ed6b376b6188dd86f676aa161f756ef4ed15ba8a456cefd1c7334.md",
-      "bytes": 3736722,
-      "sha256": "42d3990db7ab9296d93484a72a6f7e6772924372d16961c2ba40cde085abf935",
-      "entries": 987
+      "path": "EXPORTED_TRANSCRIPT.part-002-17c24531be309c0f28f54d860e20a0e0fe4db1f6df2a28ec5a3e5aeee66077f3.md",
+      "bytes": 3981988,
+      "sha256": "95ea8608c446dcdd3d0721fb923980ffea54c8d7f2a0f7e1a31124ab17c4ffec",
+      "entries": 1082
     }
   ],
-  "indexBytes": 861,
-  "indexSHA256": "bb9e1fc63bd18245a844967b42f271029bacfd445848ad33f85a8c5c4bc6abf9",
+  "indexBytes": 862,
+  "indexSHA256": "df9ca9ab756416d3e2f7b2a3f52df03fb1bee76cf46f0a2376f062cace79626e",
   "secondaryScan": {
     "status": "zero-findings",
     "findings": 8,
@@ -1694,9 +1719,9 @@
       "twitch-api-token": 4,
       "generic-api-key": 4
     },
-    "omissionReportSHA256": "8e35ba5d893057993584bb5c381e281fa22b37f16cacbfafff99df9a6f6eb48e",
-    "reportSHA256": "78bf8e4b824138372296cabbbf9cf7b04d82427f5c6a566eef9b21393d17c670",
-    "scannedExportSHA256": "d733b125b19ed6b376b6188dd86f676aa161f756ef4ed15ba8a456cefd1c7334",
-    "scannedPartsSHA256": "d5b071b782daf9b90ddd7b0dfd53cb6c86f1ae9011e780c4715a77eeb2bdc00a"
+    "omissionReportSHA256": "63314b89c15315b4b7fd8cb71c8b4e75a1224a059c5d9161996f047da0aa87d2",
+    "reportSHA256": "f98c11f82ba36b17f1d10035fd8c0cd4ef770b6f30c9696a977ab90ff95ff365",
+    "scannedExportSHA256": "17c24531be309c0f28f54d860e20a0e0fe4db1f6df2a28ec5a3e5aeee66077f3",
+    "scannedPartsSHA256": "62e1dd285c25dad68a7c9ca256874dca41bec913a37e78d4641adf3817bd4438"
   }
 }

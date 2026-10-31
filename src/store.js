@@ -1,6 +1,6 @@
 import { publicKeeperProfiles } from './scoreboard.js';
 import { wanderMutation, wanderActivity } from './wander-state.js';
-import { receivingView } from './receiving.js';
+import { receivingView, currentApprovedView } from './receiving.js';
 import { streakView } from './streaks.js';
 import { enqueueP7, p7Mutation, cancelP7 } from './p7.js';
 import { journeyMap } from './journey-map.js';
@@ -1080,7 +1080,23 @@ export function createFirestoreStore(
       return journeyMap((await ref('lineage', 'single').get()).data(), config, now);
     },
     async getAtlasPage(options) {
-      return atlasPage((await ref('lineage', 'single').get()).data(), options);
+      if (options?.stopId) return atlasPage((await ref('lineage', 'single').get()).data(), options);
+      return db.runTransaction(async (tx) => {
+        const registry = (await tx.get(ref('keeperRegistry', 'single'))).data();
+        const lineage = (await tx.get(ref('lineage', 'single'))).data();
+        const channels = {},
+          docs = {};
+        // Only the configured immutable holder is read; no public identity lookup.
+        if (config?.channels.includes(registry?.holderId)) {
+          const host = registry.holderId;
+          channels[host] = (await tx.get(ref('streamChannels', host))).data();
+          docs[host] = (await tx.get(ref('markChannels', host))).data();
+        }
+        return {
+          ...atlasPage(lineage, options),
+          current: currentApprovedView(registry, channels, docs, lineage, config),
+        };
+      });
     },
     async getPublicPresentation(host, now) {
       return db.runTransaction(async (tx) => {

@@ -4,11 +4,14 @@ import { createServer } from 'node:https';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';
 import { createLocalTLS } from '../test-support/local-tls.js';
+import { attachOverlaySockets } from '../src/overlay-sockets.js';
+import { runeSvg } from '../src/marks.js';
 const origin = 'https://localhost:5191';
 let page,
   browser,
   server,
   tls,
+  sockets,
   stage = 'setup',
   failureCategory = null,
   passed = false;
@@ -74,6 +77,10 @@ try {
   }
   tls = await createLocalTLS();
   server = createServer(tls.options, f.runtime.handler);
+  sockets = attachOverlaySockets(server, f.runtime.overlayFeeds, {
+    origins: [origin],
+    allowRead: f.runtime.allowPublicRead,
+  });
   await new Promise((resolve, reject) => {
     server.once('error', reject);
     server.listen(5191, '127.0.0.1', resolve);
@@ -169,8 +176,46 @@ try {
   await f.chat(HOME, '8201', '!offer');
   await f.chat(OTHER, '8202', '!accept');
   assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
+  await f.chat(OTHER, '8301', '!mark light');
+  await f.chat(OTHER, '8302', '!mark spoiler');
+  const liveAtlas = JSON.parse((await f.request('/api/atlas')).body.toString());
+  assert.equal(liveAtlas.current.approvedCount, 1);
+  assert.deepEqual(
+    liveAtlas.current.marks.map((m) => m.text),
+    ['light'],
+  );
+  assert.equal(liveAtlas.stops[0].approvedCount, 1);
+  stage = 'current-holder-overlay-glyph';
+  // Real reduced-motion SVG output makes the approved glyph itself observable;
+  // normal WebGL/resource coverage remains in the existing overlay workflows.
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto(origin + '/overlay/' + OTHER);
+  await page.waitForFunction(
+    (svg) =>
+      [...document.querySelectorAll('#runes img')].filter(
+        (img) =>
+          decodeURIComponent(img.src.split(',')[1] ?? '') === svg &&
+          img.complete &&
+          img.naturalWidth > 0 &&
+          img.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }),
+      ).length === 1,
+    runeSvg('light'),
+  );
+  assert.equal(
+    await page.locator('#runes img').count(),
+    2,
+    'One archived carried moon plus one current light',
+  );
+  assert.doesNotMatch(await page.locator('body').innerText(), /spoiler|8301|8302/);
   stage = 'atlas-holder';
   await page.goto(origin + '/atlas/');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.locator('#atlas-current-live img[alt="Live approved rune: light"]').waitFor();
+  assert.match(
+    await page.locator('#atlas-current-live').innerText(),
+    /Current hold · Ring 1.*@olsols2/s,
+  );
+  assert.doesNotMatch(await page.locator('#atlas-current-live').innerText(), /spoiler|8301|8302/);
   assert.equal(errors, 0);
   await page
     .locator('.holder-spotlight h3')
@@ -222,6 +267,9 @@ try {
   );
   assert.doesNotMatch(await page.locator('#receiving-content').innerText(), /spoiler|8101/);
   assert.equal(await page.locator('.keeper-glyphs img').count(), 1);
+  await page.locator('#keeper-current-live img[alt="Live approved rune: light"]').waitFor();
+  assert.equal(await page.locator('#keeper-current-live img').count(), 1);
+  assert.match(await page.locator('#keeper-current-live').innerText(), /1 live approved marks/);
   await page.locator('.keeper-card-preview').first().waitFor({ state: 'visible' });
   const thumbnail = await page
     .locator('.keeper-card-preview')
@@ -397,6 +445,7 @@ try {
     : 'browser-or-fixture';
 } finally {
   await browser?.close().catch(() => {});
+  sockets?.close();
   if (server)
     await new Promise((r) => {
       server.closeAllConnections();

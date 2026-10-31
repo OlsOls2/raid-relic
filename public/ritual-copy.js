@@ -68,7 +68,7 @@ export const BOT_COPY = Object.freeze({
   marksAreOpenOnlyWhile:
     'Marks are open only while this channel is live, unpaused and holding the relic. No mark was added.',
   noMarkWasAddedUse:
-    'No mark was added. Use one allowed word or emoji, wait 30 seconds between marks, and use at most five marks per stream. Private review text is never public.',
+    'No mark was added. Use one allowed word or emoji, for example !mark light; not !mark first light. Wait 30 seconds between marks and use at most five marks per stream. Private review text is never public.',
   markRequestCheckedUnderQuota:
     'Mark request checked under quota and cooldown. Clean valid marks become public automatically; held marks stay private until moderator approval.',
   markRequestProcessedUnderThe:

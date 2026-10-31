@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-31T11:49:01.809Z",
+  "sourceLead": "01a1705c-a87d-7143-80f6-021e47b78ced",
+  "applicationSourceRuns": [
+    329,
+    330,
+    331
+  ],
+  "fixtureRuns": [
+    332,
+    333
+  ],
+  "qa": {
+    "nativeTests": 1265,
+    "nativeSkipped": 0,
+    "browserFlows": 46,
+    "browserChecks": 153,
+    "execution": "OS-isolated Node22/Chromium; mock provider endpoints"
+  },
+  "readOnlyProductionObservation": {
+    "at": "2026-10-31T11:19:19.975Z",
+    "approvedLightStoredInCurrentHolderSession": true,
+    "holder": "olsols3",
+    "rings": 12,
+    "oldAtlasApprovedCount": 0,
+    "oldKeeperGlyphTotal": 0,
+    "productionDataWritten": false,
+    "overlayLiveSocketNotVerified": true
+  },
+  "changes": [
+    "Current approved/unblocked live marks are separate from immutable arrival archives in Atlas/Keeper; overlay decoded glyph rendering covered.",
+    "Only configured overlay?channel login/id aliases redirect relatively to canonical overlay id; unknown/duplicate/injected targets rejected.",
+    "One-word grammar unchanged; explicit !mark light example added.",
+    "Setup pending resolves to success/error/timeout/authorization guidance;401 adjacent/global feedback covered.",
+    "Softer waiting-for-Twitch copy preserves verified-arrival and claim authority."
+  ],
+  "privacy": [
+    "No pending text/private viewer IDs exposed.",
+    "Both stores cover forget/block/pause/offline/former-holder and replay/move behavior.",
+    "No historical marks rewritten, approval/quota reset or migration.",
+    "Fresh full browser cohort preserves trusted Send Off polling-click regression."
+  ],
+  "operator": {
+    "productionPromotionNotPerformed": true,
+    "hardReloadAfterPromotion": "Static modules retain existing one-hour cache policy.",
+    "privatePreviewUsesExistingOwnerCredential": true
+  },
+  "evidence": {
+    "originalOnlyThroughRun": 331,
+    "laterFixtureRunsNotIncluded": true,
+    "secondaryFindings": 0,
+    "wholeEntryOmissions": 8,
+    "chunkCapBytes": 16777216,
+    "totalCapBytes": 33554432
+  },
+  "noLiveTwitchSendPerformed": true
+}

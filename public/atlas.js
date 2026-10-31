@@ -11,6 +11,10 @@ const fitLedger = () => {
 fitLedger();
 ledgerWidth.addEventListener('change', fitLedger);
 const hero = createAtlasHero({ archive: $('atlas-relic') });
+const liveSection = document.createElement('section');
+liveSection.id = 'atlas-current-live';
+liveSection.hidden = true;
+(ledgerDetails ?? $('journey')).before(liveSection);
 const stopId = /^\/stops\/([a-f0-9]{64})$/.exec(location.pathname)?.[1];
 let offset = 0;
 let next = null;
@@ -41,6 +45,8 @@ function chronicleCaption(value) {
   return `Fiction · ${value.source}: ${value.line}`;
 }
 function clear() {
+  liveSection.replaceChildren();
+  liveSection.hidden = true;
   hero.clear();
   $('status').classList.remove('empty-state');
   $('journey').replaceChildren();
@@ -68,6 +74,44 @@ async function load() {
     if (current !== generation) return;
     if (atlasRings(data.rings) === null) throw Error('Invalid rings');
     hero.update(data.rings);
+    if (!stopId && data.current) {
+      const live = data.current;
+      if (
+        !Object.values(keeperNames).includes(live.login) ||
+        live.ringCount !== data.rings ||
+        !Array.isArray(live.marks) ||
+        live.marks.length > 160 ||
+        live.approvedCount !== live.marks.length
+      )
+        throw Error('Invalid live marks');
+      liveSection.append(
+        node('h2', `Current hold · Ring ${live.ringCount} · @${live.login}`),
+        node(
+          'p',
+          `${live.approvedCount} live approved marks. Added during this hold; not the archived arrival snapshot.`,
+        ),
+      );
+      const list = node('ul');
+      for (const mark of live.marks) {
+        if (
+          typeof mark.text !== 'string' ||
+          mark.text.length > 128 ||
+          typeof mark.runeSvg !== 'string' ||
+          mark.runeSvg.length > 4096 ||
+          !mark.runeSvg.startsWith('<svg xmlns="http://www.w3.org/2000/svg"')
+        )
+          throw Error('Invalid live glyph');
+        const image = node('img');
+        image.src = `data:image/svg+xml,${encodeURIComponent(mark.runeSvg)}`;
+        image.width = image.height = 48;
+        image.alt = 'Live approved rune: ' + mark.text;
+        const item = node('li');
+        item.append(image, node('span', mark.text));
+        list.append(item);
+      }
+      liveSection.append(list);
+      liveSection.hidden = false;
+    }
     $('simulator').textContent = data.mode === 'simulator' ? 'SIMULATOR · local test journey' : '';
     $('simulator').hidden = data.mode !== 'simulator';
     if (data.pilotEnabled)

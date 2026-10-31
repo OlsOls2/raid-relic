@@ -610,6 +610,21 @@ export function createApp({
         return result(503, 'Atlas unavailable');
       }
     }
+    if (path.startsWith('/overlay?channel=')) {
+      if (method !== 'GET') return result(405, 'Read only');
+      const match = /^\/overlay\?channel=([a-z0-9_]{1,32})$/.exec(path);
+      const channel =
+        match &&
+        Object.entries(keeperNames).find(
+          ([id, login]) => match[1] === login || match[1] === id,
+        )?.[0];
+      const feeds = overlayFeeds ?? (overlayFeed ? { [overlayFeed.channel]: overlayFeed } : {});
+      if (!channel || !Object.hasOwn(feeds, channel)) return result(404, 'Keeper not configured');
+      return {
+        ...result(307, ''),
+        headers: { location: `/overlay/${channel}`, 'cache-control': 'no-store' },
+      };
+    }
     const feedPath = /^(\/api)?\/overlay\/(\d{1,32})(?:\?(.*))?$/.exec(path);
     if (feedPath) {
       const selected = (overlayFeeds ??

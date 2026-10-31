@@ -1,6 +1,6 @@
 import { seekerState } from './seeker-state.js';
 import { boundedCall } from './bounded.js';
-import { runeSvg } from './marks.js';
+import { runeSvg, publicMarks } from './marks.js';
 
 export const RECEIVING_KEEPERS = Object.freeze({
   1591805230: 'raidrelichq',
@@ -28,8 +28,44 @@ export function keeperNetwork(value = RECEIVING_KEEPERS) {
 }
 const time = (v) => Number.isSafeInteger(v) && v >= 0;
 const count = (v) => Number.isSafeInteger(v) && v >= 0 && v <= 1000000;
+// Current-session content is separate from immutable completed arrival archives.
+export function currentApprovedView(registry, channels, docs, lineage, config) {
+  const host = registry?.holderId;
+  if (!config?.channels.includes(host)) return null;
+  const channel = channels[host],
+    doc = docs[host];
+  const session = doc?.sessions?.find((s) => s.streamId === channel?.streamId);
+  if (
+    !channel?.online ||
+    !channel.optedIn ||
+    channel.paused ||
+    channel.banned ||
+    channel.blockedUserIds?.includes(host) ||
+    !doc ||
+    doc.paused ||
+    doc.blocked?.includes(host) ||
+    doc.context?.blockedUserIds?.includes(host) ||
+    !doc.context?.holdsRelic ||
+    !doc.context.optedIn ||
+    doc.context.keeperId !== host ||
+    doc.context.streamId !== channel.streamId ||
+    !session ||
+    session.closed ||
+    session.marks.length > 160 ||
+    (lineage?.stops?.length ?? 0) > 16
+  )
+    return null;
+  const visible = new Set(publicMarks(doc, host).marks.map((m) => m.id));
+  const marks = session.marks
+    .filter((m) => visible.has(m.id) && !channel.blockedUserIds?.includes(m.userId))
+    .map(({ id, text }) => ({ id, text, runeSvg: runeSvg(text) }));
+  const login = Object.entries(config.logins).find(([, id]) => id === host)?.[0];
+  if (!login) return null;
+  return { login, ringCount: lineage?.stops?.length ?? 0, approvedCount: marks.length, marks };
+}
 // Called from the existing store read transaction. No viewer associations escape.
 export function receivingView(registry, channels, marks, lineage, config, now) {
+  const current = currentApprovedView(registry, channels, marks, lineage, config);
   const names = Object.fromEntries(Object.entries(config?.logins ?? {}).map(([n, id]) => [id, n]));
   const ids = config?.channels ?? [];
   const stops = lineage?.stops ?? [];
@@ -104,6 +140,7 @@ export function receivingView(registry, channels, marks, lineage, config, now) {
             .slice(0, 20)
             .map((m) => ({ text: m.text, runeSvg: runeSvg(m.text) })),
           glyphTotal: latest?.marks?.length ?? 0,
+          ...(current?.login === names[id] ? { current } : {}),
         };
       }),
   };

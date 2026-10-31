@@ -248,6 +248,15 @@ async function captureControl(page) {
 try {
   review = await visualReview({ seekers: true });
   const { page, context, fixture: f, origin } = review;
+  const overlayAlias = await context.request.get(origin + '/overlay?channel=raidrelichq', {
+    maxRedirects: 0,
+  });
+  assert.equal(overlayAlias.status(), 307);
+  assert.equal(overlayAlias.headers().location, '/overlay/' + HOME);
+  assert.equal(
+    (await context.request.get(origin + '/overlay?channel=unknown', { maxRedirects: 0 })).status(),
+    404,
+  );
   await context.addInitScript(() => {
     window.__onboardCopies = [];
     window.__copyDenied = false;
@@ -479,6 +488,9 @@ try {
   assert.equal(controlReads, pendingReadCount + 1);
   assert.equal(f.calls.length, callsBeforePending, 'Pending GET cannot call the provider');
   async function action(id) {
+    const previousGeneration = await page.evaluate(() =>
+      Number(document.body.dataset.controlReadGeneration),
+    );
     const [response] = await Promise.all([
       page.waitForResponse(
         (r) => new URL(r.url()).pathname === '/control/' + OTHER && r.request().method() === 'POST',
@@ -492,7 +504,12 @@ try {
       'first-seek': 'seek-on',
     };
     assert.equal(response.request().postDataJSON().action, expected[id]);
-    await page.waitForFunction(() => !document.querySelector('#refresh').disabled);
+    await page.waitForFunction(
+      (previous) =>
+        Number(document.body.dataset.controlReadGeneration) > previous &&
+        !document.querySelector('#refresh').disabled,
+      previousGeneration,
+    );
   }
   stage = 'explicit-setup';
   await action('first-bootstrap');
@@ -517,6 +534,151 @@ try {
   assert.notEqual((await f.runtime.state.getStreamStatus(OTHER)).seeking, true);
   assert.equal(await page.locator('#setup-primary > button').getAttribute('id'), 'first-bootstrap');
   assert.equal(await page.locator('#first-keep').isVisible(), false);
+  // Keep finishes by moving focus to Add overlay. Join that real completion
+  // before navigating back; otherwise its late focus can close Setup again.
+  await page.waitForFunction(
+    () =>
+      document.querySelector('#overlay-step').open && !document.querySelector('#refresh').disabled,
+  );
+  async function openReadySetup() {
+    await page.waitForFunction(
+      () =>
+        !document.querySelector('#refresh').disabled &&
+        !document.querySelector('#first-bootstrap').disabled,
+    );
+    await page.getByRole('link', { name: 'Set up channel', exact: true }).click();
+    await page.waitForFunction(
+      () =>
+        document.querySelector('#setup-step').open &&
+        !document.querySelector('#first-bootstrap').disabled,
+    );
+    assert.equal(await page.locator('#first-bootstrap').isVisible(), true);
+  }
+  await openReadySetup();
+  stage = 'setup-slow-error-recovery';
+  const setupPath = '**/control/' + OTHER;
+  let releaseSetup;
+  const heldSetup = new Promise((resolve) => {
+    releaseSetup = resolve;
+  });
+  let slowSetupPosts = 0;
+  const callsBeforeSlowSetup = f.calls.length;
+  const channelBeforeSlowSetup = await f.runtime.state.getStreamStatus(OTHER);
+  const registryBeforeSlowSetup = await f.runtime.state.getKeeperRegistry();
+  const slowSetup = async (route) => {
+    if (
+      route.request().method() !== 'POST' ||
+      route.request().postDataJSON()?.action !== 'bootstrap'
+    )
+      return route.continue();
+    slowSetupPosts++;
+    await heldSetup;
+    await route.fulfill({
+      status: 503,
+      contentType: 'application/json',
+      body: JSON.stringify({ status: 'unavailable' }),
+    });
+  };
+  await page.route(setupPath, slowSetup);
+  try {
+    await Promise.all([
+      page.waitForRequest(
+        (r) =>
+          new URL(r.url()).pathname === '/control/' + OTHER &&
+          r.method() === 'POST' &&
+          r.postDataJSON()?.action === 'bootstrap',
+      ),
+      page.locator('#first-bootstrap').click(),
+    ]);
+    await page.clock.runFor(1001);
+    assert.match(await page.locator('#setup-flow-status').textContent(), /Setup request pending/);
+    assert.equal(await page.locator('#first-bootstrap').isDisabled(), true);
+  } finally {
+    releaseSetup();
+  }
+  await page.waitForFunction(() =>
+    document.querySelector('#setup-flow-status').textContent.includes('Setup stopped.'),
+  );
+  assert.doesNotMatch(await page.locator('#result').textContent(), /Request pending/);
+  await page.waitForFunction(() => !document.querySelector('#refresh').disabled);
+  await page.clock.runFor(5001);
+  assert.equal(slowSetupPosts, 1, '503 Setup never retries');
+  assert.equal(f.calls.length, callsBeforeSlowSetup);
+  assert.deepEqual(await f.runtime.state.getStreamStatus(OTHER), channelBeforeSlowSetup);
+  assert.deepEqual(await f.runtime.state.getKeeperRegistry(), registryBeforeSlowSetup);
+  await page.unroute(setupPath, slowSetup);
+  await openReadySetup();
+  await action('first-bootstrap');
+  await page.waitForFunction(() =>
+    document
+      .querySelector('#setup-flow-status')
+      .textContent.includes('all five subscriptions enabled'),
+  );
+  await openReadySetup();
+  stage = 'setup-unauthorized-feedback';
+  const callsBeforeUnauthorizedSetup = f.calls.length;
+  const channelBeforeUnauthorizedSetup = await f.runtime.state.getStreamStatus(OTHER);
+  const registryBeforeUnauthorizedSetup = await f.runtime.state.getKeeperRegistry();
+  let unauthorizedSetupPosts = 0;
+  const unauthorizedSetup = async (route) => {
+    if (
+      route.request().method() !== 'POST' ||
+      route.request().postDataJSON()?.action !== 'bootstrap'
+    )
+      return route.continue();
+    unauthorizedSetupPosts++;
+    await route.fulfill({
+      status: 401,
+      contentType: 'application/json',
+      body: JSON.stringify({ status: 'unauthorized' }),
+    });
+  };
+  await page.route(setupPath, unauthorizedSetup);
+  // Existing visible polling is active; a real click must terminate both surfaces.
+  const [unauthorizedResponse] = await Promise.all([
+    page.waitForResponse(
+      (r) => new URL(r.url()).pathname === '/control/' + OTHER && r.request().method() === 'POST',
+    ),
+    page.locator('#first-bootstrap').click(),
+  ]);
+  assert.equal(unauthorizedResponse.status(), 401);
+  await page.waitForFunction(() =>
+    document
+      .querySelector('#setup-flow-status')
+      .textContent.includes('Control session expired or unauthorized.'),
+  );
+  const unauthorizedMessage =
+    'Control session expired or unauthorized. Reconnect this matching Keeper; no new Send Off is authorized.';
+  assert.equal(await page.locator('#setup-flow-status').textContent(), unauthorizedMessage);
+  assert.equal(await page.locator('#result').textContent(), unauthorizedMessage);
+  assert.equal(await page.locator('#stop-setup').isHidden(), true);
+  assert.equal(await page.locator('#first-bootstrap').isDisabled(), true);
+  await page.clock.runFor(45001);
+  assert.equal(unauthorizedSetupPosts, 1, 'Unauthorized Setup never retries');
+  assert.equal(
+    f.calls.length,
+    callsBeforeUnauthorizedSetup,
+    'Denied mock never reaches provider or authorization refresh',
+  );
+  assert.deepEqual(await f.runtime.state.getStreamStatus(OTHER), channelBeforeUnauthorizedSetup);
+  assert.deepEqual(await f.runtime.state.getKeeperRegistry(), registryBeforeUnauthorizedSetup);
+  await page.unroute(setupPath, unauthorizedSetup);
+  // The response above was an intercepted failure, not extension of a real session.
+  // Explicit read recovers this still-valid local fixture for the remaining checks.
+  const [recoveryRead] = await Promise.all([
+    page.waitForResponse(
+      (r) =>
+        new URL(r.url()).pathname === '/control/' + OTHER + '/status' &&
+        r.request().method() === 'GET',
+    ),
+    page.locator('#refresh').click(),
+  ]);
+  assert.equal(recoveryRead.status(), 200);
+  await page.waitForFunction(
+    () =>
+      document.querySelector('#result').textContent.startsWith('Session read.') &&
+      !document.querySelector('#first-bootstrap').disabled,
+  );
   await page.getByRole('link', { name: 'Add overlay', exact: true }).click();
   assert.equal(
     await page.locator('#overlay-primary > button').getAttribute('id'),

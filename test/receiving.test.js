@@ -1,12 +1,82 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { pilotFixture, HOME, OTHER, BOT } from '../test-support/pilot-fixture.js';
-import { createReceiving, keeperNetwork } from '../src/receiving.js';
+import { createReceiving, keeperNetwork, currentApprovedView } from '../src/receiving.js';
 import { keeperCardFilename } from '../public/keeper-card.js';
-import { parseMarkCommand } from '../src/marks.js';
+import { parseMarkCommand, runeSvg } from '../src/marks.js';
 
 const posts = (f) =>
   f.calls.filter((c) => c.url.endsWith('/chat/messages')).map((c) => JSON.parse(c.body));
+test('current hold projection is bounded, distinct and fails closed for revoked or inactive contexts', () => {
+  const registry = { holderId: HOME },
+    lineage = { stops: [{}] };
+  const config = { channels: [HOME, OTHER], logins: { raidrelichq: HOME, olsols2: OTHER } };
+  const channel = {
+    online: true,
+    optedIn: true,
+    paused: false,
+    streamId: 'stream-one',
+    blockedUserIds: [],
+  };
+  const doc = {
+    context: {
+      streamId: 'stream-one',
+      keeperId: HOME,
+      holdsRelic: true,
+      optedIn: true,
+      blockedUserIds: [],
+    },
+    paused: false,
+    blocked: [],
+    sessions: [
+      {
+        streamId: 'stream-one',
+        closed: false,
+        marks: Array.from({ length: 160 }, (_, i) => ({
+          id: 'm' + (i + 1),
+          text: 'light',
+          userId: String(9000 + i),
+          status: 'approved',
+        })),
+      },
+    ],
+  };
+  const project = (c = channel, d = doc, r = registry) =>
+    currentApprovedView(r, { [HOME]: c }, { [HOME]: d }, lineage, config);
+  assert.equal(project().approvedCount, 160);
+  assert.equal(new Set(project().marks.map((m) => m.id)).size, 160);
+  assert.doesNotMatch(JSON.stringify(project()), /userId|9000|stream-one/);
+  for (const patch of [
+    { online: false },
+    { optedIn: false },
+    { paused: true },
+    { banned: true },
+    { streamId: 'another' },
+    { blockedUserIds: [HOME] },
+  ])
+    assert.equal(project({ ...channel, ...patch }), null);
+  for (const patch of [
+    { paused: true },
+    { blocked: [HOME] },
+    { context: { ...doc.context, holdsRelic: false } },
+    { context: { ...doc.context, optedIn: false } },
+    { context: { ...doc.context, keeperId: OTHER } },
+  ])
+    assert.equal(project(channel, { ...doc, ...patch }), null);
+  const closed = structuredClone(doc);
+  closed.sessions[0].closed = true;
+  assert.equal(project(channel, closed), null);
+  const over = structuredClone(doc);
+  over.sessions[0].marks.push({ ...over.sessions[0].marks[0], id: 'm161' });
+  assert.equal(project(channel, over), null);
+  const privateDoc = structuredClone(doc);
+  privateDoc.sessions[0].marks[0].status = 'pending';
+  privateDoc.sessions[0].marks[1].status = 'rejected';
+  privateDoc.blocked.push('9002');
+  privateDoc.context.blockedUserIds.push('9003');
+  assert.equal(project({ ...channel, blockedUserIds: ['9004'] }, privateDoc).approvedCount, 155);
+  assert.equal(project(channel, doc, { holderId: OTHER }), null);
+});
 async function setup(kind, enabled = true) {
   const f = await pilotFixture(kind, {
     extraBotScopes: ['user:read:moderated_channels'],
@@ -118,6 +188,47 @@ for (const kind of ['memory', 'firestore']) {
     );
     assert.ok(!JSON.stringify(v).includes('spoiler'));
     assert.ok(!JSON.stringify(v).includes('7101'));
+    // Current-hold approval is public on the live overlay, not a rewrite of the
+    // immutable completed ring's source-mark archive.
+    await f.chat(OTHER, '7401', '!mark light');
+    assert.equal(posts(f).at(-1).message, 'Your mark is public on the relic.');
+    const current = JSON.parse((await f.request(`/api/overlay/${OTHER}`)).body.toString());
+    assert.equal(current.lineageRings, 1);
+    assert.ok(current.marks.some((m) => m.id && m.runeSvg === runeSvg('light')));
+    const currentIds = current.marks.map((m) => m.id);
+    f.advance(30001);
+    await f.chat(OTHER, '7402', '!mark spoiler');
+    assert.match(posts(f).at(-1).message, /Waiting for moderator approval.*private/);
+    const held = JSON.parse((await f.request(`/api/overlay/${OTHER}`)).body.toString());
+    assert.deepEqual(
+      held.marks.map((m) => m.id),
+      currentIds,
+    );
+    assert.ok(!JSON.stringify(held).includes('spoiler'));
+    const archive = JSON.parse((await f.request('/api/atlas')).body.toString());
+    assert.equal(archive.rings, 1);
+    assert.equal(archive.stops[0].approvedCount, 1);
+    assert.equal(archive.current.login, 'olsols2');
+    assert.equal(archive.current.ringCount, 1);
+    assert.equal(archive.current.approvedCount, 1);
+    assert.deepEqual(
+      archive.current.marks.map((m) => m.text),
+      ['light'],
+    );
+    const profile = JSON.parse((await f.request('/api/keeper/olsols2')).body.toString()).profile;
+    assert.deepEqual(profile.current, archive.current);
+    assert.equal(profile.glyphTotal, 1, 'Arrival archive remains moon only');
+    assert.equal(
+      JSON.parse((await f.request('/api/keeper/raidrelichq')).body.toString()).profile.current,
+      undefined,
+    );
+    assert.doesNotMatch(JSON.stringify(archive.current), /spoiler|7401|7402|userId|streamId/);
+    await f.chat(OTHER, '7403', '!mark first light');
+    assert.match(posts(f).at(-1).message, /one allowed word or emoji.*!mark light/);
+    assert.deepEqual(
+      JSON.parse((await f.request(`/api/overlay/${OTHER}`)).body.toString()).marks.map((m) => m.id),
+      currentIds,
+    );
     await f.chat(OTHER, '7301', '!where');
     assert.match(
       posts(f).at(-1).message,
@@ -134,6 +245,49 @@ for (const kind of ['memory', 'firestore']) {
     const calls = f.calls.length;
     await f.runtime.receiving.page();
     assert.equal(f.calls.length, calls, 'gate off has no provider operations');
+    await f.chat(OTHER, '7401', '!relic forgetme');
+    assert.equal(
+      JSON.parse((await f.request('/api/atlas')).body.toString()).current.approvedCount,
+      0,
+    );
+    await f.chat(OTHER, '7404', '!mark star');
+    f.advance(10001);
+    await f.chat(OTHER, OTHER, '!relic block 7404');
+    assert.equal(
+      JSON.parse((await f.request('/api/atlas')).body.toString()).current.approvedCount,
+      0,
+    );
+    await f.chat(OTHER, '7405', '!mark dawn');
+    await f.control(OTHER, 'pause');
+    assert.equal(JSON.parse((await f.request('/api/atlas')).body.toString()).current, null);
+    await f.control(OTHER, 'resume');
+    assert.deepEqual(
+      JSON.parse((await f.request('/api/atlas')).body.toString()).current.marks.map((m) => m.text),
+      ['dawn'],
+    );
+    await f.control(OTHER, 'send:' + HOME);
+    f.advance();
+    await f.raid(OTHER, HOME, 1);
+    await f.chat(OTHER, '7501', '!offer');
+    await f.chat(HOME, '7502', '!accept', { messageId: 'return-accept' });
+    const moved = JSON.parse((await f.request('/api/atlas')).body.toString());
+    assert.equal(moved.rings, 2);
+    assert.equal(moved.current.login, 'raidrelichq');
+    assert.ok(!moved.current.marks.some((m) => m.text === 'dawn'));
+    assert.equal(moved.stops.at(-1).approvedCount, 1);
+    assert.equal(
+      JSON.parse((await f.request('/api/keeper/olsols2')).body.toString()).profile.current,
+      undefined,
+    );
+    await f.chat(HOME, '7502', '!accept', { messageId: 'return-accept' });
+    assert.deepEqual(JSON.parse((await f.request('/api/atlas')).body.toString()), moved);
+    await f.chat(OTHER, '7405', '!relic forgetme');
+    assert.equal(
+      JSON.parse((await f.request('/api/atlas')).body.toString()).stops.at(-1).approvedCount,
+      0,
+    );
+    await f.signed('stream.offline', { broadcaster_user_id: HOME }, HOME);
+    assert.equal(JSON.parse((await f.request('/api/atlas')).body.toString()).current, null);
   });
 }
 
