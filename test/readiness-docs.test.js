@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, stat } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-test('judge front door uses activated read-only judge admission and preserves scoped historical owner-preview proof', async () => {
+test('judge front door uses public no-code browsing with guarded controls and optional sandbox history', async () => {
   const s = await readFile('README.md', 'utf8');
   const guide = await readFile('docs/PROJECT_GUIDE.md', 'utf8');
   const quick = await readFile('docs/JUDGES_QUICKSTART.md', 'utf8');
@@ -22,7 +22,8 @@ test('judge front door uses activated read-only judge admission and preserves sc
     'Unofficial fan project. Not affiliated with Twitch.',
   ])
     assert.ok(s.includes(term), term);
-  const origin = 'https://judge-mode-1031---raid-relic-vz4bhnskgq-uc.a.run.app';
+  const origin = 'https://raid-relic-760724762396.us-central1.run.app';
+  const sandboxOrigin = 'https://judge-mode-1031---raid-relic-vz4bhnskgq-uc.a.run.app';
   for (const route of [
     '',
     '/atlas/',
@@ -33,20 +34,33 @@ test('judge front door uses activated read-only judge admission and preserves sc
     '/demo/',
   ])
     assert.ok(s.includes(origin + route), route);
-  assert.match(s, /read-only judge sandbox/i);
-  assert.match(s, /`<JUDGE_CODE>`[^\n]*private judging instructions/);
-  assert.match(s, /no owner contact or Twitch login is needed/);
-  assert.match(s, /Never put the code in this repository or a URL/);
-  assert.match(s, /server read-only and judge admission are ON/);
-  assert.match(s, /2026-11-16T00:00:00Z exclusive/);
-  assert.match(s, /OAuth, control, Setup, Send Off, chat and other Twitch actions are blocked/);
-  assert.match(s, /raid-relic-judge-mode-fixed-1031/);
-  assert.match(s, /runtime f8151d2/);
-  assert.match(s, /26 HTTP-only checks[^\n]*separately from the first revision/);
-  assert.match(s, /HTTP acceptance is not deployed browser\/WSS, visual or physical proof/);
-  assert.match(s, /owner-only preview[^\n]*historical, not the submission link/);
-  for (const doc of [quick, admission]) {
+  const draft = await readFile('docs/DEVPOST_DRAFT.md', 'utf8');
+  for (const doc of [s, quick, admission, draft]) {
     assert.ok(doc.includes(origin));
+    assert.match(doc, /no access code and no login/i);
+    assert.match(doc, /Public content browsing is read-only/);
+    assert.match(doc, /production is not globally read-only/);
+    assert.match(
+      doc,
+      /Keeper control requires Twitch sign-in as one of the owner-admitted creator channels/,
+    );
+    for (const name of ['raidrelichq', 'olsols2', 'olsols3']) assert.ok(doc.includes(name));
+    assert.match(doc, /Arbitrary judges do not gain controls/i);
+    assert.match(doc, /no consent, live setup or raid authority/);
+    assert.match(doc, /Privacy was[^\n]*prelaunch timing[^\n]*not a judge restriction/i);
+    assert.ok(doc.includes(sandboxOrigin));
+    assert.match(doc, /optional[^\n]*fallback|optional[^\n]*sandbox/i);
+  }
+  assert.match(s, /No owner contact is required/);
+  assert.match(s, /do not trigger Twitch actions/);
+  assert.match(
+    s,
+    /server-enforced OAuth\/control\/SendOff denial applies only there, not to public production/,
+  );
+  assert.match(s, /owner-only preview[^\n]*historical, not the submission link/);
+  assert.match(quick, /Sandbox code-mode guards do not apply to public production/);
+  for (const doc of [quick, admission]) {
+    assert.ok(doc.includes(sandboxOrigin));
     assert.ok(doc.includes('`<JUDGE_CODE>`'));
     assert.match(doc, /no owner contact or Twitch login/i);
     assert.match(doc, /2026-11-16T00:00:00Z exclusive/);
@@ -83,7 +97,7 @@ test('judge front door uses activated read-only judge admission and preserves sc
   assert.match(admission, /P5_PREVIEW_READ_ONLY=true/);
   assert.match(admission, /P5_PREVIEW_PRIVATE_ENABLED=false/);
   assert.match(admission, /JUDGE_ADMISSION_ENABLED=true/);
-  assert.ok(admission.includes('OVERLAY_ORIGIN=' + origin));
+  assert.ok(admission.includes('OVERLAY_ORIGIN=' + sandboxOrigin));
   assert.match(admission, /overlay-sockets\.js[^\n]*rejects upgrades with other request origins/);
   assert.match(admission, /two configuration revisions, one final tagged target/);
   assert.match(admission, /first[^\n]*raid-relic-judge-mode-1031[^\n]*untagged at0%/i);
