@@ -125,7 +125,7 @@ for (const kind of ['memory', 'firestore']) {
     assert.ok(seen.every(validSnapshot));
     off();
   });
-  test(`${kind}: actual latecommands27s/71s get two SENT closed replies, replay/rateblocked never resend or transfer`, async () => {
+  test(`${kind}: actual latecommands27s/71s remain quiet across replay and never transfer`, async () => {
     const f = await setup(kind);
     await f.control(HOME, `send:${OTHER}`);
     f.advance();
@@ -134,21 +134,20 @@ for (const kind of ['memory', 'firestore']) {
     f.advance(end - f.now() + 27000);
     await f.chat(OTHER, OTHER, '!accept', { messageId: 'closed-first' });
     const posts = () => f.calls.filter((c) => c.url.endsWith('/chat/messages'));
-    assert.equal(posts().length, 1);
-    assert.match(JSON.parse(posts()[0].body).message, /binding window has closed/);
+    assert.equal(posts().length, 0);
     f.advance(1000);
     await f.chat(OTHER, OTHER, '!accept', { messageId: 'closed-rate' });
-    assert.equal(posts().length, 1);
+    assert.equal(posts().length, 0);
     f.advance(43000);
     await f.chat(OTHER, OTHER, '!accept', { messageId: 'closed-second' });
-    assert.equal(posts().length, 2);
+    assert.equal(posts().length, 0);
     await f.chat(OTHER, OTHER, '!accept', { messageId: 'closed-first' });
     await f.chat(OTHER, OTHER, '!accept', { messageId: 'closed-rate' });
-    assert.equal(posts().length, 2);
+    assert.equal(posts().length, 0);
     assert.equal(
       (await f.runtime.state.getPrivateClaimAcks(OTHER)).rows.filter((r) => r.status === 'sent')
         .length,
-      2,
+      0,
     );
     const root = await f.runtime.state.getKeeperRegistry();
     assert.equal(root.holderId, HOME);
@@ -156,7 +155,7 @@ for (const kind of ['memory', 'firestore']) {
     assert.equal(root.pendingHop.accepts, undefined);
     assert.equal((await f.runtime.state.getPublicJourney()).rings, 0);
   });
-  test(`${kind}: closed claim replies reject unsafe actors; forgotten/wrong-side commands get status without votes`, async () => {
+  test(`${kind}: closed claims keep forgotten/blocked/copied/wrong-side/bot commands quiet without votes`, async () => {
     const f = await setup(kind);
     await f.control(HOME, `send:${OTHER}`);
     f.advance();
@@ -192,17 +191,7 @@ for (const kind of ['memory', 'firestore']) {
       .filter((c) => c.url.endsWith('/chat/messages'))
       .slice(n)
       .map((c) => JSON.parse(c.body));
-    assert.deepEqual(
-      extra.map((c) => c.broadcaster_id),
-      [HOME, HOME, OTHER],
-    );
-    assert.ok(
-      extra.every(
-        (c) =>
-          c.message ===
-          'No Send Off is active yet. The Keeper starts one in private control; after the raid arrives, sending chat uses !offer and receiving chat uses !accept.',
-      ),
-    );
+    assert.deepEqual(extra, []);
     assert.equal((await f.runtime.state.getPublicJourney()).rings, 0);
     for (const host of [HOME, OTHER]) {
       const rows = await f.runtime.state.getPrivateClaimAcks(host);

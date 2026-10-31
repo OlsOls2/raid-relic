@@ -29,6 +29,7 @@ import {
   arrivalNotice,
   completionEligible,
   cancelCompletionNotices,
+  trackHopNotices,
 } from './claim-ack.js';
 import { hash as observationHash } from './crypto.js';
 import {
@@ -347,6 +348,7 @@ export function createFirestoreStore(
             op,
             now,
           );
+          trackHopNotices(transition?.registry ?? registry, sending.registry);
           claiming = reduceClaims(
             sending.registry,
             channelMap,
@@ -599,7 +601,8 @@ export function createFirestoreStore(
           previous?.rows?.some(
             (r) => r.key === op.key && r.status === 'dispatching' && r.p7Proof?.to === host,
           );
-        const history = active ? (await tx.get(ref('lineage', 'single'))).data() : null,
+        const history = (active || (op.type === 'claim' && previous?.rows?.some((r) => r.key === op.key && r.completion)))
+            ? (await tx.get(ref('lineage', 'single'))).data() : null,
           jobs = active ? (await tx.get(ref('p7Actions', host))).data() : null;
         const promptTarget = registry?.pendingHop?.to;
         const receiverRef =
@@ -611,7 +614,7 @@ export function createFirestoreStore(
           channel,
           marks,
           now,
-          completionEligible(previous, op.key, registry, channels, markMap, now),
+          completionEligible(previous, op.key, registry, channels, markMap, now, history),
         );
         let result = next.result,
           queued;
@@ -644,6 +647,7 @@ export function createFirestoreStore(
           );
           if (notice) {
             tx.set(receiverRef, notice.doc);
+            tx.set(ref('keeperRegistry', 'single'), registry);
             result = { ...result, arrivalAcks: [{ host: promptTarget, key: notice.key }] };
           }
         }
@@ -668,6 +672,8 @@ export function createFirestoreStore(
           marks[id] = (await tx.get(ref('markChannels', id))).data();
         }
         const n = p7Mutation(previous, op, op.flags, registry, history, channels, marks, now);
+        if (op.type === 'claim' && n.result?.kind === 'announcement')
+          tx.set(ref('keeperRegistry', 'single'), registry);
         if (n.doc) tx.set(r, n.doc);
         return n.result;
       });
@@ -823,6 +829,7 @@ export function createFirestoreStore(
           marks[host] = (await tx.get(ref('markChannels', host))).data();
         }
         const next = sendState(registry, channels, marks, config, op, now);
+        trackHopNotices(registry, next.registry);
         if (next.result?.status === 'reserved') wanderActivity(next.registry, now, wander?.enabled);
         tx.set(ref('keeperRegistry', 'single'), next.registry);
         return next.result;

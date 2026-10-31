@@ -1,6 +1,6 @@
 import { hash } from './crypto.js';
 import { boundedCall } from './bounded.js';
-import { completionEligible } from './claim-ack.js';
+import { completionEligible, reserveHopNotice, announcementBudgetAvailable } from './claim-ack.js';
 export { P7_SCOPES } from './p7-scopes.js';
 export const P7_KINDS = Object.freeze(['announcement', 'pin', 'shoutout']);
 export function p7Config(env = {}) {
@@ -134,6 +134,7 @@ export function enqueueP7(
   const keys = [];
   for (const kind of P7_KINDS) {
     if (!flags[kind]) continue;
+    if (kind === 'announcement' && !announcementBudgetAvailable(registry?.pendingHop)) continue;
     const key = p7Key(kind, host, base.proof.eventId);
     if (doc.rows.some((r) => r.key === key)) continue;
     if (doc.rows.length >= 64) continue;
@@ -164,6 +165,7 @@ export function p7Mutation(previous, op, flags, registry, lineage, channels, mar
     row?.status === 'queued' &&
     (!P7_KINDS.includes(row.kind) ||
       !flags[row.kind] ||
+      (row.kind === 'announcement' && !announcementBudgetAvailable(registry?.pendingHop)) ||
       !fresh(row, registry, lineage, channels, marks, now) ||
       row.key !== p7Key(row.kind, row.host, row.proof.eventId))
   ) {
@@ -182,6 +184,10 @@ export function p7Mutation(previous, op, flags, registry, lineage, channels, mar
       (kind === 'shoutout' && now < (doc.cooldowns[pair] ?? 0))
     ) {
       row.status = 'cooldown';
+      delete row.proof;
+      delete row.messageId;
+    } else if (kind === 'announcement' && !reserveHopNotice(registry.pendingHop, 'announcement')) {
+      row.status = 'cancelled';
       delete row.proof;
       delete row.messageId;
     } else {

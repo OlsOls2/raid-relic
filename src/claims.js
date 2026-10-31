@@ -1,4 +1,4 @@
-import { claimVoteCopy, BOT_COPY } from '../public/ritual-copy.js';
+import { claimVoteCopy } from '../public/ritual-copy.js';
 import { dequeueSeeker } from './seeker-state.js';
 import { RECEIVING_KEEPERS } from './receiving.js';
 import { observeStreak, completeStreak, stopStreak } from './streaks.js';
@@ -6,6 +6,7 @@ import { scoreCompletion } from './scoreboard.js';
 import { hash } from './crypto.js';
 import { runeSvg } from './marks.js';
 import { eligible } from './send-state.js';
+import { reserveHopNotice } from './claim-ack.js';
 
 export const LINEAGE_LIMITS = Object.freeze({ stops: 16, marksPerStop: 160, bytes: 524288 });
 export const emptyLineage = () => ({ stops: [] });
@@ -77,6 +78,14 @@ export function reduceClaims(
       );
     });
   const hop = registry.pendingHop;
+  // Landing replaces the provisional hop in send-state. The matching existing
+  // intent carries only this six-bit reservation watermark across that rebuild.
+  const noticeIntent = hop && registry.send?.id === hop.intentId &&
+    registry.send?.sourceId === hop?.from && registry.send?.targetId === hop?.to &&
+    registry.send?.sourceStreamId === hop?.sourceStreamId &&
+    registry.send?.targetStreamId === hop?.targetStreamId ? registry.send : null;
+  if (noticeIntent?.noticeMask !== undefined && hop.noticeMask === undefined)
+    hop.noticeMask = noticeIntent.noticeMask;
   if (hop && !hop.finalized && !hop.cancelled) {
     const source = channels[hop.from];
     const target = channels[hop.to];
@@ -197,7 +206,14 @@ export function reduceClaims(
           hop.movedOffers ??= [];
           hop.movedOffers.push(chat.chatterId);
         }
-        acknowledgement = claimVoteCopy(side, hop, names);
+        const slot =
+          side === 'offers' && chat.broadcasterId === hop.from && !(hop.noticeMask & 1)
+            ? 'sender'
+            : 'progress1';
+        if (reserveHopNotice(hop, slot)) {
+          acknowledgement = claimVoteCopy(side, hop, names);
+          acknowledgementKind = slot === 'sender' ? 'hop-sender' : 'hop-reserved';
+        }
       }
     }
     if (
@@ -236,7 +252,7 @@ export function reduceClaims(
         if (Buffer.byteLength(JSON.stringify(lineage)) > LINEAGE_LIMITS.bytes)
           throw new Error('Lineage capacity reached');
         completedScore = scoreCompletion(hop, [...hop.offers, ...hop.accepts]);
-        acknowledgement = null;
+        if (acknowledgementKind !== 'hop-sender') acknowledgement = null;
         delete registry.echo;
         registry.holderId = hop.to;
         dequeueSeeker(channels[hop.to], now);
@@ -298,8 +314,9 @@ export function reduceClaims(
         (id) => !channels[id].blockedUserIds.includes(actor) && !marks[id].blocked.includes(actor),
       )
     ) {
-      acknowledgement = BOT_COPY.closedClaim;
-      acknowledgementKind = 'closed';
+      // Closed votes are quiet: no actor-specific error lane can bypass the
+      // aggregate reservation. The public deadline remains authoritative.
+      acknowledgement = null;
       ackDeadline = now;
     }
   }
@@ -335,10 +352,17 @@ export function reduceClaims(
         ),
     ),
   );
-  if (Buffer.byteLength(JSON.stringify(registry)) > 4096)
+  if (noticeIntent && registry.send === noticeIntent && hop.noticeMask !== undefined)
+    noticeIntent.noticeMask = hop.noticeMask;
+  // Completion/arrival reserve later in this same transaction. Account for
+  // their widest mask now without increasing the existing registry byte cap.
+  const registryBytes = () => Buffer.byteLength(JSON.stringify(
+    hop ? { ...registry, pendingHop: { ...hop, noticeMask: 63 } } : registry,
+  ));
+  if (registryBytes() > 4096)
     throw new Error('Relic registry capacity reached');
   observeStreak(registry, now, streakEnabled);
-  if (streakEnabled && Buffer.byteLength(JSON.stringify(registry)) > 4096)
+  if (streakEnabled && registryBytes() > 4096)
     throw Error('Relic registry capacity reached');
   return {
     registry,
@@ -350,7 +374,10 @@ export function reduceClaims(
     dequeued: completedScore
       ? { id: registry.holderId, channel: channels[registry.holderId] }
       : null,
-    acknowledgement,
+    // Truthy quiet result marks votes as handled for the generic command lane.
+    // It carries no text, actor history or delivery authority.
+    acknowledgement: acknowledgement ??
+      (hop && ['offer', 'accept'].includes(chat?.markAction?.type) ? { quiet: true } : null),
     acknowledgementKind,
     ackDeadline: ackDeadline ?? registry.pendingHop?.endsAt,
   };

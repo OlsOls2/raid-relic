@@ -29,6 +29,7 @@ import {
   arrivalNotice,
   completionEligible,
   cancelCompletionNotices,
+  trackHopNotices,
 } from './claim-ack.js';
 import { hash as observationHash } from './crypto.js';
 import {
@@ -242,6 +243,7 @@ export function createMemoryState({
               }
             : { type: 'noop' };
         sending = sendState(transition?.registry ?? registry, channelMap, markMap, config, op, now);
+        trackHopNotices(transition?.registry ?? registry, sending.registry);
         claiming = reduceClaims(
           sending.registry,
           channelMap,
@@ -581,6 +583,7 @@ export function createMemoryState({
         op,
         now,
       );
+      trackHopNotices(registry, next.registry);
       if (next.result?.status === 'reserved') wanderActivity(next.registry, now, wander?.enabled);
       registry = next.registry;
       return next.result;
@@ -675,7 +678,7 @@ export function createMemoryState({
         channels.get(host),
         markDocs.get(host),
         now,
-        completionEligible(previous, op.key, registry, cs, ms, now),
+        completionEligible(previous, op.key, registry, cs, ms, now, lineage),
       );
       let result = next.result;
       if (

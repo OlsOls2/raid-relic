@@ -66,26 +66,22 @@ for (const kind of ['memory', 'firestore']) {
     assert.match(JSON.parse(posts()[1].body).message, /The relic has arrived.*!accept.*!offer/);
     assert.equal(posts()[0].headers.Authorization, `Bearer access-${BOT}`);
     await vote(f, OTHER, HOME, 'same-user', '!accept');
-    assert.equal(posts().length, 3);
-    assert.equal(
-      JSON.parse(posts()[2].body).message,
-      'That vote was not counted. Check the ritual, chat role and deadline.',
-    );
+    assert.equal(posts().length, 2, 'uncounted votes cannot use a generic reply outside the hop budget');
     await vote(f, OTHER, HOME, 'same-user', '!accept');
-    assert.equal(posts().length, 3);
+    assert.equal(posts().length, 2);
     await vote(f, OTHER, OTHER, 'accept-one', '!accept');
-    assert.equal(posts().length, 5);
+    assert.equal(posts().length, 4);
     assert.deepEqual(
       posts()
-        .slice(3)
+        .slice(2)
         .map((p) => JSON.parse(p.body).broadcaster_id),
       [HOME, OTHER],
     );
-    for (const p of posts().slice(3)) assert.match(JSON.parse(p.body).message, /Claim complete/);
+    for (const p of posts().slice(2)) assert.match(JSON.parse(p.body).message, /Claim complete/);
     assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, OTHER);
     assert.equal((await f.runtime.state.getPublicJourney()).rings, 1);
     await vote(f, OTHER, OTHER, 'accept-one', '!accept');
-    assert.equal(posts().length, 5);
+    assert.equal(posts().length, 4);
     f.advance();
     await f.control(OTHER, `send:${HOME}`);
     f.advance();
@@ -446,7 +442,7 @@ for (const kind of ['memory', 'firestore']) {
     assert.equal((await f.runtime.state.getKeeperRegistry()).holderId, HOME);
     assert.equal((await f.runtime.state.getPublicJourney()).rings, 0);
   });
-  test(`${kind}: already committed votes have30s delivery grace, equality-deadline votes never count and get a closed-window reply`, async () => {
+  test(`${kind}: already committed votes have30s delivery grace, equality-deadline votes never count and stay quiet`, async () => {
     const f = await setup(kind),
       process = f.runtime.claimAcks.process;
     f.runtime.claimAcks.process = async () => {};
@@ -457,16 +453,13 @@ for (const kind of ['memory', 'firestore']) {
     await process(HOME, ackKey({ broadcasterId: HOME, chatterId: HOME, messageId: 'grace-vote' }));
     assert.equal((await f.runtime.state.getPrivateClaimAcks(HOME)).rows[0].status, 'sent');
     await vote(f, OTHER, OTHER, 'late-vote', '!accept');
-    assert.equal((await f.runtime.state.getPrivateClaimAcks(OTHER)).rows[0].status, 'queued');
-    assert.match(
-      (await f.runtime.state.getPrivateClaimAcks(OTHER)).rows[0].message,
-      /binding window has closed/,
-    );
+    assert.equal((await f.runtime.state.getPrivateClaimAcks(OTHER)).rows[0].status, 'ignored');
+    assert.equal((await f.runtime.state.getPrivateClaimAcks(OTHER)).rows[0].message, undefined);
     await process(
       OTHER,
       ackKey({ broadcasterId: OTHER, chatterId: OTHER, messageId: 'late-vote' }),
     );
-    assert.equal((await f.runtime.state.getPrivateClaimAcks(OTHER)).rows[0].status, 'sent');
+    assert.equal((await f.runtime.state.getPrivateClaimAcks(OTHER)).rows[0].status, 'ignored');
     assert.equal((await f.runtime.state.getPublicJourney()).rings, 0);
   });
 }
