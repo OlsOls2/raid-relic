@@ -39,7 +39,7 @@ test('polish keeps source and corner assets accessible and excludes local browse
     ),
   );
   const demo = await readFile('docs/DEMO_SCRIPT.md', 'utf8');
-  assert.match(demo, /2:45/);
+  assert.match(demo, /^# Raid Relic demo — 2:55 local owner-review edit\n/);
   assert.match(demo, /01a1705c-a87d-7143-80f6-021e47b78ced/);
   assert.match(demo, /not evidence of completed live validation/);
 });

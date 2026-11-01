@@ -16,7 +16,7 @@ Paste-ready content, prepared1November2026; owner review and actual submission a
 
 **Repository field:** PENDING owner-approved judge access. Intended repository: https://github.com/OlsOls2/raid-relic. Do not promise access until the rules/repository review confirms the required method and owner approval.
 
-**Video field:** PENDING completed genuine footage, owner-approved edit and Public YouTube upload. The required video must be under3minutes and show the project functioning on Twitch AND footage of Codex building; text session cards alone are insufficient. No final video URL or completed genuine integration/build footage is claimed. [2:45 English narration and shot plan](DEMO_SCRIPT.md).
+**Video field:** Local2:55 OWNER-REVIEW V2 edit completed by parent; Public YouTube URL and owner rights approval remain PENDING. Independent V1 review completed PASS for private owner review, not clearance; parent verified V2 corrections, but V2 has not been independently re-reviewed. Neither is unconditional clearance. Parent reports technical full-decode and selected-frame checks, not submission-compliance certification. The required video must show functioning on Twitch AND footage of Codex building; the included new docs/regression refinement is not historical original-build replay, and text session cards alone are insufficient. No upload or submission is claimed. [2:55 local edit manifest and review limits](DEMO_SCRIPT.md).
 
 ## Inspiration
 
@@ -106,7 +106,7 @@ An honest UI needs the same authority boundaries as its backend: accepted is not
 
 Parent subsequently completed G3.05 (`092a89d2e67c12c7f1d3f71667d6a25751140e3d`, full native1268zeroSkip and nine whole-plate native checks) and G4.04 (`e80b322`, native1270zeroSkip, default offline reliability and twelve actual repository-harness production navigations). LCP route maxima508/404/364/364ms compare with the14:13 baseline428/380/356/364ms; no speedup, forced server-cold, p95 or SLA claim follows. These earlier overlapping cohorts remain separate from the final release proof below. [Cold-navigation scope](COLD_NAVIGATION.md) · [Panel status](PANEL_STATUS.md). Physical Twitch/OBS, manual assistive-technology checks and native OS sharing remain manual work; no performance metric or completion is invented. Compaction G6.07 is outside this authorization. Consented pilot expansion and optional paid/clipping work require separate owner decisions; Wander remains off with its scheduler commented pending explicit GO.
 
-The owner may arrange genuine consenting live footage separately from the GET-only judge walk; see the [2:45 shot list](DEMO_SCRIPT.md). No footage, external submission, publication, promotion or new consent was created by this worker. The repository and this draft remain private. Use original procedural visuals and existing MIT/OFL notices, no music, third-party logos, trademark artwork or official endorsement.
+The owner may arrange genuine consenting live footage separately from the GET-only judge walk; see the [2:55 local edit manifest](DEMO_SCRIPT.md). No footage, external submission, publication, promotion or new consent was created by this worker. The repository and this draft remain private. Use original procedural visuals and existing MIT/OFL notices, no music, third-party logos, trademark artwork or official endorsement.
 
 ## Historical release proof · parent receipt 31 October 2026, 15:43:10.690 UTC
 

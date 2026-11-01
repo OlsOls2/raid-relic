@@ -183,9 +183,12 @@ test('judge front door lists only public production with guarded controls and sc
     /earlier overlapping cohorts remain separate from the dated historical release proof/,
   );
   assert.match(quick, /no speedup, forced server-cold, p95 or SLA claim/);
-  assert.match(demo, /2:45 shot list/);
+  assert.match(demo, /2:55 local owner-review edit/);
   assert.match(demo, /Keep the edit below three minutes/);
-  assert.match(demo, /recording plan, not completed footage/);
+  assert.match(
+    demo,
+    /final local \*\*OWNER-REVIEW\*\* edit is complete, not uploaded or submitted/,
+  );
   assert.match(demo, /Include only genuine consenting footage/);
   assert.match(demo, /Genuine live integration footage unavailable/);
   assert.match(demo, /Never mix simulated votes into live proof/);
@@ -198,7 +201,7 @@ test('judge front door lists only public production with guarded controls and sc
     '**Built with:**',
     '**Primary Codex session ID:** 01a1705c-a87d-7143-80f6-021e47b78ced',
     '**Repository field:** PENDING',
-    '**Video field:** PENDING',
+    '**Video field:** Local2:55 OWNER-REVIEW V2 edit completed by parent',
   ])
     assert.ok(draft.includes(value), value);
   for (const [id, role] of [
@@ -239,7 +242,93 @@ test('judge front door lists only public production with guarded controls and sc
     assert.match(doc, /judge-freeze-on-1031[^\n]*runtime2b218b3/);
     assert.doesNotMatch(doc, /judge-mode|sandbox|access[- ]code|JUDGE_CODE|---raid-relic/);
   }
-  assert.match(demo, /UNCONFIRMED pending incomplete media inventory/);
+  assert.match(demo, /Supplied source availability is not completion proof/);
+  for (const doc of [demo, submission]) {
+    assert.ok(doc.includes('/home/ubuntu/raw-live-raid-1031.mp4'));
+    assert.match(doc, /374[.]65s/);
+    assert.match(doc, /1280×800/);
+    assert.match(doc, /31 ?October ?2026 at11:12UK/);
+    assert.match(doc, /Same3× and earlier3-way versions were also supplied/);
+    assert.match(
+      doc,
+      /Parent has (?:now selected the visible events|completed visible-event selection)/,
+    );
+    assert.match(doc, /source360[^\n]*screen-recorded/);
+    assert.match(
+      doc,
+      /functioning-on-Twitch footage and Codex-building footage (?:are|remain) (?:distinct|separate)/i,
+    );
+    assert.match(doc, /text session cards/);
+    assert.match(doc, /not (?:a current|a blanket) no-source blocker/);
+    assert.match(doc, /historical[^\n]*owner-review (?:artifact|file)/i);
+    assert.match(doc, /not the final video/);
+    assert.match(doc, /Public YouTube URL[^\n]*PENDING|Public YouTube URL[^\n]*remain \*\*PENDING/);
+    assert.match(doc, /has (?:not read any|read no) video or transcript/);
+    assert.ok(
+      doc.includes(
+        '/home/ubuntu/.openclaw/workspace/deliverables/raid-relic-submission-2026-11-01/raid-relic-demo-2m55s-OWNER-REVIEW.mp4',
+      ),
+    );
+    assert.match(doc, /175[.]000s =2:55/);
+    assert.match(doc, /1920×1080,H264 yuv420p30fps \/ AAC silence/);
+    assert.match(doc, /4,215,403 bytes/);
+    assert.ok(doc.includes('e9f54a74901e5b018d841459a44f9f35a09e2451622ffb85925a7978c55e774d'));
+    assert.ok(doc.includes('113e2c1074e965ac9cb33ddb55161d23cb3aeebec2655c34ea1ca71945312cb6'));
+    assert.match(doc, /ffmpeg full-decode PASS/);
+    assert.match(doc, /Independent V1 review is complete/);
+    assert.match(doc, /PASS for private owner review, not clearance/);
+    assert.match(doc, /V2 has not been independently re-reviewed/);
+    assert.match(doc, /Neither is unconditional clearance/);
+    assert.match(doc, /prior-edit-v1/);
+    assert.match(doc, /frames46,74,76,82,88/);
+    assert.match(doc, /a950px-wide source chat crop/);
+    assert.match(
+      doc,
+      /partial username prefixes and later receiving-command prefixes remain masked in the sender hold/,
+    );
+    assert.doesNotMatch(
+      doc,
+      /4,163,778 bytes|590ecb27815cbbf231ea45e2a1137d7bca3f994dbda7b9dbbd80cc38d58e361d|Raw226–246|raw226–246|Raw290–298|raw290–298/,
+    );
+    assert.match(doc, /not submission-compliance certification|No compliance certification/);
+    assert.match(doc, /accept before offer/);
+    assert.match(doc, /failed `!mark first light` attempt is excluded/i);
+    assert.match(doc, /earlier3-way simulated\/admin footage is wholly excluded/i);
+    assert.match(doc, /not historical original-build replay/i);
+    assert.match(doc, /receiving left70px/);
+    assert.match(doc, /sending left82px/);
+    assert.match(doc, /No new Twitch actions were performed/);
+  }
+  const editRows = [...demo.matchAll(/^\|\s*(\d+)[–-](\d+)\s*\|/gm)].map((m) => [
+    Number(m[1]),
+    Number(m[2]),
+  ]);
+  assert.deepEqual(editRows, [
+    [0, 8],
+    [8, 20],
+    [20, 32],
+    [32, 45],
+    [45, 65],
+    [65, 75],
+    [75, 83],
+    [83, 89],
+    [89, 106],
+    [106, 156],
+    [156, 175],
+  ]);
+  for (const source of [
+    'Raw229–249',
+    'Raw256–266',
+    'Raw292–298 at1×',
+    'Raw307–313',
+    'Raw345–362',
+    'source110–210 at2×',
+  ])
+    assert.ok(demo.includes(source), source);
+  assert.match(demo, /explicitly labelled2-second final-frame hold/);
+  assert.match(demo, /real Node22 docs tests5passed\/0skips and actual git log/);
+  assert.match(demo, /not[^\n]*full-frame secrets\/authentication guarantee/);
+  assert.match(draft, /Public YouTube URL and owner rights approval remain PENDING/);
   assert.match(demo, /English narration and captions/);
   assert.match(
     demo,
@@ -270,7 +359,6 @@ test('judge front door lists only public production with guarded controls and sc
   for (const doc of [draft, demo, submission]) {
     assert.match(doc, /feature\/raid-relic-p9-stretch/);
     assert.match(doc, /NOT submission-ready/);
-    assert.match(doc, /footage worker timed out/i);
   }
   for (const doc of [demo, submission]) {
     assert.ok(
