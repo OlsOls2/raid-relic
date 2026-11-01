@@ -8,6 +8,8 @@ test('judge front door lists only public production with guarded controls and sc
   const quick = await readFile('docs/JUDGES_QUICKSTART.md', 'utf8');
   const demo = await readFile('docs/DEMO_SCRIPT.md', 'utf8');
   const admission = await readFile('docs/JUDGE_ADMISSION.md', 'utf8');
+  const historical = await readFile('docs/CODEX_SESSIONS.md', 'utf8');
+  const submission = await readFile('docs/SUBMISSION_HANDOFF.md', 'utf8');
   const compact = (value) => value.replace(/\s+/g, ' ');
   assert.ok(s.trimEnd().split('\n').length <= 60);
   for (const term of [
@@ -117,7 +119,7 @@ test('judge front door lists only public production with guarded controls and sc
     /multiple \*\*simultaneous\*\* relics.*future work.*not a current feature/,
   );
   assert.match(guide, /client-only expiry/);
-  for (const doc of [demo]) {
+  for (const doc of [historical]) {
     assert.match(doc, /judge-freeze-1031/);
     assert.doesNotMatch(
       doc,
@@ -129,7 +131,7 @@ test('judge front door lists only public production with guarded controls and sc
     assert.match(doc, /production[- ](?:mode|environment)|PRODENV/);
     assert.match(doc, /private access|accessprivate|access-gated/);
   }
-  for (const doc of [demo]) {
+  for (const doc of [historical]) {
     for (const value of [
       '2b218b390210f709f031eac4b79b2606b1ff09e0',
       'raid-relic-judge-freeze-fix-1031',
@@ -187,7 +189,119 @@ test('judge front door lists only public production with guarded controls and sc
   assert.match(demo, /Include only genuine consenting footage/);
   assert.match(demo, /Genuine live integration footage unavailable/);
   assert.match(demo, /Never mix simulated votes into live proof/);
-  assert.match(demo, /no external video upload, submission or production promotion/);
+  assert.match(demo, /no external video upload, submission or production promotion/i);
+  for (const value of [
+    '**Project name:** Raid Relic',
+    '**Tagline:** Raids that leave a story.',
+    '**Short description:**',
+    '**Public try-it URL:** ' + origin,
+    '**Built with:**',
+    '**Primary Codex session ID:** 01a1705c-a87d-7143-80f6-021e47b78ced',
+    '**Repository field:** PENDING',
+    '**Video field:** PENDING',
+  ])
+    assert.ok(draft.includes(value), value);
+  for (const [id, role] of [
+    ['01a19023-5596-7dd2-825a-5c0e25286d42', 'Presentation fonts/tokens'],
+    ['01a19023-b32e-75f2-9c0b-94bc30233f1e', 'Control wizard/readiness'],
+    ['01a19046-f9c9-7112-a4d3-ae2f073e90c6', 'Shared replies'],
+  ]) {
+    const row = draft.split('\n').find((line) => line.startsWith('| ' + id + ' |'));
+    assert.ok(row && row.includes(role), id);
+  }
+  for (const id of ['01a18f00-8033-7d81-befa-9b82d727a3a6', '01a1924f-dc94-7033-84fb-5041b52f26b1'])
+    assert.ok(draft.includes(id));
+  assert.match(draft, /not new Codex application authors/);
+  assert.match(draft, /Testing instructions · paste-ready/);
+  for (const route of [
+    '/atlas/',
+    '/keeper/olsols3',
+    '/overlay/1593561134',
+    '/demo/judge',
+    '/demo/film?autoplay=1&kiosk=1',
+    '/demo/',
+  ])
+    assert.ok(draft.includes(origin + route));
+  assert.deepEqual(
+    [
+      ...draft.matchAll(
+        /^\|\s*(Innovation\/Idea|Potential Impact|Technological implementation|Design)\s*\|/gm,
+      ),
+    ].map((m) => m[1]),
+    ['Innovation/Idea', 'Potential Impact', 'Technological implementation', 'Design'],
+  );
+  assert.match(draft, /verified names, four equally weighted criteria/);
+  assert.match(draft, /free-tier allowances do not guarantee a zero bill/);
+  for (const doc of [draft, demo]) {
+    assert.match(doc, /8eda3af/);
+    assert.match(doc, /1277[^\n]*zero skips/);
+    assert.match(doc, /41252418241/);
+    assert.match(doc, /judge-freeze-on-1031[^\n]*runtime2b218b3/);
+    assert.doesNotMatch(doc, /judge-mode|sandbox|access[- ]code|JUDGE_CODE|---raid-relic/);
+  }
+  assert.match(demo, /UNCONFIRMED pending incomplete media inventory/);
+  assert.match(demo, /English narration and captions/);
+  assert.match(
+    demo,
+    /Do not start fresh public Twitch streams, chat, raids[^\n]*without explicit owner approval/,
+  );
+  assert.match(demo, /do not fake Twitch UI/);
+  assert.match(demo, /no third-party logos[^\n]*music/i);
+  assert.match(demo, /not evidence of completed live validation/);
+  assert.match(submission, /PRIVATE \/ NOT SUBMITTED/);
+  assert.match(submission, /Sunday 1 November 2026[^\n]*20:00 UK/);
+  assert.match(submission, /Monday 2 November 2026[^\n]*22:00 UTC \/ 22:00 UK \(14:00 PST\)/);
+  assert.match(submission, /Parent rules research completed 1 November 07:21–07:24 UTC/);
+  assert.match(submission, /16 November 2026, 01:00 UTC/);
+  assert.match(submission, /four \*\*equally weighted\*\* criteria/);
+  assert.match(submission, /Public YouTube[^\n]*under 3 minutes/);
+  assert.match(submission, /functioning on Twitch \*\*AND footage of Codex building\*\*/);
+  assert.match(submission, /Text session cards or a source slate alone do not meet/);
+  assert.match(submission, /testing@devpost\.com/);
+  assert.match(submission, /Settings|settings\/access/);
+  assert.match(submission, /private personal-repository collaborator has write-capable access/);
+  assert.match(submission, /`permission=pull` is not a supported read-only workaround/);
+  assert.match(
+    submission,
+    /gh api --method PUT repos\/OlsOls2\/raid-relic\/collaborators\/VERIFIED_DEVPOST_GITHUB_USERNAME/,
+  );
+  assert.doesNotMatch(submission, /gh api --method PUT[^\n]*testing@devpost/);
+  assert.match(submission, /PUT201 means invitation created, not accepted access/);
+  for (const doc of [draft, demo, submission]) {
+    assert.match(doc, /feature\/raid-relic-p9-stretch/);
+    assert.match(doc, /NOT submission-ready/);
+    assert.match(doc, /footage worker timed out/i);
+  }
+  for (const doc of [demo, submission]) {
+    assert.ok(
+      doc.includes(
+        '/home/ubuntu/.openclaw/workspace/.openclaw/tmp/raid-relic-final-submission/raid-relic-owner-review-INCOMPLETE.mp4',
+      ),
+    );
+    assert.match(doc, /H264\/AAC/);
+    assert.match(doc, /silent slideshow/);
+    assert.match(doc, /not Codex-build proof/);
+  }
+  assert.match(submission, /do \*\*not\*\* merge it or change default branch main/);
+  assert.match(submission, /Repository admission[^\n]*PENDING/);
+  assert.match(submission, /Media inventory\/video[^\n]*PENDING/);
+  assert.match(
+    submission,
+    /collaborator invitation or public-visibility change needs explicit owner OK/,
+  );
+  assert.match(submission, /Do not guess that an email address is a GitHub username/);
+  for (const action of [
+    'register/sign in',
+    'create the project entry',
+    'Paste the fields',
+    'actual Submit',
+  ])
+    assert.ok(submission.includes(action), action);
+  assert.match(submission, /merely saving a draft is insufficient/);
+  assert.match(submission, /record its actual project\/submission URL and confirmation\/time/);
+  assert.match(submission, /prohibits Raid Relic Discord updates, including DMs/);
+  assert.match(submission, /NON-DISCORD project context/);
+  assert.match(submission, /No public posting[^\n]*without owner OK/);
   const built = await readFile('BUILT_WITH_CODEX.md', 'utf8'),
     scopes = await readFile('docs/JUDGE_SCOPES.md', 'utf8');
   assert.ok(built.includes('01a1705c-a87d-7143-80f6-021e47b78ced'));

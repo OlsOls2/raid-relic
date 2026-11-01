@@ -1,5 +1,23 @@
 # PRIVATE DRAFT — not submitted
 
+Paste-ready content, prepared1November2026; owner review and actual submission are pending. Parent rules research is now complete; the verified requirements and unresolved delivery gates are in [submission handoff](SUBMISSION_HANDOFF.md). Copy each named field into the matching form field, preserving the limitations below. Do not paste internal checklists as project claims.
+
+**Project name:** Raid Relic
+
+**Tagline:** Raids that leave a story.
+
+**Short description:** A living relic passes between consenting Twitch creator streams. Both chats claim each verified hand-off, adding a ring and a shared history of approved words and emoji.
+
+**Public try-it URL:** https://raid-relic-760724762396.us-central1.run.app
+
+**Built with:** JavaScript; Node.js22+; HTML/CSS; WebGL; SVG; Three.js; WebSockets; Google Cloud Run; Firestore; Twitch OAuth and signed EventSub; OpenAI Codex. Three.js MIT and Cinzel OFL notices remain included.
+
+**Primary Codex session ID:** 01a1705c-a87d-7143-80f6-021e47b78ced — original application author and integration lead, with separately credited application contributions below.
+
+**Repository field:** PENDING owner-approved judge access. Intended repository: https://github.com/OlsOls2/raid-relic. Do not promise access until the rules/repository review confirms the required method and owner approval.
+
+**Video field:** PENDING completed genuine footage, owner-approved edit and Public YouTube upload. The required video must be under3minutes and show the project functioning on Twitch AND footage of Codex building; text session cards alone are insufficient. No final video URL or completed genuine integration/build footage is claimed. [2:45 English narration and shot plan](DEMO_SCRIPT.md).
+
 ## Inspiration
 
 A raid is brief, but its welcome can leave a lasting story. Raid Relic gives two communities a shared object to contribute to and pass onward, with visible memories instead of a disconnected collectible for every channel.
@@ -21,6 +39,16 @@ Original WebGL geometry and SVG rendering present the relic and deterministic ru
 ## How used Codex
 
 The [session registry](CODEX_SESSIONS.md) records actual IDs and roles. Original session **01a1705c-a87d-7143-80f6-021e47b78ced** authored the original application, tests and procedural art and remains sole integration lead. Three separately registered application workers contributed presentation, controls and replies; the earlier QA worker authored only a report. The separately registered judge-freeze worker authored only five authorized documentation files; the original lead reviewed and integrated that prose in source343, with parent QA/Git still separate. Parent operators own formatting, native QA, Git/CI, evidence and releases; current repository authorship is not claimed to belong to one session.
+
+Actual application contributions, registered in CODEX_SESSIONS:
+
+| Actual session                       | Contribution                                                                                  |
+| ------------------------------------ | --------------------------------------------------------------------------------------------- |
+| 01a19023-5596-7dd2-825a-5c0e25286d42 | Presentation fonts/tokens, Atlas/film/card styling and presentation QA definitions            |
+| 01a19023-b32e-75f2-9c0b-94bc30233f1e | Control wizard/readiness/observation copy and onboarding QA definitions                       |
+| 01a19046-f9c9-7112-a4d3-ae2f073e90c6 | Shared replies, bounded hop notice reservations, claims/ACK/store parity and associated tests |
+
+Separately, report-only QA documentation session01a18f00-8033-7d81-befa-9b82d727a3a6 authored a report, not application changes or browser execution; documentation session01a1924f-dc94-7033-84fb-5041b52f26b1 authored the five scoped judge-freeze documents. Parent operators executed QA and releases. Current independent rules/repository and media-inventory assistants are read-only reviewers, not new Codex application authors; no new session identity is invented for them.
 
 All four prompt/problem descriptions below are **paraphrases, not verbatim quotes** from existing sanitized [Codex usage summaries](CODEX_USAGE.md#concrete-implementation-and-review-checkpoints), not fresh transcript quotations or executions.
 
@@ -91,3 +119,38 @@ Final whole-plate native9checks passed at FHD/960 in normal/reduced idle, source
 Original-only selected evidence is now promoted **through342**:6775entries/343CLI digests,2parts/21,188,376selected bytes,8whole-entry omissions,6702prior headers preserved and zero secondary findings. Limits remain16MiB/part,32MiB aggregate,200MiB source. Later343–347 and private worker transcripts are outside that fixed cutoff. No selected/private transcript was read for this closeout.
 
 Owner clarification31October23:20UTC makes the public production site the sole judge entrypoint in these submission documents. This documentation does not change runtime, traffic, permissions or consent and reports no new live or physical proof.
+
+## Testing instructions · paste-ready
+
+Open https://raid-relic-760724762396.us-central1.run.app directly; no login required for public content. This is a browsing walkthrough, not an instruction to operate Twitch.
+
+1. Open [Atlas](https://raid-relic-760724762396.us-central1.run.app/atlas/), select Ring12 and inspect the surviving approved `light` detail. Earlier parent observation confirmed it after stream closure; if legitimate privacy removal changed the record, report the current state rather than recreate it.
+2. Open [Keeper olsols3](https://raid-relic-760724762396.us-central1.run.app/keeper/olsols3) and the [overlay](https://raid-relic-760724762396.us-central1.run.app/overlay/1593561134). Retained approved glyphs may remain offline; no currently live stream is promised.
+3. Watch the [45-second judge demo](https://raid-relic-760724762396.us-central1.run.app/demo/judge), [150-second film](https://raid-relic-760724762396.us-central1.run.app/demo/film?autoplay=1&kiosk=1) or [35-second interactive demo](https://raid-relic-760724762396.us-central1.run.app/demo/). All are explicitly fictional, not real transfers or footage.
+
+Production is not globally read-only. Keeper control requires Twitch sign-in as one of the owner-admitted creator channels raidrelichq, olsols2 or olsols3; arbitrary judges gain no controls or consent. Do not trigger setup, raids, chat or new streams for this walkthrough.
+
+## Judging-criteria mapping · verified names, four equally weighted criteria
+
+| Verified criterion (equal weight) | What to assess, without an invented score                                                                                                                                                                         |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Innovation/Idea                   | One shared object carries an evolving, erasable story across verified hand-offs; acceptance and arrival are distinct.                                                                                             |
+| Potential Impact                  | A design for two chats to cooperate and leave approved memories. Only three creator test channels are evidenced, not community adoption, growth or measured social impact.                                        |
+| Technological implementation      | Signed events, transactional claims/quotas, dispatch fences and consistent public projections; the four historical prompt → code → test episodes and attributed application workers show the Codex contribution.  |
+| Design                            | Original procedural crystal/runes, readable role guidance, Atlas history, reduced-motion/static presentation and privacy-aware cards; universal manual accessibility and physical OBS acceptance remain unproved. |
+
+## Current proof and cost note ·1November parent handoff
+
+Parent reports docs repository checkpoint **8eda3af** passed **1277 native tests, zero skips**, and hosted [CI41252418241](https://github.com/OlsOls2/raid-relic/actions/runs/41252418241) green. These results belong to that documentation/source checkpoint, not a new deployed image or source358 execution. Production remains parent-reported **judge-freeze-on-1031 / runtime2b218b3**; current docs SHA and deployed runtime are distinct. Earlier cohorts above remain historical and overlapping; they are not summed. No new physical Twitch/OBS, video or long-duration observation is claimed.
+
+Paid AI and clipping are off; clipping remains design-only/unwired. Cloud scale-to-zero and free-tier allowances do not guarantee a zero bill. No paid service, capacity increase or operational action is authorised by this draft.
+
+Owner must approve the final fields, repository admission, video/publication and actual submission. See [submission handoff](SUBMISSION_HANDOFF.md). This private draft is **NOT SUBMITTED**.
+
+## Verified delivery requirements · parent rules report1November2026
+
+Submit by **Monday 2 November 2026 at22:00 UTC /22:00 UK (14:00 PST)**. Keep the working project and repository free and unrestricted for judges through **16 November 2026 at01:00 UTC**. The owner target remains Sunday 1 November20:00 UK. Official Rules prevail; owner should recheck for changes before submission. Eligibility, rights/build-period declarations and actual logged-in form fields still require owner verification.
+
+The video must be **Public YouTube**, under3minutes, with the project functioning on Twitch AND footage showing Codex building. A source slate or text session card alone does not meet the build-footage requirement. The local 165-second 1920×1080 H264/AAC silent owner-review slideshow is **INCOMPLETE and NOT submission-ready**: actual public retained-state screenshots and an honest missing-footage slate are neither functioning-on-Twitch nor Codex-build proof. The footage worker timed out; inventory remains incomplete. No upload, fresh Twitch action or submission is authorised here.
+
+Final source ref for reviewer discoverability: **feature/raid-relic-p9-stretch**, [branch source](https://github.com/OlsOls2/raid-relic/tree/feature/raid-relic-p9-stretch). Default branch main is not asserted to contain that final ref; do not merge or change the default branch for this handoff. Private repository access remains owner-gated and unproven until accepted and checked. [Exact access procedure and final checklist](SUBMISSION_HANDOFF.md).
